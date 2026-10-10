@@ -13,6 +13,7 @@ Usage: make_placeholders.py --out DIR
 import argparse
 import math
 import os
+import shutil
 import struct
 
 from PIL import Image, ImageDraw, PngImagePlugin
@@ -112,7 +113,38 @@ def write_clock(path):
     sheet.save(path, pnginfo=meta)
 
 
-def write_map(folder, title, size_w, size_h, placed, visibility, spawns):
+# Scenario maps for mod/test_scenarios.sh. Each runs a Lua script from mod/scenarios, copied into the map folder
+# (the map lint only accepts scripts inside the map), that prints a PASS or FAIL line.
+# A far-off xeno silo keeps the game from ending at tick zero, where it is not part of the test.
+def _scenario(script, marines):
+    return {"script": script, "actors": marines + [("resin-silo", "Xenos", 19, 19, 0)]}
+
+
+SCENARIOS = {
+    "scenario-heal": _scenario("test-heal", [
+        ("medic", "Marines", 10, 10, 512),
+        ("rifleman", "Marines", 9, 12, 512),
+        ("rifleman", "Marines", 10, 12, 512),
+        ("rifleman", "Marines", 11, 12, 512),
+    ]),
+    "scenario-repair": _scenario("test-repair", [
+        ("engineer", "Marines", 10, 10, 512),
+        ("sentry-turret", "Marines", 10, 12, 512),
+    ]),
+    "scenario-combat": _scenario("test-combat", [
+        ("rifleman", "Marines", 10, 10, 512),
+        ("runner", "Xenos", 13, 10, 0),
+    ]),
+    "scenario-victory": _scenario("test-victory", [
+        ("rifleman", "Marines", 10, 10, 512),
+        ("runner", "Xenos", 14, 10, 0),
+        ("mini-silo", "Xenos", 16, 14, 0),
+    ]),
+}
+
+
+def write_map(folder, title, size_w, size_h, placed, visibility, spawns, script=None):
+    # A scenario map has no slot for the xenos: they are a scripted player, so Lua can find them and they never act.
     os.makedirs(folder, exist_ok=True)
     cells = size_w * size_h
     # map.bin: version byte, width, height, u32 tiles offset, u32 heights offset (0), u32 resources offset (0),
@@ -127,6 +159,14 @@ def write_map(folder, title, size_w, size_h, placed, visibility, spawns):
     placed = [("mpspawn", "Neutral", x, y, 0) for x, y in spawns] + list(placed)
     for i, (name, owner, x, y, facing) in enumerate(placed):
         actors.append(f"\tActor{i}: {name}\n\t\tOwner: {owner}\n\t\tLocation: {x},{y}\n\t\tFacing: {facing}\n")
+
+    rules_line = ""
+    if script:
+        rules_line = "Rules: rules.yaml\n\n"
+        with open(os.path.join(folder, "rules.yaml"), "w", encoding="utf-8", newline="\n") as f:
+            f.write(f"World:\n\tLuaScript:\n\t\tScripts: {script}.lua\n")
+        shutil.copyfile(os.path.join(os.path.dirname(os.path.abspath(__file__)), "scenarios", f"{script}.lua"),
+                        os.path.join(folder, f"{script}.lua"))
 
     yaml = f"""MapFormat: 12
 
@@ -144,7 +184,7 @@ Bounds: 1,1,{size_w - 2},{size_h - 2}
 
 Visibility: {visibility}
 
-Categories: Skirmish
+{rules_line}Categories: Skirmish
 
 Players:
 	PlayerReference@Neutral:
@@ -156,13 +196,15 @@ Players:
 		Playable: True
 		Faction: marines
 		LockFaction: True
+		Enemies: Xenos
 		Spawn: 1
 		LockSpawn: True
 	PlayerReference@Xenos:
 		Name: Xenos
-		Playable: True
+		Playable: {not script}
 		Faction: xenos
 		LockFaction: True
+		Enemies: Marines
 		Spawn: 2
 		LockSpawn: True
 
@@ -187,6 +229,9 @@ def main():
     write_clock(os.path.join(args.out, "clock.png"))
     write_map(os.path.join(args.out, "maps", "test-field"), "TGMC test field", 24, 24, TEST_FIELD, "Lobby, Shellmap", [(10, 12), (14, 12)])
     write_map(os.path.join(args.out, "maps", "landing-zone"), "Landing Zone", 40, 28, LANDING_ZONE, "Lobby", [(6, 14), (33, 13)])
+    for name, sc in SCENARIOS.items():
+        write_map(os.path.join(args.out, "maps", name), name, 24, 24, sc["actors"], "MissionSelector", [(10, 8), (19, 17)],
+                  script=sc["script"])
     print(f"placeholders written to {args.out}")
 
 

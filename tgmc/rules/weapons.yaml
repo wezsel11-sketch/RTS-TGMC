@@ -17,6 +17,7 @@ TGMCHeal:
 	ReloadDelay: 60
 	Report: audio/heal.ogg
 	ValidTargets: Heal
+	TargetActorCenter: true
 	Projectile: InstantHit
 	Warhead@1Dam: TargetDamage
 		Damage: -25
@@ -28,6 +29,7 @@ TGMCRepair:
 	ReloadDelay: 40
 	Report: audio/repair.ogg
 	ValidTargets: Repair
+	TargetActorCenter: true
 	Projectile: InstantHit
 	Warhead@1Dam: TargetDamage
 		Damage: -30
@@ -38,6 +40,7 @@ TGMCClaws:
 	Range: 1c256
 	ReloadDelay: 15
 	Report: audio/claw-hit.ogg
+	TargetActorCenter: true
 	Projectile: InstantHit
 	Warhead@1Dam: TargetDamage
 		Damage: 20
@@ -46,6 +49,7 @@ TGMCAcid:
 	Range: 6c0
 	ReloadDelay: 25
 	Report: audio/acid-spit.ogg
+	TargetActorCenter: true
 	Projectile: InstantHit
 	Warhead@1Dam: TargetDamage
 		Damage: 30

@@ -11,6 +11,7 @@
 		ShortGameCheckboxEnabled: false
 		TechLevelDropdownVisible: false
 	MapStartingLocations:
+	ScriptTriggers:
 	ValidateOrder:
 	ObjectivesPanel:
 		PanelName: SKIRMISH_STATS

@@ -17,5 +17,6 @@ Player:
 		DisplayOrder: 2
 	DeveloperMode:
 	TechTree:
+	ScriptTriggers:
 	MissionObjectives:
 	ConquestVictoryConditions:

@@ -46,6 +46,9 @@ mod/                        converters and build script (Python 3, Pillow, ffmpe
   build_sounds.py           TGMC .ogg -> mono 22050 Hz Vorbis .ogg
   make_placeholders.py      palette, ground tile, cursor, and a 24x24 test map (no TGMC art)
   lint_static.py            cross-reference check (sounds, weapons, voice sets, Fluent keys, sequences); build_mod.sh runs it
+  smoke.sh                  launches the built mod headless on a map, screenshots it, fails on an engine exception
+  test_scenarios.sh         runs the scripted scenario maps (heal, repair, victory, combat) and checks each prints PASS
+  scenarios/                the Lua scripts those maps run (copied into each map by make_placeholders.py)
   check_mod.sh              runs OpenRA's own lint (--check-yaml, --check-missing-sprites) on the built mod and map
   make_chrome.py            HUD atlas (chrome.png) and chrome.yaml: panels, buttons, icons, logo (no TGMC art)
 tgmc/                       the OpenRA mod (YAML and Fluent only)
@@ -121,8 +124,9 @@ On a headless machine, run OpenRA under Xvfb with Mesa software GL
 - Sounds are wired to weapons (`Report`), voice sets (`audio/voices.yaml`, played on select, order and death)
   and the UI click, deny and ping. The smoke test doesn't check audio, because the headless run has no
   audio device. Structures have no death sound yet.
-- Medic and engineer have no heal or repair animation (they reuse `attack`) and no gun. Healing and repair are
-  weapons with negative damage. Both are untested in game.
+- Medic and engineer have no heal or repair animation (they reuse `attack`). Healing and repair are weapons
+  with negative damage. Scenario tests cover heal, repair, victory and a rifleman-versus-Runner fight.
+- Weapons that use `InstantHit` need `TargetActorCenter: true`, or the hit lands on a position and does nothing.
 - The test field uses placeholder terrain (one flat tile). It is not TGMC art.
 - The HUD is a squad sidebar (radar, a static selection label, production palette, cash, menu button).
   Production icons are the units' front-facing sprite. The clock overlay and the production tab icons are
@@ -132,8 +136,8 @@ On a headless machine, run OpenRA under Xvfb with Mesa software GL
 - Verified by running the mod headless (OpenRA bleed, `mod/check_mod.sh` and `mod/smoke.sh`): the lint passes with
   no errors or warnings, and on Landing Zone the camera starts on the base, the radar and production palette work,
   the vendor spawns queued marines, income ticks up, and a "Skirmish AI" in the xeno slot trains Runners that attack
-  the marine base and kill a sentry. Not yet checked: heal and repair, victory and defeat, voices (no audio device),
-  and the xeno side from the player's seat.
+  the marine base. `mod/test_scenarios.sh` checks heal, repair, victory and combat. Not yet checked: voices (no audio
+  device) and the xeno side from the player's seat.
 - Production is fast (a few seconds a unit) and the radar shows no terrain colour. Both need tuning.
 - The Runner's death sound was converted earlier and then dropped. `WithDeathAnimation` has no sound field, so
   wire one in with `Voiced` when you add voice sets.

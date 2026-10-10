@@ -45,6 +45,27 @@ TGMCClaws:
 	Warhead@1Dam: TargetDamage
 		Damage: 14
 
+TGMCSpit:
+	Range: 5c0
+	ReloadDelay: 30
+	Report: audio/acid-spit.ogg
+	TargetActorCenter: true
+	Projectile: InstantHit
+	Warhead@1Dam: TargetDamage
+		Damage: 16
+
+TGMCMend:
+	Range: 2c0
+	ReloadDelay: 40
+	Report: audio/resin-build.ogg
+	ValidTargets: Repair
+	TargetActorCenter: true
+	Projectile: InstantHit
+	Warhead@1Dam: TargetDamage
+		Damage: -30
+		ValidRelationships: Ally
+		ValidTargets: Repair
+
 TGMCAcid:
 	Range: 6c0
 	ReloadDelay: 25

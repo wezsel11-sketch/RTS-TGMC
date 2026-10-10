@@ -3,7 +3,8 @@
 An [OpenRA](https://github.com/OpenRA/OpenRA) mod that uses sprites and sounds from
 [Terra Gov Marine Corps (TGMC)](https://github.com/tgstation/terragov-marine-corps), the
 SS13-based game. It has marine infantry (rifleman, corpsman, engineer), a xeno Runner, a few
-marine and xeno structures, and a TGMC-styled HUD.
+marine and xeno structures, and a TGMC-styled HUD. The xenos have a Runner, a Hunter, an acid-spitting Sentinel and a
+structure-mending Drone.
 
 **This repo holds scripts, YAML, and docs only.** No TGMC art or sound, no extracted or
 converted sprites or audio, no `.mix`/`.oramap`, and no OpenRA binaries are committed.
@@ -28,6 +29,8 @@ The converters read these TGMC files:
 
 - `icons/mob/human.dmi` state `body_m`, with `icons/mob/clothing/uniforms/marine_uniforms.dmi` state `marine_jumpsuit` on top, for the rifleman.
 - Terrain tiles: `icons/turf/jungle.dmi` (`grass1`, `grass2`) and `icons/turf/ground_map.dmi` (`dirt`, `seashallow`, `seadeep`).
+- `icons/Xeno/castes/hunter.dmi`, `sentinel.dmi` and `drone.dmi` (48px; Hunter and Sentinel have animated walks and runs,
+  so each file has a still and an animated state of the same name, and the converter uses the animated one).
 - `icons/Xeno/castes/runner.dmi` states `Runner Walking`, `Runner Running`, and `Runner Dead`, for the Runner.
 - Marine gear: Mark I modular armour from `icons/mob/modular/mark_one/infantry.dmi` (`leg`, `chest`, `arm`, `helm`, tinted
   olive by the converter, since TGMC tints it in code), and the held weapon from `icons/mob/inhands/guns/`
@@ -49,7 +52,7 @@ mod/                        converters and build script (Python 3, Pillow, ffmpe
   make_placeholders.py      palette, cursor, clock, fog tiles and the maps (no TGMC art)
   lint_static.py            cross-reference check (sounds, weapons, voice sets, Fluent keys, sequences); build_mod.sh runs it
   smoke.sh                  launches the built mod headless on a map, screenshots it, fails on an engine exception
-  test_scenarios.sh         runs the scripted scenario maps (heal, repair, victory, combat) and checks each prints PASS
+  test_scenarios.sh         runs the scripted scenario maps (heal, repair, mend, victory, combat) and checks each prints PASS
   scenarios/                the Lua scripts those maps run (copied into each map by make_placeholders.py)
   check_mod.sh              runs OpenRA's own lint (--check-yaml, --check-missing-sprites) on the built mod and map
   make_chrome.py            HUD atlas (chrome.png) and chrome.yaml: panels, buttons, icons, logo (no TGMC art)

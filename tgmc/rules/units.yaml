@@ -112,14 +112,8 @@ engineer:
 		BuildPaletteOrder: 30
 		Description: actor-engineer.description
 
-runner:
+^Xeno:
 	Inherits: ^Unit
-	Health:
-		HP: 90
-	Selectable:
-		Bounds: 1024, 768, -512, -512
-	Mobile:
-		Speed: 90
 	WithInfantryBody:
 		MoveSequence: run
 		StandSequences: stand
@@ -133,6 +127,15 @@ runner:
 	Armament@PRIMARY:
 		Weapon: TGMCClaws
 	AttackFrontal:
+
+runner:
+	Inherits: ^Xeno
+	Health:
+		HP: 90
+	Selectable:
+		Bounds: 1024, 768, -512, -512
+	Mobile:
+		Speed: 90
 	Tooltip:
 		Name: actor-runner.name
 	Valued:
@@ -141,3 +144,64 @@ runner:
 		Queue: Xeno
 		BuildPaletteOrder: 10
 		Description: actor-runner.description
+
+hunter:
+	Inherits: ^Xeno
+	Health:
+		HP: 110
+	Selectable:
+		Bounds: 768, 768, -384, -512
+	Mobile:
+		Speed: 70
+	Tooltip:
+		Name: actor-hunter.name
+	Valued:
+		Cost: 90
+	Buildable:
+		Queue: Xeno
+		BuildPaletteOrder: 20
+		Description: actor-hunter.description
+
+sentinel:
+	Inherits: ^Xeno
+	Health:
+		HP: 80
+	Selectable:
+		Bounds: 768, 768, -384, -512
+	Mobile:
+		Speed: 55
+	Armament@PRIMARY:
+		Weapon: TGMCSpit
+	Tooltip:
+		Name: actor-sentinel.name
+	Valued:
+		Cost: 110
+	Buildable:
+		Queue: Xeno
+		BuildPaletteOrder: 30
+		Description: actor-sentinel.description
+
+drone:
+	Inherits: ^Xeno
+	Health:
+		HP: 70
+	Selectable:
+		Bounds: 768, 768, -384, -512
+	Mobile:
+		Speed: 50
+	Armament@PRIMARY:
+		Weapon: TGMCMend
+		Cursor: repair
+		OutsideRangeCursor: repair-blocked
+		TargetRelationships: Ally
+		ForceTargetRelationships: None
+	AutoTargetPriority@DEFAULT:
+		ValidTargets: Structure
+	Tooltip:
+		Name: actor-drone.name
+	Valued:
+		Cost: 60
+	Buildable:
+		Queue: Xeno
+		BuildPaletteOrder: 40
+		Description: actor-drone.description

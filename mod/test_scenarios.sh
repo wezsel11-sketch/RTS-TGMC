@@ -1,5 +1,5 @@
 #!/bin/sh
-# Run the scripted scenario maps (heal, repair, victory) headless and check that each prints "TEST <name> PASS".
+# Run the scripted scenario maps (heal, repair, mend, victory, combat) headless and check that each prints "TEST <name> PASS".
 #
 #   OPENRA_DIR=/path/to/OpenRA  mod/test_scenarios.sh [seconds-per-scenario]
 #

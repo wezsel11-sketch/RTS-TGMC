@@ -31,6 +31,9 @@ TEST_FIELD = [
     ("runner", "Xenos", 13, 12, 0),
     ("runner", "Xenos", 14, 12, 256),
     ("runner", "Xenos", 15, 12, 512),
+    ("hunter", "Xenos", 13, 14, 256),
+    ("sentinel", "Xenos", 14, 14, 256),
+    ("drone", "Xenos", 15, 14, 256),
     ("resin-turret", "Xenos", 17, 10, 0),
     ("resin-silo", "Xenos", 4, 4, 0),
     ("mini-silo", "Xenos", 18, 4, 0),
@@ -61,6 +64,9 @@ LANDING_ZONE = [
     ("runner", "Xenos", 29, 14, 768),
     ("runner", "Xenos", 29, 15, 768),
     ("runner", "Xenos", 29, 12, 768),
+    ("hunter", "Xenos", 30, 14, 768),
+    ("sentinel", "Xenos", 31, 13, 768),
+    ("drone", "Xenos", 32, 16, 768),
 ]
 
 
@@ -158,6 +164,11 @@ SCENARIOS = {
         ("rifleman", "Marines", 10, 10, 512),
         ("runner", "Xenos", 13, 10, 0),
     ]),
+    "scenario-mend": {"script": "test-mend", "actors": [
+        ("drone", "Xenos", 10, 10, 512),
+        ("resin-turret", "Xenos", 10, 12, 512),
+        ("rifleman", "Marines", 20, 20, 0),
+    ]},
     "scenario-victory": _scenario("test-victory", [
         ("rifleman", "Marines", 10, 10, 512),
         ("runner", "Xenos", 14, 10, 0),

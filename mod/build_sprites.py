@@ -36,6 +36,9 @@ import tgmc_dmi  # noqa: E402
 HUMAN = "icons/mob/human.dmi"
 MARINE_UNIFORM = "icons/mob/clothing/uniforms/marine_uniforms.dmi"
 RUNNER = "icons/Xeno/castes/runner.dmi"
+HUNTER = "icons/Xeno/castes/hunter.dmi"
+SENTINEL = "icons/Xeno/castes/sentinel.dmi"
+DRONE = "icons/Xeno/castes/drone.dmi"
 ACID_TURRET = "icons/Xeno/acid_turret.dmi"
 RESIN_SILO = "icons/Xeno/resin_silo.dmi"
 RESIN_POD = "icons/Xeno/resin_pod.dmi"
@@ -56,7 +59,8 @@ OLIVE = (112, 130, 88)
 
 # unit -> sequence -> list of (dmi path, state name[, multiply tint]) layers, bottom first.
 # A sequence given as a string reuses another sequence's cells (an alias, no new art).
-# "name:S" aliases a single facing of that sequence (N, NE, E, SE, S, SW, W or NW).
+# "name:S" aliases a single facing of that sequence (N, NE, E, SE, S, SW, W or NW), and "name#1" keeps every facing
+# but only the first frame, which gives an animated walk a still pose to stand in.
 ARMOUR = [(MARK_ONE, "leg", OLIVE), (MARK_ONE, "chest", OLIVE), (MARK_ONE, "arm", OLIVE), (MARK_ONE, "helm", OLIVE)]
 
 
@@ -79,6 +83,36 @@ UNITS = {
             "stand": [(RUNNER, "Runner Walking")],
             "run": [(RUNNER, "Runner Running")],
             "die": [(RUNNER, "Runner Dead")],
+            "attack": "stand",
+            "icon": "stand:S",
+        },
+    },
+    # More xeno castes. Hunter and Sentinel have a real animated walk; Drone is a still pose.
+    "hunter": {
+        "sequences": {
+            "walk": [(HUNTER, "Hunter Walking")],
+            "run": [(HUNTER, "Hunter Running")],
+            "stand": "walk#1",
+            "die": [(HUNTER, "Hunter Dead")],
+            "attack": "stand",
+            "icon": "stand:S",
+        },
+    },
+    "sentinel": {
+        "sequences": {
+            "walk": [(SENTINEL, "Sentinel Walking")],
+            "run": [(SENTINEL, "Sentinel Running")],
+            "stand": "walk#1",
+            "die": [(SENTINEL, "Sentinel Dead")],
+            "attack": "stand",
+            "icon": "stand:S",
+        },
+    },
+    "drone": {
+        "sequences": {
+            "stand": [(DRONE, "Drone Walking")],
+            "run": [(DRONE, "Drone Running")],
+            "die": [(DRONE, "Drone Dead")],
             "attack": "stand",
             "icon": "stand:S",
         },
@@ -167,9 +201,13 @@ def composite(layers):
 
 
 def frame_timing(delays):
-    """Map BYOND per-frame delays (deciseconds) to (tick_ms, frame indices to show), or (None, None)."""
-    if len(delays) < 2 or min(delays) <= 0:
+    """Map BYOND per-frame delays (deciseconds) to (tick_ms, frame indices to show), or (None, None).
+
+    TGMC sometimes lists a delay of 0 for a frame, which BYOND treats as the shortest delay, so use 1.
+    """
+    if len(delays) < 2:
         return None, None
+    delays = [max(1, d) for d in delays]
     unit = math.gcd(*delays)
     order = [i for i, d in enumerate(delays) for _ in range(d // unit)]
     return unit * 100, order
@@ -178,7 +216,7 @@ def frame_timing(delays):
 def build_unit(tgmc, unit, spec, out_dir):
     sheet_cells = []      # PIL images, appended in cell order
     cell_size = None  # (width, height) of one cell
-    seq_defs = []         # (sequence name, start, length, facings, tick or None)
+    seq_defs = []         # (sequence name, start, length, facings, tick or None, stride or None)
     aliases = []
     for seq_name, layer_specs in spec["sequences"].items():
         if isinstance(layer_specs, str):
@@ -205,18 +243,22 @@ def build_unit(tgmc, unit, spec, out_dir):
         for source in sources:
             for f in order:
                 sheet_cells.append(sides[source][f])
-        seq_defs.append((seq_name, start, len(order), len(sources), tick))
+        seq_defs.append((seq_name, start, len(order), len(sources), tick, None))
 
-    starts = {name: (start, length, facings, tick) for name, start, length, facings, tick in seq_defs}
-    for alias, target in aliases:
+    starts = {name: (start, length, facings, tick, stride) for name, start, length, facings, tick, stride in seq_defs}
+    for alias, target in aliases:  # an alias may point at an earlier alias, so resolve them in order
+        target, _, still = target.partition("#")  # "walk#1" keeps every facing but shows only the first frame
         name, _, side = target.partition(":")
-        start, length, facings, tick = starts[name]
+        start, length, facings, tick, stride = starts[name]
+        if still:
+            stride, length, tick = stride or length, int(still), None
         if side:  # "stand:S" is the one facing the icon should show, here the front
             if facings == 1:
                 raise SystemExit(f"{unit}: {alias} wants side {side} of {name}, which has one facing")
-            start += FACING_NAMES.index(side) * length
-            facings = 1
-        seq_defs.append((alias, start, length, facings, tick))
+            start += FACING_NAMES.index(side) * (stride or length)
+            facings, stride = 1, None
+        starts[alias] = (start, length, facings, tick, stride)
+        seq_defs.append((alias, start, length, facings, tick, stride))
 
     cols = 8
     rows = (len(sheet_cells) + cols - 1) // cols
@@ -235,20 +277,22 @@ def build_unit(tgmc, unit, spec, out_dir):
 
     lines = ["# Generated by mod/build_sprites.py from TGMC art. Do not edit.",
              f"{unit}:", "\tDefaults:", f"\t\tFilename: sprites/{unit}.png"]
-    for seq_name, start, length, facings, tick in seq_defs:
+    for seq_name, start, length, facings, tick, stride in seq_defs:
         lines.append(f"\t{seq_name}:")
         lines.append(f"\t\tStart: {start}")
         if length != 1:
             lines.append(f"\t\tLength: {length}")
         if facings != 1:
             lines.append(f"\t\tFacings: {facings}")
+        if stride is not None:
+            lines.append(f"\t\tStride: {stride}")
         if tick is not None:
             lines.append(f"\t\tTick: {tick}")
     with open(os.path.join(out_dir, "sequences", f"{unit}.yaml"), "w", encoding="utf-8", newline="\n") as f:
         f.write("\n".join(lines) + "\n")
 
     return {"unit": unit, "sheet": f"sprites/{unit}.png", "cell": [cw, ch], "cells": len(sheet_cells),
-            "sequences": [{"name": n, "start": s, "length": l, "facings": fa, "tick": t} for n, s, l, fa, t in seq_defs]}
+            "sequences": [{"name": n, "start": s, "length": l, "facings": fa, "tick": t} for n, s, l, fa, t, _ in seq_defs]}
 
 
 def main():

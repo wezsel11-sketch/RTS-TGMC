@@ -36,6 +36,7 @@ SOUNDS = {
     "marine-scream-1": "sound/voice/human/male/scream_1.ogg",
     "marine-scream-2": "sound/voice/human/male/scream_2.ogg",
     # Structures and interface
+    "resin-build": "sound/effects/alien/resin_build1.ogg",
     "explosion": "sound/effects/explosion/medium1.ogg",
     "turret-death": "sound/effects/alien/turret_death.ogg",
     "ui-click": "sound/effects/menu_click.ogg",

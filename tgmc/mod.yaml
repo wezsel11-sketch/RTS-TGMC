@@ -26,6 +26,9 @@ Sequences:
 	tgmc|sequences/shroud.yaml
 	tgmc|sequences/rifleman.yaml
 	tgmc|sequences/runner.yaml
+	tgmc|sequences/hunter.yaml
+	tgmc|sequences/sentinel.yaml
+	tgmc|sequences/drone.yaml
 	tgmc|sequences/medic.yaml
 	tgmc|sequences/engineer.yaml
 	tgmc|sequences/sentry-turret.yaml

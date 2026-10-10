@@ -28,7 +28,7 @@ import math
 import os
 import sys
 
-from PIL import Image, PngImagePlugin
+from PIL import Image, ImageChops, PngImagePlugin
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import tgmc_dmi  # noqa: E402
@@ -40,6 +40,10 @@ ACID_TURRET = "icons/Xeno/acid_turret.dmi"
 RESIN_SILO = "icons/Xeno/resin_silo.dmi"
 RESIN_POD = "icons/Xeno/resin_pod.dmi"
 SENTRY = "icons/obj/machines/deployable/sentry/sentry.dmi"
+MARK_ONE = "icons/mob/modular/mark_one/infantry.dmi"
+RIFLES = "icons/mob/inhands/guns/rifles_right_1.dmi"
+SMGS = "icons/mob/inhands/guns/submachineguns_right_1.dmi"
+PISTOLS = "icons/mob/inhands/guns/pistols_right_1.dmi"
 CRYO = "icons/obj/machines/cryogenics2.dmi"
 VENDING = "icons/obj/machines/vending.dmi"
 
@@ -47,14 +51,25 @@ VENDING = "icons/obj/machines/vending.dmi"
 FACING_NAMES = ["N", "NE", "E", "SE", "S", "SW", "W", "NW"]
 FACING_SOURCE = {"N": "N", "NE": "E", "E": "E", "SE": "E", "S": "S", "SW": "W", "W": "W", "NW": "W"}
 
-# unit -> sequence -> list of (dmi path, state name) layers, bottom first.
+# TGMC draws its modular armour grey and tints it in code. This multiply tint gives the usual olive drab.
+OLIVE = (112, 130, 88)
+
+# unit -> sequence -> list of (dmi path, state name[, multiply tint]) layers, bottom first.
 # A sequence given as a string reuses another sequence's cells (an alias, no new art).
 # "name:S" aliases a single facing of that sequence (N, NE, E, SE, S, SW, W or NW).
+ARMOUR = [(MARK_ONE, "leg", OLIVE), (MARK_ONE, "chest", OLIVE), (MARK_ONE, "arm", OLIVE), (MARK_ONE, "helm", OLIVE)]
+
+
+def marine(uniform, weapon):
+    """Body, role uniform, olive Mark I armour and helmet, then the weapon held in the right hand."""
+    return [(HUMAN, "body_m"), (MARINE_UNIFORM, uniform)] + ARMOUR + [weapon]
+
+
 UNITS = {
     "rifleman": {
         "sequences": {
-            "stand": [(HUMAN, "body_m"), (MARINE_UNIFORM, "marine_jumpsuit")],
-            "run": [(HUMAN, "body_m"), (MARINE_UNIFORM, "marine_jumpsuit")],
+            "stand": marine("marine_jumpsuit", (RIFLES, "t18_w")),
+            "run": "stand",
             "attack": "stand",
             "icon": "stand:S",
         },
@@ -71,16 +86,16 @@ UNITS = {
     # Marine roles. Same body as the rifleman, with the role's uniform state on top.
     "medic": {
         "sequences": {
-            "stand": [(HUMAN, "body_m"), (MARINE_UNIFORM, "marine_medic")],
-            "run": [(HUMAN, "body_m"), (MARINE_UNIFORM, "marine_medic")],
+            "stand": marine("marine_medic", (PISTOLS, "m44")),
+            "run": "stand",
             "attack": "stand",
             "icon": "stand:S",
         },
     },
     "engineer": {
         "sequences": {
-            "stand": [(HUMAN, "body_m"), (MARINE_UNIFORM, "marine_engineer")],
-            "run": [(HUMAN, "body_m"), (MARINE_UNIFORM, "marine_engineer")],
+            "stand": marine("marine_engineer", (SMGS, "t19_w")),
+            "run": "stand",
             "attack": "stand",
             "icon": "stand:S",
         },
@@ -108,15 +123,25 @@ UNITS = {
 }
 
 
-def layer_images(dmi, state):
+def tinted(img, rgb):
+    """Multiply the colour channels by rgb/255 and keep the alpha."""
+    if rgb is None:
+        return img
+    r, g, b, a = img.split()
+    out = ImageChops.multiply(Image.merge("RGB", (r, g, b)), Image.new("RGB", img.size, rgb))
+    out.putalpha(a)
+    return out
+
+
+def layer_images(dmi, state, tint=None):
     """Return {side: [frame images]} for S/N/E/W, or {"*": [frame images]} for a 1-dir state."""
     frames = dmi.frames(state)
     dirs = dmi.state(state)["dirs"]
     if dirs == 1:
-        return {"*": [frames[f][0] for f in range(len(frames))]}
+        return {"*": [tinted(frames[f][0], tint) for f in range(len(frames))]}
     if dirs != 4:
         raise SystemExit(f"{dmi.path}:{state} has {dirs} dirs; only 1 or 4 are handled")
-    return {name: [frames[f][d] for f in range(len(frames))] for d, name in enumerate(tgmc_dmi.DIRS4)}
+    return {name: [tinted(frames[f][d], tint) for f in range(len(frames))] for d, name in enumerate(tgmc_dmi.DIRS4)}
 
 
 def composite(layers):
@@ -159,8 +184,9 @@ def build_unit(tgmc, unit, spec, out_dir):
         if isinstance(layer_specs, str):
             aliases.append((seq_name, layer_specs))
             continue
-        dmis = [(tgmc_dmi.Dmi(os.path.join(tgmc, path)), state) for path, state in layer_specs]
-        layers = [(dmi, state, layer_images(dmi, state)) for dmi, state in dmis]
+        dmis = [(tgmc_dmi.Dmi(os.path.join(tgmc, spec[0])), spec[1]) for spec in layer_specs]
+        layers = [(dmi, state, layer_images(dmi, state, spec[2] if len(spec) > 2 else None))
+                  for (dmi, state), spec in zip(dmis, layer_specs)]
         sides = composite(layers)
         size = (dmis[0][0].icon_w, dmis[0][0].icon_h)
         if cell_size is None:

@@ -28,7 +28,10 @@ The converters read these TGMC files:
 
 - `icons/mob/human.dmi` state `body_m`, with `icons/mob/clothing/uniforms/marine_uniforms.dmi` state `marine_jumpsuit` on top, for the rifleman.
 - `icons/Xeno/castes/runner.dmi` states `Runner Walking`, `Runner Running`, and `Runner Dead`, for the Runner.
-- Corpsman and engineer use `body_m` plus the `marine_medic` / `marine_engineer` uniform states.
+- Marine gear: Mark I modular armour from `icons/mob/modular/mark_one/infantry.dmi` (`leg`, `chest`, `arm`, `helm`, tinted
+  olive by the converter, since TGMC tints it in code), and the held weapon from `icons/mob/inhands/guns/`
+  (`t18_w` rifle, `m44` pistol, `t19_w` SMG). The corpsman and engineer use the `marine_medic` / `marine_engineer`
+  uniform states under the same armour.
 - Structures: `icons/Xeno/acid_turret.dmi`, `resin_silo.dmi`, `resin_pod.dmi`, and
   `icons/obj/machines/` (`sentry/sentry.dmi`, `cryogenics2.dmi`, `vending.dmi`).
 - `sound/weapons/guns/fire/autorifle-1.ogg` (rifle fire) and `sound/voice/alien/hiss1.ogg` (Runner hiss).
@@ -110,9 +113,8 @@ On a headless machine, run OpenRA under Xvfb with Mesa software GL
 
 ## Known gaps
 
-- The marine has no death sprite, so it disappears when killed. Its `run` sequence uses the same
-  art as `stand`, duplicated in the sheet, because TGMC's human sheet has only a standing state.
-- The marine's worn gear is the jumpsuit only. Helmets, armour, and held weapons aren't drawn.
+- The marine has no death sprite, so it disappears when killed. Its `run` sequence aliases `stand`, because
+  TGMC's human sheet has only a standing state.
 - Player colour remapping is off. The sprites are RGBA, so the `player` palette doesn't
   recolour them. Units are not coloured by owner.
 - Runners have no attack animation. `attack` reuses `stand`. The Runner's claws play the hiss on attack.
@@ -127,8 +129,12 @@ On a headless machine, run OpenRA under Xvfb with Mesa software GL
   placeholders drawn by the scripts. Production buildings have no rally point yet.
 - The AI (`rules/ai.yaml`) only trains units and sends them out in squads. It doesn't build structures.
   Pick "Skirmish AI" for a slot in the lobby.
-- None of the rules have been run in OpenRA since the production, victory and fog traits went in. Run
-  `mod/check_mod.sh` before trusting them.
+- Verified by running the mod headless (OpenRA bleed, `mod/check_mod.sh` and `mod/smoke.sh`): the lint passes with
+  no errors or warnings, and on Landing Zone the camera starts on the base, the radar and production palette work,
+  the vendor spawns queued marines, income ticks up, and a "Skirmish AI" in the xeno slot trains Runners that attack
+  the marine base and kill a sentry. Not yet checked: heal and repair, victory and defeat, voices (no audio device),
+  and the xeno side from the player's seat.
+- Production is fast (a few seconds a unit) and the radar shows no terrain colour. Both need tuning.
 - The Runner's death sound was converted earlier and then dropped. `WithDeathAnimation` has no sound field, so
   wire one in with `Voiced` when you add voice sets.
 

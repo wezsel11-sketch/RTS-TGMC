@@ -54,7 +54,7 @@ BUTTON_COLLECTIONS = [
     "observer-scrollpanel-button-pressed", "slider-thumb",
     "checkbox-toggle", "checkbox-toggle-hover", "checkbox-toggle-pressed",
     "checkbox-toggle-highlighted", "checkbox-pressed", "checkbox-disabled",
-    "tgui-tab", "tgui-tab-hover", "tgui-tab-active",
+    "tgui-tab", "tgui-tab-hover", "tgui-tab-pressed", "tgui-tab-disabled", "tgui-tab-active",
 ]
 
 
@@ -75,6 +75,10 @@ def style_for(name):
         return TGUI_TAB, TGUI_EDGE
     if name == "tgui-tab-hover":
         return OLIVE, OLIVE_HI
+    if name == "tgui-tab-pressed":
+        return OLIVE_DARK, AMBER_DIM
+    if name == "tgui-tab-disabled":
+        return GREY_DIM, GREY
     if name == "tgui-tab-active":
         return OLIVE, AMBER
     if name in ("slider-thumb",):

@@ -38,11 +38,13 @@ mod/                        converters and build script (Python 3, Pillow, ffmpe
   build_sprites.py          .dmi states -> PNG sheets + OpenRA sequence YAML (8 facings)
   build_sounds.py           TGMC .ogg -> mono 22050 Hz Vorbis .ogg
   make_placeholders.py      palette, ground tile, cursor, and a 24x24 test map (no TGMC art)
+  make_chrome.py            TGUI-style UI atlas (olive, slate, amber) and its chrome.yaml (no TGMC art)
 tgmc/                       the OpenRA mod (YAML and Fluent only)
   mod.yaml                  manifest
   rules/                    world, player, palettes, units, weapons
   tilesets/ground.yaml      one flat ground template
   cursors.yaml, fluent/     cursor names, display strings
+  chrome/                   in-game squad sidebar and observer banner (TGUI-style)
 build/                      generated; git-ignored
 ```
 
@@ -75,8 +77,9 @@ MAP=$(sh utility.sh tgmc --map-hash ~/openra-tgmc-mod/build/mod/tgmc/maps/test-f
 ```
 
 The test field is a 24x24 map with three marines and three Runners at facings
-north, east, and south. This is the only entry point for now. The mod has no menus
-or sidebar yet, so you launch it with `Launch.Map`.
+north, east, and south. This is the only entry point for now. The in-game squad sidebar
+and observer banner use TGUI-style chrome. The main menu and Esc menu still use OpenRA's
+default layout, so you launch it with `Launch.Map`.
 
 On a headless machine, run OpenRA under Xvfb with Mesa software GL
 (`LIBGL_ALWAYS_SOFTWARE=1`). Take screenshots with `xwd -root | convert xwd:- png:out.png`.
@@ -106,7 +109,9 @@ On a headless machine, run OpenRA under Xvfb with Mesa software GL
 - Sounds are wired to the rifle (`Report` on `TGMCRifle`) and the Runner's claws (hiss). The smoke test
   doesn't check audio, because the headless run has no audio device.
 - The test field uses placeholder terrain (one flat tile). It is not TGMC art.
-- The mod has no ingame layout, so there is no sidebar, menu, or order UI yet.
+- The main menu and Esc menu are not restyled yet. Their chrome lives in OpenRA's `mods/common`, and
+  overriding it needs OpenRA's widget IDs, so do that with an OpenRA checkout at hand. The
+  sidebar and observer banner are styled, but there is no left-rail tab nav or order UI yet.
 - `Spectator` has no traits, which the YAML checker reports as one intentional warning.
 - The Runner's death sound was converted earlier and then dropped. `WithDeathAnimation` has no sound field, so
   wire one in with `Voiced` when you add voice sets.

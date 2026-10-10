@@ -10,7 +10,7 @@ Container@OBSERVER_WIDGETS:
 			Y: 0
 			Width: 240
 			Height: 30
-			Background: tgmc-panel
+			Background: tgui-titlebar
 			Children:
 				Label@OBSERVER_TITLE:
 					X: 8

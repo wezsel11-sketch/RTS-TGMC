@@ -42,7 +42,7 @@ Container@PLAYER_WIDGETS:
 					X: 8
 					Y: 48
 					Width: 224
-					Height: 224
+					Height: 160
 					Background: tgmc-radar-frame
 					Logic: IngameRadarDisplayLogic
 					Children:
@@ -52,12 +52,12 @@ Container@PLAYER_WIDGETS:
 							X: 2
 							Y: 2
 							Width: 220
-							Height: 220
+							Height: 156
 				Background@SELECTION_PANEL:
 					X: 8
-					Y: 282
+					Y: 214
 					Width: 224
-					Height: 120
+					Height: 52
 					Background: tgmc-selection
 					Children:
 						Label@SELECTION_TITLE:
@@ -69,15 +69,61 @@ Container@PLAYER_WIDGETS:
 							Font: Bold
 						Label@SELECTION_TEXT:
 							X: 8
-							Y: 30
+							Y: 26
 							Width: PARENT_WIDTH - 16
-							Height: 80
+							Height: 20
 							Text: hud-selection-empty
-							Font: Regular
-							WordWrap: true
+							Font: Small
+				Container@SIDEBAR_PRODUCTION:
+					Logic: ClassicProductionLogic
+					X: 4
+					Y: 272
+					Width: 232
+					Height: PARENT_HEIGHT - 376
+					Children:
+						LogicTicker@PRODUCTION_TICKER:
+						ProductionPalette@PRODUCTION_PALETTE:
+							X: 34
+							Columns: 3
+							IconSize: 62, 46
+							IconMargin: 1, 1
+							TooltipContainer: TOOLTIP_CONTAINER
+							ReadyText: productionpalette-sidebar-production-palette.ready
+							HoldText: productionpalette-sidebar-production-palette.hold
+							HotkeyPrefix: Production
+							HotkeyCount: 24
+							SelectProductionBuildingHotkey: SelectProductionBuilding
+						Container@PRODUCTION_TYPES:
+							X: 2
+							Width: 28
+							Height: 62
+							Children:
+								ProductionTypeButton@INFANTRY:
+									Width: 28
+									Height: 28
+									VisualHeight: 0
+									Background: sidebar-button
+									ProductionGroup: Infantry
+									Children:
+										Image@ICON:
+											X: 6
+											Y: 6
+											ImageCollection: production-icons
+								ProductionTypeButton@XENO:
+									Y: 31
+									Width: 28
+									Height: 28
+									VisualHeight: 0
+									Background: sidebar-button
+									ProductionGroup: Xeno
+									Children:
+										Image@ICON:
+											X: 6
+											Y: 6
+											ImageCollection: production-icons
 				Background@READOUT_PANEL:
 					X: 8
-					Y: 410
+					Y: PARENT_HEIGHT - 98
 					Width: 224
 					Height: 56
 					Background: tgmc-panel
@@ -102,7 +148,7 @@ Container@PLAYER_WIDGETS:
 							TooltipTemplate: SIMPLE_TOOLTIP
 				MenuButton@OPTIONS_BUTTON:
 					X: 8
-					Y: 474
+					Y: PARENT_HEIGHT - 34
 					Width: 224
 					Height: 26
 					Background: sidebar-button

@@ -106,3 +106,7 @@ runner:
 		Name: actor-runner.name
 	Valued:
 		Cost: 50
+	Buildable:
+		Queue: Xeno
+		BuildPaletteOrder: 10
+		Description: actor-runner.description

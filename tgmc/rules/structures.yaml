@@ -65,6 +65,16 @@ resin-silo:
 		Cost: 400
 	WithIdleAnimation:
 		Sequences: idle
+	CashTrickler:
+		Interval: 50
+		Amount: 15
+	Exit@1:
+		SpawnOffset: 0,512,0
+		ExitCell: 0,2
+	Production:
+		Produces: Xeno
+	ProductionBar:
+		ProductionType: Xeno
 
 mini-silo:
 	Inherits: ^Structure
@@ -79,6 +89,9 @@ mini-silo:
 		Cost: 150
 	WithIdleAnimation:
 		Sequences: idle
+	CashTrickler:
+		Interval: 50
+		Amount: 5
 
 sentry-turret:
 	Inherits: ^Structure
@@ -115,8 +128,13 @@ cryo-pod:
 		HP: 250
 	WithIdleAnimation:
 		Sequences: active
+	Exit@1:
+		SpawnOffset: 0,512,0
+		ExitCell: 0,2
 	Production:
 		Produces: Infantry
+	ProductionBar:
+		ProductionType: Infantry
 	Tooltip:
 		Name: actor-cryo-pod.name
 	Valued:
@@ -129,8 +147,16 @@ vendor:
 		Dimensions: 1, 1
 	Health:
 		HP: 200
+	Exit@1:
+		SpawnOffset: 0,512,0
+		ExitCell: 0,1
 	Production:
 		Produces: Infantry
+	ProductionBar:
+		ProductionType: Infantry
+	CashTrickler:
+		Interval: 50
+		Amount: 15
 	Tooltip:
 		Name: actor-vendor.name
 	Valued:

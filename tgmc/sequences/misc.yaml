@@ -1,0 +1,5 @@
+# Sequences that are not tied to a unit. clock.png is drawn by mod/make_placeholders.py (no TGMC art).
+clock:
+	idle:
+		Filename: clock.png
+		Length: *

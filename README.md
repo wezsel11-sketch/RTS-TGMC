@@ -80,7 +80,10 @@ MAP=$(sh utility.sh tgmc --map-hash ~/openra-tgmc-mod/build/mod/tgmc/maps/test-f
 ./launch-game.sh Game.Mod=tgmc Launch.Map=$MAP
 ```
 
-The test field is a 24x24 map with three marines and three Runners at facings
+There are two maps. **Landing Zone** (40x28) is a skirmish map: marines in the west with a cryo pod
+and vendor, xenos in the east with a resin silo. Pick a faction in the lobby and build units from the
+sidebar palette. Cash comes from a starting amount plus a trickle from the vendor and the silos.
+The **test field** is a 24x24 map with three marines and three Runners at facings
 north, east, and south, plus a corpsman, an engineer, and one of each structure. The main menu
 opens, but the test field is the quickest way in: launch it with `Launch.Map`.
 
@@ -114,8 +117,12 @@ On a headless machine, run OpenRA under Xvfb with Mesa software GL
 - Sounds are wired to the rifle (`Report` on `TGMCRifle`) and the Runner's claws (hiss). The smoke test
   doesn't check audio, because the headless run has no audio device.
 - The test field uses placeholder terrain (one flat tile). It is not TGMC art.
-- The HUD is a squad sidebar (radar, selection text, cash, menu button). It has no production
-  palette yet, and the cryo pod and vendor have no `Exit`, so they cannot spawn units.
+- The HUD is a squad sidebar (radar, a static selection label, production palette, cash, menu button).
+  Production icons are the units' front-facing sprite. The clock overlay and the production tab icons are
+  placeholders drawn by the scripts. Production buildings have no rally point yet.
+- There is no AI opponent yet, so both sides need a human player.
+- None of the rules have been run in OpenRA since the production, victory and fog traits went in. Run
+  `mod/check_mod.sh` before trusting them.
 - The Runner's death sound was converted earlier and then dropped. `WithDeathAnimation` has no sound field, so
   wire one in with `Voiced` when you add voice sets.
 

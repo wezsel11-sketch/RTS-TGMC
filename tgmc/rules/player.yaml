@@ -5,9 +5,16 @@
 Player:
 	Inherits: ^BasePlayer
 	PlayerResources:
-		DefaultCash: 5000
+		SelectableCash: 500, 1000, 2500, 5000
+		DefaultCash: 1000
 	ClassicProductionQueue@Infantry:
 		Type: Infantry
+		Factions: marines
+		DisplayOrder: 1
+	ClassicProductionQueue@Xeno:
+		Type: Xeno
+		Factions: xenos
+		DisplayOrder: 2
 	DeveloperMode:
 	TechTree:
 	MissionObjectives:

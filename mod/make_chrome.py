@@ -114,6 +114,7 @@ ICON_COLLECTIONS = {
     "dropdown-decorations": ["marker"],
     "dropdown-separators": ["separator"],
     "scrollpanel-decorations": ["up", "down", "left", "right"],
+    "production-icons": ["infantry", "infantry-disabled", "infantry-alert", "xeno", "xeno-disabled", "xeno-alert"],
 }
 ICON = 16
 ICON_COLS = 16
@@ -123,12 +124,17 @@ def draw_icon(name):
     """A 16x16 amber tile with the name's first letter in it."""
     img = Image.new("RGBA", (ICON, ICON), (0, 0, 0, 0))
     d = ImageDraw.Draw(img)
-    d.rounded_rectangle([0, 0, ICON - 1, ICON - 1], radius=3, fill=OLIVE, outline=AMBER)
+    fill, outline, glyph = OLIVE, AMBER, AMBER
+    if name.endswith("-disabled"):
+        fill, outline, glyph = GREY_DIM, GREY, GREY
+    elif name.endswith("-alert"):
+        fill, outline, glyph = AMBER_DIM, AMBER, SLATE
+    d.rounded_rectangle([0, 0, ICON - 1, ICON - 1], radius=3, fill=fill, outline=outline)
     font = ImageFont.load_default(size=11)
     ch = name[0].upper()
     box = d.textbbox((0, 0), ch, font=font)
     w, h = box[2] - box[0], box[3] - box[1]
-    d.text(((ICON - w) / 2 - box[0], (ICON - h) / 2 - box[1]), ch, font=font, fill=AMBER)
+    d.text(((ICON - w) / 2 - box[0], (ICON - h) / 2 - box[1]), ch, font=font, fill=glyph)
     return img
 
 

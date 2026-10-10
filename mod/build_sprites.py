@@ -49,13 +49,14 @@ FACING_SOURCE = {"N": "N", "NE": "E", "E": "E", "SE": "E", "S": "S", "SW": "W", 
 
 # unit -> sequence -> list of (dmi path, state name) layers, bottom first.
 # A sequence given as a string reuses another sequence's cells (an alias, no new art).
+# "name:S" aliases a single facing of that sequence (N, NE, E, SE, S, SW, W or NW).
 UNITS = {
     "rifleman": {
         "sequences": {
             "stand": [(HUMAN, "body_m"), (MARINE_UNIFORM, "marine_jumpsuit")],
             "run": [(HUMAN, "body_m"), (MARINE_UNIFORM, "marine_jumpsuit")],
             "attack": "stand",
-            "icon": "stand",
+            "icon": "stand:S",
         },
     },
     "runner": {
@@ -64,7 +65,7 @@ UNITS = {
             "run": [(RUNNER, "Runner Running")],
             "die": [(RUNNER, "Runner Dead")],
             "attack": "stand",
-            "icon": "stand",
+            "icon": "stand:S",
         },
     },
     # Marine roles. Same body as the rifleman, with the role's uniform state on top.
@@ -73,7 +74,7 @@ UNITS = {
             "stand": [(HUMAN, "body_m"), (MARINE_UNIFORM, "marine_medic")],
             "run": [(HUMAN, "body_m"), (MARINE_UNIFORM, "marine_medic")],
             "attack": "stand",
-            "icon": "stand",
+            "icon": "stand:S",
         },
     },
     "engineer": {
@@ -81,7 +82,7 @@ UNITS = {
             "stand": [(HUMAN, "body_m"), (MARINE_UNIFORM, "marine_engineer")],
             "run": [(HUMAN, "body_m"), (MARINE_UNIFORM, "marine_engineer")],
             "attack": "stand",
-            "icon": "stand",
+            "icon": "stand:S",
         },
     },
     # Marine structures. Sentry is 4-dir (8 facings). Cryo pod and vendor are 1-dir and animate in place.
@@ -182,7 +183,14 @@ def build_unit(tgmc, unit, spec, out_dir):
 
     starts = {name: (start, length, facings, tick) for name, start, length, facings, tick in seq_defs}
     for alias, target in aliases:
-        seq_defs.append((alias, *starts[target]))
+        name, _, side = target.partition(":")
+        start, length, facings, tick = starts[name]
+        if side:  # "stand:S" is the one facing the icon should show, here the front
+            if facings == 1:
+                raise SystemExit(f"{unit}: {alias} wants side {side} of {name}, which has one facing")
+            start += FACING_NAMES.index(side) * length
+            facings = 1
+        seq_defs.append((alias, start, length, facings, tick))
 
     cols = 8
     rows = (len(sheet_cells) + cols - 1) // cols

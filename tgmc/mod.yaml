@@ -21,6 +21,7 @@ Weapons:
 	tgmc|rules/weapons.yaml
 
 Sequences:
+	tgmc|sequences/misc.yaml
 	tgmc|sequences/rifleman.yaml
 	tgmc|sequences/runner.yaml
 	tgmc|sequences/medic.yaml

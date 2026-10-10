@@ -96,6 +96,9 @@ ChromeLayout:
 	common|chrome/playerprofile.yaml
 	common|chrome/text-notifications.yaml
 
+Notifications:
+	tgmc|audio/notifications.yaml
+
 Hotkeys:
 	common|hotkeys/game.yaml
 	common|hotkeys/observer.yaml

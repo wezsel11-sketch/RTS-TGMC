@@ -149,12 +149,11 @@ def main():
 
     names = all_collections()
     rows = (len(names) + COLS - 1) // COLS
-    # Pad to a power of two: OpenGL texture uploads reject other sizes.
     logo_y = rows * TILE
     icon_names = [(c, n) for c, names in ICON_COLLECTIONS.items() for n in names]
     icon_y = logo_y + LOGO
     icon_rows = (len(icon_names) + ICON_COLS - 1) // ICON_COLS
-    side = 1
+    side = 1  # pad to a power of two: OpenGL texture uploads reject other sizes
     while side < max(COLS * TILE, icon_y + icon_rows * ICON):
         side *= 2
     atlas = Image.new("RGBA", (side, side), (0, 0, 0, 0))

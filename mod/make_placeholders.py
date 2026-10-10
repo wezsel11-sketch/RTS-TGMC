@@ -4,7 +4,7 @@ Nothing here is TGMC art. It writes:
   tgmc.pal                      a flat grey 256-colour palette (OpenRA needs one for its palette setup)
   ground.png                    one 24x24 green ground tile for the terrain template
   cursor.png                    a plain arrow for the default cursor
-  maps/test-field/map.{yaml,bin,png}   a 24x24 map with two marines and two runners
+  maps/test-field/map.{yaml,bin,png}   a 24x24 map with marines, runners, and one of each structure
 
 Usage: make_placeholders.py --out DIR
 """

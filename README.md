@@ -2,7 +2,8 @@
 
 An [OpenRA](https://github.com/OpenRA/OpenRA) mod that uses sprites and sounds from
 [Terra Gov Marine Corps (TGMC)](https://github.com/tgstation/terragov-marine-corps), the
-SS13-based game. Right now it has two units: a TGMC marine rifleman and a xeno Runner.
+SS13-based game. It has marine infantry (rifleman, corpsman, engineer), a xeno Runner, a few
+marine and xeno structures, and a TGMC-styled HUD.
 
 **This repo holds scripts, YAML, and docs only.** No TGMC art or sound, no extracted or
 converted sprites or audio, no `.mix`/`.oramap`, and no OpenRA binaries are committed.
@@ -27,6 +28,9 @@ The converters read these TGMC files:
 
 - `icons/mob/human.dmi` state `body_m`, with `icons/mob/clothing/uniforms/marine_uniforms.dmi` state `marine_jumpsuit` on top, for the rifleman.
 - `icons/Xeno/castes/runner.dmi` states `Runner Walking`, `Runner Running`, and `Runner Dead`, for the Runner.
+- Corpsman and engineer use `body_m` plus the `marine_medic` / `marine_engineer` uniform states.
+- Structures: `icons/Xeno/acid_turret.dmi`, `resin_silo.dmi`, `resin_pod.dmi`, and
+  `icons/obj/machines/` (`sentry/sentry.dmi`, `cryogenics2.dmi`, `vending.dmi`).
 - `sound/weapons/guns/fire/autorifle-1.ogg` (rifle fire) and `sound/voice/alien/hiss1.ogg` (Runner hiss).
 
 ## Layout
@@ -38,9 +42,12 @@ mod/                        converters and build script (Python 3, Pillow, ffmpe
   build_sprites.py          .dmi states -> PNG sheets + OpenRA sequence YAML (8 facings)
   build_sounds.py           TGMC .ogg -> mono 22050 Hz Vorbis .ogg
   make_placeholders.py      palette, ground tile, cursor, and a 24x24 test map (no TGMC art)
+  make_chrome.py            HUD atlas (chrome.png) and chrome.yaml: panels, buttons, icons, logo (no TGMC art)
 tgmc/                       the OpenRA mod (YAML and Fluent only)
   mod.yaml                  manifest
-  rules/                    world, player, palettes, units, weapons
+  rules/                    world, player, palettes, units, structures, weapons
+  chrome/                   in-game HUD layouts (player sidebar, observer banner)
+  audio/notifications.yaml  UI sound mapping
   tilesets/ground.yaml      one flat ground template
   cursors.yaml, fluent/     cursor names, display strings
 build/                      generated; git-ignored
@@ -75,8 +82,8 @@ MAP=$(sh utility.sh tgmc --map-hash ~/openra-tgmc-mod/build/mod/tgmc/maps/test-f
 ```
 
 The test field is a 24x24 map with three marines and three Runners at facings
-north, east, and south. This is the only entry point for now. The mod has no menus
-or sidebar yet, so you launch it with `Launch.Map`.
+north, east, and south, plus a corpsman, an engineer, and one of each structure. The main menu
+opens, but the test field is the quickest way in: launch it with `Launch.Map`.
 
 On a headless machine, run OpenRA under Xvfb with Mesa software GL
 (`LIBGL_ALWAYS_SOFTWARE=1`). Take screenshots with `xwd -root | convert xwd:- png:out.png`.
@@ -86,7 +93,9 @@ On a headless machine, run OpenRA under Xvfb with Mesa software GL
 - **Sprites.** Each sequence is a stack of `.dmi` states, composited bottom to top. Each unit
   gets one PNG sheet, with cells in `facing * frames + frame` order. The sheet is tagged with
   `FrameSize` and `FrameAmount`, and `sequences/<unit>.yaml` gives `Start`, `Length`, and
-  `Facings` for each sequence. OpenRA's facing order is N, NE, E, SE, S, SW, W, NW. TGMC
+  `Facings` for each sequence. Animated states take their timing from the `.dmi` `delay` list:
+  `Tick` is the GCD of the delays, and a frame that holds longer is repeated in the sheet
+  (the resin silo's 5 s hold becomes 25 repeated cells at a 200 ms tick). OpenRA's facing order is N, NE, E, SE, S, SW, W, NW. TGMC
   provides E and W, so nothing is mirrored (the Doom mod mirrors because its sprites lack
   one side). Diagonals use the side sprite on their own horizontal side: NE and SE use E,
   and SW and NW use W. `attack` reuses `stand`'s cells, so no art is duplicated.
@@ -106,7 +115,8 @@ On a headless machine, run OpenRA under Xvfb with Mesa software GL
 - Sounds are wired to the rifle (`Report` on `TGMCRifle`) and the Runner's claws (hiss). The smoke test
   doesn't check audio, because the headless run has no audio device.
 - The test field uses placeholder terrain (one flat tile). It is not TGMC art.
-- The mod has no ingame layout, so there is no sidebar, menu, or order UI yet.
+- The HUD is a squad sidebar (radar, selection text, cash, menu button). It has no production
+  palette yet, and the cryo pod and vendor have no `Exit`, so they cannot spawn units.
 - `Spectator` has no traits, which the YAML checker reports as one intentional warning.
 - The Runner's death sound was converted earlier and then dropped. `WithDeathAnimation` has no sound field, so
   wire one in with `Voiced` when you add voice sets.

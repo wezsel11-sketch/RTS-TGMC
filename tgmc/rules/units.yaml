@@ -36,6 +36,15 @@
 
 ^Infantry:
 	Inherits: ^Unit
+	Targetable@HEAL:
+		RequiresCondition: damaged
+		TargetTypes: Heal
+	GrantConditionOnDamageState@DAMAGED:
+		Condition: damaged
+		ValidDamageStates: Light, Medium, Heavy, Critical
+	Voiced:
+		VoiceSet: MarineVoice
+	DeathSounds:
 	WithInfantryBody:
 		MoveSequence: run
 		StandSequences: stand
@@ -60,6 +69,16 @@ medic:
 	Inherits: ^Infantry
 	Health:
 		HP: 90
+	Voiced:
+		VoiceSet: CorpsmanVoice
+	Armament@PRIMARY:
+		Weapon: TGMCHeal
+		Cursor: heal
+		OutsideRangeCursor: heal-blocked
+		TargetRelationships: Ally
+		ForceTargetRelationships: None
+	AutoTargetPriority@DEFAULT:
+		ValidTargets: Infantry
 	Tooltip:
 		Name: actor-medic.name
 	Valued:
@@ -74,6 +93,14 @@ engineer:
 	Inherits: ^Infantry
 	Health:
 		HP: 100
+	Armament@PRIMARY:
+		Weapon: TGMCRepair
+		Cursor: repair
+		OutsideRangeCursor: repair-blocked
+		TargetRelationships: Ally
+		ForceTargetRelationships: None
+	AutoTargetPriority@DEFAULT:
+		ValidTargets: Structure
 	Tooltip:
 		Name: actor-engineer.name
 	Valued:
@@ -99,6 +126,9 @@ runner:
 	WithDeathAnimation:
 		DeathSequence: die
 		FallbackSequence: die
+	Voiced:
+		VoiceSet: XenoVoice
+	DeathSounds:
 	Armament@PRIMARY:
 		Weapon: TGMCClaws
 	AttackFrontal:

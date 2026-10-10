@@ -14,6 +14,7 @@ Rules:
 	tgmc|rules/palettes.yaml
 	tgmc|rules/world.yaml
 	tgmc|rules/player.yaml
+	tgmc|rules/ai.yaml
 	tgmc|rules/units.yaml
 	tgmc|rules/structures.yaml
 
@@ -96,6 +97,9 @@ ChromeLayout:
 	common|chrome/editor.yaml
 	common|chrome/playerprofile.yaml
 	common|chrome/text-notifications.yaml
+
+Voices:
+	tgmc|audio/voices.yaml
 
 Notifications:
 	tgmc|audio/notifications.yaml

@@ -6,14 +6,14 @@ Sounds:
 	Notifications:
 		ChatLine: audio/runner-hiss
 		ChatLineSound: audio/runner-hiss
-		ClickDisabledSound: audio/runner-hiss
-		ClickSound: audio/rifle-fire
+		ClickDisabledSound: audio/ui-deny
+		ClickSound: audio/ui-click
 		DevLevelUp: audio/rifle-fire
 		HideReplayChat: audio/runner-hiss
-		LobbyOptionChangedSound: audio/rifle-fire
+		LobbyOptionChangedSound: audio/ui-ping
 		OpenGeneralChat: audio/runner-hiss
 		OpenTeamChat: audio/runner-hiss
-		PlayerJoinedSound: audio/rifle-fire
+		PlayerJoinedSound: audio/ui-ping
 		PlayerLeftSound: audio/runner-hiss
 		PowerDown: audio/rifle-fire
 		RadarDown: audio/rifle-fire

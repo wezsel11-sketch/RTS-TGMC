@@ -8,10 +8,36 @@ TGMCRifle:
 		Damage: 12
 		Spread: 1c0
 
+TGMCSentry:
+	Inherits: TGMCRifle
+	Report: audio/sentry-fire.ogg
+
+TGMCHeal:
+	Range: 3c0
+	ReloadDelay: 60
+	Report: audio/heal.ogg
+	ValidTargets: Heal
+	Projectile: InstantHit
+	Warhead@1Dam: TargetDamage
+		Damage: -25
+		ValidRelationships: Ally
+		ValidTargets: Heal
+
+TGMCRepair:
+	Range: 2c0
+	ReloadDelay: 40
+	Report: audio/repair.ogg
+	ValidTargets: Repair
+	Projectile: InstantHit
+	Warhead@1Dam: TargetDamage
+		Damage: -30
+		ValidRelationships: Ally
+		ValidTargets: Repair
+
 TGMCClaws:
 	Range: 1c256
 	ReloadDelay: 15
-	Report: audio/runner-hiss.ogg
+	Report: audio/claw-hit.ogg
 	Projectile: InstantHit
 	Warhead@1Dam: TargetDamage
 		Damage: 20
@@ -19,6 +45,7 @@ TGMCClaws:
 TGMCAcid:
 	Range: 6c0
 	ReloadDelay: 25
+	Report: audio/acid-spit.ogg
 	Projectile: InstantHit
 	Warhead@1Dam: TargetDamage
 		Damage: 30

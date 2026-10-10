@@ -16,8 +16,31 @@ import os
 import subprocess
 
 SOUNDS = {
-    "rifle-fire": "sound/weapons/guns/fire/autorifle-1.ogg",
+    # Weapons and hits
+    "rifle-fire": "sound/weapons/guns/fire/t18.ogg",
+    "sentry-fire": "sound/weapons/guns/fire/smartgun1.ogg",
+    "claw-hit": "sound/weapons/alien_claw_flesh1.ogg",
+    "acid-spit": "sound/voice/alien/spitacid.ogg",
+    "heal": "sound/items/hypospray.ogg",
+    "repair": "sound/items/welder.ogg",
+    # Xeno voices
     "runner-hiss": "sound/voice/alien/hiss1.ogg",
+    "xeno-roar-1": "sound/voice/alien/roar1.ogg",
+    "xeno-roar-2": "sound/voice/alien/roar2.ogg",
+    "xeno-death": "sound/voice/alien/death2.ogg",
+    # Marine voices
+    "marine-warcry": "sound/voice/human/male/warcry_1.ogg",
+    "marine-medic": "sound/voice/human/male/medic.ogg",
+    "marine-pain-1": "sound/voice/human/male/pain_1.ogg",
+    "marine-pain-2": "sound/voice/human/male/pain_2.ogg",
+    "marine-scream-1": "sound/voice/human/male/scream_1.ogg",
+    "marine-scream-2": "sound/voice/human/male/scream_2.ogg",
+    # Structures and interface
+    "explosion": "sound/effects/explosion/medium1.ogg",
+    "turret-death": "sound/effects/alien/turret_death.ogg",
+    "ui-click": "sound/effects/menu_click.ogg",
+    "ui-deny": "sound/machines/buzz-two.ogg",
+    "ui-ping": "sound/machines/ping.ogg",
 }
 
 

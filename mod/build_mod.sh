@@ -13,6 +13,8 @@ TGMC=${TGMC:?set TGMC to a terragov-marine-corps checkout}
 OUT="$ROOT/build/mod/tgmc"
 PY=${PYTHON:-python3}
 
+"$PY" -I "$HERE/lint_static.py"
+
 rm -rf "$OUT"
 mkdir -p "$OUT"
 cp -R "$ROOT/tgmc/." "$OUT/"

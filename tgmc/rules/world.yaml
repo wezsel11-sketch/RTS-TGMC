@@ -7,6 +7,9 @@
 	MusicPlaylist:
 	LoadWidgetAtGameStart:
 	CreateMapPlayers:
+	ValidateOrder:
+	ObjectivesPanel:
+		PanelName: SKIRMISH_STATS
 	SpawnMapActors:
 	TerrainRenderer:
 	ColorPickerManager:

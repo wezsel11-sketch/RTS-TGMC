@@ -153,10 +153,12 @@ Players:
 		Name: Marines
 		Playable: True
 		Faction: marines
+		LockFaction: True
 	PlayerReference@Xenos:
 		Name: Xenos
 		Playable: True
 		Faction: xenos
+		LockFaction: True
 
 Actors:
 {"".join(actors)}"""

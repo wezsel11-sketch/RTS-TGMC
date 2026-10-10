@@ -1,0 +1,22 @@
+# Voice sets. Clips are built by mod/build_sounds.py. Select and Action are the phrases Mobile and
+# the attack traits ask for; Die is played by DeathSounds.
+MarineVoice:
+	DefaultVariant: .ogg
+	Voices:
+		Select: audio/marine-warcry
+		Action: audio/marine-warcry
+		Die: audio/marine-scream-1, audio/marine-scream-2, audio/marine-pain-1, audio/marine-pain-2
+
+CorpsmanVoice:
+	DefaultVariant: .ogg
+	Voices:
+		Select: audio/marine-medic
+		Action: audio/marine-medic
+		Die: audio/marine-scream-1, audio/marine-scream-2, audio/marine-pain-1, audio/marine-pain-2
+
+XenoVoice:
+	DefaultVariant: .ogg
+	Voices:
+		Select: audio/xeno-roar-1, audio/xeno-roar-2
+		Action: audio/runner-hiss
+		Die: audio/xeno-death

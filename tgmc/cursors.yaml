@@ -18,3 +18,11 @@ Cursors:
 			Start: 0
 		attackoutsiderange:
 			Start: 0
+		heal:
+			Start: 0
+		heal-blocked:
+			Start: 0
+		repair:
+			Start: 0
+		repair-blocked:
+			Start: 0

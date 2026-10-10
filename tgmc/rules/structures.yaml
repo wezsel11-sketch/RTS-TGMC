@@ -20,6 +20,12 @@
 			BottomRight: 512, 512
 	Targetable:
 		TargetTypes: Ground, Structure
+	Targetable@REPAIR:
+		RequiresCondition: damaged
+		TargetTypes: Repair
+	GrantConditionOnDamageState@DAMAGED:
+		Condition: damaged
+		ValidDamageStates: Light, Medium, Heavy, Critical
 	RenderSprites:
 		Palette: player
 	BodyOrientation:
@@ -111,7 +117,7 @@ sentry-turret:
 	Turreted:
 		TurnSpeed: 20
 	Armament@PRIMARY:
-		Weapon: TGMCRifle
+		Weapon: TGMCSentry
 		Turret: primary
 	AttackTurreted:
 	AutoTarget:

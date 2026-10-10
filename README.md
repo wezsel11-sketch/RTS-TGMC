@@ -42,6 +42,8 @@ mod/                        converters and build script (Python 3, Pillow, ffmpe
   build_sprites.py          .dmi states -> PNG sheets + OpenRA sequence YAML (8 facings)
   build_sounds.py           TGMC .ogg -> mono 22050 Hz Vorbis .ogg
   make_placeholders.py      palette, ground tile, cursor, and a 24x24 test map (no TGMC art)
+  lint_static.py            cross-reference check (sounds, weapons, voice sets, Fluent keys, sequences); build_mod.sh runs it
+  check_mod.sh              runs OpenRA's own lint (--check-yaml, --check-missing-sprites) on the built mod and map
   make_chrome.py            HUD atlas (chrome.png) and chrome.yaml: panels, buttons, icons, logo (no TGMC art)
 tgmc/                       the OpenRA mod (YAML and Fluent only)
   mod.yaml                  manifest
@@ -114,13 +116,17 @@ On a headless machine, run OpenRA under Xvfb with Mesa software GL
 - Player colour remapping is off. The sprites are RGBA, so the `player` palette doesn't
   recolour them. Units are not coloured by owner.
 - Runners have no attack animation. `attack` reuses `stand`. The Runner's claws play the hiss on attack.
-- Sounds are wired to the rifle (`Report` on `TGMCRifle`) and the Runner's claws (hiss). The smoke test
-  doesn't check audio, because the headless run has no audio device.
+- Sounds are wired to weapons (`Report`), voice sets (`audio/voices.yaml`, played on select, order and death)
+  and the UI click, deny and ping. The smoke test doesn't check audio, because the headless run has no
+  audio device. Structures have no death sound yet.
+- Medic and engineer have no heal or repair animation (they reuse `attack`) and no gun. Healing and repair are
+  weapons with negative damage. Both are untested in game.
 - The test field uses placeholder terrain (one flat tile). It is not TGMC art.
 - The HUD is a squad sidebar (radar, a static selection label, production palette, cash, menu button).
   Production icons are the units' front-facing sprite. The clock overlay and the production tab icons are
   placeholders drawn by the scripts. Production buildings have no rally point yet.
-- There is no AI opponent yet, so both sides need a human player.
+- The AI (`rules/ai.yaml`) only trains units and sends them out in squads. It doesn't build structures.
+  Pick "Skirmish AI" for a slot in the lobby.
 - None of the rules have been run in OpenRA since the production, victory and fog traits went in. Run
   `mod/check_mod.sh` before trusting them.
 - The Runner's death sound was converted earlier and then dropped. `WithDeathAnimation` has no sound field, so

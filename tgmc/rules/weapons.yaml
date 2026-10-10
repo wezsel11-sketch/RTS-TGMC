@@ -15,3 +15,10 @@ TGMCClaws:
 	Projectile: InstantHit
 	Warhead@1Dam: TargetDamage
 		Damage: 20
+
+TGMCAcid:
+	Range: 6c0
+	ReloadDelay: 25
+	Projectile: InstantHit
+	Warhead@1Dam: TargetDamage
+		Damage: 30

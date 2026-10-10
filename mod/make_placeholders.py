@@ -25,6 +25,14 @@ ACTORS = [
     ("runner", "Xenos", 13, 12, 0),
     ("runner", "Xenos", 14, 12, 256),
     ("runner", "Xenos", 15, 12, 512),
+    ("resin-turret", "Xenos", 17, 10, 0),
+    ("resin-silo", "Xenos", 4, 4, 0),
+    ("mini-silo", "Xenos", 18, 4, 0),
+    ("medic", "Marines", 9, 13, 512),
+    ("engineer", "Marines", 10, 13, 512),
+    ("sentry-turret", "Marines", 12, 8, 512),
+    ("cryo-pod", "Marines", 5, 17, 512),
+    ("vendor", "Marines", 19, 17, 512),
 ]
 
 
@@ -90,7 +98,7 @@ MapSize: {MAP_SIZE},{MAP_SIZE}
 
 Bounds: 0,0,{MAP_SIZE},{MAP_SIZE}
 
-Visibility: Lobby
+Visibility: Lobby, Shellmap
 
 Categories: Skirmish
 

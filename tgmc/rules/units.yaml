@@ -40,10 +40,43 @@
 
 rifleman:
 	Inherits: ^Infantry
+	Buildable:
+		Queue: Infantry
+		BuildAtProductionType: Infantry
+		BuildPaletteOrder: 10
+		Description: actor-rifleman.description
 	Tooltip:
 		Name: actor-rifleman.name
 	Valued:
 		Cost: 100
+
+medic:
+	Inherits: ^Infantry
+	Health:
+		HP: 90
+	Tooltip:
+		Name: actor-medic.name
+	Valued:
+		Cost: 120
+	Buildable:
+		Queue: Infantry
+		BuildAtProductionType: Infantry
+		BuildPaletteOrder: 20
+		Description: actor-medic.description
+
+engineer:
+	Inherits: ^Infantry
+	Health:
+		HP: 100
+	Tooltip:
+		Name: actor-engineer.name
+	Valued:
+		Cost: 130
+	Buildable:
+		Queue: Infantry
+		BuildAtProductionType: Infantry
+		BuildPaletteOrder: 30
+		Description: actor-engineer.description
 
 runner:
 	Inherits: ^Unit

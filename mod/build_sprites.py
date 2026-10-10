@@ -31,6 +31,12 @@ import tgmc_dmi  # noqa: E402
 HUMAN = "icons/mob/human.dmi"
 MARINE_UNIFORM = "icons/mob/clothing/uniforms/marine_uniforms.dmi"
 RUNNER = "icons/Xeno/castes/runner.dmi"
+ACID_TURRET = "icons/Xeno/acid_turret.dmi"
+RESIN_SILO = "icons/Xeno/resin_silo.dmi"
+RESIN_POD = "icons/Xeno/resin_pod.dmi"
+SENTRY = "icons/obj/machines/deployable/sentry/sentry.dmi"
+CRYO = "icons/obj/machines/cryogenics2.dmi"
+VENDING = "icons/obj/machines/vending.dmi"
 
 # OpenRA facing order (clockwise from north) -> which TGMC side to draw.
 FACING_NAMES = ["N", "NE", "E", "SE", "S", "SW", "W", "NW"]
@@ -44,6 +50,7 @@ UNITS = {
             "stand": [(HUMAN, "body_m"), (MARINE_UNIFORM, "marine_jumpsuit")],
             "run": [(HUMAN, "body_m"), (MARINE_UNIFORM, "marine_jumpsuit")],
             "attack": "stand",
+            "icon": "stand",
         },
     },
     "runner": {
@@ -52,7 +59,45 @@ UNITS = {
             "run": [(RUNNER, "Runner Running")],
             "die": [(RUNNER, "Runner Dead")],
             "attack": "stand",
+            "icon": "stand",
         },
+    },
+    # Xeno structures. Turret is 4-dir, so it gets 8 facings; silo and pod are 1-dir and animate in place.
+    # Marine roles. Same body as the rifleman, with the role's uniform state on top.
+    "medic": {
+        "sequences": {
+            "stand": [(HUMAN, "body_m"), (MARINE_UNIFORM, "marine_medic")],
+            "run": [(HUMAN, "body_m"), (MARINE_UNIFORM, "marine_medic")],
+            "attack": "stand",
+            "icon": "stand",
+        },
+    },
+    "engineer": {
+        "sequences": {
+            "stand": [(HUMAN, "body_m"), (MARINE_UNIFORM, "marine_engineer")],
+            "run": [(HUMAN, "body_m"), (MARINE_UNIFORM, "marine_engineer")],
+            "attack": "stand",
+            "icon": "stand",
+        },
+    },
+    # Marine structures. Sentry is 4-dir (8 facings). Cryo pod and vendor are 1-dir and animate in place.
+    "sentry-turret": {
+        "sequences": {"turret": [(SENTRY, "sentry_deployed")]},
+    },
+    "cryo-pod": {
+        "sequences": {"idle": [(CRYO, "cell_off")], "active": [(CRYO, "cell_on")]},
+    },
+    "vendor": {
+        "sequences": {"idle": [(VENDING, "sustenance")]},
+    },
+    "resin-turret": {
+        "sequences": {"turret": [(ACID_TURRET, "resin_turret")]},
+    },
+    "resin-silo": {
+        "sequences": {"idle": [(RESIN_SILO, "weed_silo")]},
+    },
+    "mini-silo": {
+        "sequences": {"idle": [(RESIN_POD, "resinpod")]},
     },
 }
 
@@ -92,7 +137,7 @@ def composite(layers):
 
 def build_unit(tgmc, unit, spec, out_dir):
     sheet_cells = []      # PIL images, appended in cell order
-    cell_size = None
+    cell_size = None  # (width, height) of one cell
     seq_defs = []         # (sequence name, start, length, facings)
     aliases = []
     for seq_name, layer_specs in spec["sequences"].items():
@@ -102,7 +147,7 @@ def build_unit(tgmc, unit, spec, out_dir):
         dmis = [(tgmc_dmi.Dmi(os.path.join(tgmc, path)), state) for path, state in layer_specs]
         layers = [(dmi, state, layer_images(dmi, state)) for dmi, state in dmis]
         sides = composite(layers)
-        size = dmis[0][0].icon_w
+        size = (dmis[0][0].icon_w, dmis[0][0].icon_h)
         if cell_size is None:
             cell_size = size
         elif cell_size != size:
@@ -126,12 +171,13 @@ def build_unit(tgmc, unit, spec, out_dir):
 
     cols = 8
     rows = (len(sheet_cells) + cols - 1) // cols
-    sheet = Image.new("RGBA", (cols * cell_size, rows * cell_size), (0, 0, 0, 0))
+    cw, ch = cell_size
+    sheet = Image.new("RGBA", (cols * cw, rows * ch), (0, 0, 0, 0))
     for i, img in enumerate(sheet_cells):
-        sheet.paste(img, ((i % cols) * cell_size, (i // cols) * cell_size))
+        sheet.paste(img, ((i % cols) * cw, (i // cols) * ch))
 
     meta = PngImagePlugin.PngInfo()
-    meta.add_text("FrameSize", f"{cell_size},{cell_size}")
+    meta.add_text("FrameSize", f"{cw},{ch}")
     meta.add_text("FrameAmount", str(len(sheet_cells)))
     os.makedirs(os.path.join(out_dir, "sprites"), exist_ok=True)
     os.makedirs(os.path.join(out_dir, "sequences"), exist_ok=True)
@@ -150,7 +196,7 @@ def build_unit(tgmc, unit, spec, out_dir):
     with open(os.path.join(out_dir, "sequences", f"{unit}.yaml"), "w", encoding="utf-8", newline="\n") as f:
         f.write("\n".join(lines) + "\n")
 
-    return {"unit": unit, "sheet": f"sprites/{unit}.png", "cell": cell_size, "cells": len(sheet_cells),
+    return {"unit": unit, "sheet": f"sprites/{unit}.png", "cell": [cw, ch], "cells": len(sheet_cells),
             "sequences": [{"name": n, "start": s, "length": l, "facings": fa} for n, s, l, fa in seq_defs]}
 
 
@@ -165,7 +211,7 @@ def main():
     for unit in args.units:
         info = build_unit(args.tgmc, unit, UNITS[unit], args.out)
         report.append(info)
-        print(f"{unit}: {info['cells']} cells of {info['cell']}px -> {info['sheet']}")
+        print(f"{unit}: {info['cells']} cells of {info['cell'][0]}x{info['cell'][1]}px -> {info['sheet']}")
     with open(os.path.join(args.out, "sprites.json"), "w") as f:
         json.dump(report, f, indent=2)
 

@@ -43,7 +43,9 @@ ACID_TURRET = "icons/Xeno/acid_turret.dmi"
 RESIN_SILO = "icons/Xeno/resin_silo.dmi"
 RESIN_POD = "icons/Xeno/resin_pod.dmi"
 SENTRY = "icons/obj/machines/deployable/sentry/sentry.dmi"
-MARK_ONE = "icons/mob/modular/mark_one/infantry.dmi"
+MARINE_ARMOR = "icons/mob/clothing/suits/marine_armor.dmi"
+MARINE_HELMETS = "icons/mob/clothing/headwear/marine_helmets.dmi"
+FEET = "icons/mob/clothing/feet.dmi"
 RIFLES = "icons/mob/inhands/guns/rifles_right_1.dmi"
 SMGS = "icons/mob/inhands/guns/submachineguns_right_1.dmi"
 PISTOLS = "icons/mob/inhands/guns/pistols_right_1.dmi"
@@ -54,19 +56,18 @@ VENDING = "icons/obj/machines/vending.dmi"
 FACING_NAMES = ["N", "NE", "E", "SE", "S", "SW", "W", "NW"]
 FACING_SOURCE = {"N": "N", "NE": "E", "E": "E", "SE": "E", "S": "S", "SW": "W", "W": "W", "NW": "W"}
 
-# TGMC draws its modular armour grey and tints it in code. This multiply tint gives the usual olive drab.
-OLIVE = (112, 130, 88)
-
 # unit -> sequence -> list of (dmi path, state name[, multiply tint]) layers, bottom first.
 # A sequence given as a string reuses another sequence's cells (an alias, no new art).
 # "name:S" aliases a single facing of that sequence (N, NE, E, SE, S, SW, W or NW), and "name#1" keeps every facing
 # but only the first frame, which gives an animated walk a still pose to stand in.
-ARMOUR = [(MARK_ONE, "leg", OLIVE), (MARK_ONE, "chest", OLIVE), (MARK_ONE, "arm", OLIVE), (MARK_ONE, "helm", OLIVE)]
+# TGMC's standard marine kit in its jungle camo ("m_" states). The boots go over the armour, whose legs would
+# otherwise hide them.
+GEAR = [(MARINE_ARMOR, "m_xarmor"), (FEET, "marine"), (MARINE_HELMETS, "m_helmet")]
 
 
 def marine(uniform, weapon):
-    """Body, role uniform, olive Mark I armour and helmet, then the weapon held in the right hand."""
-    return [(HUMAN, "body_m"), (MARINE_UNIFORM, uniform)] + ARMOUR + [weapon]
+    """Body, role uniform, camo armour, boots and helmet, then the weapon held in the right hand."""
+    return [(HUMAN, "body_m"), (MARINE_UNIFORM, uniform)] + GEAR + [weapon]
 
 
 UNITS = {

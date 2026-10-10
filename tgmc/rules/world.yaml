@@ -4,6 +4,8 @@
 	ScreenMap:
 	Selection:
 	ControlGroups:
+	MusicPlaylist:
+	LoadWidgetAtGameStart:
 	CreateMapPlayers:
 	SpawnMapActors:
 	TerrainRenderer:

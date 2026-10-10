@@ -162,7 +162,7 @@ MapFolders:
 	tgmc|maps
 
 MapGrid:
-	TileSize: 24, 24
+	Type: Rectangular
 
 DefaultOrderGenerator: UnitOrderGenerator
 

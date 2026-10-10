@@ -1,13 +1,14 @@
 ^BasePlayer:
 	Shroud:
+	FrozenActorLayer:
 
 Player:
 	Inherits: ^BasePlayer
 	PlayerResources:
 		DefaultCash: 5000
-	ProductionQueue@Infantry:
+	ClassicProductionQueue@Infantry:
 		Type: Infantry
 	DeveloperMode:
 	TechTree:
-
-Spectator:
+	MissionObjectives:
+	ConquestVictoryConditions:

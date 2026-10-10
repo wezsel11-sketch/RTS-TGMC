@@ -19,6 +19,12 @@
 		TargetTypes: Ground, Infantry
 	AutoTarget:
 		InitialStance: AttackAnything
+	AutoTargetPriority@DEFAULT:
+		ValidTargets: Ground
+	RevealsShroud:
+		Range: 7c0
+	HiddenUnderFog:
+	MustBeDestroyed:
 	AttackMove:
 	RenderSprites:
 		Palette: player
@@ -92,6 +98,7 @@ runner:
 		DefaultAttackSequence: attack
 	WithDeathAnimation:
 		DeathSequence: die
+		FallbackSequence: die
 	Armament@PRIMARY:
 		Weapon: TGMCClaws
 	AttackFrontal:

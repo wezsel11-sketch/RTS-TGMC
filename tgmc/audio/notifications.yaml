@@ -1,19 +1,21 @@
 # Notification sounds for the mod. Files live in audio/ (built by mod/build_sounds.py).
 # Placeholders: every name maps to a TGMC clip we already convert.
+# Names are bare: the engine appends DefaultVariant to each one.
 Sounds:
+	DefaultVariant: .ogg
 	Notifications:
-		ChatLine: audio/runner-hiss.ogg
-		ChatLineSound: audio/runner-hiss.ogg
-		ClickDisabledSound: audio/runner-hiss.ogg
-		ClickSound: audio/rifle-fire.ogg
-		DevLevelUp: audio/rifle-fire.ogg
-		HideReplayChat: audio/runner-hiss.ogg
-		LobbyOptionChangedSound: audio/rifle-fire.ogg
-		OpenGeneralChat: audio/runner-hiss.ogg
-		OpenTeamChat: audio/runner-hiss.ogg
-		PlayerJoinedSound: audio/rifle-fire.ogg
-		PlayerLeftSound: audio/runner-hiss.ogg
-		PowerDown: audio/rifle-fire.ogg
-		RadarDown: audio/rifle-fire.ogg
-		RadarUp: audio/rifle-fire.ogg
-		TransientLineSound: audio/runner-hiss.ogg
+		ChatLine: audio/runner-hiss
+		ChatLineSound: audio/runner-hiss
+		ClickDisabledSound: audio/runner-hiss
+		ClickSound: audio/rifle-fire
+		DevLevelUp: audio/rifle-fire
+		HideReplayChat: audio/runner-hiss
+		LobbyOptionChangedSound: audio/rifle-fire
+		OpenGeneralChat: audio/runner-hiss
+		OpenTeamChat: audio/runner-hiss
+		PlayerJoinedSound: audio/rifle-fire
+		PlayerLeftSound: audio/runner-hiss
+		PowerDown: audio/rifle-fire
+		RadarDown: audio/rifle-fire
+		RadarUp: audio/rifle-fire
+		TransientLineSound: audio/runner-hiss

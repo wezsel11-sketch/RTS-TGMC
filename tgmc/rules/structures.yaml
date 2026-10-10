@@ -6,6 +6,11 @@
 	Building:
 		Footprint: x
 		Dimensions: 1, 1
+		TerrainTypes: Clear
+	RevealsShroud:
+		Range: 8c0
+	FrozenUnderFog:
+	MustBeDestroyed:
 	Selectable:
 		Bounds: 512, 512, -256, -256
 	HitShape:
@@ -44,6 +49,8 @@ resin-turret:
 	AttackTurreted:
 	AutoTarget:
 		InitialStance: AttackAnything
+	AutoTargetPriority@DEFAULT:
+		ValidTargets: Ground
 
 resin-silo:
 	Inherits: ^Structure
@@ -96,6 +103,8 @@ sentry-turret:
 	AttackTurreted:
 	AutoTarget:
 		InitialStance: AttackAnything
+	AutoTargetPriority@DEFAULT:
+		ValidTargets: Ground
 
 cryo-pod:
 	Inherits: ^Structure

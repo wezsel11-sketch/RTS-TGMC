@@ -73,8 +73,7 @@ cd ~/openra-tgmc-mod
 TGMC=~/tgmc OPENRA_DIR=~/openra/openra sh mod/build_mod.sh
 
 # 4. Check the YAML (run from the OpenRA folder)
-cd ~/openra/openra && sh utility.sh tgmc --check-yaml          # expect 0 errors, 1 warning
-sh utility.sh tgmc --check-missing-sprites                      # prints the mod name and no errors
+cd ~/openra-tgmc-mod && OPENRA_DIR=~/openra/openra sh mod/check_mod.sh   # --check-yaml, --check-missing-sprites, and the map
 
 # 5. Launch straight onto the test field. The map UID comes from --map-hash.
 MAP=$(sh utility.sh tgmc --map-hash ~/openra-tgmc-mod/build/mod/tgmc/maps/test-field | tail -1)
@@ -117,7 +116,6 @@ On a headless machine, run OpenRA under Xvfb with Mesa software GL
 - The test field uses placeholder terrain (one flat tile). It is not TGMC art.
 - The HUD is a squad sidebar (radar, selection text, cash, menu button). It has no production
   palette yet, and the cryo pod and vendor have no `Exit`, so they cannot spawn units.
-- `Spectator` has no traits, which the YAML checker reports as one intentional warning.
 - The Runner's death sound was converted earlier and then dropped. `WithDeathAnimation` has no sound field, so
   wire one in with `Voiced` when you add voice sets.
 

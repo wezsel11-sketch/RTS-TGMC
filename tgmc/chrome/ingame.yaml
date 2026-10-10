@@ -1,6 +1,12 @@
 Container@INGAME_ROOT:
 	Logic: LoadIngamePlayerOrObserverUILogic
 	Children:
+		Background@ROOT_MARKER:
+			X: 0
+			Y: 0
+			Width: 200
+			Height: 200
+			Background: tgui-tab-active
 		LogicKeyListener@GLOBAL_KEYHANDLER:
 			Logic: MusicHotkeyLogic, ScreenshotHotkeyLogic, MuteHotkeyLogic, DisableUIKeyLogic, DisableAllUIKeyLogic, QuickSaveHotkeyLogic
 				StopMusicKey: StopMusic

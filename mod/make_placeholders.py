@@ -112,7 +112,7 @@ def write_clock(path):
     sheet.save(path, pnginfo=meta)
 
 
-def write_map(folder, title, size_w, size_h, placed, visibility):
+def write_map(folder, title, size_w, size_h, placed, visibility, spawns):
     os.makedirs(folder, exist_ok=True)
     cells = size_w * size_h
     # map.bin: version byte, width, height, u32 tiles offset, u32 heights offset (0), u32 resources offset (0),
@@ -123,6 +123,8 @@ def write_map(folder, title, size_w, size_h, placed, visibility):
         f.write(header + body)
 
     actors = []
+    # Spawn points come first so that Spawn: 1 and 2 on the players below are their indices.
+    placed = [("mpspawn", "Neutral", x, y, 0) for x, y in spawns] + list(placed)
     for i, (name, owner, x, y, facing) in enumerate(placed):
         actors.append(f"\tActor{i}: {name}\n\t\tOwner: {owner}\n\t\tLocation: {x},{y}\n\t\tFacing: {facing}\n")
 
@@ -138,7 +140,7 @@ Tileset: TGMC
 
 MapSize: {size_w},{size_h}
 
-Bounds: 0,0,{size_w},{size_h}
+Bounds: 1,1,{size_w - 2},{size_h - 2}
 
 Visibility: {visibility}
 
@@ -154,11 +156,15 @@ Players:
 		Playable: True
 		Faction: marines
 		LockFaction: True
+		Spawn: 1
+		LockSpawn: True
 	PlayerReference@Xenos:
 		Name: Xenos
 		Playable: True
 		Faction: xenos
 		LockFaction: True
+		Spawn: 2
+		LockSpawn: True
 
 Actors:
 {"".join(actors)}"""
@@ -179,8 +185,8 @@ def main():
     write_ground_tile(os.path.join(args.out, "ground.png"))
     write_cursor(os.path.join(args.out, "cursor.png"))
     write_clock(os.path.join(args.out, "clock.png"))
-    write_map(os.path.join(args.out, "maps", "test-field"), "TGMC test field", 24, 24, TEST_FIELD, "Lobby, Shellmap")
-    write_map(os.path.join(args.out, "maps", "landing-zone"), "Landing Zone", 40, 28, LANDING_ZONE, "Lobby")
+    write_map(os.path.join(args.out, "maps", "test-field"), "TGMC test field", 24, 24, TEST_FIELD, "Lobby, Shellmap", [(10, 12), (14, 12)])
+    write_map(os.path.join(args.out, "maps", "landing-zone"), "Landing Zone", 40, 28, LANDING_ZONE, "Lobby", [(6, 14), (33, 13)])
     print(f"placeholders written to {args.out}")
 
 

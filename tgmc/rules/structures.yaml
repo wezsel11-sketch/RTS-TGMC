@@ -11,6 +11,8 @@
 		Range: 8c0
 	FrozenUnderFog:
 	MustBeDestroyed:
+	AppearsOnRadar:
+	ProvidesPrerequisite@buildingname:
 	Selectable:
 		Bounds: 512, 512, -256, -256
 	HitShape:
@@ -60,6 +62,7 @@ resin-turret:
 
 resin-silo:
 	Inherits: ^Structure
+	ProvidesRadar:
 	Building:
 		Footprint: xx xx
 		Dimensions: 2, 2
@@ -127,6 +130,7 @@ sentry-turret:
 
 cryo-pod:
 	Inherits: ^Structure
+	ProvidesRadar:
 	Building:
 		Footprint: x x
 		Dimensions: 1, 2

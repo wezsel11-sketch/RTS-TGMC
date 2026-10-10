@@ -25,6 +25,7 @@
 		Range: 7c0
 	HiddenUnderFog:
 	MustBeDestroyed:
+	AppearsOnRadar:
 	AttackMove:
 	RenderSprites:
 		Palette: player

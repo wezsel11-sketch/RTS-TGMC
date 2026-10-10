@@ -3,17 +3,19 @@
 #
 #   OPENRA_DIR=/path/to/OpenRA  mod/check_mod.sh
 #
-# Checks the rules (--check-yaml), the sprite references (--check-missing-sprites), and the test map.
+# Checks the rules (--check-yaml), the sprite references (--check-missing-sprites), and every built map.
 # Exits non-zero on any error. Needs the .NET SDK, like OpenRA itself.
 set -eu
 
 HERE=$(cd "$(dirname "$0")" && pwd)
 ROOT=$(cd "$HERE/.." && pwd)
 OPENRA_DIR=${OPENRA_DIR:?set OPENRA_DIR to a built OpenRA checkout}
-MAP="$ROOT/build/mod/tgmc/maps/test-field"
+MAPS="$ROOT/build/mod/tgmc/maps"
 
 cd "$OPENRA_DIR"
 sh utility.sh tgmc --check-yaml
 sh utility.sh tgmc --check-missing-sprites
-sh utility.sh tgmc --check-yaml "$MAP"
+for map in "$MAPS"/*/; do
+	sh utility.sh tgmc --check-yaml "${map%/}"
+done
 echo "tgmc: checks passed"

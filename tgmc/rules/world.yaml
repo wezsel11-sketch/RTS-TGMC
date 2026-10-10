@@ -7,6 +7,10 @@
 	MusicPlaylist:
 	LoadWidgetAtGameStart:
 	CreateMapPlayers:
+	MapOptions:
+		ShortGameCheckboxEnabled: false
+		TechLevelDropdownVisible: false
+	MapStartingLocations:
 	ValidateOrder:
 	ObjectivesPanel:
 		PanelName: SKIRMISH_STATS
@@ -38,3 +42,9 @@
 
 World:
 	Inherits: ^BaseWorld
+
+# Map editor and lobby marker for a starting position. Actors of this type are read by MapStartingLocations.
+mpspawn:
+	Interactable:
+	Immobile:
+		OccupiesSpace: false

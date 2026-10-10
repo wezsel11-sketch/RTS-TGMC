@@ -2,7 +2,7 @@
 
 An [OpenRA](https://github.com/OpenRA/OpenRA) mod that uses sprites and sounds from
 [Terra Gov Marine Corps (TGMC)](https://github.com/tgstation/terragov-marine-corps), the
-SS13-based game. It has eight units across two factions, plus two xeno structures and a
+SS13-based game. It has nine units across two factions, plus two xeno structures and a
 marine structure set. Each unit has its own weapon, and the NPC bots for each faction train
 and send their own units. See [Units and factions](#units-and-factions).
 

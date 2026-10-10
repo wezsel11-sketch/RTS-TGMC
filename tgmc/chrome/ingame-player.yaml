@@ -15,6 +15,12 @@ Container@PLAYER_WIDGETS:
 			CombineWithGroupKeyPrefix: ControlGroupCombineWith
 			JumpToGroupKeyPrefix: ControlGroupJumpTo
 		LogicTicker@SIDEBAR_TICKER:
+		Background@DEBUG_MARKER:
+			X: 0
+			Y: 0
+			Width: 200
+			Height: 200
+			Background: tgui-tab-active
 		Background@TGMC_SIDEBAR:
 			X: WINDOW_WIDTH - 240
 			Y: 0

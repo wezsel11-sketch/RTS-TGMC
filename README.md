@@ -138,7 +138,10 @@ On a headless machine, run OpenRA under Xvfb with Mesa software GL
   the vendor spawns queued marines, income ticks up, and a "Skirmish AI" in the xeno slot trains Runners that attack
   the marine base. `mod/test_scenarios.sh` checks heal, repair, victory and combat. Not yet checked: voices (no audio
   device) and the xeno side from the player's seat.
-- Production is fast (a few seconds a unit) and the radar shows no terrain colour. Both need tuning.
+- Tuning so far: queues take cost x 60% x 350% ticks (a rifleman is about 8 s, a Runner about 4 s). Marines have
+  120 HP and rifles do 14; Runners have 90 HP and claws do 14, so one marine beats one Runner and swarms matter.
+  Income is 15 cash every 2 s from the vendor and silo and 5 from a mini silo. None of this has had real play time.
+- Fog of war is drawn with plain black quadrant tiles, so edges look blocky.
 - The Runner's death sound was converted earlier and then dropped. `WithDeathAnimation` has no sound field, so
   wire one in with `Voiced` when you add voice sets.
 

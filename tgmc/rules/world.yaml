@@ -17,6 +17,10 @@
 		PanelName: SKIRMISH_STATS
 	SpawnMapActors:
 	TerrainRenderer:
+	ShroudRenderer:
+		Index: 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14
+		OverrideFullShroud: shroudfull
+		OverrideFullFog: fogfull
 	ColorPickerManager:
 		PreviewActor: rifleman
 		PresetColors: FF3B3B, 3BA0FF, 3BFF5C, FFE03B, FF8A1F, B05CFF, 3BFFF0, D9D9D9

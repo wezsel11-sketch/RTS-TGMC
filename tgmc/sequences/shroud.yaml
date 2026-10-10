@@ -1,0 +1,13 @@
+# Shroud and fog edge tiles, drawn by mod/make_placeholders.py (no TGMC art). Frame i - 1 is the tile whose
+# shrouded corners are the bits of i: 1 top left, 2 top right, 4 bottom right, 8 bottom left.
+shroud:
+	shroud:
+		Filename: shroud.png
+		Length: 14
+	shroudfull:
+		Filename: shroudfull.png
+	fog:
+		Filename: fog.png
+		Length: 14
+	fogfull:
+		Filename: fogfull.png

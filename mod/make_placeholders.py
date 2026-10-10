@@ -4,6 +4,7 @@ Nothing here is TGMC art. It writes:
   tgmc.pal                      a flat grey 256-colour palette (OpenRA needs one for its palette setup)
   ground.png                    one 24x24 green ground tile for the terrain template
   cursor.png                    a plain arrow for the default cursor
+  shroud.png, fog.png           14 edge tiles each for unexplored and out-of-sight cells; shroudfull.png and fogfull.png
   clock.png                     production-icon clock overlay frames (62x46, a dark wedge that sweeps away)
   maps/test-field/map.{yaml,bin,png}   a 24x24 map with marines, runners, and one of each structure
   maps/landing-zone/map.{yaml,bin,png} a 40x28 two-base skirmish map: marines west, xenos east
@@ -94,6 +95,28 @@ def write_cursor(path):
         for x in range(min(y + 1, 8)):
             px[x, y] = (255, 255, 255, 255) if x == 0 or x == y or y == 11 else (0, 0, 0, 255)
     img.save(path)
+
+
+def write_shroud_tiles(out, tile=24):
+    """Edge tiles for ShroudRenderer. Frame i - 1 darkens the quadrants named by the bits of i (1 TL, 2 TR, 4 BR, 8 BL)."""
+    half = tile // 2
+    quadrants = {1: (0, 0), 2: (half, 0), 4: (half, half), 8: (0, half)}
+    for name, alpha in (("shroud", 255), ("fog", 128)):
+        sheet = Image.new("RGBA", (tile * 14, tile), (0, 0, 0, 0))
+        for pattern in range(1, 15):
+            for bit, (x, y) in quadrants.items():
+                if pattern & bit:
+                    sheet.paste((0, 0, 0, alpha), (tile * (pattern - 1) + x, y, tile * (pattern - 1) + x + half, y + half))
+        meta = PngImagePlugin.PngInfo()
+        meta.add_text("FrameSize", f"{tile},{tile}")
+        meta.add_text("FrameAmount", "14")
+        sheet.save(os.path.join(out, f"{name}.png"), pnginfo=meta)
+
+        full = Image.new("RGBA", (tile, tile), (0, 0, 0, alpha))
+        meta = PngImagePlugin.PngInfo()
+        meta.add_text("FrameSize", f"{tile},{tile}")
+        meta.add_text("FrameAmount", "1")
+        full.save(os.path.join(out, f"{name}full.png"), pnginfo=meta)
 
 
 def write_clock(path):
@@ -227,6 +250,7 @@ def main():
     write_ground_tile(os.path.join(args.out, "ground.png"))
     write_cursor(os.path.join(args.out, "cursor.png"))
     write_clock(os.path.join(args.out, "clock.png"))
+    write_shroud_tiles(args.out)
     write_map(os.path.join(args.out, "maps", "test-field"), "TGMC test field", 24, 24, TEST_FIELD, "Lobby, Shellmap", [(10, 12), (14, 12)])
     write_map(os.path.join(args.out, "maps", "landing-zone"), "Landing Zone", 40, 28, LANDING_ZONE, "Lobby", [(6, 14), (33, 13)])
     for name, sc in SCENARIOS.items():

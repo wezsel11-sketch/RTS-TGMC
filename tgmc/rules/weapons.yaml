@@ -5,7 +5,7 @@ TGMCRifle:
 	Projectile: Bullet
 		Speed: 600
 	Warhead@1Dam: SpreadDamage
-		Damage: 12
+		Damage: 14
 		Spread: 1c0
 
 TGMCSentry:
@@ -43,7 +43,7 @@ TGMCClaws:
 	TargetActorCenter: true
 	Projectile: InstantHit
 	Warhead@1Dam: TargetDamage
-		Damage: 20
+		Damage: 14
 
 TGMCAcid:
 	Range: 6c0

@@ -3,7 +3,7 @@
 
 ^Unit:
 	Health:
-		HP: 100
+		HP: 120
 	Mobile:
 		Locomotor: foot
 		Speed: 43
@@ -69,7 +69,7 @@ rifleman:
 medic:
 	Inherits: ^Infantry
 	Health:
-		HP: 90
+		HP: 100
 	Voiced:
 		VoiceSet: CorpsmanVoice
 	Armament@PRIMARY:
@@ -93,7 +93,7 @@ medic:
 engineer:
 	Inherits: ^Infantry
 	Health:
-		HP: 100
+		HP: 110
 	Armament@PRIMARY:
 		Weapon: TGMCRepair
 		Cursor: repair
@@ -115,7 +115,7 @@ engineer:
 runner:
 	Inherits: ^Unit
 	Health:
-		HP: 120
+		HP: 90
 	Selectable:
 		Bounds: 1024, 768, -512, -512
 	Mobile:

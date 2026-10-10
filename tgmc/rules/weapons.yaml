@@ -22,3 +22,57 @@ TGMCAcid:
 	Projectile: InstantHit
 	Warhead@1Dam: TargetDamage
 		Damage: 30
+
+# Marine gunners. Smartgunner: fast, spread bullets. Grenadier: lobbed, splash.
+TGMCSmartgun:
+	Range: 7c0
+	ReloadDelay: 5
+	Report: audio/rifle-fire.ogg
+	Projectile: Bullet
+		Speed: 900
+		Inaccuracy: 256
+		InaccuracyType: Maximum
+	Warhead@1Dam: SpreadDamage
+		Damage: 7
+		Spread: 1c0
+
+TGMCGrenade:
+	Range: 8c0
+	ReloadDelay: 40
+	Projectile: Bullet
+		Speed: 280
+		Image: grenade
+		Shadow: true
+		LaunchAngle: 165
+		Blockable: false
+	Warhead@1Dam: SpreadDamage
+		Damage: 45
+		Spread: 2c0
+		Falloff: 100, 50, 20, 0
+
+# Xeno castes. Hunter: a short, fast pounce. Warrior: a wide melee slam. Spitter: a ranged acid glob.
+TGMCPounce:
+	Range: 2c0
+	ReloadDelay: 12
+	Projectile: InstantHit
+	Warhead@1Dam: TargetDamage
+		Damage: 16
+
+TGMCSlam:
+	Range: 1c512
+	ReloadDelay: 35
+	Projectile: InstantHit
+	Warhead@1Dam: SpreadDamage
+		Damage: 30
+		Spread: 1c256
+		Falloff: 100, 60, 25
+
+TGMCSpit:
+	Range: 6c0
+	ReloadDelay: 30
+	Projectile: Bullet
+		Speed: 320
+		Image: acidspit
+	Warhead@1Dam: SpreadDamage
+		Damage: 22
+		Spread: 1c0

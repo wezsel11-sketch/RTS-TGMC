@@ -126,3 +126,19 @@ vendor:
 		Name: actor-vendor.name
 	Valued:
 		Cost: 200
+
+# Xeno production. Trains the xeno castes (Infantry queue). Uses the mini-silo's resin pod art.
+resin-pod:
+	Inherits: ^Structure
+	Health:
+		HP: 350
+	RenderSprites:
+		Image: mini-silo
+	WithIdleAnimation:
+		Sequences: idle
+	Production:
+		Produces: Infantry
+	Tooltip:
+		Name: actor-resin-pod.name
+	Valued:
+		Cost: 250

@@ -37,6 +37,11 @@ RESIN_POD = "icons/Xeno/resin_pod.dmi"
 SENTRY = "icons/obj/machines/deployable/sentry/sentry.dmi"
 CRYO = "icons/obj/machines/cryogenics2.dmi"
 VENDING = "icons/obj/machines/vending.dmi"
+HUNTER = "icons/Xeno/castes/hunter.dmi"
+SPITTER = "icons/Xeno/castes/spitter.dmi"
+WARRIOR = "icons/Xeno/castes/warrior.dmi"
+XENO_EFFECTS = "icons/Xeno/Effects.dmi"
+GRENADE = "icons/obj/items/grenade.dmi"
 
 # OpenRA facing order (clockwise from north) -> which TGMC side to draw.
 FACING_NAMES = ["N", "NE", "E", "SE", "S", "SW", "W", "NW"]
@@ -58,6 +63,51 @@ UNITS = {
             "stand": [(RUNNER, "Runner Walking")],
             "run": [(RUNNER, "Runner Running")],
             "die": [(RUNNER, "Runner Dead")],
+            "attack": [(RUNNER, "alien_fire")],
+            "icon": "stand",
+        },
+    },
+    # Xeno castes. Each has its own alien_fire (4-dir, 5 frames) for its attack animation.
+    "hunter": {
+        "sequences": {
+            "stand": [(HUNTER, "Hunter Walking")],
+            "run": [(HUNTER, "Hunter Running")],
+            "die": [(HUNTER, "Hunter Dead")],
+            "attack": [(HUNTER, "alien_fire")],
+            "icon": "stand",
+        },
+    },
+    "spitter": {
+        "sequences": {
+            "stand": [(SPITTER, "Spitter Walking")],
+            "run": [(SPITTER, "Spitter Running")],
+            "die": [(SPITTER, "Spitter Dead")],
+            "attack": [(SPITTER, "alien_fire")],
+            "icon": "stand",
+        },
+    },
+    "warrior": {
+        "sequences": {
+            "stand": [(WARRIOR, "Warrior Walking")],
+            "run": [(WARRIOR, "Warrior Running")],
+            "die": [(WARRIOR, "Warrior Dead")],
+            "attack": [(WARRIOR, "alien_fire")],
+            "icon": "stand",
+        },
+    },
+    # Marine gunners. Same body as the rifleman, with a different uniform state on top.
+    "smartgunner": {
+        "sequences": {
+            "stand": [(HUMAN, "body_m"), (MARINE_UNIFORM, "marine_assault_crewman")],
+            "run": [(HUMAN, "body_m"), (MARINE_UNIFORM, "marine_assault_crewman")],
+            "attack": "stand",
+            "icon": "stand",
+        },
+    },
+    "grenadier": {
+        "sequences": {
+            "stand": [(HUMAN, "body_m"), (MARINE_UNIFORM, "pilot_spec")],
+            "run": [(HUMAN, "body_m"), (MARINE_UNIFORM, "pilot_spec")],
             "attack": "stand",
             "icon": "stand",
         },
@@ -98,6 +148,13 @@ UNITS = {
     },
     "mini-silo": {
         "sequences": {"idle": [(RESIN_POD, "resinpod")]},
+    },
+    # Projectile images. Weapons refer to these by name (Bullet Image:), not as actors.
+    "acidspit": {
+        "sequences": {"idle": [(XENO_EFFECTS, "acidblob")]},
+    },
+    "grenade": {
+        "sequences": {"idle": [(GRENADE, "grenade")]},
     },
 }
 

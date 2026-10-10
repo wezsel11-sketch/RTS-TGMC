@@ -9,5 +9,53 @@ Player:
 		Type: Infantry
 	DeveloperMode:
 	TechTree:
+	# Each faction gets its own prerequisite, so its units show only for that faction (see Buildable in units.yaml).
+	ProvidesPrerequisite@marines:
+		Prerequisite: marines
+		Factions: marines
+	ProvidesPrerequisite@xenos:
+		Prerequisite: xenos
+		Factions: xenos
+	# NPC bot. It runs only when a slot is set to this bot. Each faction's modules run only for that faction.
+	ModularBot@NormalAI:
+		Name: bot-tgmc-ai.name
+		Type: normal
+	GrantConditionOnBotOwner@normal:
+		Condition: enable-normal-ai
+		Bots: normal
+	GrantConditionOnFaction@marines:
+		Condition: faction-marines
+		Factions: marines
+	GrantConditionOnFaction@xenos:
+		Condition: faction-xenos
+		Factions: xenos
+	# Marine NPCs train a squad mix of riflemen, support roles and heavy gunners.
+	UnitBuilderBotModule@marines:
+		RequiresCondition: enable-normal-ai && faction-marines
+		UnitQueues: Infantry
+		ProductionMinCashRequirement: 150
+		UnitsToBuild:
+			rifleman: 5
+			medic: 1
+			engineer: 1
+			smartgunner: 2
+			grenadier: 2
+	# Xeno NPCs swarm with runners and add the specialist castes.
+	UnitBuilderBotModule@xenos:
+		RequiresCondition: enable-normal-ai && faction-xenos
+		UnitQueues: Infantry
+		ProductionMinCashRequirement: 150
+		UnitsToBuild:
+			runner: 5
+			hunter: 2
+			spitter: 2
+			warrior: 1
+	# Squads gather from production and attack enemy units.
+	SquadManagerBotModule@marines:
+		RequiresCondition: enable-normal-ai && faction-marines
+		SquadSize: 8
+	SquadManagerBotModule@xenos:
+		RequiresCondition: enable-normal-ai && faction-xenos
+		SquadSize: 8
 
 Spectator:

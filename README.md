@@ -2,7 +2,9 @@
 
 An [OpenRA](https://github.com/OpenRA/OpenRA) mod that uses sprites and sounds from
 [Terra Gov Marine Corps (TGMC)](https://github.com/tgstation/terragov-marine-corps), the
-SS13-based game. Right now it has two units: a TGMC marine rifleman and a xeno Runner.
+SS13-based game. It has eight units across two factions, plus two xeno structures and a
+marine structure set. Each unit has its own weapon, and the NPC bots for each faction train
+and send their own units. See [Units and factions](#units-and-factions).
 
 **This repo holds scripts, YAML, and docs only.** No TGMC art or sound, no extracted or
 converted sprites or audio, no `.mix`/`.oramap`, and no OpenRA binaries are committed.
@@ -25,9 +27,14 @@ redistribute the built mod, and do not publish TGMC-derived art or audio. See
 
 The converters read these TGMC files:
 
-- `icons/mob/human.dmi` state `body_m`, with `icons/mob/clothing/uniforms/marine_uniforms.dmi` state `marine_jumpsuit` on top, for the rifleman.
-- `icons/Xeno/castes/runner.dmi` states `Runner Walking`, `Runner Running`, and `Runner Dead`, for the Runner.
+- `icons/mob/human.dmi` state `body_m`, with a uniform state from `icons/mob/clothing/uniforms/marine_uniforms.dmi`
+  on top, for every marine (`marine_jumpsuit`, `marine_medic`, `marine_engineer`, `marine_assault_crewman`, `pilot_spec`).
+- `icons/Xeno/castes/{runner,hunter,spitter,warrior}.dmi`: `Walking`, `Running`, `Dead` states, plus `alien_fire`
+  (4 directions, 5 frames) as each caste's attack animation.
+- `icons/Xeno/Effects.dmi` state `acidblob`, the spitter's acid glob. `icons/obj/items/grenade.dmi` state `grenade`, the grenadier's shell.
+- `icons/Xeno/resin_pod.dmi` (via `mini-silo`), `icons/Xeno/acid_turret.dmi`, and the other structure states listed in `build_sprites.py`.
 - `sound/weapons/guns/fire/autorifle-1.ogg` (rifle fire) and `sound/voice/alien/hiss1.ogg` (Runner hiss).
+  The new weapons reuse the rifle report and have no sound of their own.
 
 ## Layout
 
@@ -48,6 +55,39 @@ build/                      generated; git-ignored
 
 The Doom mod in `aliens-vs-predators-with-tgmc-models` is where these converters started.
 `tgmc_dmi.py` and the sound converter follow its extractor and sound builder.
+
+## Units and factions
+
+The mod has two factions. Each one's units can only be built by that faction: a build
+prerequisite (`ProvidesPrerequisite` in `rules/player.yaml`) grants `marines` or `xenos`,
+and every unit lists its faction in `Buildable: Prerequisites`.
+
+| Faction | Unit | Attack | Notes |
+| --- | --- | --- | --- |
+| Marines | Rifleman | Rifle, 6-cell range, single shot | Standard squad unit |
+| Marines | Corpsman (`medic`) | Rifle | No healing yet; 90 HP |
+| Marines | Engineer | Rifle | 100 HP |
+| Marines | Smartgunner | Rapid spread bullets, 7-cell range, fast reload | Heavy, slow, 130 HP |
+| Marines | Grenadier | Lobbed grenade, splash over 2 cells, 8-cell range | Fragile, 90 HP |
+| Xenos | Runner | Claws, melee | Fast, 120 HP |
+| Xenos | Hunter | Pounce, 2-cell range, very fast | Fastest unit, 110 HP |
+| Xenos | Spitter | Acid glob, 6-cell range, splashes on impact | Ranged, slow |
+| Xenos | Warrior | Melee slam, 1.5-cell reach, 1.25-cell splash | Tank, 260 HP, slow |
+
+Xenos train their units at the **Resin Pod**, which uses the mini-silo's art and the
+Infantry queue. Marines train theirs at the cryo pod and vendor, as before.
+
+**NPC factions.** Each faction has its own bot setup in `rules/player.yaml`, which runs when a
+lobby slot is set to the `TGMC AI` bot:
+
+- `UnitBuilderBotModule` per faction. It trains that faction's units in weighted ratios,
+  e.g. marines favour riflemen, and xenos favour runners.
+- `SquadManagerBotModule` per faction. It gathers squads of 8 and attacks enemy units.
+- `GrantConditionOnFaction` gates each module to its own faction, so a marine bot never
+  trains xeno units and a xeno bot never trains marines.
+
+The bots have no economy yet. They spend the starting cash of 5000 and then stop producing,
+because there are no harvesters and no base-building modules. See [Known gaps](#known-gaps).
 
 ## Build and smoke test
 
@@ -74,8 +114,8 @@ MAP=$(sh utility.sh tgmc --map-hash ~/openra-tgmc-mod/build/mod/tgmc/maps/test-f
 ./launch-game.sh Game.Mod=tgmc Launch.Map=$MAP
 ```
 
-The test field is a 24x24 map with three marines and three Runners at facings
-north, east, and south. This is the only entry point for now. The mod has no menus
+The test field is a 24x24 map with the original marines and runners at facings north,
+east, and south, plus one of each new unit and a resin pod. This is the only entry point for now. The mod has no menus
 or sidebar yet, so you launch it with `Launch.Map`.
 
 On a headless machine, run OpenRA under Xvfb with Mesa software GL
@@ -89,7 +129,10 @@ On a headless machine, run OpenRA under Xvfb with Mesa software GL
   `Facings` for each sequence. OpenRA's facing order is N, NE, E, SE, S, SW, W, NW. TGMC
   provides E and W, so nothing is mirrored (the Doom mod mirrors because its sprites lack
   one side). Diagonals use the side sprite on their own horizontal side: NE and SE use E,
-  and SW and NW use W. `attack` reuses `stand`'s cells, so no art is duplicated.
+  and SW and NW use W. Xeno castes use their own `alien_fire` for `attack`. Marines have no fire
+  frames, so their `attack` reuses `stand`'s cells and no art is duplicated.
+- **Duplicate state names.** Some TGMC castes repeat a state name (the hunter has two
+  `Hunter Walking` states). BYOND uses the first one, and so does `tgmc_dmi.py`.
 - **Facing check.** Actors placed at facing 0, 256, and 512 show the north (back), east
   (side), and south (front) sprites, as expected.
 - **Sounds.** Each `.ogg` is re-encoded to mono, 22050 Hz, Vorbis, and trimmed to 4 seconds.
@@ -102,9 +145,16 @@ On a headless machine, run OpenRA under Xvfb with Mesa software GL
 - The marine's worn gear is the jumpsuit only. Helmets, armour, and held weapons aren't drawn.
 - Player colour remapping is off. The sprites are RGBA, so the `player` palette doesn't
   recolour them. Units are not coloured by owner.
-- Runners have no attack animation. `attack` reuses `stand`. The Runner's claws play the hiss on attack.
-- Sounds are wired to the rifle (`Report` on `TGMCRifle`) and the Runner's claws (hiss). The smoke test
-  doesn't check audio, because the headless run has no audio device.
+- Marines have no attack animation. `attack` reuses `stand`. Xeno castes use `alien_fire`. The Runner's
+  claws play the hiss on attack.
+- Sounds are wired to the rifle (`Report` on `TGMCRifle`, shared by `TGMCSmartgun`) and the Runner's claws
+  (hiss). The grenadier, spitter, hunter and warrior are silent. The smoke test doesn't check audio,
+  because the headless run has no audio device.
+- The NPC bots have no economy. There are no harvesters and no base-building modules, so each bot spends
+  its starting cash and then stops producing. Adding income would need a harvester or a cash trickle.
+- The new units, the resin pod and the bot setup were checked against OpenRA's source (trait names,
+  parameters, sequence and fluent references), not in the game. The `utility.sh --check-yaml` step in
+  the smoke test is still the real check.
 - The test field uses placeholder terrain (one flat tile). It is not TGMC art.
 - The mod has no ingame layout, so there is no sidebar, menu, or order UI yet.
 - `Spectator` has no traits, which the YAML checker reports as one intentional warning.

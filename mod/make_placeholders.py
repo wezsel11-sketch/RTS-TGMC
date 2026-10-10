@@ -33,6 +33,12 @@ ACTORS = [
     ("sentry-turret", "Marines", 12, 8, 512),
     ("cryo-pod", "Marines", 5, 17, 512),
     ("vendor", "Marines", 19, 17, 512),
+    ("smartgunner", "Marines", 7, 14, 512),
+    ("grenadier", "Marines", 8, 16, 512),
+    ("hunter", "Xenos", 16, 15, 0),
+    ("spitter", "Xenos", 18, 14, 0),
+    ("warrior", "Xenos", 20, 12, 0),
+    ("resin-pod", "Xenos", 21, 20, 0),
 ]
 
 

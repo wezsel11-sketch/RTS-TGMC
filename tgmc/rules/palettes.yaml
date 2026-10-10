@@ -1,0 +1,41 @@
+^Palettes:
+	PaletteFromFile@terrain:
+		Name: terrain
+		Tileset: TGMC
+		Filename: tgmc.pal
+		ShadowIndex: 3, 4
+	PaletteFromFile@player:
+		Name: player
+		Filename: tgmc.pal
+		ShadowIndex: 4
+	PaletteFromFile@player-noshadow:
+		Name: player-noshadow
+		Filename: tgmc.pal
+		TransparentIndex: 0, 4
+	PaletteFromFile@chrome:
+		Name: chrome
+		Filename: tgmc.pal
+		ShadowIndex: 3
+		AllowModifiers: false
+	PaletteFromFile@cursor:
+		Name: cursor
+		Filename: tgmc.pal
+		AllowModifiers: false
+		CursorPalette: true
+	PaletteFromFile@effect:
+		Name: effect
+		Filename: tgmc.pal
+		ShadowIndex: 4
+	PaletteFromRGBA@shadow:
+		Name: shadow
+		R: 0
+		G: 0
+		B: 0
+		A: 140
+	IndexedPlayerPalette:
+		BasePalette: player
+		BaseName: player
+		RemapIndex: 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95
+		PlayerIndex:
+			marines: 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95
+			xenos: 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95

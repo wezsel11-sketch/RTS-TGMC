@@ -1,0 +1,39 @@
+# Build output: assembled mod, converted sprites and sounds, test maps. TGMC-derived, never commit.
+build/
+
+# TGMC-derived or extracted art and audio. The repo carries scripts, YAML and docs only.
+*.dmi
+*.png
+*.gif
+*.jpg
+*.ogg
+*.wav
+*.mp3
+*.aud
+*.shp
+*.tem
+*.mix
+*.oramap
+*.zip
+*.pal
+
+# Extracted or converted sprite and sound sets from anywhere.
+extracted/
+converted/
+
+# OpenRA engine checkout and its build output, if they sit inside this tree.
+OpenRA/
+openra/
+bin/
+obj/
+*.pdb
+*.deps.json
+*.runtimeconfig.json
+
+# Python and editor noise.
+__pycache__/
+*.pyc
+.venv/
+.vscode/
+.idea/
+.DS_Store

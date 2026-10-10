@@ -1,0 +1,17 @@
+TGMCRifle:
+	Range: 6c0
+	ReloadDelay: 12
+	Report: audio/rifle-fire.ogg
+	Projectile: Bullet
+		Speed: 600
+	Warhead@1Dam: SpreadDamage
+		Damage: 12
+		Spread: 1c0
+
+TGMCClaws:
+	Range: 1c256
+	ReloadDelay: 15
+	Report: audio/runner-hiss.ogg
+	Projectile: InstantHit
+	Warhead@1Dam: TargetDamage
+		Damage: 20

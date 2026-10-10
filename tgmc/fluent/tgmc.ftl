@@ -1,0 +1,13 @@
+mod-title = TGMC Marines vs Xenos (personal, non-commercial)
+mod-windowtitle = TGMC Marines vs Xenos
+faction-marines =
+    .name = TGMC Marines
+faction-xenos =
+    .name = Xenomorphs
+faction-random =
+    .name = Random
+actor-rifleman =
+    .name = TGMC Rifleman
+actor-runner =
+    .name = Xeno Runner
+tileset-tgmc = TGMC test ground

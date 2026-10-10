@@ -1,0 +1,89 @@
+Metadata:
+	Title: mod-title
+	WindowTitle: mod-windowtitle
+	Version: 0.1
+	Website: https://github.com/tgstation/terragov-marine-corps
+
+FileSystem: DefaultFileSystem
+	Packages:
+		^EngineDir
+		$tgmc: tgmc
+		^EngineDir|mods/common: common
+
+Rules:
+	tgmc|rules/palettes.yaml
+	tgmc|rules/world.yaml
+	tgmc|rules/player.yaml
+	tgmc|rules/units.yaml
+
+Weapons:
+	tgmc|rules/weapons.yaml
+
+Sequences:
+	tgmc|sequences/rifleman.yaml
+	tgmc|sequences/runner.yaml
+
+TileSets:
+	tgmc|tilesets/ground.yaml
+
+Cursors:
+	tgmc|cursors.yaml
+
+Chrome:
+
+Assemblies: OpenRA.Mods.Common.dll
+
+ChromeLayout:
+
+Hotkeys:
+
+LoadScreen: BlankLoadScreen
+
+ChromeMetrics:
+	common|metrics.yaml
+
+Fonts:
+	Regular:
+		Font: common|FreeSans.ttf
+		Size: 14
+		Ascender: 11
+
+MapFolders:
+	tgmc|maps
+
+FluentMessages:
+	tgmc|fluent/tgmc.ftl
+	common|fluent/common.ftl
+	common|fluent/chrome.ftl
+	common|fluent/ingame-debug.ftl
+	common|fluent/hotkeys.ftl
+	common|fluent/rules.ftl
+
+Missions:
+
+MapGrid:
+	TileSize: 24, 24
+
+DefaultOrderGenerator: UnitOrderGenerator
+
+SoundFormats: Ogg
+
+SpriteFormats: PngSheet
+
+TerrainFormat: DefaultTerrain
+
+SpriteSequenceFormat: DefaultSpriteSequence
+
+ServerTraits:
+	LobbyCommands
+	SkirmishLogic
+	PlayerPinger
+	MasterServerPinger
+
+GameSpeeds:
+	DefaultSpeed: default
+	Speeds:
+		default:
+			Name: options-game-speed.normal
+			Timestep: 40
+			OrderLatency: 3

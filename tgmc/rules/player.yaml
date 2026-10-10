@@ -1,0 +1,9 @@
+^BasePlayer:
+	Shroud:
+
+Player:
+	Inherits: ^BasePlayer
+	PlayerResources:
+		DefaultCash: 5000
+
+Spectator:

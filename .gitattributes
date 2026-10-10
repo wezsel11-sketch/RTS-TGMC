@@ -1,0 +1,7 @@
+# OpenRA's --check-yaml compares each YAML file byte-for-byte against its own
+# LF-only re-serialisation, so a CRLF checkout (Windows autocrlf) fails the lint.
+# Keep these as LF everywhere.
+*.yaml text eol=lf
+*.ftl  text eol=lf
+*.sh   text eol=lf
+*.py   text eol=lf

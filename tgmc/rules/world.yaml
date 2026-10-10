@@ -31,6 +31,8 @@
 		SharesCell: true
 		TerrainSpeeds:
 			Clear: 100
+			Road: 120
+			Ford: 60
 	Faction@marines:
 		Name: faction-marines.name
 		InternalName: marines

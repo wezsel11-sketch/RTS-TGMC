@@ -2,7 +2,6 @@
 
 Nothing here is TGMC art. It writes:
   tgmc.pal                      a flat grey 256-colour palette (OpenRA needs one for its palette setup)
-  ground.png                    one 24x24 green ground tile for the terrain template
   cursor.png                    a plain arrow for the default cursor
   shroud.png, fog.png           14 edge tiles each for unexplored and out-of-sight cells; shroudfull.png and fogfull.png
   clock.png                     production-icon clock overlay frames (62x46, a dark wedge that sweeps away)
@@ -20,7 +19,9 @@ import struct
 from PIL import Image, ImageDraw, PngImagePlugin
 
 CLOCK_W, CLOCK_H, CLOCK_FRAMES, CLOCK_COLS = 62, 46, 30, 6  # matches the sidebar palette's IconSize
-TILE_ID = 1  # Template@1 in tilesets/ground.yaml, which is the Clear ground tile
+# Template ids in tilesets/ground.yaml. Grass lists two images, which the engine picks between per cell. The byte
+# after the id in map.bin is the tile's index within a multi-cell template, so it is 0 for every one of these.
+GRASS, WATER, FORD, DIRT = 1, 2, 3, 4
 
 # (actor, owner, x, y, facing). Facing is in OpenRA angle units: 0 = north, 512 = south.
 TEST_FIELD = [
@@ -63,6 +64,19 @@ LANDING_ZONE = [
 ]
 
 
+def flat_ground(x, y):
+    return GRASS, 0
+
+
+def landing_zone_ground(x, y):
+    """A two-cell river down the middle with three fords, and a dirt road linking the two bases."""
+    if x in (19, 20):
+        return (FORD, 0) if y in (4, 5, 12, 13, 14, 15, 22, 23) else (WATER, 0)
+    if y == 13 and (6 <= x <= 32):
+        return DIRT, 0
+    return flat_ground(x, y)
+
+
 def palette_entries():
     """A plain grey ramp. Only the palette-based paths read it; the TGMC-free tiles and sprites are RGBA."""
     return [(i, i, i) for i in range(256)]
@@ -71,20 +85,6 @@ def palette_entries():
 def write_palette(path):
     with open(path, "wb") as f:
         f.write(bytes(c for rgb in palette_entries() for c in rgb))
-
-
-def write_ground_tile(path):
-    """RGBA, not indexed: OpenRA's indexed terrain path drew this tile in the wrong colours."""
-    img = Image.new("RGBA", (24, 24), (0x3B, 0x5A, 0x2F, 255))
-    px = img.load()
-    for y in range(24):
-        for x in range(24):
-            if (x * 7 + y * 13) % 11 == 0:
-                px[x, y] = (0x34, 0x51, 0x2A, 255)
-    meta = PngImagePlugin.PngInfo()
-    meta.add_text("FrameSize", "24,24")
-    meta.add_text("FrameAmount", "1")
-    img.save(path, pnginfo=meta)
 
 
 def write_cursor(path):
@@ -97,7 +97,7 @@ def write_cursor(path):
     img.save(path)
 
 
-def write_shroud_tiles(out, tile=24):
+def write_shroud_tiles(out, tile=32):
     """Edge tiles for ShroudRenderer. Frame i - 1 darkens the quadrants named by the bits of i (1 TL, 2 TR, 4 BR, 8 BL)."""
     half = tile // 2
     quadrants = {1: (0, 0), 2: (half, 0), 4: (half, half), 8: (0, half)}
@@ -166,14 +166,14 @@ SCENARIOS = {
 }
 
 
-def write_map(folder, title, size_w, size_h, placed, visibility, spawns, script=None):
+def write_map(folder, title, size_w, size_h, placed, visibility, spawns, script=None, ground=flat_ground):
     # A scenario map has no slot for the xenos: they are a scripted player, so Lua can find them and they never act.
     os.makedirs(folder, exist_ok=True)
     cells = size_w * size_h
     # map.bin: version byte, width, height, u32 tiles offset, u32 heights offset (0), u32 resources offset (0),
     # then per cell (x-major): u16 template id, u8 variant index.
     header = struct.pack("<BHHIII", 2, size_w, size_h, 17, 0, 0)
-    body = b"".join(struct.pack("<HB", TILE_ID, 0) for _ in range(cells))
+    body = b"".join(struct.pack("<HB", *ground(x, y)) for x in range(size_w) for y in range(size_h))
     with open(os.path.join(folder, "map.bin"), "wb") as f:
         f.write(header + body)
 
@@ -236,7 +236,7 @@ Actors:
     with open(os.path.join(folder, "map.yaml"), "w", encoding="utf-8", newline="\n") as f:
         f.write(yaml)
 
-    preview = Image.new("RGBA", (size_w, size_h), (0x3B, 0x5A, 0x2F, 255))
+    preview = Image.new("RGBA", (size_w, size_h), (0x2E, 0x52, 0x30, 255))
     preview.save(os.path.join(folder, "map.png"))
 
 
@@ -247,12 +247,12 @@ def main():
 
     os.makedirs(args.out, exist_ok=True)
     write_palette(os.path.join(args.out, "tgmc.pal"))
-    write_ground_tile(os.path.join(args.out, "ground.png"))
     write_cursor(os.path.join(args.out, "cursor.png"))
     write_clock(os.path.join(args.out, "clock.png"))
-    write_shroud_tiles(args.out)
+    write_shroud_tiles(args.out, tile=32)
     write_map(os.path.join(args.out, "maps", "test-field"), "TGMC test field", 24, 24, TEST_FIELD, "Lobby, Shellmap", [(10, 12), (14, 12)])
-    write_map(os.path.join(args.out, "maps", "landing-zone"), "Landing Zone", 40, 28, LANDING_ZONE, "Lobby", [(6, 14), (33, 13)])
+    write_map(os.path.join(args.out, "maps", "landing-zone"), "Landing Zone", 40, 28, LANDING_ZONE, "Lobby", [(6, 14), (33, 13)],
+              ground=landing_zone_ground)
     for name, sc in SCENARIOS.items():
         write_map(os.path.join(args.out, "maps", name), name, 24, 24, sc["actors"], "MissionSelector", [(10, 8), (19, 17)],
                   script=sc["script"])

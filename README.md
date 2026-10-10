@@ -27,6 +27,7 @@ redistribute the built mod, and do not publish TGMC-derived art or audio. See
 The converters read these TGMC files:
 
 - `icons/mob/human.dmi` state `body_m`, with `icons/mob/clothing/uniforms/marine_uniforms.dmi` state `marine_jumpsuit` on top, for the rifleman.
+- Terrain tiles: `icons/turf/jungle.dmi` (`grass1`, `grass2`) and `icons/turf/ground_map.dmi` (`dirt`, `seashallow`, `seadeep`).
 - `icons/Xeno/castes/runner.dmi` states `Runner Walking`, `Runner Running`, and `Runner Dead`, for the Runner.
 - Marine gear: Mark I modular armour from `icons/mob/modular/mark_one/infantry.dmi` (`leg`, `chest`, `arm`, `helm`, tinted
   olive by the converter, since TGMC tints it in code), and the held weapon from `icons/mob/inhands/guns/`
@@ -44,7 +45,8 @@ mod/                        converters and build script (Python 3, Pillow, ffmpe
   tgmc_dmi.py               BYOND .dmi reader: state metadata and frame slicing
   build_sprites.py          .dmi states -> PNG sheets + OpenRA sequence YAML (8 facings)
   build_sounds.py           TGMC .ogg -> mono 22050 Hz Vorbis .ogg
-  make_placeholders.py      palette, ground tile, cursor, and a 24x24 test map (no TGMC art)
+  build_tileset.py          TGMC floor tiles (jungle grass, dirt, shallow and deep water) -> 32px PNG tiles
+  make_placeholders.py      palette, cursor, clock, fog tiles and the maps (no TGMC art)
   lint_static.py            cross-reference check (sounds, weapons, voice sets, Fluent keys, sequences); build_mod.sh runs it
   smoke.sh                  launches the built mod headless on a map, screenshots it, fails on an engine exception
   test_scenarios.sh         runs the scripted scenario maps (heal, repair, victory, combat) and checks each prints PASS
@@ -127,7 +129,8 @@ On a headless machine, run OpenRA under Xvfb with Mesa software GL
 - Medic and engineer have no heal or repair animation (they reuse `attack`). Healing and repair are weapons
   with negative damage. Scenario tests cover heal, repair, victory and a rifleman-versus-Runner fight.
 - Weapons that use `InstantHit` need `TargetActorCenter: true`, or the hit lands on a position and does nothing.
-- The test field uses placeholder terrain (one flat tile). It is not TGMC art.
+- Terrain is flat tiles from TGMC's `jungle.dmi` and `ground_map.dmi`: grass (two variants), dirt road, a walkable
+  ford and impassable water. There are no edge or transition tiles, so shorelines are hard. The test field is all grass.
 - The HUD is a squad sidebar (radar, a static selection label, production palette, cash, menu button).
   Production icons are the units' front-facing sprite. The clock overlay and the production tab icons are
   placeholders drawn by the scripts. Production buildings have no rally point yet.

@@ -6,7 +6,7 @@
 	Building:
 		Footprint: x
 		Dimensions: 1, 1
-		TerrainTypes: Clear
+		TerrainTypes: Clear, Road
 	RevealsShroud:
 		Range: 8c0
 	FrozenUnderFog:
@@ -64,8 +64,14 @@ resin-silo:
 	Inherits: ^Structure
 	ProvidesRadar:
 	Building:
-		Footprint: xx xx
-		Dimensions: 2, 2
+		Footprint: xxx xxx xxx
+		Dimensions: 3, 3
+	Selectable:
+		Bounds: 2560, 2560, -1280, -1280
+	HitShape:
+		Type: Rectangle
+			TopLeft: -1536, -1536
+			BottomRight: 1536, 1536
 	StoresPlayerResources:
 		Capacity: 1000
 	Tooltip:
@@ -78,8 +84,8 @@ resin-silo:
 		Interval: 50
 		Amount: 15
 	Exit@1:
-		SpawnOffset: 0,512,0
-		ExitCell: 0,2
+		SpawnOffset: 0,1024,0
+		ExitCell: 1,3
 	Production:
 		Produces: Xeno
 	ProductionBar:

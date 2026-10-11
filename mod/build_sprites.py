@@ -60,13 +60,14 @@ FACING_SOURCE = {"N": "N", "NE": "E", "E": "E", "SE": "E", "S": "S", "SW": "W", 
 # A sequence given as a string reuses another sequence's cells (an alias, no new art).
 # "name:S" aliases a single facing of that sequence (N, NE, E, SE, S, SW, W or NW), and "name#1" keeps every facing
 # but only the first frame, which gives an animated walk a still pose to stand in.
-# TGMC's standard marine kit in its jungle camo ("m_" states). The boots go over the armour, whose legs would
+# TGMC's standard marine kit, the unprefixed states, which are a mottled grey-brown pattern camo that shows up well
+# against green terrain (the "m_" jungle set is dark and blends in). The boots go over the armour, whose legs would
 # otherwise hide them.
-GEAR = [(MARINE_ARMOR, "m_xarmor"), (FEET, "marine"), (MARINE_HELMETS, "m_helmet")]
+GEAR = [(MARINE_ARMOR, "xarmor"), (FEET, "marine"), (MARINE_HELMETS, "helmet")]
 
 
 def marine(uniform, weapon):
-    """Body, role uniform, camo armour, boots and helmet, then the weapon held in the right hand."""
+    """Body, role uniform, armour, boots and helmet, then the weapon held in the right hand."""
     return [(HUMAN, "body_m"), (MARINE_UNIFORM, uniform)] + GEAR + [weapon]
 
 

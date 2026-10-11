@@ -32,6 +32,14 @@ The converters read these TGMC files:
 - `icons/Xeno/castes/hunter.dmi`, `sentinel.dmi` and `drone.dmi` (48px; Hunter and Sentinel have animated walks and runs,
   so each file has a still and an animated state of the same name, and the converter uses the animated one).
 - `icons/Xeno/castes/runner.dmi` states `Runner Walking`, `Runner Running`, and `Runner Dead`, for the Runner.
+- Marine gear: TGMC's standard marine kit, the unprefixed states, a mottled grey-brown pattern camo: `xarmor` from
+  `icons/mob/clothing/suits/marine_armor.dmi`, `marine` boots from `icons/mob/clothing/feet.dmi` (drawn over the armour,
+  whose legs would hide them), `helmet` from `marine_helmets.dmi`, and the held weapon from `icons/mob/inhands/guns/`
+  (`t18_w` rifle, `m44` pistol, `t19_w` SMG). The corpsman and engineer use the `marine_medic` / `marine_engineer`
+  uniform states under the same kit. The `m_` jungle set is darker and hid the marines against the terrain.
+- `icons/Xeno/castes/hunter.dmi`, `sentinel.dmi` and `drone.dmi` (48px; Hunter and Sentinel have animated walks and runs,
+  so each file has a still and an animated state of the same name, and the converter uses the animated one).
+- `icons/Xeno/castes/runner.dmi` states `Runner Walking`, `Runner Running`, and `Runner Dead`, for the Runner.
 - Marine gear: TGMC's standard marine kit in jungle camo: `m_xarmor` from `icons/mob/clothing/suits/marine_armor.dmi`,
   `marine` boots from `icons/mob/clothing/feet.dmi` (drawn over the armour, whose legs would hide them), `m_helmet`
   from `marine_helmets.dmi`, and the held weapon from `icons/mob/inhands/guns/` (`t18_w` rifle, `m44` pistol,

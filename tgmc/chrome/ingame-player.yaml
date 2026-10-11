@@ -1,4 +1,4 @@
-# TGMC squad sidebar for players. Lives on the right, 240px wide, over the map view.
+# TGMC command sidebar for players. Lives on the right, 240px wide, over the map view.
 # The map viewport is narrowed to match in tgmc/chrome/ingame.yaml.
 
 Container@PLAYER_WIDGETS:
@@ -53,33 +53,12 @@ Container@PLAYER_WIDGETS:
 							Y: 2
 							Width: 220
 							Height: 156
-				Background@SELECTION_PANEL:
-					X: 8
-					Y: 214
-					Width: 224
-					Height: 52
-					Background: tgmc-selection
-					Children:
-						Label@SELECTION_TITLE:
-							X: 8
-							Y: 6
-							Width: PARENT_WIDTH - 16
-							Height: 18
-							Text: hud-selection-title
-							Font: Bold
-						Label@SELECTION_TEXT:
-							X: 8
-							Y: 26
-							Width: PARENT_WIDTH - 16
-							Height: 20
-							Text: hud-selection-empty
-							Font: Small
 				Container@SIDEBAR_PRODUCTION:
 					Logic: ClassicProductionLogic
 					X: 4
-					Y: 272
+					Y: 214
 					Width: 232
-					Height: PARENT_HEIGHT - 376
+					Height: PARENT_HEIGHT - 322
 					Children:
 						LogicTicker@PRODUCTION_TICKER:
 						ProductionPalette@PRODUCTION_PALETTE:
@@ -136,13 +115,20 @@ Container@PLAYER_WIDGETS:
 							Height: 20
 							Align: Center
 							Font: TinyBold
+						Label@CASH_LABEL:
+							X: 10
+							Y: 28
+							Width: 100
+							Height: 20
+							Text: hud-cash
+							Font: Tiny
 						LabelWithTooltip@CASH:
 							Logic: IngameCashCounterLogic
 							X: 8
 							Y: 28
 							Width: PARENT_WIDTH - 16
 							Height: 20
-							Align: Center
+							Align: Right
 							Font: Bold
 							TooltipContainer: TOOLTIP_CONTAINER
 							TooltipTemplate: SIMPLE_TOOLTIP
@@ -153,5 +139,7 @@ Container@PLAYER_WIDGETS:
 					Height: 26
 					Background: sidebar-button
 					Key: escape
+					Text: hud-menu
+					Font: Bold
 					DisableWorldSounds: true
 					VisualHeight: 0

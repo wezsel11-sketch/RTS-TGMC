@@ -153,7 +153,7 @@ On a headless machine, run OpenRA under Xvfb with Mesa software GL
 - Weapons that use `InstantHit` need `TargetActorCenter: true`, or the hit lands on a position and does nothing.
 - Terrain is flat tiles from TGMC's `jungle.dmi` and `ground_map.dmi`: grass (two variants), dirt road, a walkable
   ford and impassable water. There are no edge or transition tiles, so shorelines are hard. The test field is all grass.
-- The HUD is a squad sidebar (radar, a static selection label, production palette, cash, menu button).
+- The HUD is a command sidebar (radar, production palette with an Infantry and a Xeno tab, requisition, menu button); it reads the same for either faction. There is no selection readout, as that would need C#.
   Production icons are the units' front-facing sprite. The clock overlay and the production tab icons are
   placeholders drawn by the scripts. Production buildings have no rally point yet.
 - The AI (`rules/ai.yaml`) only trains units and sends them out in squads. It doesn't build structures.
@@ -163,8 +163,8 @@ On a headless machine, run OpenRA under Xvfb with Mesa software GL
 - Verified by running the mod headless (OpenRA bleed, `mod/check_mod.sh` and `mod/smoke.sh`): the lint passes with
   no errors or warnings, and on Landing Zone the camera starts on the base, the radar and production palette work,
   the vendor spawns queued marines, income ticks up, and a "Skirmish AI" in the xeno slot trains Runners that attack
-  the marine base. `mod/test_scenarios.sh` checks heal, repair, mend, victory, combat, the wave script and the AI. Not yet checked: voices (no audio
-  device) and the xeno side from the player's seat.
+  the marine base. `mod/test_scenarios.sh` checks heal, repair, mend, victory, combat, the wave script and the AI. The xeno seat was played on Landing Zone against a marine bot: silo, mini silos, all four castes, palette and tooltips work.
+  Not yet checked: voices (no audio device).
 - AI against AI (`mod/balance.sh`, Landing Zone layout, fastest speed): the marines win about every time, in 2 to 5 minutes
   of game time. The xeno AI masses 12 to 17 units, attacks around minute one, and loses them crossing open ground to
   rifles, sentries and corpsmen before reaching a structure; the marine AI then destroys the hive. The match is never over

@@ -20,3 +20,11 @@ XenoVoice:
 		Select: audio/xeno-roar-1, audio/xeno-roar-2
 		Action: audio/runner-hiss
 		Die: audio/xeno-death
+
+# Structures: a click when selected or ordered, and an explosion when destroyed.
+StructureVoice:
+	DefaultVariant: .ogg
+	Voices:
+		Select: audio/ui-click
+		Action: audio/ui-click
+		Die: audio/explosion

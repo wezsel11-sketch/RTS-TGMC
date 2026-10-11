@@ -146,7 +146,7 @@ On a headless machine, run OpenRA under Xvfb with Mesa software GL
 - Runners have no attack animation. `attack` reuses `stand`. The Runner's claws play the hiss on attack.
 - Sounds are wired to weapons (`Report`), voice sets (`audio/voices.yaml`, played on select, order and death)
   and the UI click, deny and ping. The smoke test doesn't check audio, because the headless run has no
-  audio device. Structures have no death sound yet.
+  audio device. Structures click when selected and explode on death, with one shared sound.
 - Medic and engineer have no heal or repair animation (they reuse `attack`). Healing and repair are weapons
   with negative damage. Scenario tests cover heal, repair, victory and a rifleman-versus-Runner fight.
 - Weapons that use `InstantHit` need `TargetActorCenter: true`, or the hit lands on a position and does nothing.

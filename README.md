@@ -67,7 +67,7 @@ mod/                        converters and build script (Python 3, Pillow, ffmpe
   make_placeholders.py      palette, cursor, clock, fog tiles and the maps (no TGMC art)
   lint_static.py            cross-reference check (sounds, weapons, voice sets, Fluent keys, sequences); build_mod.sh runs it
   smoke.sh                  launches the built mod headless on a map, screenshots it, fails on an engine exception
-  test_scenarios.sh         runs the scripted scenario maps (heal, repair, mend, victory, combat) and checks each prints PASS
+  test_scenarios.sh         runs the scripted scenario maps (heal, repair, mend, victory, combat, waves, ai) and checks each prints PASS
   scenarios/                the Lua scripts those maps run (copied into each map by make_placeholders.py)
   check_mod.sh              runs OpenRA's own lint (--check-yaml, --check-missing-sprites) on the built mod and map
   make_chrome.py            HUD atlas (chrome.png) and chrome.yaml: panels, buttons, icons, logo (no TGMC art)
@@ -108,7 +108,10 @@ MAP=$(sh utility.sh tgmc --map-hash ~/openra-tgmc-mod/build/mod/tgmc/maps/test-f
 ./launch-game.sh Game.Mod=tgmc Launch.Map=$MAP
 ```
 
-There are two maps. **Landing Zone** (40x28) is a skirmish map: marines in the west with a cryo pod
+There are three maps. **Hold the Line** is a survival map: the marines (one human player, no xeno slot) hold their base against
+six timed waves of Runners, Hunters and Sentinels coming from the east, and win by destroying the last wave. The script is
+`mod/scenarios/wave-survival.lua`; its `Config` table at the top sets the spawn cells, wave sizes and delays.
+**Landing Zone** (40x28) is a skirmish map: marines in the west with a cryo pod
 and vendor, xenos in the east with a resin silo. Pick a faction in the lobby and build units from the
 sidebar palette. Cash comes from a starting amount plus a trickle from the vendor and the silos.
 The **test field** is a 24x24 map with three marines and three Runners at facings
@@ -157,7 +160,7 @@ On a headless machine, run OpenRA under Xvfb with Mesa software GL
 - Verified by running the mod headless (OpenRA bleed, `mod/check_mod.sh` and `mod/smoke.sh`): the lint passes with
   no errors or warnings, and on Landing Zone the camera starts on the base, the radar and production palette work,
   the vendor spawns queued marines, income ticks up, and a "Skirmish AI" in the xeno slot trains Runners that attack
-  the marine base. `mod/test_scenarios.sh` checks heal, repair, victory and combat. Not yet checked: voices (no audio
+  the marine base. `mod/test_scenarios.sh` checks heal, repair, mend, victory, combat, the wave script and the AI. Not yet checked: voices (no audio
   device) and the xeno side from the player's seat.
 - Tuning so far: queues take cost x 60% x 350% ticks (a rifleman is about 8 s, a Runner about 4 s). Marines have
   120 HP and rifles do 14; Runners have 90 HP and claws do 14, so one marine beats one Runner and swarms matter.

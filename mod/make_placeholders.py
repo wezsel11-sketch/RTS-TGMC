@@ -146,8 +146,15 @@ def write_clock(path):
 # (the map lint only accepts scripts inside the map), that prints a PASS or FAIL line.
 # A far-off xeno silo keeps the game from ending at tick zero, where it is not part of the test.
 def _scenario(script, marines):
-    return {"script": script, "actors": marines + [("resin-silo", "Xenos", 19, 19, 0)]}
+    return {"scripts": (script,), "actors": marines + [("resin-silo", "Xenos", 19, 19, 0)]}
 
+
+# Hold the Line: the marine half of Landing Zone. The xeno waves come from the east edge.
+HOLD_THE_LINE = [a for a in LANDING_ZONE if a[1] == "Marines"] + [
+    ("sentry-turret", "Marines", 11, 13, 256),
+    ("rifleman", "Marines", 8, 15, 256),
+    ("rifleman", "Marines", 8, 11, 256),
+]
 
 SCENARIOS = {
     "scenario-heal": _scenario("test-heal", [
@@ -164,10 +171,21 @@ SCENARIOS = {
         ("rifleman", "Marines", 10, 10, 512),
         ("runner", "Xenos", 13, 10, 0),
     ]),
-    "scenario-mend": {"script": "test-mend", "actors": [
+    "scenario-mend": {"scripts": ("test-mend",), "actors": [
         ("drone", "Xenos", 10, 10, 512),
         ("resin-turret", "Xenos", 10, 12, 512),
         ("rifleman", "Marines", 20, 20, 0),
+    ]},
+    "scenario-waves": {"scripts": ("wave-survival", "test-waves"), "drop_conquest": True, "actors": [
+        ("rifleman", "Marines", 9, 10, 512),
+        ("rifleman", "Marines", 10, 10, 512),
+        ("rifleman", "Marines", 11, 10, 512),
+        ("rifleman", "Marines", 9, 12, 512),
+        ("rifleman", "Marines", 10, 12, 512),
+    ]},
+    "scenario-ai": {"scripts": ("test-ai",), "xeno_bot": "skirmish", "actors": [
+        ("rifleman", "Marines", 3, 3, 512),
+        ("resin-silo", "Xenos", 16, 16, 0),
     ]},
     "scenario-victory": _scenario("test-victory", [
         ("rifleman", "Marines", 10, 10, 512),
@@ -177,7 +195,8 @@ SCENARIOS = {
 }
 
 
-def write_map(folder, title, size_w, size_h, placed, visibility, spawns, script=None, ground=flat_ground):
+def write_map(folder, title, size_w, size_h, placed, visibility, spawns, scripts=(), ground=flat_ground,
+              category="Skirmish", drop_conquest=False, xeno_bot=None):
     # A scenario map has no slot for the xenos: they are a scripted player, so Lua can find them and they never act.
     os.makedirs(folder, exist_ok=True)
     cells = size_w * size_h
@@ -194,14 +213,21 @@ def write_map(folder, title, size_w, size_h, placed, visibility, spawns, script=
     for i, (name, owner, x, y, facing) in enumerate(placed):
         actors.append(f"\tActor{i}: {name}\n\t\tOwner: {owner}\n\t\tLocation: {x},{y}\n\t\tFacing: {facing}\n")
 
+    script = bool(scripts)
     rules_line = ""
-    if script:
+    if scripts:
         rules_line = "Rules: rules.yaml\n\n"
+        rules = "World:\n\tLuaScript:\n\t\tScripts: " + ", ".join(f"{name}.lua" for name in scripts) + "\n"
+        if drop_conquest:
+            # The script owns the objective, and the xenos start with nothing, so conquest would end the game at once.
+            rules += "Player:\n\t-ConquestVictoryConditions:\n"
         with open(os.path.join(folder, "rules.yaml"), "w", encoding="utf-8", newline="\n") as f:
-            f.write(f"World:\n\tLuaScript:\n\t\tScripts: {script}.lua\n")
-        shutil.copyfile(os.path.join(os.path.dirname(os.path.abspath(__file__)), "scenarios", f"{script}.lua"),
-                        os.path.join(folder, f"{script}.lua"))
+            f.write(rules)
+        for name in scripts:
+            shutil.copyfile(os.path.join(os.path.dirname(os.path.abspath(__file__)), "scenarios", f"{name}.lua"),
+                            os.path.join(folder, f"{name}.lua"))
 
+    xeno_bot_line = f"\t\tBot: {xeno_bot}\n" if xeno_bot else ""
     yaml = f"""MapFormat: 12
 
 RequiresMod: tgmc
@@ -218,7 +244,7 @@ Bounds: 1,1,{size_w - 2},{size_h - 2}
 
 Visibility: {visibility}
 
-{rules_line}Categories: Skirmish
+{rules_line}Categories: {category}
 
 Players:
 	PlayerReference@Neutral:
@@ -236,7 +262,7 @@ Players:
 	PlayerReference@Xenos:
 		Name: Xenos
 		Playable: {not script}
-		Faction: xenos
+{xeno_bot_line}		Faction: xenos
 		LockFaction: True
 		Enemies: Marines
 		Spawn: 2
@@ -266,7 +292,11 @@ def main():
               ground=landing_zone_ground)
     for name, sc in SCENARIOS.items():
         write_map(os.path.join(args.out, "maps", name), name, 24, 24, sc["actors"], "MissionSelector", [(10, 8), (19, 17)],
-                  script=sc["script"])
+                  scripts=sc["scripts"], drop_conquest=sc.get("drop_conquest", False),
+                  xeno_bot=sc.get("xeno_bot"))
+    write_map(os.path.join(args.out, "maps", "hold-the-line"), "Hold the Line", 40, 28, HOLD_THE_LINE, "Lobby",
+              [(6, 14), (33, 13)], scripts=("wave-survival",), ground=landing_zone_ground, category="Survival",
+              drop_conquest=True)
     print(f"placeholders written to {args.out}")
 
 

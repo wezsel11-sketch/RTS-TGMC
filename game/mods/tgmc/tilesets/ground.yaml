@@ -1,0 +1,22 @@
+General:
+	Name: tileset-tgmc
+	Id: TGMC
+	SheetSize: 512
+	EditorTemplateOrder: Terrain
+	HeightDebugColors: AA0000
+
+Terrain:
+	TerrainType@Clear:
+		Type: Clear
+		TargetTypes: Ground
+		Color: 3B5A2F
+
+Templates:
+	Template@1:
+		Id: 1
+		Images: ground.png
+		Size: 1,1
+		PickAny: True
+		Categories: Terrain
+		Tiles:
+			0: Clear

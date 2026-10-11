@@ -1,0 +1,12 @@
+[
+  {
+    "name": "rifle-fire",
+    "source": "sound/weapons/guns/fire/autorifle-1.ogg",
+    "bytes": 17368
+  },
+  {
+    "name": "runner-hiss",
+    "source": "sound/voice/alien/hiss1.ogg",
+    "bytes": 20645
+  }
+]

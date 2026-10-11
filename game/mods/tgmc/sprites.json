@@ -1,0 +1,256 @@
+[
+  {
+    "unit": "cryo-pod",
+    "sheet": "sprites/cryo-pod.png",
+    "cell": [
+      32,
+      64
+    ],
+    "cells": 2,
+    "sequences": [
+      {
+        "name": "idle",
+        "start": 0,
+        "length": 1,
+        "facings": 1
+      },
+      {
+        "name": "active",
+        "start": 1,
+        "length": 1,
+        "facings": 1
+      }
+    ]
+  },
+  {
+    "unit": "engineer",
+    "sheet": "sprites/engineer.png",
+    "cell": [
+      32,
+      32
+    ],
+    "cells": 16,
+    "sequences": [
+      {
+        "name": "stand",
+        "start": 0,
+        "length": 1,
+        "facings": 8
+      },
+      {
+        "name": "run",
+        "start": 8,
+        "length": 1,
+        "facings": 8
+      },
+      {
+        "name": "attack",
+        "start": 0,
+        "length": 1,
+        "facings": 8
+      },
+      {
+        "name": "icon",
+        "start": 0,
+        "length": 1,
+        "facings": 8
+      }
+    ]
+  },
+  {
+    "unit": "medic",
+    "sheet": "sprites/medic.png",
+    "cell": [
+      32,
+      32
+    ],
+    "cells": 16,
+    "sequences": [
+      {
+        "name": "stand",
+        "start": 0,
+        "length": 1,
+        "facings": 8
+      },
+      {
+        "name": "run",
+        "start": 8,
+        "length": 1,
+        "facings": 8
+      },
+      {
+        "name": "attack",
+        "start": 0,
+        "length": 1,
+        "facings": 8
+      },
+      {
+        "name": "icon",
+        "start": 0,
+        "length": 1,
+        "facings": 8
+      }
+    ]
+  },
+  {
+    "unit": "mini-silo",
+    "sheet": "sprites/mini-silo.png",
+    "cell": [
+      64,
+      64
+    ],
+    "cells": 2,
+    "sequences": [
+      {
+        "name": "idle",
+        "start": 0,
+        "length": 2,
+        "facings": 1
+      }
+    ]
+  },
+  {
+    "unit": "resin-silo",
+    "sheet": "sprites/resin-silo.png",
+    "cell": [
+      96,
+      96
+    ],
+    "cells": 5,
+    "sequences": [
+      {
+        "name": "idle",
+        "start": 0,
+        "length": 5,
+        "facings": 1
+      }
+    ]
+  },
+  {
+    "unit": "resin-turret",
+    "sheet": "sprites/resin-turret.png",
+    "cell": [
+      32,
+      32
+    ],
+    "cells": 80,
+    "sequences": [
+      {
+        "name": "turret",
+        "start": 0,
+        "length": 10,
+        "facings": 8
+      }
+    ]
+  },
+  {
+    "unit": "rifleman",
+    "sheet": "sprites/rifleman.png",
+    "cell": [
+      32,
+      32
+    ],
+    "cells": 16,
+    "sequences": [
+      {
+        "name": "stand",
+        "start": 0,
+        "length": 1,
+        "facings": 8
+      },
+      {
+        "name": "run",
+        "start": 8,
+        "length": 1,
+        "facings": 8
+      },
+      {
+        "name": "attack",
+        "start": 0,
+        "length": 1,
+        "facings": 8
+      },
+      {
+        "name": "icon",
+        "start": 0,
+        "length": 1,
+        "facings": 8
+      }
+    ]
+  },
+  {
+    "unit": "runner",
+    "sheet": "sprites/runner.png",
+    "cell": [
+      64,
+      64
+    ],
+    "cells": 17,
+    "sequences": [
+      {
+        "name": "stand",
+        "start": 0,
+        "length": 1,
+        "facings": 8
+      },
+      {
+        "name": "run",
+        "start": 8,
+        "length": 1,
+        "facings": 8
+      },
+      {
+        "name": "die",
+        "start": 16,
+        "length": 1,
+        "facings": 1
+      },
+      {
+        "name": "attack",
+        "start": 0,
+        "length": 1,
+        "facings": 8
+      },
+      {
+        "name": "icon",
+        "start": 0,
+        "length": 1,
+        "facings": 8
+      }
+    ]
+  },
+  {
+    "unit": "sentry-turret",
+    "sheet": "sprites/sentry-turret.png",
+    "cell": [
+      32,
+      32
+    ],
+    "cells": 8,
+    "sequences": [
+      {
+        "name": "turret",
+        "start": 0,
+        "length": 1,
+        "facings": 8
+      }
+    ]
+  },
+  {
+    "unit": "vendor",
+    "sheet": "sprites/vendor.png",
+    "cell": [
+      32,
+      32
+    ],
+    "cells": 1,
+    "sequences": [
+      {
+        "name": "idle",
+        "start": 0,
+        "length": 1,
+        "facings": 1
+      }
+    ]
+  }
+]

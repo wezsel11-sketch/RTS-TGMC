@@ -1,0 +1,89 @@
+MapFormat: 12
+
+RequiresMod: tgmc
+
+Title: TGMC test field
+
+Author: local smoke test
+
+Tileset: TGMC
+
+MapSize: 26,26
+
+Bounds: 1,1,24,24
+
+Visibility: Lobby, Shellmap
+
+Categories: Skirmish
+
+Players:
+	PlayerReference@Neutral:
+		Name: Neutral
+		OwnsWorld: True
+		NonCombatant: True
+	PlayerReference@Marines:
+		Name: Marines
+		Playable: True
+		Faction: marines
+	PlayerReference@Xenos:
+		Name: Xenos
+		Playable: True
+		Faction: xenos
+
+Actors:
+	Actor0: rifleman
+		Owner: Marines
+		Location: 9,11
+		Facing: 0
+	Actor1: rifleman
+		Owner: Marines
+		Location: 10,11
+		Facing: 256
+	Actor2: rifleman
+		Owner: Marines
+		Location: 11,11
+		Facing: 512
+	Actor3: runner
+		Owner: Xenos
+		Location: 13,12
+		Facing: 0
+	Actor4: runner
+		Owner: Xenos
+		Location: 14,12
+		Facing: 256
+	Actor5: runner
+		Owner: Xenos
+		Location: 15,12
+		Facing: 512
+	Actor6: resin-turret
+		Owner: Xenos
+		Location: 17,10
+		Facing: 0
+	Actor7: resin-silo
+		Owner: Xenos
+		Location: 4,4
+		Facing: 0
+	Actor8: mini-silo
+		Owner: Xenos
+		Location: 18,4
+		Facing: 0
+	Actor9: medic
+		Owner: Marines
+		Location: 9,13
+		Facing: 512
+	Actor10: engineer
+		Owner: Marines
+		Location: 10,13
+		Facing: 512
+	Actor11: sentry-turret
+		Owner: Marines
+		Location: 12,8
+		Facing: 512
+	Actor12: cryo-pod
+		Owner: Marines
+		Location: 5,17
+		Facing: 512
+	Actor13: vendor
+		Owner: Marines
+		Location: 19,17
+		Facing: 512

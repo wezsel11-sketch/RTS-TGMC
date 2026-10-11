@@ -1,0 +1,3 @@
+The engine in this folder is OpenRA (GPL-3.0), built unmodified from
+https://github.com/OpenRA/OpenRA/commit/e7e9e4ad270221d7fb9725b348c75504d48c1ebd
+with: dotnet publish -c Release -r win-x64 --self-contained true

@@ -159,7 +159,8 @@ Fonts:
 Missions:
 
 MapFolders:
-	tgmc|maps
+	tgmc|maps: System
+	~^SupportDir|maps/tgmc: User
 
 MapGrid:
 	TileSize: 24, 24

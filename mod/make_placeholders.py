@@ -14,7 +14,8 @@ import struct
 
 from PIL import Image, PngImagePlugin
 
-MAP_SIZE = 24
+MAP_SIZE = 26  # 24x24 playable area plus the one-cell cordon OpenRA requires on every side
+PLAY_SIZE = MAP_SIZE - 2
 TILE_ID = 1  # Template@1 in tilesets/ground.yaml, which is the Clear ground tile
 
 # (actor, owner, x, y, facing). Facing is in OpenRA angle units: 0 = north, 512 = south.
@@ -96,7 +97,7 @@ Tileset: TGMC
 
 MapSize: {MAP_SIZE},{MAP_SIZE}
 
-Bounds: 0,0,{MAP_SIZE},{MAP_SIZE}
+Bounds: 1,1,{PLAY_SIZE},{PLAY_SIZE}
 
 Visibility: Lobby, Shellmap
 

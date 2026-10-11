@@ -1,0 +1,13 @@
+^BasePlayer:
+	Shroud:
+
+Player:
+	Inherits: ^BasePlayer
+	PlayerResources:
+		DefaultCash: 5000
+	ProductionQueue@Infantry:
+		Type: Infantry
+	DeveloperMode:
+	TechTree:
+
+Spectator:

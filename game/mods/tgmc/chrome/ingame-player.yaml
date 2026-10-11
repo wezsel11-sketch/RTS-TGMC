@@ -1,0 +1,111 @@
+# TGMC squad sidebar for players. Lives on the right, 240px wide, over the map view.
+# The map viewport is narrowed to match in tgmc/chrome/ingame.yaml.
+
+Container@PLAYER_WIDGETS:
+	Logic: LoadIngameChatLogic
+	Children:
+		Container@CHAT_ROOT:
+		LogicKeyListener@PLAYER_KEYHANDLER:
+			Logic: RemoveFromControlGroupHotkeyLogic
+				RemoveFromControlGroupKey: RemoveFromControlGroup
+		ControlGroups@CONTROLGROUPS:
+			SelectGroupKeyPrefix: ControlGroupSelect
+			CreateGroupKeyPrefix: ControlGroupCreate
+			AddToGroupKeyPrefix: ControlGroupAddTo
+			CombineWithGroupKeyPrefix: ControlGroupCombineWith
+			JumpToGroupKeyPrefix: ControlGroupJumpTo
+		LogicTicker@SIDEBAR_TICKER:
+		Background@TGMC_SIDEBAR:
+			X: WINDOW_WIDTH - 240
+			Y: 0
+			Width: 240
+			Height: WINDOW_HEIGHT
+			Background: tgmc-panel
+			Children:
+				Label@HEADER:
+					X: 8
+					Y: 6
+					Width: PARENT_WIDTH - 16
+					Height: 22
+					Text: hud-header
+					Font: Bold
+					Align: Center
+				Label@FACTION:
+					X: 8
+					Y: 26
+					Width: PARENT_WIDTH - 16
+					Height: 16
+					Text: hud-faction
+					Font: Tiny
+					Align: Center
+				Background@RADAR_FRAME:
+					X: 8
+					Y: 48
+					Width: 224
+					Height: 224
+					Background: tgmc-radar-frame
+					Logic: IngameRadarDisplayLogic
+					Children:
+						LogicTicker@RADAR_TICKER:
+						Radar@RADAR_MINIMAP:
+							WorldInteractionController: INTERACTION_CONTROLLER
+							X: 2
+							Y: 2
+							Width: 220
+							Height: 220
+				Background@SELECTION_PANEL:
+					X: 8
+					Y: 282
+					Width: 224
+					Height: 120
+					Background: tgmc-selection
+					Children:
+						Label@SELECTION_TITLE:
+							X: 8
+							Y: 6
+							Width: PARENT_WIDTH - 16
+							Height: 18
+							Text: hud-selection-title
+							Font: Bold
+						Label@SELECTION_TEXT:
+							X: 8
+							Y: 30
+							Width: PARENT_WIDTH - 16
+							Height: 80
+							Text: hud-selection-empty
+							Font: Regular
+							WordWrap: true
+				Background@READOUT_PANEL:
+					X: 8
+					Y: 410
+					Width: 224
+					Height: 56
+					Background: tgmc-panel
+					Children:
+						Label@GAME_TIMER:
+							Logic: GameTimerLogic
+							X: 8
+							Y: 6
+							Width: PARENT_WIDTH - 16
+							Height: 20
+							Align: Center
+							Font: TinyBold
+						LabelWithTooltip@CASH:
+							Logic: IngameCashCounterLogic
+							X: 8
+							Y: 28
+							Width: PARENT_WIDTH - 16
+							Height: 20
+							Align: Center
+							Font: Bold
+							TooltipContainer: TOOLTIP_CONTAINER
+							TooltipTemplate: SIMPLE_TOOLTIP
+				MenuButton@OPTIONS_BUTTON:
+					X: 8
+					Y: 474
+					Width: 224
+					Height: 26
+					Background: sidebar-button
+					Key: escape
+					DisableWorldSounds: true
+					VisualHeight: 0

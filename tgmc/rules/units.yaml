@@ -117,6 +117,42 @@ engineer:
 		BuildPaletteOrder: 30
 		Description: actor-engineer.description
 
+smartgunner:
+	Inherits: ^Infantry
+	Health:
+		HP: 130
+	Mobile:
+		Speed: 36
+	Armament@PRIMARY:
+		Weapon: TGMCSmartgun
+	Tooltip:
+		Name: actor-smartgunner.name
+	Valued:
+		Cost: 200
+	Buildable:
+		Queue: Infantry
+		BuildAtProductionType: Infantry
+		BuildPaletteOrder: 40
+		Description: actor-smartgunner.description
+		Prerequisites: marines
+
+grenadier:
+	Inherits: ^Infantry
+	Health:
+		HP: 90
+	Armament@PRIMARY:
+		Weapon: TGMCGrenade
+	Tooltip:
+		Name: actor-grenadier.name
+	Valued:
+		Cost: 180
+	Buildable:
+		Queue: Infantry
+		BuildAtProductionType: Infantry
+		BuildPaletteOrder: 50
+		Description: actor-grenadier.description
+		Prerequisites: marines
+
 ^Xeno:
 	Inherits: ^Unit
 	Targetable@ALIEN:
@@ -220,3 +256,24 @@ drone:
 		Queue: Xeno
 		BuildPaletteOrder: 40
 		Description: actor-drone.description
+
+warrior:
+	Inherits: ^Xeno
+	Voiced:
+		VoiceSet: HunterVoice
+	Health:
+		HP: 260
+	Selectable:
+		Bounds: 1024, 1024, -512, -512
+	Mobile:
+		Speed: 32
+	Armament@PRIMARY:
+		Weapon: TGMCSlam
+	Tooltip:
+		Name: actor-warrior.name
+	Valued:
+		Cost: 200
+	Buildable:
+		Queue: Xeno
+		BuildPaletteOrder: 50
+		Description: actor-warrior.description

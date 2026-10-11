@@ -48,6 +48,9 @@ TEST_FIELD = [
     ("sentry-turret", "Marines", 12, 8, 512),
     ("cryo-pod", "Marines", 5, 17, 512),
     ("vendor", "Marines", 19, 17, 512),
+    ("smartgunner", "Marines", 7, 14, 512),
+    ("grenadier", "Marines", 8, 16, 512),
+    ("warrior", "Xenos", 20, 12, 0),
 ]
 
 # Two bases facing each other across the middle. Exits are below the producers, so keep those cells clear.

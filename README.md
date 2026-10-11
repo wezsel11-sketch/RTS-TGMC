@@ -2,9 +2,9 @@
 
 An [OpenRA](https://github.com/OpenRA/OpenRA) mod that uses sprites and sounds from
 [Terra Gov Marine Corps (TGMC)](https://github.com/tgstation/terragov-marine-corps), the
-SS13-based game. It has marine infantry (rifleman, corpsman, engineer), a xeno Runner, a few
-marine and xeno structures, and a TGMC-styled HUD. The xenos have a Runner, a Hunter, an acid-spitting Sentinel and a
-structure-mending Drone.
+SS13-based game. It has marine infantry (rifleman, corpsman, engineer, smartgunner, grenadier), a few
+marine and xeno structures, and a TGMC-styled HUD. The xenos have a Runner, a Hunter, an acid-spitting Sentinel, a
+structure-mending Drone and a heavy Warrior.
 
 **This repo holds scripts, YAML, and docs only.** No TGMC art or sound, no extracted or
 converted sprites or audio, no `.mix`/`.oramap`, and no OpenRA binaries are committed.
@@ -37,8 +37,8 @@ the commits this mod was tested against (see the top of the script), so a later 
 - **Main menu -> Singleplayer -> Skirmish.** Pick **Landing Zone** (two-player skirmish) or **Hold the Line** (marines against waves).
   In Landing Zone choose a faction for yourself and set the other slot to **Skirmish AI**, then Start Game.
 - **Marines** start with a cryo pod, a vendor and a squad. Click the cryo pod and use the sidebar's *Infantry* tab to train riflemen,
-  corpsmen (they heal) and engineers (they repair). **Xenos** start with a resin silo and mini silos; use the *Xeno* tab for Runner,
-  Hunter, Sentinel (spits acid) and Drone (mends structures).
+  corpsmen (they heal), engineers (they repair), smartgunners (rapid spread fire) and grenadiers (splash). **Xenos** start with a resin silo and mini silos; use the *Xeno* tab for Runner,
+  Hunter, Sentinel (spits acid), Drone (mends structures) and Warrior (wide melee slam).
 - **Cash** is a starting sum plus a trickle from the vendor and the silos. There is no harvesting.
 - **Controls** are OpenRA's: left-click or drag to select, right-click to move or attack, `A` then click to attack-move,
   `S` to stop, `Ctrl`+number to group, and right-click a production building to set where new units gather (rally point).

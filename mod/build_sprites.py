@@ -51,6 +51,8 @@ SMGS = "icons/mob/inhands/guns/submachineguns_right_1.dmi"
 PISTOLS = "icons/mob/inhands/guns/pistols_right_1.dmi"
 CRYO = "icons/obj/machines/cryogenics2.dmi"
 VENDING = "icons/obj/machines/vending.dmi"
+WARRIOR = "icons/Xeno/castes/warrior.dmi"
+GRENADE = "icons/obj/items/grenade.dmi"
 
 # OpenRA facing order (clockwise from north) -> which TGMC side to draw.
 FACING_NAMES = ["N", "NE", "E", "SE", "S", "SW", "W", "NW"]
@@ -119,6 +121,16 @@ UNITS = {
             "icon": "stand:S",
         },
     },
+    "warrior": {
+        "sequences": {
+            "walk": [(WARRIOR, "Warrior Walking")],
+            "run": [(WARRIOR, "Warrior Running")],
+            "stand": "walk#1",
+            "die": [(WARRIOR, "Warrior Dead")],
+            "attack": "stand",
+            "icon": "stand:S",
+        },
+    },
     # Marine roles. Same body as the rifleman, with the role's uniform state on top.
     "medic": {
         "sequences": {
@@ -131,6 +143,23 @@ UNITS = {
     "engineer": {
         "sequences": {
             "stand": marine("marine_engineer", (SMGS, "t19_w")),
+            "run": "stand",
+            "attack": "stand",
+            "icon": "stand:S",
+        },
+    },
+    # Marine gunners. Same kit as the other roles with their own uniform state; the weapon art is the rifle's.
+    "smartgunner": {
+        "sequences": {
+            "stand": marine("marine_assault_crewman", (RIFLES, "t18_w")),
+            "run": "stand",
+            "attack": "stand",
+            "icon": "stand:S",
+        },
+    },
+    "grenadier": {
+        "sequences": {
+            "stand": marine("pilot_spec", (RIFLES, "t18_w")),
             "run": "stand",
             "attack": "stand",
             "icon": "stand:S",
@@ -155,6 +184,10 @@ UNITS = {
     },
     "mini-silo": {
         "sequences": {"idle": [(RESIN_POD, "resinpod")]},
+    },
+    # Projectile images. Weapons refer to these by name (Bullet Image:), not as actors.
+    "grenade": {
+        "sequences": {"idle": [(GRENADE, "grenade")]},
     },
 }
 

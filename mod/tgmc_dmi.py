@@ -76,7 +76,10 @@ class Dmi:
         self.icon_w, self.icon_h, self.states = parse_meta(text)
         self.sheet = Image.open(path).convert("RGBA")
         self.cols = self.sheet.width // self.icon_w
-        self._by_name = {s["name"]: s for s in self.states}
+        # BYOND uses the first state with a given name. Some TGMC castes (hunter) repeat a name.
+        self._by_name = {}
+        for s in self.states:
+            self._by_name.setdefault(s["name"], s)
 
     def has_state(self, name):
         return name in self._by_name

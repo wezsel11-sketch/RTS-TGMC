@@ -107,3 +107,49 @@ TGMCAcid:
 		ImpactSoundChance: 70
 		ValidRelationships: Enemy
 		ValidTargets: Ground, Water
+
+# Marine gunners. Smartgunner: fast, spread bullets. Grenadier: lobbed, splash.
+TGMCSmartgun:
+	Range: 7c0
+	ReloadDelay: 5
+	Report: rifle-fire-1.ogg, rifle-fire-2.ogg, rifle-fire-3.ogg
+	Projectile: Bullet
+		Speed: 900
+		Inaccuracy: 256
+		InaccuracyType: Maximum
+	Warhead@1Dam: SpreadDamage
+		Damage: 7
+		Spread: 1c0
+		ValidRelationships: Enemy
+	Warhead@2Hit: CreateEffect
+		ImpactSounds: hit-bullet-1.ogg, hit-bullet-2.ogg, hit-bullet-3.ogg, hit-bullet-4.ogg
+		ImpactSoundChance: 40
+		ValidRelationships: Enemy
+		ValidTargets: Alien, Structure
+
+TGMCGrenade:
+	Range: 8c0
+	ReloadDelay: 40
+	Projectile: Bullet
+		Speed: 280
+		Image: grenade
+		Shadow: true
+		LaunchAngle: 165
+		Blockable: false
+	Warhead@1Dam: SpreadDamage
+		Damage: 45
+		Spread: 2c0
+		Falloff: 100, 50, 20, 0
+		ValidRelationships: Enemy
+
+# Xeno Warrior: a wide melee slam.
+TGMCSlam:
+	Range: 1c512
+	ReloadDelay: 35
+	Report: claw-swipe-1.ogg, claw-swipe-2.ogg, claw-swipe-3.ogg
+	Projectile: InstantHit
+	Warhead@1Dam: SpreadDamage
+		Damage: 30
+		Spread: 1c256
+		Falloff: 100, 60, 25
+		ValidRelationships: Enemy

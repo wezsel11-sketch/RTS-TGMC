@@ -38,6 +38,10 @@ Sequences:
 	tgmc|sequences/resin-turret.yaml
 	tgmc|sequences/resin-silo.yaml
 	tgmc|sequences/mini-silo.yaml
+	tgmc|sequences/smartgunner.yaml
+	tgmc|sequences/grenadier.yaml
+	tgmc|sequences/warrior.yaml
+	tgmc|sequences/grenade.yaml
 
 TileSets:
 	tgmc|tilesets/ground.yaml

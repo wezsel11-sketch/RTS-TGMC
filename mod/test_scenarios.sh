@@ -2,6 +2,7 @@
 # Run every scripted scenario map (build/mod/tgmc/maps/scenario-*) headless and check that each prints "TEST <name> PASS".
 #
 #   OPENRA_DIR=/path/to/OpenRA  mod/test_scenarios.sh [seconds-per-scenario]
+#   SCENARIO_ONLY="death vet"   run only scenario-death and scenario-vet
 #
 # Each scenario is a map built by make_placeholders.py with a Lua script from mod/scenarios. The game runs in real
 # time at best (25 ticks a second), so each one is stopped once it prints PASS or FAIL, or after the ceiling in seconds
@@ -14,6 +15,15 @@ OPENRA_DIR=${OPENRA_DIR:?set OPENRA_DIR to a built OpenRA checkout}
 WAIT=${1:-150}
 OUT=${SMOKE_OUT:-"$ROOT/build/scenarios"}
 fail=0
+ONLY=${SCENARIO_ONLY:-}
+# wanted <scenario-name>: true when no filter is set or the name (without "scenario-") is in it
+wanted() {
+	[ -z "$ONLY" ] && return 0
+	for w in $ONLY; do
+		[ "scenario-$w" = "$1" ] && return 0
+	done
+	return 1
+}
 
 rm -rf "$OUT"
 export LIBGL_ALWAYS_SOFTWARE=1 SDL_AUDIODRIVER=dummy
@@ -47,6 +57,7 @@ run_one() {
 
 running=0
 for dir in "$ROOT"/build/mod/tgmc/maps/scenario-*/; do
+	wanted "$(basename "$dir")" || continue
 	run_one "$(basename "$dir")" &
 	running=$((running + 1))
 	if [ "$running" -ge "$JOBS" ]; then
@@ -58,6 +69,7 @@ wait
 
 for dir in "$ROOT"/build/mod/tgmc/maps/scenario-*/; do
 	name=$(basename "$dir")
+	wanted "$name" || continue
 	line=$(grep -h "TEST " "$OUT/$name/game.log" | sed 's/^Lua debug: //' | head -3)
 	badsound=$(grep -hE "does not exist|not a valid sound" "$OUT/$name/support/Logs/sound.log" "$OUT/$name/game.log" 2>/dev/null | head -2)
 	if [ -n "$badsound" ]; then

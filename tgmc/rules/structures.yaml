@@ -21,6 +21,7 @@
 	DeathSounds:
 	Selectable:
 		Bounds: 512, 512, -256, -256
+	SelectionDecorations:
 	HitShape:
 		UseTargetableCellsOffsets: true
 		Type: Rectangle

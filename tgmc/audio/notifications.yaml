@@ -9,6 +9,7 @@ Sounds:
 		ClickDisabledSound: ui-deny
 		ClickSound: ui-click
 		DevLevelUp: ui-confirm
+		LevelUp: ui-confirm
 		HideReplayChat: ui-click
 		LobbyOptionChangedSound: ui-ping
 		OpenGeneralChat: ui-click

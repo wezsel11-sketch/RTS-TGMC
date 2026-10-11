@@ -19,6 +19,10 @@ green xeno splatter becomes red marine blood), "size" scales the frames to that 
 square, "fit" (w, h) shrinks them into a box of that size keeping the aspect ratio, "side" keeps one side (S, N, E, W) of a
 4-direction state, and "tick" sets the milliseconds per frame.
 
+A sequence may instead be a dict {"fall": layers, "frames": n, "tick": ms}: the layers are composited as for a stand pose, then
+turned over n frames into a body lying on the ground in a growing pool of blood (a marine has no death art of its own). With
+"final": True only the last, fully fallen frame is kept (the corpse that stays behind).
+
 Animation timing comes from the .dmi `delay` list (deciseconds per frame). OpenRA has one `Tick`
 (ms per frame) per sequence, so Tick is the GCD of the delays and a frame that holds longer is
 repeated in the sheet. A state with no delay list keeps OpenRA's default Tick.
@@ -98,6 +102,9 @@ UNITS = {
             "stand": marine("marine_jumpsuit", (RIFLES, "t18_w")),
             "run": "stand",
             "attack": "stand",
+            # Marines have no death art in TGMC: topple the stand pose into a pool of blood, and keep the last frame as the corpse
+            "die": {"fall": marine("marine_jumpsuit", (RIFLES, "t18_w")), "frames": 5, "tick": 90, "side": "S"},
+            "corpse": {"fall": marine("marine_jumpsuit", (RIFLES, "t18_w")), "frames": 5, "final": True, "side": "S"},
             "flash": [(PROJECTILES, "muzzle_bullet", None, {"rotate": 90, "facings": 8, "tick": 50})],
             "icon": "stand:S",
         },
@@ -157,6 +164,9 @@ UNITS = {
             "stand": marine("marine_medic", (PISTOLS, "m44")),
             "run": "stand",
             "attack": "stand",
+            # Marines have no death art in TGMC: topple the stand pose into a pool of blood, and keep the last frame as the corpse
+            "die": {"fall": marine("marine_medic", (PISTOLS, "m44")), "frames": 5, "tick": 90, "side": "S"},
+            "corpse": {"fall": marine("marine_medic", (PISTOLS, "m44")), "frames": 5, "final": True, "side": "S"},
             "icon": "stand:S",
         },
     },
@@ -165,6 +175,9 @@ UNITS = {
             "stand": marine("marine_engineer", (SMGS, "t19_w")),
             "run": "stand",
             "attack": "stand",
+            # Marines have no death art in TGMC: topple the stand pose into a pool of blood, and keep the last frame as the corpse
+            "die": {"fall": marine("marine_engineer", (SMGS, "t19_w")), "frames": 5, "tick": 90, "side": "S"},
+            "corpse": {"fall": marine("marine_engineer", (SMGS, "t19_w")), "frames": 5, "final": True, "side": "S"},
             "icon": "stand:S",
         },
     },
@@ -174,6 +187,9 @@ UNITS = {
             "stand": marine("marine_assault_crewman", (RIFLES, "t18_w")),
             "run": "stand",
             "attack": "stand",
+            # Marines have no death art in TGMC: topple the stand pose into a pool of blood, and keep the last frame as the corpse
+            "die": {"fall": marine("marine_assault_crewman", (RIFLES, "t18_w")), "frames": 5, "tick": 90, "side": "S"},
+            "corpse": {"fall": marine("marine_assault_crewman", (RIFLES, "t18_w")), "frames": 5, "final": True, "side": "S"},
             "flash": [(PROJECTILES, "muzzle_bullet", None, {"rotate": 90, "facings": 8, "tick": 35})],
             "icon": "stand:S",
         },
@@ -183,6 +199,9 @@ UNITS = {
             "stand": marine("pilot_spec", (RIFLES, "t18_w")),
             "run": "stand",
             "attack": "stand",
+            # Marines have no death art in TGMC: topple the stand pose into a pool of blood, and keep the last frame as the corpse
+            "die": {"fall": marine("pilot_spec", (RIFLES, "t18_w")), "frames": 5, "tick": 90, "side": "S"},
+            "corpse": {"fall": marine("pilot_spec", (RIFLES, "t18_w")), "frames": 5, "final": True, "side": "S"},
             # The grenade launcher's thump: a puff of dust at the muzzle, not a flash
             "flash": [(HEAVY_IMPACT, "heavyimpact", None, {"frames": (0, 9), "size": 32, "tick": 60})],
             "icon": "stand:S",
@@ -388,6 +407,44 @@ def layer_images(dmi, state, tint=None, opts=None):
     return sides
 
 
+BLOOD = (120, 8, 8, 255)
+BLOOD_DARK = (84, 4, 6, 255)
+
+
+def fall_frames(img, side, count, final):
+    """Turn a standing composited frame into `count` frames of it falling over into a pool of blood.
+
+    The body topples away from where it faces: E and N fall one way, W and S the other. It turns about a point that
+    slides from its feet to its middle, so the finished pose lies inside the cell instead of off its edge. Returns the
+    frames, or only the last when `final`."""
+    from PIL import ImageDraw
+    w, h = img.size
+    box = img.getbbox() or (0, 0, w, h)
+    foot_y, mid_y = box[3], (box[1] + box[3]) / 2
+    sign = 1 if side in ("E", "N", "*") else -1
+    steps = [count - 1] if final else list(range(count))
+    frames = []
+    for i in steps:
+        t = (i + 1) / count
+        out = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+        pool_w, pool_h = round(w * 0.85 * t), round(h * 0.30 * t)
+        if pool_w > 2:
+            pool = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+            d = ImageDraw.Draw(pool)
+            cx, cy = w // 2, round(h * 0.74)
+            d.ellipse((cx - pool_w // 2 - 1, cy - pool_h // 2 - 1, cx + pool_w // 2 + 1, cy + pool_h // 2 + 1), fill=BLOOD_DARK)
+            d.ellipse((cx - pool_w // 2, cy - pool_h // 2, cx + pool_w // 2, cy + pool_h // 2), fill=BLOOD)
+            out = Image.alpha_composite(out, pool)
+        pivot = (w / 2, foot_y + (mid_y - foot_y) * t)
+        body = img.rotate(sign * 90 * t, resample=Image.BICUBIC, center=pivot)
+        # settle a little toward the ground as it lands, so the body lies on the pool
+        lowered = Image.new("RGBA", (w, h), (0, 0, 0, 0))  # a paste, not ImageChops.offset, which wraps rows round to the top
+        lowered.paste(body, (0, round(h * 0.10 * t)))
+        body = lowered
+        frames.append(Image.alpha_composite(out, body))
+    return frames
+
+
 def composite(layers):
     """layers: list of (dmi, state, sides) -> {side or '*': [composited frames]}."""
     names = set(k for _, _, sides in layers for k in sides)
@@ -436,11 +493,19 @@ def render_sequences(tgmc, sequences):
         if isinstance(layer_specs, str):
             aliases.append((seq_name, layer_specs))
             continue
+        fall = layer_specs if isinstance(layer_specs, dict) else None
+        if fall:
+            layer_specs = fall["fall"]
         dmis = [(tgmc_dmi.Dmi(os.path.join(tgmc, spec[0])), spec[1]) for spec in layer_specs]
         layers = [(dmi, state, layer_images(dmi, state, spec[2] if len(spec) > 2 else None,
                                             spec[3] if len(spec) > 3 else None))
                   for (dmi, state), spec in zip(dmis, layer_specs)]
         sides = composite(layers)
+        if fall:
+            if "side" in fall:  # one facing only: a corpse effect or a made-in-place corpse has no direction
+                sides = {"*": fall_frames(sides[fall["side"]][0], fall["side"], fall.get("frames", 5), fall.get("final", False))}
+            else:
+                sides = {k: fall_frames(v[0], k, fall.get("frames", 5), fall.get("final", False)) for k, v in sides.items()}
         first_opts = layer_specs[0][3] if len(layer_specs[0]) > 3 else {}
         size = (dmis[0][0].icon_w, dmis[0][0].icon_h)
         if "size" in first_opts:
@@ -462,8 +527,8 @@ def render_sequences(tgmc, sequences):
         if "frames" in first_opts:
             delays = delays[slice(*first_opts["frames"])]
         tick, order = frame_timing(delays)
-        if order is None or len(order) < len(sides[sources[0]]):
-            tick, order = None, list(range(len(sides[sources[0]])))
+        if fall or order is None or len(order) < len(sides[sources[0]]):
+            tick, order = (fall or {}).get("tick"), list(range(len(sides[sources[0]])))
         if "tick" in first_opts:
             tick = first_opts["tick"]
             order = list(range(len(sides[sources[0]])))

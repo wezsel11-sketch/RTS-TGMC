@@ -2,9 +2,11 @@
 
 Nothing here is TGMC art. It writes:
   tgmc.pal                      a flat grey 256-colour palette (OpenRA needs one for its palette setup)
-  cursor.png                    a plain arrow for the default cursor
+  cursor.png                    the cursors: an arrow, and a drawn marker for move, attack, heal, repair, ability and deploy
   shroud.png, fog.png           14 edge tiles each for unexplored and out-of-sight cells; shroudfull.png and fogfull.png
   rally-flag.png, rally-circles.png  the rally point marker: a waving flag and pulsing ground rings
+  rank-pips.png                      one, two and three amber chevrons under a promoted unit
+  wounds.png                         blood splotches drawn over a hurt marine: frame 0 for half health, 1 for a quarter, 2 for critical
   clock.png                     production-icon clock overlay frames (62x46, a dark wedge that sweeps away)
   maps/test-field/map.{yaml,bin,png}   a 24x24 map with marines, runners, and one of each structure
   maps/landing-zone/map.{yaml,bin,png} a 40x28 two-base skirmish map: marines west, xenos east
@@ -105,14 +107,77 @@ def write_palette(path):
         f.write(bytes(c for rgb in palette_entries() for c in rgb))
 
 
+# One 32x32 cell per cursor, in the order tgmc/cursors.yaml lists them (its Start numbers are the indices here).
+# Each is (name, hotspot x, hotspot y). Action cursors are centred on their target; the arrow points from its corner.
+CURSORS = [
+    ("default", 0, 0), ("move", 16, 16), ("move-blocked", 16, 16), ("attackmove", 16, 16), ("attackmove-blocked", 16, 16),
+    ("assaultmove", 16, 16), ("assaultmove-blocked", 16, 16), ("attack", 16, 16), ("attackoutsiderange", 16, 16),
+    ("heal", 16, 16), ("heal-blocked", 16, 16), ("repair", 16, 16), ("repair-blocked", 16, 16), ("ability", 16, 16),
+    ("deploy", 16, 16), ("deploy-blocked", 16, 16),
+]
+GREEN, RED, AMBER, GREY, BLUE, WHITE = (88, 214, 96), (232, 64, 56), (255, 190, 48), (150, 150, 150), (90, 170, 255), (240, 240, 240)
+
+
+def _cursor_cell(name):
+    """Draw one cursor on a 32x32 transparent cell. Every mark is drawn twice, a dark wide stroke then the colour, so it
+    reads on grass, dirt and water alike. No TGMC art."""
+    img = Image.new("RGBA", (32, 32), (0, 0, 0, 0))
+    d = ImageDraw.Draw(img)
+    dark = (0, 0, 0, 255)
+
+    def line(pts, col, w=2):
+        d.line(pts, fill=dark, width=w + 2)
+        d.line(pts, fill=col + (255,), width=w)
+
+    def ring(r, col, w=2, cx=16, cy=16):
+        d.ellipse([cx - r - 1, cy - r - 1, cx + r + 1, cy + r + 1], outline=dark, width=w + 2)
+        d.ellipse([cx - r, cy - r, cx + r, cy + r], outline=col + (255,), width=w)
+
+    def slash(col=RED):
+        line([(7, 7), (25, 25)], col, 3)
+
+    if name == "default":
+        pts = [(1, 1), (1, 21), (7, 16), (12, 25), (15, 23), (10, 14), (18, 14)]
+        d.polygon(pts, fill=dark)
+        d.polygon([(2, 3), (2, 18), (7, 14), (13, 23), (14, 22), (9, 12), (16, 12)], fill=WHITE + (255,))
+    elif name.startswith("move"):
+        ring(9, GREEN); line([(16, 7), (16, 25)], GREEN); line([(7, 16), (25, 16)], GREEN)
+    elif name.startswith("attackmove"):
+        ring(9, AMBER); line([(16, 3), (16, 11)], AMBER); line([(16, 21), (16, 29)], AMBER)
+        line([(3, 16), (11, 16)], AMBER); line([(21, 16), (29, 16)], AMBER)
+    elif name.startswith("assaultmove"):
+        ring(9, RED); line([(16, 9), (16, 23)], RED); line([(9, 16), (23, 16)], RED); ring(2, RED, 1)
+    elif name == "attack":
+        ring(8, RED); line([(16, 2), (16, 11)], RED); line([(16, 21), (16, 30)], RED)
+        line([(2, 16), (11, 16)], RED); line([(21, 16), (30, 16)], RED)
+    elif name == "attackoutsiderange":
+        ring(8, (190, 110, 100), 1); line([(16, 2), (16, 8)], (190, 110, 100)); line([(16, 24), (16, 30)], (190, 110, 100))
+        line([(2, 16), (8, 16)], (190, 110, 100)); line([(24, 16), (30, 16)], (190, 110, 100))
+    elif name.startswith("heal"):
+        col = GREEN if name == "heal" else GREY
+        ring(10, WHITE if name == "heal" else GREY, 1); line([(16, 9), (16, 23)], col, 4); line([(9, 16), (23, 16)], col, 4)
+    elif name.startswith("repair"):
+        col = AMBER if name == "repair" else GREY
+        line([(8, 24), (20, 12)], col, 4); ring(5, col, 2, 22, 10)
+    elif name == "ability":
+        ring(10, BLUE); line([(16, 6), (16, 26)], BLUE); line([(6, 16), (26, 16)], BLUE); ring(3, WHITE, 1)
+    elif name.startswith("deploy"):
+        col = BLUE if name == "deploy" else GREY
+        ring(10, col); line([(16, 8), (16, 23)], col, 3); line([(10, 17), (16, 24), (22, 17)], col, 3)
+    if name.endswith("-blocked"):
+        slash()
+    return img
+
+
 def write_cursor(path):
-    """A plain arrow, drawn here so the mod has a cursor without any TGMC art."""
-    img = Image.new("RGBA", (16, 16), (0, 0, 0, 0))
-    px = img.load()
-    for y in range(12):
-        for x in range(min(y + 1, 8)):
-            px[x, y] = (255, 255, 255, 255) if x == 0 or x == y or y == 11 else (0, 0, 0, 255)
-    img.save(path)
+    """The cursor sheet, drawn here so the mod has cursors without any TGMC art: one cell per entry of CURSORS."""
+    sheet = Image.new("RGBA", (32 * len(CURSORS), 32), (0, 0, 0, 0))
+    for i, (name, _, _) in enumerate(CURSORS):
+        sheet.paste(_cursor_cell(name), (32 * i, 0))
+    meta = PngImagePlugin.PngInfo()
+    meta.add_text("FrameSize", "32,32")
+    meta.add_text("FrameAmount", str(len(CURSORS)))
+    sheet.save(path, pnginfo=meta)
 
 
 def write_shroud_tiles(out, tile=32):
@@ -158,6 +223,45 @@ def write_rally_marker(out):
         img.save(os.path.join(out, f"{name}.png"), pnginfo=meta)
 
 
+def write_wounds(out):
+    """Three 32x32 frames of blood on a marine's torso, arm and leg. Each frame has the last one's marks plus more, so
+    the overlay for a worse state replaces the milder one. Drawn once, for the front view, whichever way the marine faces."""
+    marks = [  # (cx, cy, radius) in a 32x32 cell, torso at about (16, 15)
+        [(15, 14, 2), (19, 17, 1)],
+        [(15, 14, 3), (19, 17, 2), (12, 20, 2), (18, 11, 1)],
+        [(15, 14, 4), (19, 17, 3), (12, 20, 3), (18, 11, 2), (13, 25, 2), (21, 22, 2), (10, 14, 1)],
+    ]
+    sheet = Image.new("RGBA", (32 * len(marks), 32), (0, 0, 0, 0))
+    for i, frame_marks in enumerate(marks):
+        d = ImageDraw.Draw(sheet)
+        for cx, cy, r in frame_marks:
+            x = 32 * i + cx
+            d.ellipse([x - r - 1, cy - r - 1, x + r + 1, cy + r + 1], fill=(70, 3, 5, 200))
+            d.ellipse([x - r, cy - r, x + r, cy + r], fill=(150, 10, 10, 235))
+            d.point([x - r // 2, cy - r // 2], fill=(220, 60, 50, 255))
+    meta = PngImagePlugin.PngInfo()
+    meta.add_text("FrameSize", "32,32")
+    meta.add_text("FrameAmount", str(len(marks)))
+    sheet.save(os.path.join(out, "wounds.png"), pnginfo=meta)
+
+
+def write_rank_pips(out):
+    """Three 14x14 frames: one, two and three amber chevrons, drawn with a dark outline so they read on any terrain."""
+    size = 14
+    sheet = Image.new("RGBA", (size * 3, size), (0, 0, 0, 0))
+    d = ImageDraw.Draw(sheet)
+    for i in range(3):
+        for k in range(i + 1):
+            y = size - 4 - 3 * k
+            chevron = [(size * i + 2, y), (size * i + 7, y - 3), (size * i + 12, y)]
+            d.line(chevron, fill=(25, 18, 5, 255), width=3)
+            d.line(chevron, fill=(255, 196, 51, 255), width=1)
+    meta = PngImagePlugin.PngInfo()
+    meta.add_text("FrameSize", f"{size},{size}")
+    meta.add_text("FrameAmount", "3")
+    sheet.save(os.path.join(out, "rank-pips.png"), pnginfo=meta)
+
+
 def write_clock(path):
     """Frame i darkens the part of the icon the production clock has not swept yet, clockwise from 12 o'clock."""
     rows = (CLOCK_FRAMES + CLOCK_COLS - 1) // CLOCK_COLS
@@ -199,6 +303,21 @@ SCENARIOS = {
     "scenario-repair": _scenario("test-repair", [
         ("engineer", "Marines", 10, 10, 512),
         ("sentry-turret", "Marines", 10, 12, 512),
+    ]),
+    # A marine dies, leaves a corpse, and the corpse goes away again (see scenarios/test-death.lua)
+    "scenario-death": _scenario("test-death", [
+        ("rifleman", "Marines", 10, 10, 512),
+        ("rifleman", "Marines", 3, 3, 512),
+    ]),
+    # Marines at different health, ranks and one dying, to look at (mod/smoke.sh look-marines; scenarios/look-marines.lua)
+    "look-marines": _scenario("look-marines", [("rifleman", "Marines", 6 + 2 * i, 10, 512) for i in range(5)]
+                              + [("rifleman", "Marines", 6 + 2 * i, 13, 512) for i in range(4)]),
+    # Ranks: a scripted promotion, and a runner that ranks up by killing (see scenarios/test-vet.lua). Spare marines keep the game going.
+    "scenario-vet": _scenario("test-vet", [
+        ("rifleman", "Marines", 10, 10, 512),
+        ("rifleman", "Marines", 3, 3, 512),
+        ("rifleman", "Marines", 4, 3, 512),
+        ("runner", "Xenos", 12, 10, 0),
     ]),
     "scenario-combat": _scenario("test-combat", [
         ("rifleman", "Marines", 10, 10, 512),
@@ -388,6 +507,8 @@ def main():
     write_clock(os.path.join(args.out, "clock.png"))
     write_shroud_tiles(args.out, tile=32)
     write_rally_marker(args.out)
+    write_wounds(args.out)
+    write_rank_pips(args.out)
     write_map(os.path.join(args.out, "maps", "test-field"), "TGMC test field", 24, 24, TEST_FIELD, "Lobby, Shellmap", [(10, 12), (14, 12)])
     write_map(os.path.join(args.out, "maps", "landing-zone"), "Landing Zone", 40, 28, LANDING_ZONE, "Lobby", [(6, 14), (33, 13)],
               ground=landing_zone_ground, category="Conquest")

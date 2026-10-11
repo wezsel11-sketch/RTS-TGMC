@@ -10,6 +10,8 @@
 		TurnSpeed: 20
 	Selectable:
 		Bounds: 512, 768, -256, -512
+	# The selection box and the health bar (shown when selected or hurt, per the player's "status bars" setting)
+	SelectionDecorations:
 	HitShape:
 		UseTargetableCellsOffsets: true
 		Type: Rectangle
@@ -35,9 +37,79 @@
 		Sequence: stand
 	Valued:
 		Cost: 100
+	GivesExperience:
+
+# Veterancy. A unit gains experience when it kills (the victim's cost, or `Experience`), and each rank is reached at a
+# percentage of its own cost. The condition `rank` is granted once per rank, so `rank == 2` means second rank (the same
+# pattern OpenRA's Red Alert mod uses). Xenos are cheap, so they rank up a little faster than marines to keep the
+# marines' lead from snowballing (see the balance notes in the README).
+^RankBonuses:
+	FirepowerMultiplier@RANK1:
+		Modifier: 110
+		RequiresCondition: rank == 1
+	FirepowerMultiplier@RANK2:
+		Modifier: 120
+		RequiresCondition: rank == 2
+	FirepowerMultiplier@RANK3:
+		Modifier: 130
+		RequiresCondition: rank == 3
+	DamageMultiplier@RANK1:
+		Modifier: 95
+		RequiresCondition: rank == 1
+	DamageMultiplier@RANK2:
+		Modifier: 90
+		RequiresCondition: rank == 2
+	DamageMultiplier@RANK3:
+		Modifier: 85
+		RequiresCondition: rank == 3
+	SpeedMultiplier@RANK3:
+		Modifier: 110
+		RequiresCondition: rank == 3
+	ChangesHealth@HEROIC:
+		Step: 2
+		Delay: 25
+		StartIfBelow: 100
+		RequiresCondition: rank == 3
+	WithDecoration@RANK1:
+		Image: rank-pips
+		Sequence: rank-1
+		Position: BottomLeft
+		Margin: 7, -5
+		RequiresCondition: rank == 1
+	WithDecoration@RANK2:
+		Image: rank-pips
+		Sequence: rank-2
+		Position: BottomLeft
+		Margin: 7, -5
+		RequiresCondition: rank == 2
+	WithDecoration@RANK3:
+		Image: rank-pips
+		Sequence: rank-3
+		Position: BottomLeft
+		Margin: 7, -5
+		RequiresCondition: rank == 3
+
+^MarineRanks:
+	Inherits: ^RankBonuses
+	GainsExperience:
+		LevelUpNotification: LevelUp
+		Conditions:
+			250: rank
+			500: rank
+			900: rank
+
+^XenoRanks:
+	Inherits: ^RankBonuses
+	GainsExperience:
+		LevelUpNotification: LevelUp
+		Conditions:
+			150: rank
+			300: rank
+			500: rank
 
 ^Infantry:
 	Inherits: ^Unit
+	Inherits@ranks: ^MarineRanks
 	Targetable@HEAL:
 		RequiresCondition: damaged
 		TargetTypes: Heal
@@ -46,6 +118,31 @@
 	GrantConditionOnDamageState@DAMAGED:
 		Condition: damaged
 		ValidDamageStates: Light, Medium, Heavy, Critical
+	# Visible wounds: blood on the body at 75% health and below, more at 50%, the most at 25%, and a limp at 25%
+	GrantConditionOnDamageState@MEDIUM:
+		Condition: wounded
+		ValidDamageStates: Medium, Heavy, Critical
+	GrantConditionOnDamageState@HEAVY:
+		Condition: badly-wounded
+		ValidDamageStates: Heavy, Critical
+	GrantConditionOnDamageState@CRITICAL:
+		Condition: crippled
+		ValidDamageStates: Critical
+	WithIdleOverlay@WOUNDED:
+		Image: wounds
+		Sequence: medium
+		RequiresCondition: wounded && !badly-wounded
+	WithIdleOverlay@BADLYWOUNDED:
+		Image: wounds
+		Sequence: heavy
+		RequiresCondition: badly-wounded && !crippled
+	WithIdleOverlay@CRIPPLED:
+		Image: wounds
+		Sequence: critical
+		RequiresCondition: crippled
+	SpeedMultiplier@CRIPPLED:
+		Modifier: 70
+		RequiresCondition: crippled
 	Voiced:
 		VoiceSet: MarineVoice
 	DeathSounds:
@@ -61,6 +158,9 @@
 
 rifleman:
 	Inherits: ^Infantry
+	SpawnActorOnDeath:
+		Actor: rifleman-corpse
+		SkipMakeAnimations: false
 	Armament@PRIMARY:
 		MuzzleSequence: flash
 		LocalOffset: 256,0,200
@@ -77,6 +177,9 @@ rifleman:
 
 medic:
 	Inherits: ^Infantry
+	SpawnActorOnDeath:
+		Actor: medic-corpse
+		SkipMakeAnimations: false
 	Health:
 		HP: 100
 	Voiced:
@@ -101,6 +204,9 @@ medic:
 
 engineer:
 	Inherits: ^Infantry
+	SpawnActorOnDeath:
+		Actor: engineer-corpse
+		SkipMakeAnimations: false
 	Health:
 		HP: 110
 	Armament@PRIMARY:
@@ -127,6 +233,9 @@ engineer:
 
 smartgunner:
 	Inherits: ^Infantry
+	SpawnActorOnDeath:
+		Actor: smartgunner-corpse
+		SkipMakeAnimations: false
 	Health:
 		HP: 130
 	Mobile:
@@ -149,6 +258,9 @@ smartgunner:
 
 grenadier:
 	Inherits: ^Infantry
+	SpawnActorOnDeath:
+		Actor: grenadier-corpse
+		SkipMakeAnimations: false
 	Health:
 		HP: 90
 	Armament@PRIMARY:
@@ -169,6 +281,7 @@ grenadier:
 
 ^Xeno:
 	Inherits: ^Unit
+	Inherits@ranks: ^XenoRanks
 	Targetable@ALIEN:
 		TargetTypes: Alien
 	WithInfantryBody:
@@ -327,3 +440,47 @@ queen:
 		BuildLimit: 1
 		Prerequisites: resin-silo
 		Description: actor-queen.description
+
+# What a dead marine leaves behind: it falls over (the `die` sequence, played once by the make animation), then lies
+# there for a while (`corpse`) before it is removed. TGMC has no marine death art, so mod/build_sprites.py draws both.
+^MarineCorpse:
+	Immobile:
+		OccupiesSpace: false
+	RenderSprites:
+		Palette: player
+	BodyOrientation:
+		QuantizedFacings: 1
+	WithSpriteBody:
+		Sequence: corpse
+	WithMakeAnimation:
+		Sequence: die
+	HiddenUnderFog:
+		Type: CenterPosition
+	KillsSelf:
+		Delay: 750
+		RemoveInstead: true
+
+rifleman-corpse:
+	Inherits: ^MarineCorpse
+	RenderSprites:
+		Image: rifleman
+
+medic-corpse:
+	Inherits: ^MarineCorpse
+	RenderSprites:
+		Image: medic
+
+engineer-corpse:
+	Inherits: ^MarineCorpse
+	RenderSprites:
+		Image: engineer
+
+smartgunner-corpse:
+	Inherits: ^MarineCorpse
+	RenderSprites:
+		Image: smartgunner
+
+grenadier-corpse:
+	Inherits: ^MarineCorpse
+	RenderSprites:
+		Image: grenadier

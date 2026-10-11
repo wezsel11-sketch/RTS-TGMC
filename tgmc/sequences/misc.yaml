@@ -17,3 +17,25 @@ rallypoint:
 		Length: 4
 		Tick: 160
 		ZOffset: 2047
+
+# Blood on a hurt marine, drawn over its body (WithIdleOverlay in units.yaml). wounds.png is drawn by mod/make_placeholders.py.
+wounds:
+	Defaults:
+		Filename: wounds.png
+	medium:
+		Start: 0
+	heavy:
+		Start: 1
+	critical:
+		Start: 2
+
+# Rank chevrons under a promoted unit (WithDecoration in units.yaml). rank-pips.png is drawn by mod/make_placeholders.py.
+rank-pips:
+	Defaults:
+		Filename: rank-pips.png
+	rank-1:
+		Start: 0
+	rank-2:
+		Start: 1
+	rank-3:
+		Start: 2

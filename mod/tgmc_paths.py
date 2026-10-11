@@ -20,6 +20,8 @@ def paths():
         for layers in unit["sequences"].values():
             if isinstance(layers, str):
                 continue  # alias of another sequence, no new art
+            if isinstance(layers, dict):
+                layers = layers["fall"]  # a generated fall sequence: it reads the layers of its stand pose
             for layer in layers:
                 found.add(layer[0])
     for entry in build_sounds.SOUNDS.values():

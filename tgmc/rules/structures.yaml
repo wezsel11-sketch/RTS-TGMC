@@ -103,6 +103,15 @@ mini-silo:
 		Dimensions: 2, 2
 	StoresPlayerResources:
 		Capacity: 300
+	Exit@1:
+		SpawnOffset: 0,512,0
+		ExitCell: 0,2
+	RallyPoint:
+		Path: 0, 5
+	Production:
+		Produces: Xeno
+	ProductionBar:
+		ProductionType: Xeno
 	Tooltip:
 		Name: actor-mini-silo.name
 	Valued:

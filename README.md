@@ -68,6 +68,7 @@ mod/                        converters and build script (Python 3, Pillow, ffmpe
   lint_static.py            cross-reference check (sounds, weapons, voice sets, Fluent keys, sequences); build_mod.sh runs it
   smoke.sh                  launches the built mod headless on a map, screenshots it, fails on an engine exception
   test_scenarios.sh         runs the scripted scenario maps (heal, repair, mend, victory, combat, waves, ai, rally) and checks each prints PASS
+  balance.sh                runs several AI-vs-AI matches (balance-aivai) in parallel and prints who won and when
   scenarios/                the Lua scripts those maps run (copied into each map by make_placeholders.py)
   check_mod.sh              runs OpenRA's own lint (--check-yaml, --check-missing-sprites) on the built mod and map
   make_chrome.py            HUD atlas (chrome.png) and chrome.yaml: panels, buttons, icons, logo (no TGMC art)
@@ -164,8 +165,14 @@ On a headless machine, run OpenRA under Xvfb with Mesa software GL
   the vendor spawns queued marines, income ticks up, and a "Skirmish AI" in the xeno slot trains Runners that attack
   the marine base. `mod/test_scenarios.sh` checks heal, repair, mend, victory, combat, the wave script and the AI. Not yet checked: voices (no audio
   device) and the xeno side from the player's seat.
-- Tuning so far: queues take cost x 60% x 350% ticks (a rifleman is about 8 s, a Runner about 4 s). Marines have
-  120 HP and rifles do 14; Runners have 90 HP and claws do 14, so one marine beats one Runner and swarms matter.
+- AI against AI (`mod/balance.sh`, Landing Zone layout, fastest speed): the marines win about every time, in 2 to 5 minutes
+  of game time. The xeno AI masses 12 to 17 units, attacks around minute one, and loses them crossing open ground to
+  rifles, sentries and corpsmen before reaching a structure; the marine AI then destroys the hive. The match is never over
+  in under two minutes and the loser keeps fighting, but the xenos need a stronger opening. A human xeno player who
+  attacks from several sides at once should do better than the AI.
+- Tuning so far: the marine queue takes cost x 60% x 350% ticks (a rifleman is about 8 s) and the xeno queue x 250% (a Runner is about 3 s). Marines have
+  120 HP and rifles do 14 every 15 ticks at 6 cells; Runners have 100 HP, run at speed 115 and claws do 20 every 14 ticks;
+  Hunters 130 HP; sentries do 10; the corpsman heals 20 every 60 ticks.
   Income is 15 cash every 2 s from the vendor and silo and 5 from a mini silo. None of this has had real play time.
 - Fog of war is drawn with plain black quadrant tiles, so edges look blocky.
 - The Runner's death sound was converted earlier and then dropped. `WithDeathAnimation` has no sound field, so

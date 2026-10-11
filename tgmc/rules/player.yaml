@@ -15,7 +15,7 @@ Player:
 		DisplayOrder: 1
 	ClassicProductionQueue@Xeno:
 		Type: Xeno
-		BuildDurationModifier: 350
+		BuildDurationModifier: 250
 		Factions: xenos
 		DisplayOrder: 2
 	DeveloperMode:

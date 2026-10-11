@@ -1,16 +1,19 @@
 TGMCRifle:
 	Range: 6c0
-	ReloadDelay: 12
+	ReloadDelay: 15
 	Report: audio/rifle-fire.ogg
 	Projectile: Bullet
 		Speed: 600
 	Warhead@1Dam: SpreadDamage
 		Damage: 14
-		Spread: 1c0
+		Spread: 128
+		ValidRelationships: Enemy
 
 TGMCSentry:
 	Inherits: TGMCRifle
 	Report: audio/sentry-fire.ogg
+	Warhead@1Dam: SpreadDamage
+		Damage: 10
 
 TGMCHeal:
 	Range: 3c0
@@ -20,7 +23,7 @@ TGMCHeal:
 	TargetActorCenter: true
 	Projectile: InstantHit
 	Warhead@1Dam: TargetDamage
-		Damage: -25
+		Damage: -20
 		ValidRelationships: Ally
 		ValidTargets: Heal
 
@@ -38,12 +41,12 @@ TGMCRepair:
 
 TGMCClaws:
 	Range: 1c256
-	ReloadDelay: 15
+	ReloadDelay: 14
 	Report: audio/claw-hit.ogg
 	TargetActorCenter: true
 	Projectile: InstantHit
 	Warhead@1Dam: TargetDamage
-		Damage: 14
+		Damage: 20
 
 TGMCSpit:
 	Range: 5c0

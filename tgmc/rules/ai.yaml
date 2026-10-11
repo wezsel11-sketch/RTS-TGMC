@@ -1,6 +1,7 @@
 # Skirmish AI. One bot drives either faction: it only builds what its queues offer, so a marine
-# bot trains marines and a xeno bot trains Runners. Structures are placed by the map; the bot
+# bot trains marines and a xeno bot trains xenos. Structures are placed by the map; the bot
 # only trains units and sends them out in squads. Pattern: OpenRA mods/ra/rules/ai.yaml.
+# Xenos are cheap and fast, so the xeno bot gathers a bigger group before it attacks.
 Player:
 	ModularBot@SkirmishAI:
 		Name: bot-skirmish-ai.name
@@ -8,6 +9,9 @@ Player:
 	GrantConditionOnBotOwner@skirmish:
 		Condition: enable-skirmish-ai
 		Bots: skirmish
+	GrantConditionOnFaction@xenos:
+		Condition: faction-xenos
+		Factions: xenos
 	UnitBuilderBotModule@skirmish:
 		RequiresCondition: enable-skirmish-ai
 		UnitQueues: Infantry, Xeno
@@ -19,9 +23,16 @@ Player:
 			runner: 60
 			hunter: 30
 			sentinel: 30
-	SquadManagerBotModule@skirmish:
-		RequiresCondition: enable-skirmish-ai
-		SquadSize: 6
+	SquadManagerBotModule@marines:
+		RequiresCondition: enable-skirmish-ai && !faction-xenos
+		SquadSize: 8
+		SquadSizeRandomBonus: 20
+		ExcludeFromSquadsTypes: medic, engineer, drone
+		ConstructionYardTypes: cryo-pod, resin-silo
+		ProtectionTypes: cryo-pod, vendor, resin-silo, mini-silo, sentry-turret, resin-turret
+	SquadManagerBotModule@xenos:
+		RequiresCondition: enable-skirmish-ai && faction-xenos
+		SquadSize: 14
 		SquadSizeRandomBonus: 20
 		ExcludeFromSquadsTypes: medic, engineer, drone
 		ConstructionYardTypes: cryo-pod, resin-silo

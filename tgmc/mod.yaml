@@ -197,3 +197,7 @@ GameSpeeds:
 			Name: options-game-speed.normal
 			Timestep: 40
 			OrderLatency: 3
+		fastest:
+			Name: options-game-speed.fastest
+			Timestep: 8
+			OrderLatency: 3

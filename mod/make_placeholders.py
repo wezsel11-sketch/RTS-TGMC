@@ -214,6 +214,9 @@ SCENARIOS = {
         ("rifleman", "Marines", 20, 3, 0),
         ("resin-silo", "Xenos", 16, 16, 0),
     ]},
+    # A full match, AI against AI, on the Landing Zone layout. Both sides are scripted players with the Skirmish AI.
+    "balance-aivai": {"scripts": ("test-aivai",), "xeno_bot": "skirmish", "marine_bot": "skirmish", "fast": True,
+                       "size": (40, 28), "spawns": [(6, 14), (33, 13)], "ground": "landing_zone", "actors": LANDING_ZONE},
     "scenario-victory": _scenario("test-victory", [
         ("rifleman", "Marines", 10, 10, 512),
         ("runner", "Xenos", 14, 10, 0),
@@ -223,7 +226,7 @@ SCENARIOS = {
 
 
 def write_map(folder, title, size_w, size_h, placed, visibility, spawns, scripts=(), ground=flat_ground,
-              category="Skirmish", drop_conquest=False, xeno_bot=None):
+              category="Skirmish", drop_conquest=False, xeno_bot=None, marine_bot=None, fast=False):
     # A scenario map has no slot for the xenos: they are a scripted player, so Lua can find them and they never act.
     os.makedirs(folder, exist_ok=True)
     cells = size_w * size_h
@@ -245,6 +248,9 @@ def write_map(folder, title, size_w, size_h, placed, visibility, spawns, scripts
     if scripts:
         rules_line = "Rules: rules.yaml\n\n"
         rules = "World:\n\tLuaScript:\n\t\tScripts: " + ", ".join(f"{name}.lua" for name in scripts) + "\n"
+        if fast:
+            # Scenario maps run at the fastest game speed so a long match (such as AI against AI) finishes quickly.
+            rules += "World:\n\tMapOptions:\n\t\tGameSpeed: fastest\n"
         if drop_conquest:
             # The script owns the objective, and the xenos start with nothing, so conquest would end the game at once.
             rules += "Player:\n\t-ConquestVictoryConditions:\n"
@@ -255,6 +261,10 @@ def write_map(folder, title, size_w, size_h, placed, visibility, spawns, scripts
                             os.path.join(folder, f"{name}.lua"))
 
     xeno_bot_line = f"\t\tBot: {xeno_bot}\n" if xeno_bot else ""
+    marine_bot_line = f"\t\tBot: {marine_bot}\n" if marine_bot else ""
+    # A map needs one playable slot even when both sides are bots. This one has no units and never wins or loses.
+    observer_block = ("\tPlayerReference@Observer:\n\t\tName: Observer\n\t\tPlayable: True\n\t\tNonCombatant: True\n"
+                      "\t\tFaction: marines\n\t\tLockFaction: True\n") if marine_bot else ""
     yaml = f"""MapFormat: 12
 
 RequiresMod: tgmc
@@ -280,8 +290,8 @@ Players:
 		NonCombatant: True
 	PlayerReference@Marines:
 		Name: Marines
-		Playable: True
-		Faction: marines
+		Playable: {not marine_bot}
+{marine_bot_line}		Faction: marines
 		LockFaction: True
 		Enemies: Xenos
 		Spawn: 1
@@ -294,7 +304,7 @@ Players:
 		Enemies: Marines
 		Spawn: 2
 		LockSpawn: True
-
+{observer_block}
 Actors:
 {"".join(actors)}"""
     with open(os.path.join(folder, "map.yaml"), "w", encoding="utf-8", newline="\n") as f:
@@ -319,9 +329,12 @@ def main():
     write_map(os.path.join(args.out, "maps", "landing-zone"), "Landing Zone", 40, 28, LANDING_ZONE, "Lobby", [(6, 14), (33, 13)],
               ground=landing_zone_ground, category="Conquest")
     for name, sc in SCENARIOS.items():
-        write_map(os.path.join(args.out, "maps", name), name, 24, 24, sc["actors"], "MissionSelector", [(10, 8), (19, 17)],
-                  scripts=sc["scripts"], drop_conquest=sc.get("drop_conquest", False),
-                  xeno_bot=sc.get("xeno_bot"))
+        width, height = sc.get("size", (24, 24))
+        write_map(os.path.join(args.out, "maps", name), name, width, height, sc["actors"], "MissionSelector",
+                  sc.get("spawns", [(10, 8), (19, 17)]), scripts=sc["scripts"],
+                  drop_conquest=sc.get("drop_conquest", False), xeno_bot=sc.get("xeno_bot"),
+                  marine_bot=sc.get("marine_bot"), fast=sc.get("fast", True),
+                  ground=landing_zone_ground if sc.get("ground") == "landing_zone" else flat_ground)
     write_map(os.path.join(args.out, "maps", "hold-the-line"), "Hold the Line", 40, 28, HOLD_THE_LINE, "Lobby",
               [(6, 14), (33, 13)], scripts=("wave-survival",), ground=landing_zone_ground, category="Survival",
               drop_conquest=True)

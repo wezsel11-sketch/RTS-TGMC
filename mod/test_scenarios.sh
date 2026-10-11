@@ -5,7 +5,7 @@
 #
 # Each scenario is a map built by make_placeholders.py with a Lua script from mod/scenarios. The game runs in real
 # time at best (25 ticks a second), so each one is stopped once it prints PASS or FAIL, or after the ceiling in seconds
-# (default 150). Needs Xvfb and a built OpenRA.
+# (default 150). Needs Xvfb and a built OpenRA. The slow AI-vs-AI match is balance-aivai, run by mod/balance.sh instead.
 set -u
 
 HERE=$(cd "$(dirname "$0")" && pwd)

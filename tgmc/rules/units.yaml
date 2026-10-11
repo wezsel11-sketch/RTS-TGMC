@@ -131,11 +131,11 @@ engineer:
 runner:
 	Inherits: ^Xeno
 	Health:
-		HP: 90
+		HP: 100
 	Selectable:
 		Bounds: 1024, 768, -512, -512
 	Mobile:
-		Speed: 90
+		Speed: 115
 	Tooltip:
 		Name: actor-runner.name
 	Valued:
@@ -148,7 +148,7 @@ runner:
 hunter:
 	Inherits: ^Xeno
 	Health:
-		HP: 110
+		HP: 130
 	Selectable:
 		Bounds: 768, 768, -384, -512
 	Mobile:

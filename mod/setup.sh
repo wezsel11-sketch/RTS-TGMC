@@ -39,7 +39,7 @@ case $(uname -s) in
 	*) hint_pkg="install git, Python 3 with Pillow, ffmpeg and make (on Windows, use WSL)" ;;
 esac
 missing=
-for tool in git make ffmpeg ffprobe "$PY"; do
+for tool in git make bash ffmpeg ffprobe "$PY"; do
 	command -v "$tool" >/dev/null 2>&1 || missing="$missing $tool"
 done
 [ -z "$missing" ] || die "missing:$missing
@@ -62,7 +62,7 @@ else
 	echo "No .NET 10 SDK found; installing it into $BUILD/tools/dotnet (nothing outside build/ is touched)"
 	mkdir -p "$BUILD/tools"
 	curl -fsSL https://dot.net/v1/dotnet-install.sh -o "$BUILD/tools/dotnet-install.sh" || die "could not download dotnet-install.sh (network blocked?). Install the SDK by hand: https://dotnet.microsoft.com/download"
-	sh "$BUILD/tools/dotnet-install.sh" --channel "$DOTNET_CHANNEL" --install-dir "$BUILD/tools/dotnet"
+	bash "$BUILD/tools/dotnet-install.sh" --channel "$DOTNET_CHANNEL" --install-dir "$BUILD/tools/dotnet"
 	DOTNET_ROOT="$BUILD/tools/dotnet"
 	export DOTNET_ROOT PATH="$DOTNET_ROOT:$PATH"
 	dotnet --version | grep -q '^10\.' || die "the installed SDK is not .NET 10"

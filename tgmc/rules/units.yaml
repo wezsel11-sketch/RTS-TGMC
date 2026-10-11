@@ -26,6 +26,7 @@
 	HiddenUnderFog:
 	MustBeDestroyed:
 	AppearsOnRadar:
+	ScriptTriggers:
 	AttackMove:
 	RenderSprites:
 		Palette: player

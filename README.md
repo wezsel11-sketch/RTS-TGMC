@@ -170,6 +170,9 @@ On a headless machine, run OpenRA under Xvfb with Mesa software GL
   rifles, sentries and corpsmen before reaching a structure; the marine AI then destroys the hive. The match is never over
   in under two minutes and the loser keeps fighting, but the xenos need a stronger opening. A human xeno player who
   attacks from several sides at once should do better than the AI.
+- Hold the Line against a marine bot that holds the base (`mod/balance.sh 4 420 balance-holdline`): the marines win all
+  four runs, finishing the last wave (16 Runners, 10 Hunters, 8 Sentinels) with about 30 units and 2 or 3 of their 5
+  buildings. The waves attack-move to the marine base because `Hunt()` cannot see across the map for a scripted player.
 - Tuning so far: the marine queue takes cost x 60% x 350% ticks (a rifleman is about 8 s) and the xeno queue x 250% (a Runner is about 3 s). Marines have
   120 HP and rifles do 14 every 15 ticks at 6 cells; Runners have 100 HP, run at speed 115 and claws do 20 every 14 ticks;
   Hunters 130 HP; sentries do 10; the corpsman heals 20 every 60 ticks.

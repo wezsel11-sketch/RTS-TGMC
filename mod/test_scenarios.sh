@@ -34,7 +34,7 @@ run_one() {
 	# Stop as soon as the script reports (a loaded machine runs the game slower than real time), or at the ceiling.
 	waited=0
 	while [ "$waited" -lt "$WAIT" ]; do
-		if grep -qE "TEST .* (PASS|FAIL)|Fatal Lua Error" "$OUT/$name/game.log" 2>/dev/null; then
+		if grep -qE "TEST .* (PASS|FAIL)|Fatal Lua Error|LuaException" "$OUT/$name/game.log" 2>/dev/null; then
 			break
 		fi
 		sleep 2

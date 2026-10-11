@@ -1,10 +1,11 @@
 #!/bin/sh
-# Run several AI-vs-AI matches of scenario-aivai in parallel and summarise who won and when. The game seed is random, so
-# a set of runs shows the spread, not one lucky result.
+# Run several matches of a balance map in parallel and summarise who won and when. The game seed is random, so a set of
+# runs shows the spread, not one lucky result.
 #
-#   OPENRA_DIR=/path/to/OpenRA  mod/balance.sh [runs] [ceiling-seconds]
+#   OPENRA_DIR=/path/to/OpenRA  mod/balance.sh [runs] [ceiling-seconds] [map]
 #
-# Prints one line per run (winner and tick) and then the win counts. Per-run logs, with a STAT line every 500 ticks, go to
+# The map is balance-aivai (default: the Skirmish AI on both sides) or balance-holdline (the marine bot defending against
+# the six waves). Prints one line per run (result and tick) and then the counts. Per-run logs, with a STAT line every 500 ticks, go to
 # $BALANCE_OUT (default build/balance). Needs Xvfb and a built OpenRA with the mod linked.
 set -u
 
@@ -13,11 +14,12 @@ ROOT=$(cd "$HERE/.." && pwd)
 OPENRA_DIR=${OPENRA_DIR:?set OPENRA_DIR to a built OpenRA checkout}
 RUNS=${1:-4}
 CEILING=${2:-400}
+MAP=${3:-balance-aivai}
 OUT=${BALANCE_OUT:-"$ROOT/build/balance"}
 
 rm -rf "$OUT"
 export LIBGL_ALWAYS_SOFTWARE=1 SDL_AUDIODRIVER=dummy
-uid=$(cd "$OPENRA_DIR" && sh utility.sh tgmc --map-hash "$ROOT/build/mod/tgmc/maps/balance-aivai" | tail -1)
+uid=$(cd "$OPENRA_DIR" && sh utility.sh tgmc --map-hash "$ROOT/build/mod/tgmc/maps/$MAP" | tail -1)
 
 run_one() {
 	n=$1
@@ -31,7 +33,7 @@ run_one() {
 	runner=$!
 	waited=0
 	while [ "$waited" -lt "$CEILING" ]; do
-		grep -qE "TEST aivai|Fatal Lua Error" "$OUT/run$n/game.log" 2>/dev/null && break
+		grep -qE "TEST (aivai|holdline)|Fatal Lua Error|LuaException" "$OUT/run$n/game.log" 2>/dev/null && break
 		sleep 3
 		waited=$((waited + 3))
 	done
@@ -52,15 +54,15 @@ xenos=0
 other=0
 n=1
 while [ "$n" -le "$RUNS" ]; do
-	line=$(grep -h "TEST aivai" "$OUT/run$n/game.log" | sed 's/^Lua debug: //' | head -1)
+	line=$(grep -hE "TEST (aivai|holdline)" "$OUT/run$n/game.log" | sed 's/^Lua debug: //' | head -1)
 	last=$(grep -h "STAT" "$OUT/run$n/game.log" | tail -1 | sed 's/^Lua debug: //')
 	echo "run $n: ${line:-no result}"
 	echo "        last: $last"
 	case "$line" in
 		*"marines won"*) marines=$((marines + 1)) ;;
-		*"xenos won"*) xenos=$((xenos + 1)) ;;
+		*"xenos won"* | *"marines lost"*) xenos=$((xenos + 1)) ;;
 		*) other=$((other + 1)) ;;
 	esac
 	n=$((n + 1))
 done
-echo "marines $marines, xenos $xenos, other $other"
+echo "$MAP: marines won $marines, xenos won $xenos, other $other"

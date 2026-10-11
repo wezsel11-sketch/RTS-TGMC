@@ -12,12 +12,12 @@ Config =
 	-- { type, count } pairs. A tick is 40 ms.
 	waves =
 	{
-		{ delay = 750,  units = { { "runner", 4 } } },
-		{ delay = 900,  units = { { "runner", 6 } } },
-		{ delay = 1100, units = { { "runner", 4 }, { "hunter", 2 } } },
-		{ delay = 1200, units = { { "runner", 6 }, { "hunter", 3 }, { "sentinel", 1 } } },
-		{ delay = 1300, units = { { "runner", 6 }, { "hunter", 4 }, { "sentinel", 3 } } },
-		{ delay = 1400, units = { { "runner", 8 }, { "hunter", 5 }, { "sentinel", 4 } } },
+		{ delay = 750,  units = { { "runner", 6 } } },
+		{ delay = 900,  units = { { "runner", 8 }, { "hunter", 2 } } },
+		{ delay = 1000, units = { { "runner", 8 }, { "hunter", 4 }, { "sentinel", 2 } } },
+		{ delay = 1100, units = { { "runner", 10 }, { "hunter", 6 }, { "sentinel", 4 } } },
+		{ delay = 1200, units = { { "runner", 12 }, { "hunter", 8 }, { "sentinel", 6 } } },
+		{ delay = 1300, units = { { "runner", 16 }, { "hunter", 10 }, { "sentinel", 8 } } },
 	},
 
 	-- How often, in ticks, the win and lose conditions are checked.
@@ -27,6 +27,31 @@ Config =
 XenoTypes = { "runner", "hunter", "sentinel", "drone" }
 Finished = false
 WavesSent = 0
+
+-- Where the waves march. Hunt() cannot be used: it only chases enemies the xeno player can see, and the scripted xeno
+-- player has no vision across the map, so the units would stand at the spawn point. Attack-move to the marines' base
+-- instead (their units are engaged on the way) and, if the base is gone, to any marine actor.
+TargetCell = function()
+	for _, kind in ipairs({ "cryo-pod", "vendor", "sentry-turret" }) do
+		local found = Marines.GetActorsByType(kind)
+		if #found > 0 then
+			return found[1].Location
+		end
+	end
+	-- Not GetActors(): that includes the player's own system actor, which has no location.
+	local units = Marines.GetActorsByTypes({ "rifleman", "medic", "engineer" })
+	if #units > 0 then
+		return units[1].Location
+	end
+	return nil
+end
+
+March = function(actor)
+	local cell = TargetCell()
+	if cell ~= nil and not actor.IsDead then
+		actor.AttackMove(cell)
+	end
+end
 
 Expand = function(group)
 	local types = {}
@@ -46,7 +71,9 @@ SendWave = function(index)
 	for i, unitType in ipairs(Expand(wave.units)) do
 		Trigger.AfterDelay(i * 6, function()
 			Reinforcements.Reinforce(Xenos, { unitType }, { Utils.Random(Config.spawnCells) }, 0, function(actor)
-				actor.Hunt()
+				March(actor)
+				-- Units that arrive and find nothing to fight set off again, towards whatever marine is left.
+				Trigger.OnIdle(actor, March)
 			end)
 		end)
 	end

@@ -217,6 +217,10 @@ SCENARIOS = {
     # A full match, AI against AI, on the Landing Zone layout. Both sides are scripted players with the Skirmish AI.
     "balance-aivai": {"scripts": ("test-aivai",), "xeno_bot": "skirmish", "marine_bot": "skirmish", "fast": True,
                        "size": (40, 28), "spawns": [(6, 14), (33, 13)], "ground": "landing_zone", "actors": LANDING_ZONE},
+    # Hold the Line with a marine bot that stays home (its squad module is removed), to see if six waves are survivable.
+    "balance-holdline": {"scripts": ("wave-survival", "test-holdline"), "marine_bot": "skirmish", "fast": True,
+                         "drop_conquest": True, "size": (40, 28), "spawns": [(6, 14), (33, 13)], "ground": "landing_zone",
+                         "actors": HOLD_THE_LINE, "extra_rules": "Player:\n\t-SquadManagerBotModule@marines:\n"},
     "scenario-victory": _scenario("test-victory", [
         ("rifleman", "Marines", 10, 10, 512),
         ("runner", "Xenos", 14, 10, 0),
@@ -226,7 +230,7 @@ SCENARIOS = {
 
 
 def write_map(folder, title, size_w, size_h, placed, visibility, spawns, scripts=(), ground=flat_ground,
-              category="Skirmish", drop_conquest=False, xeno_bot=None, marine_bot=None, fast=False):
+              category="Skirmish", drop_conquest=False, xeno_bot=None, marine_bot=None, fast=False, extra_rules=""):
     # A scenario map has no slot for the xenos: they are a scripted player, so Lua can find them and they never act.
     os.makedirs(folder, exist_ok=True)
     cells = size_w * size_h
@@ -251,6 +255,7 @@ def write_map(folder, title, size_w, size_h, placed, visibility, spawns, scripts
         if fast:
             # Scenario maps run at the fastest game speed so a long match (such as AI against AI) finishes quickly.
             rules += "World:\n\tMapOptions:\n\t\tGameSpeed: fastest\n"
+        rules += extra_rules
         if drop_conquest:
             # The script owns the objective, and the xenos start with nothing, so conquest would end the game at once.
             rules += "Player:\n\t-ConquestVictoryConditions:\n"
@@ -334,6 +339,7 @@ def main():
                   sc.get("spawns", [(10, 8), (19, 17)]), scripts=sc["scripts"],
                   drop_conquest=sc.get("drop_conquest", False), xeno_bot=sc.get("xeno_bot"),
                   marine_bot=sc.get("marine_bot"), fast=sc.get("fast", True),
+                  extra_rules=sc.get("extra_rules", ""),
                   ground=landing_zone_ground if sc.get("ground") == "landing_zone" else flat_ground)
     write_map(os.path.join(args.out, "maps", "hold-the-line"), "Hold the Line", 40, 28, HOLD_THE_LINE, "Lobby",
               [(6, 14), (33, 13)], scripts=("wave-survival",), ground=landing_zone_ground, category="Survival",

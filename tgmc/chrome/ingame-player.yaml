@@ -82,7 +82,7 @@ Container@PLAYER_WIDGETS:
 						Container@PRODUCTION_TYPES:
 							X: 2
 							Width: 28
-							Height: 62
+							Height: 93
 							Children:
 								ProductionTypeButton@INFANTRY:
 									Width: 28
@@ -102,6 +102,18 @@ Container@PLAYER_WIDGETS:
 									VisualHeight: 0
 									Background: sidebar-button
 									ProductionGroup: Xeno
+									Children:
+										Image@ICON:
+											X: 6
+											Y: 6
+											ImageCollection: production-icons
+								ProductionTypeButton@BUILD:
+									Y: 62
+									Width: 28
+									Height: 28
+									VisualHeight: 0
+									Background: sidebar-button
+									ProductionGroup: Build
 									Children:
 										Image@ICON:
 											X: 6

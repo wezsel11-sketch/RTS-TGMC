@@ -16,7 +16,8 @@ A layer may carry a fourth element, a dict of options, for effect art: "frames" 
 frames, "rotate" turns a 1-dir state by that many degrees clockwise, "facings" then makes that many rotated copies of
 every frame (a muzzle flash or tracer that has to point along the shot), "swap_rg" swaps the red and green channels (the
 green xeno splatter becomes red marine blood), "size" scales the frames to that many pixels
-square, and "tick" sets the milliseconds per frame.
+square, "fit" (w, h) shrinks them into a box of that size keeping the aspect ratio, "side" keeps one side (S, N, E, W) of a
+4-direction state, and "tick" sets the milliseconds per frame.
 
 Animation timing comes from the .dmi `delay` list (deciseconds per frame). OpenRA has one `Tick`
 (ms per frame) per sequence, so Tick is the GCD of the delays and a frame that holds longer is
@@ -65,6 +66,12 @@ FX96 = "icons/effects/96x96.dmi"
 FX32 = "icons/effects/effects.dmi"
 HEAVY_IMPACT = "icons/effects/heavyimpact.dmi"
 XENO_FX = "icons/Xeno/Effects.dmi"
+QUEEN = "icons/Xeno/castes/queen.dmi"
+WEEDS = "icons/Xeno/weeds.dmi"
+XENO_2X2 = "icons/Xeno/2x2building.dmi"
+RESIN_WALL = "icons/obj/smooth_objects/resin-wall.dmi"
+MINING_DRILL = "icons/obj/mining_drill.dmi"
+CADE = "icons/obj/structures/barricades/metal.dmi"
 
 # OpenRA facing order (clockwise from north) -> which TGMC side to draw.
 FACING_NAMES = ["N", "NE", "E", "SE", "S", "SW", "W", "NW"]
@@ -185,24 +192,99 @@ UNITS = {
     "sentry-turret": {
         "sequences": {
             "turret": [(SENTRY, "sentry_deployed")],
+            "icon": [(SENTRY, "sentry_deployed", None, {"side": "S", "fit": (44, 44), "frames": (0, 1)})],
             "flash": [(PROJECTILES, "muzzle_flash", None, {"facings": 8, "tick": 50})],
         },
     },
     "cryo-pod": {
-        "sequences": {"idle": [(CRYO, "cell_off")], "active": [(CRYO, "cell_on")]},
+        "sequences": {
+            "idle": [(CRYO, "cell_off")], "active": [(CRYO, "cell_on")],
+            "icon": [(CRYO, "cell_off", None, {"fit": (44, 44), "frames": (0, 1)})],
+        },
     },
     "vendor": {
-        "sequences": {"idle": [(VENDING, "sustenance")]},
+        "sequences": {
+            "idle": [(VENDING, "sustenance")],
+            "icon": [(VENDING, "sustenance", None, {"fit": (44, 44), "frames": (0, 1)})],
+        },
     },
     # Xeno structures. Turret is 4-dir, so it gets 8 facings; silo and pod are 1-dir and animate in place.
     "resin-turret": {
-        "sequences": {"turret": [(ACID_TURRET, "resin_turret")]},
+        "sequences": {
+            "turret": [(ACID_TURRET, "resin_turret")],
+            "icon": [(ACID_TURRET, "resin_turret", None, {"side": "S", "fit": (44, 44), "frames": (0, 1)})],
+        },
     },
     "resin-silo": {
-        "sequences": {"idle": [(RESIN_SILO, "weed_silo")]},
+        "sequences": {
+            "idle": [(RESIN_SILO, "weed_silo")],
+            "icon": [(RESIN_SILO, "weed_silo", None, {"fit": (44, 44), "frames": (0, 1)})],
+        },
     },
     "mini-silo": {
-        "sequences": {"idle": [(RESIN_POD, "resinpod")]},
+        "sequences": {
+            "idle": [(RESIN_POD, "resinpod")],
+            "icon": [(RESIN_POD, "resinpod", None, {"fit": (44, 44), "frames": (0, 1)})],
+        },
+    },
+    # Supply generators, walls and tech structures the players build. Each has a still "icon" for the Build menu, which
+    # gets its own sheet scaled to fit the 62x46 palette cell.
+    "queen": {
+        "sequences": {
+            "stand": [(QUEEN, "Queen Walking")],
+            "run": [(QUEEN, "Queen Running")],
+            "die": [(QUEEN, "Queen Dead")],
+            "attack": "stand",
+            "icon": [(QUEEN, "Queen Walking", None, {"side": "S", "fit": (46, 46)})],
+        },
+    },
+    "miner": {
+        "sequences": {
+            "idle": [(MINING_DRILL, "mining_drill_active_")],
+            "icon": [(MINING_DRILL, "mining_drill_active_", None, {"fit": (44, 44), "frames": (0, 1)})],
+        },
+    },
+    "cade": {
+        "sequences": {
+            "idle": [(CADE, "metal_0", None, {"side": "S"})],
+            "icon": [(CADE, "metal_0", None, {"side": "S", "fit": (44, 44), "frames": (0, 1)})],
+        },
+    },
+    "armory": {
+        "sequences": {
+            "idle": [(VENDING, "marinearmory")],
+            "icon": [(VENDING, "marinearmory", None, {"fit": (44, 44), "frames": (0, 1)})],
+        },
+    },
+    "ordnance-depot": {
+        "sequences": {
+            "idle": [(VENDING, "robotics")],
+            "icon": [(VENDING, "robotics", None, {"fit": (44, 44), "frames": (0, 1)})],
+        },
+    },
+    "weed-node": {
+        "sequences": {
+            "idle": [(WEEDS, "weednode3")],
+            "icon": [(WEEDS, "weednode3", None, {"fit": (44, 44), "frames": (0, 1)})],
+        },
+    },
+    "resin-wall": {
+        "sequences": {
+            "idle": [(RESIN_WALL, "resin-wall-255")],
+            "icon": [(RESIN_WALL, "resin-wall-255", None, {"fit": (44, 44), "frames": (0, 1)})],
+        },
+    },
+    "evolution-tower": {
+        "sequences": {
+            "idle": [(XENO_2X2, "evotower")],
+            "icon": [(XENO_2X2, "evotower", None, {"fit": (44, 44), "frames": (0, 1)})],
+        },
+    },
+    "maturity-tower": {
+        "sequences": {
+            "idle": [(XENO_2X2, "maturitytower")],
+            "icon": [(XENO_2X2, "maturitytower", None, {"fit": (44, 44), "frames": (0, 1)})],
+        },
     },
     # Projectile images. Weapons refer to these by name (Bullet Image:), not as actors.
     "grenade": {
@@ -276,6 +358,9 @@ def _layer_images(dmi, state, tint=None, opts=None):
                       for f in range(len(frames))]}
     if dirs != 4:
         raise SystemExit(f"{dmi.path}:{state} has {dirs} dirs; only 1 or 4 are handled")
+    if "side" in opts:  # keep one side of a 4-direction state: a building that never turns
+        d = tgmc_dmi.DIRS4.index(opts["side"])
+        return {"*": [tinted(frames[f][d], tint) for f in range(len(frames))]}
     return {name: [tinted(frames[f][d], tint) for f in range(len(frames))] for d, name in enumerate(tgmc_dmi.DIRS4)}
 
 
@@ -291,6 +376,15 @@ def layer_images(dmi, state, tint=None, opts=None):
     size = (opts or {}).get("size")
     if size:
         sides = {k: [img.resize((size, size), Image.LANCZOS) for img in frames] for k, frames in sides.items()}
+    fit = (opts or {}).get("fit")
+    if fit:  # shrink to fit a (w, h) box, keeping the aspect ratio, centred on a transparent cell of that size
+        def fitted(img):
+            scale = min(fit[0] / img.width, fit[1] / img.height, 1.0)
+            small = img.resize((max(1, round(img.width * scale)), max(1, round(img.height * scale))), Image.LANCZOS)
+            cell = Image.new("RGBA", fit, (0, 0, 0, 0))
+            cell.paste(small, ((fit[0] - small.width) // 2, (fit[1] - small.height) // 2))
+            return cell
+        sides = {k: [fitted(img) for img in frames] for k, frames in sides.items()}
     return sides
 
 
@@ -329,12 +423,16 @@ def frame_timing(delays):
     return unit * 100, order
 
 
-def build_unit(tgmc, unit, spec, out_dir):
+def render_sequences(tgmc, sequences):
+    """Composite every non-alias sequence in `sequences` into one list of cells.
+
+    Returns (cells, cell_size, seq_defs, aliases)."""
     sheet_cells = []      # PIL images, appended in cell order
     cell_size = None  # (width, height) of one cell
     seq_defs = []         # (sequence name, start, length, facings, tick or None, stride or None)
     aliases = []
-    for seq_name, layer_specs in spec["sequences"].items():
+    unit = ""
+    for seq_name, layer_specs in sequences.items():
         if isinstance(layer_specs, str):
             aliases.append((seq_name, layer_specs))
             continue
@@ -347,6 +445,8 @@ def build_unit(tgmc, unit, spec, out_dir):
         size = (dmis[0][0].icon_w, dmis[0][0].icon_h)
         if "size" in first_opts:
             size = (first_opts["size"], first_opts["size"])
+        if "fit" in first_opts:
+            size = tuple(first_opts["fit"])
         if cell_size is None:
             cell_size = size
         elif cell_size != size:
@@ -372,6 +472,36 @@ def build_unit(tgmc, unit, spec, out_dir):
             for f in order:
                 sheet_cells.append(sides[source][f])
         seq_defs.append((seq_name, start, len(order), len(sources), tick, None))
+    return sheet_cells, cell_size, seq_defs, aliases
+
+
+def save_sheet(sheet_cells, cell_size, path):
+    cols = 8
+    rows = (len(sheet_cells) + cols - 1) // cols
+    cw, ch = cell_size
+    sheet = Image.new("RGBA", (cols * cw, rows * ch), (0, 0, 0, 0))
+    for i, img in enumerate(sheet_cells):
+        sheet.paste(img, ((i % cols) * cw, (i // cols) * ch))
+    meta = PngImagePlugin.PngInfo()
+    meta.add_text("FrameSize", f"{cw},{ch}")
+    meta.add_text("FrameAmount", str(len(sheet_cells)))
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    sheet.save(path, pnginfo=meta)
+
+
+def build_unit(tgmc, unit, spec, out_dir):
+    # A real (non-alias) "icon" sequence goes on its own sheet, so a big structure can have a palette icon scaled down
+    # to fit the 62x46 production cell without shrinking the sprite the map draws.
+    icon_spec = spec["sequences"].get("icon")
+    own_icon = icon_spec is not None and not isinstance(icon_spec, str)
+    main = {k: v for k, v in spec["sequences"].items() if not (own_icon and k == "icon")}
+    try:
+        sheet_cells, cell_size, seq_defs, aliases = render_sequences(tgmc, main)
+    except SystemExit as e:
+        raise SystemExit(f"{unit}: {e}")
+    icon_cells = None
+    if own_icon:
+        icon_cells, icon_size, icon_defs, _ = render_sequences(tgmc, {"icon": icon_spec})
 
     starts = {name: (start, length, facings, tick, stride) for name, start, length, facings, tick, stride in seq_defs}
     for alias, target in aliases:  # an alias may point at an earlier alias, so resolve them in order
@@ -388,20 +518,11 @@ def build_unit(tgmc, unit, spec, out_dir):
         starts[alias] = (start, length, facings, tick, stride)
         seq_defs.append((alias, start, length, facings, tick, stride))
 
-    cols = 8
-    rows = (len(sheet_cells) + cols - 1) // cols
     cw, ch = cell_size
-    sheet = Image.new("RGBA", (cols * cw, rows * ch), (0, 0, 0, 0))
-    for i, img in enumerate(sheet_cells):
-        sheet.paste(img, ((i % cols) * cw, (i // cols) * ch))
-
-    meta = PngImagePlugin.PngInfo()
-    meta.add_text("FrameSize", f"{cw},{ch}")
-    meta.add_text("FrameAmount", str(len(sheet_cells)))
-    os.makedirs(os.path.join(out_dir, "sprites"), exist_ok=True)
     os.makedirs(os.path.join(out_dir, "sequences"), exist_ok=True)
-    png = os.path.join(out_dir, "sprites", f"{unit}.png")
-    sheet.save(png, pnginfo=meta)
+    save_sheet(sheet_cells, cell_size, os.path.join(out_dir, "sprites", f"{unit}.png"))
+    if icon_cells is not None:
+        save_sheet(icon_cells, icon_size, os.path.join(out_dir, "sprites", f"{unit}-icon.png"))
 
     lines = ["# Generated by mod/build_sprites.py from TGMC art. Do not edit.",
              f"{unit}:", "\tDefaults:", f"\t\tFilename: sprites/{unit}.png"]
@@ -416,6 +537,14 @@ def build_unit(tgmc, unit, spec, out_dir):
             lines.append(f"\t\tStride: {stride}")
         if tick is not None:
             lines.append(f"\t\tTick: {tick}")
+    if icon_cells is not None:
+        _, start, length, facings, tick, _ = icon_defs[0]
+        lines += ["\ticon:", f"\t\tFilename: sprites/{unit}-icon.png", f"\t\tStart: {start}"]
+        if length != 1:
+            lines.append(f"\t\tLength: {length}")
+        if tick is not None:
+            lines.append(f"\t\tTick: {tick}")
+        seq_defs.append(("icon", start, length, facings, tick, None))
     with open(os.path.join(out_dir, "sequences", f"{unit}.yaml"), "w", encoding="utf-8", newline="\n") as f:
         f.write("\n".join(lines) + "\n")
 

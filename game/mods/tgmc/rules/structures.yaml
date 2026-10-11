@@ -1,0 +1,128 @@
+# Xeno structures. Sprites come from mod/build_sprites.py (resin-turret, resin-silo, mini-silo).
+
+^Structure:
+	Health:
+		HP: 600
+	Building:
+		Footprint: x
+		Dimensions: 1, 1
+	Selectable:
+		Bounds: 512, 512, -256, -256
+	HitShape:
+		UseTargetableCellsOffsets: true
+		Type: Rectangle
+			TopLeft: -512, -512
+			BottomRight: 512, 512
+	Targetable:
+		TargetTypes: Ground, Structure
+	RenderSprites:
+		Palette: player
+	BodyOrientation:
+	QuantizeFacingsFromSequence:
+		Sequence: idle
+	WithSpriteBody:
+	Valued:
+		Cost: 200
+
+resin-turret:
+	Inherits: ^Structure
+	Health:
+		HP: 400
+	Tooltip:
+		Name: actor-resin-turret.name
+	Valued:
+		Cost: 300
+	WithSpriteBody:
+		Sequence: turret
+	QuantizeFacingsFromSequence:
+		Sequence: turret
+	Turreted:
+		TurnSpeed: 20
+	Armament@PRIMARY:
+		Weapon: TGMCAcid
+		Turret: primary
+	AttackTurreted:
+	AutoTarget:
+		InitialStance: AttackAnything
+
+resin-silo:
+	Inherits: ^Structure
+	Building:
+		Footprint: xx xx
+		Dimensions: 2, 2
+	StoresPlayerResources:
+		Capacity: 1000
+	Tooltip:
+		Name: actor-resin-silo.name
+	Valued:
+		Cost: 400
+	WithIdleAnimation:
+		Sequences: idle
+
+mini-silo:
+	Inherits: ^Structure
+	Building:
+		Footprint: xx xx
+		Dimensions: 2, 2
+	StoresPlayerResources:
+		Capacity: 300
+	Tooltip:
+		Name: actor-mini-silo.name
+	Valued:
+		Cost: 150
+	WithIdleAnimation:
+		Sequences: idle
+
+sentry-turret:
+	Inherits: ^Structure
+	Health:
+		HP: 300
+	Building:
+		Footprint: x
+		Dimensions: 1, 1
+	Tooltip:
+		Name: actor-sentry-turret.name
+	Valued:
+		Cost: 250
+	WithSpriteBody:
+		Sequence: turret
+	QuantizeFacingsFromSequence:
+		Sequence: turret
+	Turreted:
+		TurnSpeed: 20
+	Armament@PRIMARY:
+		Weapon: TGMCRifle
+		Turret: primary
+	AttackTurreted:
+	AutoTarget:
+		InitialStance: AttackAnything
+
+cryo-pod:
+	Inherits: ^Structure
+	Building:
+		Footprint: x x
+		Dimensions: 1, 2
+	Health:
+		HP: 250
+	WithIdleAnimation:
+		Sequences: active
+	Production:
+		Produces: Infantry
+	Tooltip:
+		Name: actor-cryo-pod.name
+	Valued:
+		Cost: 300
+
+vendor:
+	Inherits: ^Structure
+	Building:
+		Footprint: x
+		Dimensions: 1, 1
+	Health:
+		HP: 200
+	Production:
+		Produces: Infantry
+	Tooltip:
+		Name: actor-vendor.name
+	Valued:
+		Cost: 200

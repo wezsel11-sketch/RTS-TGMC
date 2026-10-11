@@ -1,7 +1,7 @@
-# Build output: assembled mod, converted sprites and sounds, test maps. TGMC-derived, never commit.
+# Build output: scratch clones, .NET SDK, staging. The finished game is committed under game/ (see the end of this file).
 build/
 
-# TGMC-derived or extracted art and audio. The repo carries scripts, YAML and docs only.
+# TGMC-derived or extracted art and audio, outside game/. game/ is the one place they are committed.
 *.dmi
 *.png
 *.gif
@@ -37,3 +37,12 @@ __pycache__/
 .vscode/
 .idea/
 .DS_Store
+
+# The ready-to-run game. This is a private repo for personal use, so the converted TGMC art/sound
+# and the OpenRA binaries under game/ are committed on purpose. These lines must stay last: they
+# re-include the files the patterns above would otherwise ignore (.png, .ogg, .deps.json, ...).
+!game/
+!game/**
+# Portable settings, logs, replays and screenshots. PLAY.cmd and OpenRA write here.
+game/Support/*
+!game/Support/.gitkeep

@@ -1,0 +1,6 @@
+# Never rewrite line endings inside the prebuilt game: binaries, yaml and lua must stay byte-identical.
+game/** -text
+# Windows batch files need CRLF.
+*.cmd text eol=crlf
+# Everything else: normal text handling.
+* text=auto

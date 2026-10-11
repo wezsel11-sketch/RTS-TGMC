@@ -35,7 +35,7 @@ PANEL_COLLECTIONS = [
     "tgmc-panel", "tgmc-radar-frame", "tgmc-selection", "dialog", "dialog2", "dialog3", "dialog4",
     "dialog5", "mainmenu-border", "sidebar", "tooltip-separator", "separator", "newsbutton",
     "loadscreen-stripe", "textfield", "table", "scrollheader", "observer-scrollheader",
-    "observer-scrollitem", "scrollpanel-bg", "slider-track",
+    "observer-scrollitem", "scrollpanel-bg", "slider-track", "observer-scrollpanel-button", "progressbar-bg",
 ]
 BUTTON_COLLECTIONS = [
     "button", "button-hover", "button-pressed", "button-disabled",
@@ -105,15 +105,24 @@ def draw_logo():
 
 # Icon sheets the common chrome reads by name (see mods/common/chrome/*.yaml). Placeholder glyphs, not TGMC art.
 ICON_COLLECTIONS = {
-    "checkmark-tick": ["checked", "unchecked"],
+    "checkmark-tick": ["checked", "checked-pressed", "unchecked", "unchecked-pressed"],
+    "checkmark-cross": ["checked", "checked-pressed", "unchecked", "unchecked-pressed"],
+    "checkmark-mute": ["checked", "checked-pressed", "unchecked", "unchecked-pressed"],
     "editor": ["actors", "copy", "erase", "history", "overlays", "paste", "redo", "select", "tiles", "tools", "undo"],
-    "lobby-bits": ["admin", "kick", "spawn-unclaimed"],
-    "music": ["next", "pause", "play", "prev", "stop"],
-    "reload-icon": ["enabled"],
-    "sidebar-bits": ["production-tooltip-cost", "production-tooltip-power", "production-tooltip-time"],
-    "dropdown-decorations": ["marker"],
-    "dropdown-separators": ["separator"],
-    "scrollpanel-decorations": ["up", "down", "left", "right"],
+    "lobby-bits": [
+        "admin", "admin-anonymous", "admin-registered", "player-anonymous", "player-registered", "kick", "bot",
+        "spawn-unclaimed", "spawn-claimed", "spawn-disabled", "colorpicker", "huepicker",
+        "protected", "protected-disabled", "authentication", "authentication-disabled",
+    ],
+    "flags": ["marines", "xenos", "Random"],
+    "music": ["next", "pause", "play", "prev", "stop", "fastforward"],
+    "reload-icon": ["enabled"] + [f"disabled-{i}" for i in range(12)],
+    "sidebar-bits": ["production-tooltip-cost", "production-tooltip-power", "production-tooltip-time", "indicator-muted"],
+    "dropdown-decorations": ["marker", "marker-disabled"],
+    "dropdown-separators": ["separator", "separator-hover", "separator-pressed", "separator-disabled", "observer-separator"],
+    "scrollpanel-decorations": ["up", "up-disabled", "down", "down-disabled", "left", "left-disabled", "right", "right-disabled"],
+    "slider": ["tick"],
+    "strategic": ["critical_unowned", "enemy_owned", "player_owned"],
 }
 ICON = 16
 ICON_COLS = 16

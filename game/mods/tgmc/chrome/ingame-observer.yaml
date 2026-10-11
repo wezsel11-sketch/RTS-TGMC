@@ -1,0 +1,31 @@
+# TGMC observer HUD: a small banner. Observers get the map, the radar and the menu.
+
+Container@OBSERVER_WIDGETS:
+	Logic: LoadIngameChatLogic
+	Children:
+		Container@CHAT_ROOT:
+		LogicKeyListener@OBSERVER_KEYHANDLER:
+		Background@TGMC_OBSERVER_BANNER:
+			X: WINDOW_WIDTH - 240
+			Y: 0
+			Width: 240
+			Height: 30
+			Background: tgmc-panel
+			Children:
+				Label@OBSERVER_TITLE:
+					X: 8
+					Y: 6
+					Width: PARENT_WIDTH - 16
+					Height: 20
+					Text: hud-observer-title
+					Font: Bold
+					Align: Center
+		MenuButton@OPTIONS_BUTTON:
+			X: WINDOW_WIDTH - 240
+			Y: 34
+			Width: 240
+			Height: 26
+			Background: sidebar-button
+			Key: escape
+			DisableWorldSounds: true
+			VisualHeight: 0

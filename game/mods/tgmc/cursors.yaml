@@ -1,0 +1,20 @@
+Cursors:
+	cursor.png: cursor
+		default:
+			Start: 0
+		move:
+			Start: 0
+		move-blocked:
+			Start: 0
+		attackmove:
+			Start: 0
+		attackmove-blocked:
+			Start: 0
+		assaultmove:
+			Start: 0
+		assaultmove-blocked:
+			Start: 0
+		attack:
+			Start: 0
+		attackoutsiderange:
+			Start: 0

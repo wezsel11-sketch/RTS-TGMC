@@ -157,6 +157,8 @@ On a headless machine, run OpenRA under Xvfb with Mesa software GL
   placeholders drawn by the scripts. Production buildings have no rally point yet.
 - The AI (`rules/ai.yaml`) only trains units and sends them out in squads. It doesn't build structures.
   Pick "Skirmish AI" for a slot in the lobby.
+- The path menu -> Singleplayer -> Skirmish -> lobby (add a Skirmish AI, Start Game) was walked headless and works.
+  `tgmc/chrome/mainmenu.yaml` is OpenRA's main menu without the news feed, update notice and forum link.
 - Verified by running the mod headless (OpenRA bleed, `mod/check_mod.sh` and `mod/smoke.sh`): the lint passes with
   no errors or warnings, and on Landing Zone the camera starts on the base, the radar and production palette work,
   the vendor spawns queued marines, income ticks up, and a "Skirmish AI" in the xeno slot trains Runners that attack

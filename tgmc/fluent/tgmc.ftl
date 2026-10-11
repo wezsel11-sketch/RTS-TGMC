@@ -1,9 +1,9 @@
 mod-title = TGMC Marines vs Xenos (personal, non-commercial)
 mod-windowtitle = TGMC Marines vs Xenos
 faction-marines =
-    .name = TGMC Marines
+    .name = Marines
 faction-xenos =
-    .name = Xenomorphs
+    .name = Xenos
 faction-random =
     .name = Random
 actor-hunter =

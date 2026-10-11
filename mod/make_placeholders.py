@@ -234,7 +234,7 @@ RequiresMod: tgmc
 
 Title: {title}
 
-Author: local smoke test
+Author: TGMC OpenRA mod
 
 Tileset: TGMC
 
@@ -289,7 +289,7 @@ def main():
     write_shroud_tiles(args.out, tile=32)
     write_map(os.path.join(args.out, "maps", "test-field"), "TGMC test field", 24, 24, TEST_FIELD, "Lobby, Shellmap", [(10, 12), (14, 12)])
     write_map(os.path.join(args.out, "maps", "landing-zone"), "Landing Zone", 40, 28, LANDING_ZONE, "Lobby", [(6, 14), (33, 13)],
-              ground=landing_zone_ground)
+              ground=landing_zone_ground, category="Conquest")
     for name, sc in SCENARIOS.items():
         write_map(os.path.join(args.out, "maps", name), name, 24, 24, sc["actors"], "MissionSelector", [(10, 8), (19, 17)],
                   scripts=sc["scripts"], drop_conquest=sc.get("drop_conquest", False),

@@ -66,7 +66,7 @@ ChromeLayout:
 	common|chrome/ingame-debug-hpf.yaml
 	common|chrome/ingame-debuginfo.yaml
 	common|chrome/ingame-infochat.yaml
-	common|chrome/mainmenu.yaml
+	tgmc|chrome/mainmenu.yaml
 	common|chrome/mainmenu-prompts.yaml
 	common|chrome/settings.yaml
 	common|chrome/settings-display.yaml
@@ -125,6 +125,7 @@ FluentMessages:
 	common|fluent/ingame-debug.ftl
 	common|fluent/hotkeys.ftl
 	common|fluent/rules.ftl
+	tgmc|fluent/overrides.ftl
 
 LoadScreen: BlankLoadScreen
 
@@ -168,7 +169,7 @@ Fonts:
 Missions:
 
 MapFolders:
-	tgmc|maps
+	tgmc|maps: System
 
 MapGrid:
 	Type: Rectangular

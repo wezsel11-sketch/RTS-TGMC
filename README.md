@@ -228,6 +228,8 @@ On a headless machine, run OpenRA under Xvfb with Mesa software GL
   and linted the mod in about two minutes on a fast connection); a second run skipped the finished steps, and the scenarios, the smoke test
   and `play.sh hold-the-line` all ran afterwards. Only Linux x64 has been tried. macOS and WSL are untested.
 - Fog of war is drawn with plain black quadrant tiles, so edges look blocky.
+- The in-game MENU button now opens the Esc menu (the sidebar carries `MenuButtonsChromeLogic`). Checked headless: the menu, its objectives
+  panel and Settings open with no missing sprites. The Smartgunner, Grenadier and Warrior are new and have had the scenario tests but no play time.
 
 ## Licenses
 

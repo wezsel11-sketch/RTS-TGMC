@@ -44,6 +44,10 @@ PANEL_COLLECTIONS = [
     "observer-scrollitem", "scrollpanel-bg", "slider-track",
     "tgui-window", "tgui-titlebar", "tgui-rail", "tgui-card", "tgui-card-header", "tgui-bar-track",
     "tgui-bar-fill",
+    # States and panels the stock settings, music, lobby and observer widgets look up by name.
+    "scrollitem", "scrollitem-nohover", "scrollitem-nohover-highlighted", "progressbar-bg", "progressbar-thumb",
+    "panel-bg", "panel-header", "panel-rule", "panel-thinborder", "panel-thinborder-light",
+    "textfield-hover", "textfield-focused", "textfield-disabled",
 ]
 BUTTON_COLLECTIONS = [
     "button", "button-hover", "button-pressed", "button-disabled",
@@ -55,6 +59,16 @@ BUTTON_COLLECTIONS = [
     "checkbox-toggle", "checkbox-toggle-hover", "checkbox-toggle-pressed",
     "checkbox-toggle-highlighted", "checkbox-pressed", "checkbox-disabled",
     "tgui-tab", "tgui-tab-hover", "tgui-tab-pressed", "tgui-tab-disabled", "tgui-tab-active",
+    "scrollitem-hover", "scrollitem-pressed", "scrollitem-highlighted", "scrollheader-highlighted",
+    "observer-scrollitem-hover", "observer-scrollitem-pressed", "observer-scrollitem-highlighted",
+    "observer-scrollheader-highlighted", "observer-scrollpanel-button", "observer-scrollpanel-button-hover",
+    "observer-scrollpanel-button-disabled", "scrollpanel-button-disabled",
+    "slider-thumb-hover", "slider-thumb-pressed", "slider-thumb-disabled",
+    "checkbox", "checkbox-hover", "checkbox-highlighted", "checkbox-highlighted-hover",
+    "checkbox-highlighted-pressed", "checkbox-highlighted-disabled",
+    "checkbox-toggle-highlighted-hover", "checkbox-toggle-highlighted-pressed",
+    "button-highlighted-thin", "button-highlighted-thin-hover", "button-highlighted-thin-pressed",
+    "button-highlighted-thin-disabled",
 ]
 
 
@@ -258,6 +272,14 @@ ICONS = {
         "checked": lambda: tick(AMBER), "checked-pressed": lambda: tick(AMBER_DIM),
         "unchecked": blank, "unchecked-pressed": lambda: tick(AMBER_DIM),
     },
+    "checkmark-cross": {
+        "checked": lambda: cross(11, 11, RED), "checked-pressed": lambda: cross(11, 11, AMBER_DIM),
+        "unchecked": blank, "unchecked-pressed": lambda: cross(11, 11, AMBER_DIM),
+    },
+    "checkmark-mute": {
+        "checked": speaker_muted, "checked-pressed": speaker_muted,
+        "unchecked": blank, "unchecked-pressed": speaker_muted,
+    },
     "editor": {n: (lambda n=n: glyph_tile(n)) for n in
                ["actors", "copy", "erase", "history", "overlays", "paste", "redo", "select", "tiles", "tools", "undo"]},
     "lobby-bits": {
@@ -295,6 +317,10 @@ ICONS = {
     "production-icons": {n: (lambda n=n: glyph_tile(n)) for n in
                          ["infantry", "infantry-disabled", "infantry-alert", "xeno", "xeno-disabled", "xeno-alert"]},
 }
+
+# The highlighted checkbox state looks up its own mark collection; it reuses the plain one.
+for _mark in ("tick", "cross", "mute"):
+    ICONS[f"checkmark-{_mark}-highlighted"] = ICONS[f"checkmark-{_mark}"]
 
 
 def _huepicker():

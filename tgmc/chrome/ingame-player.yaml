@@ -16,6 +16,7 @@ Container@PLAYER_WIDGETS:
 			JumpToGroupKeyPrefix: ControlGroupJumpTo
 		LogicTicker@SIDEBAR_TICKER:
 		Background@TGMC_SIDEBAR:
+			Logic: MenuButtonsChromeLogic
 			X: WINDOW_WIDTH - 240
 			Y: 0
 			Width: 240

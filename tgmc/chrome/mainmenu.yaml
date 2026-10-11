@@ -1,6 +1,6 @@
 # TGMC main menu. Derived from OpenRA's mods/common/chrome/mainmenu.yaml (GPL-3.0).
 # Widget IDs and positions are unchanged so MainMenuLogic still finds them.
-# Changes: the button column is a TGUI window, buttons use the tab style, and each sub-menu has a title bar.
+# Changes: each sub-menu is a TGUI window (drawn by the sub-menu, so it vanishes when the lobby or another screen opens), buttons use the tab style, and each sub-menu has a title bar.
 
 Container@MAINMENU:
 	Logic: MainMenuLogic
@@ -33,16 +33,16 @@ Container@MAINMENU:
 			Align: Center
 			Font: Regular
 			Shadow: true
-		Background@MENUS:
+		Container@MENUS:
 			X: 13 + (WINDOW_WIDTH - 522) / 4 - WIDTH / 2
 			Y: WINDOW_HEIGHT / 2 - HEIGHT / 2
 			Width: 200
 			Height: 320
-			Background: tgui-window
 			Children:
 				Background@MAIN_MENU:
 					Width: PARENT_WIDTH
 					Height: PARENT_HEIGHT
+					Background: tgui-window
 					Children:
 						Background@MAIN_TITLE_BAR:
 							X: 0
@@ -109,6 +109,7 @@ Container@MAINMENU:
 				Background@SINGLEPLAYER_MENU:
 					Width: PARENT_WIDTH
 					Height: PARENT_HEIGHT
+					Background: tgui-window
 					Children:
 						Background@SINGLEPLAYER_TITLE_BAR:
 							X: 0
@@ -160,6 +161,7 @@ Container@MAINMENU:
 				Background@EXTRAS_MENU:
 					Width: PARENT_WIDTH
 					Height: PARENT_HEIGHT
+					Background: tgui-window
 					Children:
 						Background@EXTRAS_TITLE_BAR:
 							X: 0
@@ -227,6 +229,7 @@ Container@MAINMENU:
 				Background@MAP_EDITOR_MENU:
 					Width: PARENT_WIDTH
 					Height: PARENT_HEIGHT
+					Background: tgui-window
 					Children:
 						Background@MAP_EDITOR_TITLE_BAR:
 							X: 0

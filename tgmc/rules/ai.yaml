@@ -47,6 +47,10 @@ Player:
 			hunter: 20
 			sentinel: 20
 			warrior: 8
+			crusher: 12
+			boiler: 10
+			mech: 12
+			mortar-crew: 10
 			queen: 10
 	UnitBuilderBotModule@normal:
 		RequiresCondition: ai-normal
@@ -62,6 +66,10 @@ Player:
 			hunter: 30
 			sentinel: 30
 			warrior: 15
+			crusher: 12
+			boiler: 10
+			mech: 12
+			mortar-crew: 10
 			queen: 10
 	UnitBuilderBotModule@hard:
 		RequiresCondition: ai-hard
@@ -77,6 +85,10 @@ Player:
 			hunter: 40
 			sentinel: 35
 			warrior: 25
+			crusher: 12
+			boiler: 10
+			mech: 12
+			mortar-crew: 10
 			queen: 10
 	# The bot has no builder to walk around, so its cryo pod and silo give it the build area (structures.yaml) and it
 	# places each finished structure in a ring around them. It never builds walls. The refinery counts are zeroed

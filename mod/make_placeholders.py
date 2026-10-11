@@ -308,10 +308,10 @@ def write_ruin_art(out):
 
 
 def write_ability_art(out):
-    """`icon.png`: the 62x46 icons of the support powers (Screech, Flare). `flare.png`: four 48x48 frames of the light a
+    """`icon.png`: the 62x46 icons of the support powers (Screech, Flare, Orbital Strike). `flare.png`: four 48x48 frames of the light a
     Flare leaves on the ground. Drawn here, no TGMC art."""
-    icons = Image.new("RGBA", (62 * 2, 46), (0, 0, 0, 0))
-    for i in range(2):
+    icons = Image.new("RGBA", (62 * 3, 46), (0, 0, 0, 0))
+    for i in range(3):
         cell = Image.new("RGBA", (62, 46), (22, 28, 24, 255))
         d = ImageDraw.Draw(cell)
         d.rectangle([0, 0, 61, 45], outline=(88, 100, 70, 255))
@@ -320,6 +320,10 @@ def write_ability_art(out):
                 d.arc([31 - r, 23 - r, 31 + r, 23 + r], 300, 60, fill=(190, 90, 255, a), width=3)
                 d.arc([31 - r, 23 - r, 31 + r, 23 + r], 120, 240, fill=(190, 90, 255, a), width=3)
             d.ellipse([27, 19, 35, 27], fill=(235, 200, 255, 255))
+        elif i == 2:  # Orbital strike: a target ring with a beam coming down
+            d.ellipse([16, 24, 46, 40], outline=(255, 90, 60, 255), width=2)
+            d.line([(31, 2), (31, 32)], fill=(255, 220, 200, 255), width=3)
+            d.ellipse([27, 28, 35, 36], fill=(255, 140, 60, 255))
         else:  # Flare: a bright star with a trail
             d.line([(14, 40), (31, 23)], fill=(150, 80, 20, 255), width=3)
             for ang in range(0, 360, 45):
@@ -330,7 +334,7 @@ def write_ability_art(out):
         icons.paste(cell, (62 * i, 0))
     meta = PngImagePlugin.PngInfo()
     meta.add_text("FrameSize", "62,46")
-    meta.add_text("FrameAmount", "2")
+    meta.add_text("FrameAmount", "3")
     icons.save(os.path.join(out, "icon.png"), pnginfo=meta)
 
     # The tint a support power puts on each cell it will affect while you aim it
@@ -450,10 +454,10 @@ SCENARIOS = {
     "look-marines": _scenario("look-marines", [("rifleman", "Marines", 6 + 2 * i, 10, 512) for i in range(5)]
                               + [("rifleman", "Marines", 6 + 2 * i, 13, 512) for i in range(4)]),
     # Everything on show, to look at (mod/smoke.sh look-all; scenarios/look-all.lua)
-    "look-all": {"scripts": ("look-all",), "allied": True, "size": (36, 24), "spawns": [(4, 4), (30, 20)], "actors": (
-        [(u, "Marines", 4 + 2 * i, 4, 512) for i, u in enumerate(["rifleman", "medic", "engineer", "smartgunner", "grenadier"])]
-        + [(u, "Xenos", 4 + 2 * i, 7, 512) for i, u in enumerate(["runner", "hunter", "sentinel", "drone", "warrior", "queen"])]
-        + [(u, "Marines", 5 + 3 * i, 11, 0) for i, u in enumerate(["vendor", "cryo-pod", "armory", "ordnance-depot", "miner", "sentry-turret", "cade"])]
+    "look-all": {"scripts": ("look-all",), "allied": True, "size": (40, 24), "spawns": [(4, 4), (30, 20)], "actors": (
+        [(u, "Marines", 4 + 2 * i, 4, 512) for i, u in enumerate(["rifleman", "medic", "engineer", "smartgunner", "grenadier", "mortar-crew", "mech"])]
+        + [(u, "Xenos", 4 + 2 * i, 7, 512) for i, u in enumerate(["runner", "hunter", "sentinel", "drone", "warrior", "queen", "crusher", "boiler"])]
+        + [(u, "Marines", 5 + 3 * i, 11, 0) for i, u in enumerate(["vendor", "cryo-pod", "armory", "ordnance-depot", "mech-bay", "miner", "sentry-turret", "cade"])]
         + [(u, "Xenos", 5 + 4 * i, 15, 0) for i, u in enumerate(["weed-node", "resin-turret", "mini-silo", "evolution-tower", "maturity-tower", "resin-wall"])]
         + [("resin-silo", "Xenos", 30, 18, 0)])},
     # Ranks: a scripted promotion, and a runner that ranks up by killing (see scenarios/test-vet.lua). Spare marines keep the game going.
@@ -477,6 +481,33 @@ SCENARIOS = {
         ("rifleman", "Marines", 3, 17, 256), ("rifleman", "Marines", 3, 20, 256),
         ("resin-silo", "Xenos", 34, 25, 0),
     ]},
+    # Artillery shoots at range, not up close (see scenarios/test-artillery.lua)
+    "scenario-artillery": {"scripts": ("test-artillery",), "size": (40, 28), "actors": [
+        ("mortar-crew", "Marines", 3, 3, 768), ("runner", "Xenos", 9, 3, 256),
+        ("mortar-crew", "Marines", 3, 10, 768), ("runner", "Xenos", 5, 10, 256),
+        ("boiler", "Xenos", 25, 3, 768), ("rifleman", "Marines", 31, 3, 256),
+        ("boiler", "Xenos", 25, 10, 768), ("rifleman", "Marines", 27, 10, 256),
+        ("resin-silo", "Xenos", 34, 22, 0),
+    ]},
+    # Heavy armour: rifle fire against a Crusher and a Hunter, and a mech's cannon against a Crusher (see scenarios/test-armor.lua)
+    "scenario-armor": {"scripts": ("test-armor",), "size": (40, 28), "actors": [
+        ("rifleman", "Marines", 4, 3, 768), ("crusher", "Xenos", 8, 3, 256),
+        ("rifleman", "Marines", 4, 10, 768), ("hunter", "Xenos", 8, 10, 256),
+        ("mech", "Marines", 24, 3, 768), ("crusher", "Xenos", 28, 3, 256),
+        ("resin-silo", "Xenos", 34, 22, 0),
+    ]},
+    # A Research Lab makes marines take less damage (see scenarios/test-research.lua), a Weed Node speeds xenos up
+    # (test-weeds.lua), and the orbital strike marker blows up what is under it (test-orbital.lua)
+    "scenario-research-off": {"scripts": ("test-research-off",), "size": (30, 20), "actors": [
+        ("rifleman", "Marines", 8, 5, 768), ("crusher", "Xenos", 12, 5, 256), ("resin-silo", "Xenos", 24, 14, 0)]},
+    "scenario-research-on": {"scripts": ("test-research-on",), "size": (30, 20), "actors": [
+        ("rifleman", "Marines", 8, 5, 768), ("research-lab", "Marines", 3, 12, 0), ("crusher", "Xenos", 12, 5, 256),
+        ("resin-silo", "Xenos", 24, 14, 0)]},
+    "scenario-weeds": {"scripts": ("test-weeds",), "size": (40, 26), "actors": [
+        ("weed-node", "Xenos", 4, 6, 0), ("runner", "Xenos", 5, 5, 256), ("runner", "Xenos", 5, 20, 256),
+        ("rifleman", "Marines", 36, 22, 768)]},
+    "scenario-orbital": {"scripts": ("test-orbital",), "size": (30, 24), "actors": [
+        ("runner", "Xenos", 10, 10, 256), ("rifleman", "Marines", 18, 10, 768), ("resin-silo", "Xenos", 24, 18, 0)]},
     "scenario-combat": _scenario("test-combat", [
         ("rifleman", "Marines", 10, 10, 512),
         ("runner", "Xenos", 13, 10, 0),
@@ -600,18 +631,25 @@ def write_map(folder, title, size_w, size_h, placed, visibility, spawns, scripts
             rules += "Player:\n\t-ConquestVictoryConditions:\n"
         with open(os.path.join(folder, "rules.yaml"), "w", encoding="utf-8", newline="\n") as f:
             f.write(rules)
+        here = os.path.dirname(os.path.abspath(__file__))
+        # Scripts that are one template with a word filled in: the bot strength, or whether a Research Lab stands
+        templates = (("test-ai-level-", "test-ai-levels.lua", "__LEVEL__"), ("test-research-", "test-research.lua", "__MODE__"))
         for name in scripts:
             if name == "sound-list":
                 write_sound_list(os.path.join(folder, "sound-list.lua"))
                 continue
-            if name.startswith("test-ai-level-"):  # test-ai-levels.lua with the bot strength filled in
-                template = open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "scenarios", "test-ai-levels.lua"),
-                                encoding="utf-8").read()
+            source = os.path.join(here, "scenarios", f"{name}.lua")
+            text = None
+            for prefix, template_name, token in templates:
+                if name.startswith(prefix):
+                    with open(os.path.join(here, "scenarios", template_name), encoding="utf-8") as f:
+                        text = f.read().replace(token, name[len(prefix):])
+            if text is None:
+                shutil.copyfile(source, os.path.join(folder, f"{name}.lua"))
+            else:
                 with open(os.path.join(folder, f"{name}.lua"), "w", encoding="utf-8", newline="\n") as f:
-                    f.write(template.replace("__LEVEL__", name.split("-")[-1]))
-                continue
-            shutil.copyfile(os.path.join(os.path.dirname(os.path.abspath(__file__)), "scenarios", f"{name}.lua"),
-                            os.path.join(folder, f"{name}.lua"))
+                    f.write(text)
+
 
     # An allied (look-*) map also pins the two colours, so a screenshot shows the owner colouring
     marine_rel = "\t\tAllies: Xenos\n\t\tLockColor: True\n" if allied else "\t\tEnemies: Xenos\n"

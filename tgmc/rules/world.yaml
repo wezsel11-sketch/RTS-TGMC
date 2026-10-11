@@ -42,6 +42,20 @@
 			Clear: 100
 			Road: 120
 			Ford: 60
+	# The Crusher tramples marines (Crushable on infantry); the mech is big enough not to share a cell
+	Locomotor@CRUSHER:
+		Name: crusher
+		Crushes: infantry
+		TerrainSpeeds:
+			Clear: 100
+			Road: 120
+			Ford: 60
+	Locomotor@MECH:
+		Name: mech
+		TerrainSpeeds:
+			Clear: 100
+			Road: 120
+			Ford: 70
 	Faction@marines:
 		Name: faction-marines.name
 		InternalName: marines

@@ -42,6 +42,13 @@ Sequences:
 	tgmc|sequences/grenadier.yaml
 	tgmc|sequences/warrior.yaml
 	tgmc|sequences/queen.yaml
+	tgmc|sequences/crusher.yaml
+	tgmc|sequences/boiler.yaml
+	tgmc|sequences/mech.yaml
+	tgmc|sequences/mortar-crew.yaml
+	tgmc|sequences/mech-bay.yaml
+	tgmc|sequences/research-lab.yaml
+	tgmc|sequences/hive-core.yaml
 	tgmc|sequences/miner.yaml
 	tgmc|sequences/cade.yaml
 	tgmc|sequences/armory.yaml

@@ -103,6 +103,8 @@ icon:
 		Start: 0
 	flare:
 		Start: 1
+	orbital:
+		Start: 2
 flare:
 	idle:
 		Filename: flare.png

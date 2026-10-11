@@ -10,6 +10,8 @@ TGMCRifle:
 	Warhead@1Dam: SpreadDamage
 		Damage: 14
 		Spread: 128
+		Versus:
+			Heavy: 35
 		ValidRelationships: Enemy
 	Warhead@2Hit: CreateEffect
 		ImpactSounds: hit-bullet-1.ogg, hit-bullet-2.ogg, hit-bullet-3.ogg, hit-bullet-4.ogg
@@ -84,6 +86,8 @@ TGMCClaws:
 	TargetActorCenter: true
 	Projectile: InstantHit
 	Warhead@1Dam: TargetDamage
+		Versus:
+			Heavy: 35
 		Damage: 20
 	Warhead@2Hit: CreateEffect
 		ImpactSounds: hit-armor-1.ogg, hit-armor-2.ogg, hit-armor-3.ogg
@@ -124,6 +128,8 @@ TGMCSpit:
 		Damage: 16
 		Spread: 256
 		Falloff: 100, 100, 60, 0
+		Versus:
+			Heavy: 70
 		ValidRelationships: Enemy
 	Warhead@2Hit: CreateEffect
 		Image: fx-acid
@@ -167,6 +173,8 @@ TGMCAcid:
 		Damage: 30
 		Spread: 256
 		Falloff: 100, 100, 60, 0
+		Versus:
+			Heavy: 70
 		ValidRelationships: Enemy
 	Warhead@2Hit: CreateEffect
 		Image: fx-acid
@@ -190,6 +198,8 @@ TGMCSmartgun:
 	Warhead@1Dam: SpreadDamage
 		Damage: 7
 		Spread: 1c0
+		Versus:
+			Heavy: 40
 		ValidRelationships: Enemy
 	Warhead@2Hit: CreateEffect
 		ImpactSounds: hit-bullet-1.ogg, hit-bullet-2.ogg, hit-bullet-3.ogg, hit-bullet-4.ogg
@@ -221,6 +231,8 @@ TGMCGrenade:
 		Damage: 45
 		Spread: 2c0
 		Falloff: 100, 50, 20, 0
+		Versus:
+			Heavy: 80
 		ValidRelationships: Enemy
 	Warhead@2Boom: CreateEffect
 		Image: fx-blast
@@ -239,6 +251,8 @@ TGMCSlam:
 		Damage: 30
 		Spread: 1c256
 		Falloff: 100, 60, 25
+		Versus:
+			Heavy: 55
 		ValidRelationships: Enemy
 	Warhead@2Slam: CreateEffect
 		Image: fx-slam
@@ -279,3 +293,130 @@ TGMCPounce:
 		Duration: 50
 		ValidRelationships: Enemy
 		ValidTargets: Human
+
+# ---------------------------------------------------------------- armour and artillery
+# Versus on a warhead is a percentage by armour type (None is the default): rifles and claws struggle against Heavy armour,
+# the mech's cannon, the mortar and the Boiler's acid do not.
+
+# Xeno Crusher: a huge slow melee swing that wrecks armour and structures; it also tramples marines it walks over.
+TGMCCrusherSlam:
+	Range: 1c768
+	ReloadDelay: 30
+	Report: slam-1.ogg, slam-2.ogg
+	Projectile: InstantHit
+	Warhead@1Dam: SpreadDamage
+		Damage: 48
+		Spread: 1c0
+		Falloff: 100, 60, 25
+		Versus:
+			Heavy: 100
+		ValidRelationships: Enemy
+	Warhead@2Slam: CreateEffect
+		Image: fx-slam
+		Explosions: slam
+		ForceDisplayAtGroundLevel: true
+		ValidTargets: Ground, Water, Structure
+	Warhead@3Blood: CreateEffect
+		Image: fx-impact
+		Explosions: blood
+		ImpactSounds: splat.ogg
+		ImpactSoundChance: 50
+		ValidRelationships: Enemy
+		ValidTargets: Human
+
+# Xeno Boiler: lobs a heavy acid bomb a long way, but not at anything close. Strong against armour.
+TGMCBoilerBomb:
+	Range: 12c0
+	MinRange: 4c0
+	ReloadDelay: 110
+	Report: acid-spit-1.ogg, acid-spit-2.ogg
+	TargetActorCenter: true
+	Projectile: Bullet
+		Speed: 170
+		Image: fx-acid
+		Shadow: true
+		LaunchAngle: 200
+		Blockable: false
+	Warhead@1Dam: SpreadDamage
+		Damage: 58
+		Spread: 2c0
+		Falloff: 100, 70, 30, 0
+		Versus:
+			Heavy: 130
+		ValidRelationships: Enemy
+	Warhead@2Hit: CreateEffect
+		Image: fx-acid
+		Explosions: splash
+		ImpactSounds: acid-impact.ogg
+		ForceDisplayAtGroundLevel: true
+		ValidTargets: Ground, Water, Structure
+
+# Marine mech: a heavy cannon shell (strong against armour and structures) and a light machine gun for infantry.
+TGMCMechCannon:
+	Inherits: TGMCRifle
+	Range: 7c256
+	ReloadDelay: 45
+	Report: grenade-launch.ogg
+	Projectile: Bullet
+		Speed: 420
+		Sequences: large
+	Warhead@1Dam: SpreadDamage
+		Damage: 40
+		Spread: 384
+		Versus:
+			Heavy: 120
+	Warhead@7Boom: CreateEffect
+		Image: fx-blast
+		Explosions: small
+		ForceDisplayAtGroundLevel: true
+		ValidTargets: Ground, Water, Structure
+
+TGMCMechGun:
+	Inherits: TGMCRifle
+	Range: 6c0
+	ReloadDelay: 8
+	Report: sentry-fire.ogg
+	Warhead@1Dam: SpreadDamage
+		Damage: 9
+
+# Marine mortar crew: a long, slow, lobbed shell with a wide splash, and a dead zone close in.
+TGMCMortar:
+	Range: 13c0
+	MinRange: 3c0
+	ReloadDelay: 100
+	Report: grenade-launch.ogg
+	Projectile: Bullet
+		Speed: 150
+		Image: grenade
+		Shadow: true
+		LaunchAngle: 250
+		Blockable: false
+	Warhead@1Dam: SpreadDamage
+		Damage: 42
+		Spread: 2c512
+		Falloff: 100, 60, 25, 0
+		Versus:
+			Heavy: 70
+		ValidRelationships: Enemy
+	Warhead@2Boom: CreateEffect
+		Image: fx-blast
+		Explosions: grenade
+		ImpactSounds: explosion-1.ogg, explosion-2.ogg, explosion-3.ogg
+		ForceDisplayAtGroundLevel: true
+		ValidTargets: Ground, Water, Structure
+
+# The orbital strike's blast, fired when its marker actor dies (structures.yaml: orbital-strike).
+TGMCOrbital:
+	Warhead@1Dam: SpreadDamage
+		Damage: 260
+		Spread: 3c0
+		Falloff: 100, 85, 55, 30, 10, 0
+		Versus:
+			Heavy: 100
+		ValidRelationships: Enemy
+	Warhead@2Boom: CreateEffect
+		Image: fx-blast-big
+		Explosions: big
+		ImpactSounds: explosion-1.ogg, explosion-2.ogg, explosion-3.ogg
+		ForceDisplayAtGroundLevel: true
+		ValidTargets: Ground, Water, Structure

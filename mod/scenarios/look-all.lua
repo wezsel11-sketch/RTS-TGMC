@@ -3,7 +3,7 @@
 -- to show the damage overlays. It prints no TEST line, so mod/test_scenarios.sh ignores it.
 WorldLoaded = function()
 	local hurt = { 0.9, 0.7, 0.45, 0.2 }
-	local types = { "cryo-pod", "armory", "ordnance-depot", "miner", "sentry-turret", "vendor",
+	local types = { "cryo-pod", "armory", "ordnance-depot", "mech-bay", "miner", "sentry-turret", "vendor",
 		"weed-node", "resin-turret", "mini-silo", "evolution-tower", "maturity-tower", "resin-silo" }
 	local n = 0
 	for _, name in ipairs({ "Marines", "Xenos" }) do

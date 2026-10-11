@@ -94,6 +94,42 @@
 		Margin: 7, -5
 		RequiresCondition: rank == 3
 
+# Research. A Research Lab (marines) or a Hive Core (xenos) improves every unit of that side that is built or already standing.
+^MarineResearch:
+	GrantConditionOnPrerequisite@RESEARCH:
+		Condition: researched
+		Prerequisites: research-lab
+	DamageMultiplier@RESEARCH:
+		Modifier: 85
+		RequiresCondition: researched
+	FirepowerMultiplier@RESEARCH:
+		Modifier: 110
+		RequiresCondition: researched
+
+^XenoResearch:
+	GrantConditionOnPrerequisite@RESEARCH:
+		Condition: researched
+		Prerequisites: hive-core
+	DamageMultiplier@RESEARCH:
+		Modifier: 85
+		RequiresCondition: researched
+	SpeedMultiplier@RESEARCH:
+		Modifier: 108
+		RequiresCondition: researched
+
+# Weeds. Near a Weed Node or a silo xenos are quicker and mend slowly.
+^OnWeeds:
+	ExternalCondition@WEEDS:
+		Condition: on-weeds
+	SpeedMultiplier@WEEDS:
+		Modifier: 125
+		RequiresCondition: on-weeds
+	ChangesHealth@WEEDS:
+		Step: 3
+		Delay: 25
+		StartIfBelow: 100
+		RequiresCondition: on-weeds
+
 ^MarineRanks:
 	Inherits: ^RankBonuses
 	GainsExperience:
@@ -115,11 +151,14 @@
 ^Infantry:
 	Inherits: ^Unit
 	Inherits@ranks: ^MarineRanks
+	Inherits@research: ^MarineResearch
 	Targetable@HEAL:
 		RequiresCondition: damaged
 		TargetTypes: Heal
 	Targetable@HUMAN:
 		TargetTypes: Human
+	Crushable:
+		CrushClasses: infantry
 	# Abilities that act on marines. A stun (Runner pounce) holds one in place for a moment, and a screech (Queen) slows and
 	# weakens every marine in an area. Both come from outside: a weapon's warhead, or the Queen's support power.
 	ExternalCondition@STUN:
@@ -312,6 +351,8 @@ grenadier:
 ^Xeno:
 	Inherits: ^Unit
 	Inherits@ranks: ^XenoRanks
+	Inherits@research: ^XenoResearch
+	Inherits@weeds: ^OnWeeds
 	Targetable@ALIEN:
 		TargetTypes: Alien
 	WithInfantryBody:
@@ -538,6 +579,138 @@ queen:
 		Prerequisites: resin-silo
 		Description: actor-queen.description
 
+# ---------------------------------------------------------------- armour and artillery
+
+# Xeno Crusher: slow, heavily armoured, tramples marines. Rifles barely scratch it; it fears the mech, the mortar and acid.
+crusher:
+	Inherits: ^Xeno
+	WithIdleOverlay@TEAM:
+		Sequence: ring-64
+	Voiced:
+		VoiceSet: HunterVoice
+	Health:
+		HP: 520
+	Armor:
+		Type: Heavy
+	Selectable:
+		Bounds: 1536, 1536, -768, -768
+	Mobile:
+		Locomotor: crusher
+		Speed: 32
+	Armament@PRIMARY:
+		Weapon: TGMCCrusherSlam
+	Tooltip:
+		Name: actor-crusher.name
+	Valued:
+		Cost: 350
+	Buildable:
+		Queue: Xeno
+		BuildPaletteOrder: 55
+		Prerequisites: maturity-tower
+		Description: actor-crusher.description
+
+# Xeno Boiler: artillery. Frail, slow, and it cannot hit what is right next to it.
+boiler:
+	Inherits: ^Xeno
+	WithIdleOverlay@TEAM:
+		Sequence: ring-64
+	Voiced:
+		VoiceSet: SentinelVoice
+	Health:
+		HP: 120
+	Selectable:
+		Bounds: 1024, 1024, -512, -512
+	Mobile:
+		Speed: 28
+	Armament@PRIMARY:
+		Weapon: TGMCBoilerBomb
+	Tooltip:
+		Name: actor-boiler.name
+	Valued:
+		Cost: 300
+	Buildable:
+		Queue: Xeno
+		BuildPaletteOrder: 65
+		Prerequisites: maturity-tower
+		Description: actor-boiler.description
+
+# Marine assault mech: heavily armoured, a cannon for armour and structures and a machine gun for infantry. Engineers repair it.
+mech:
+	Inherits: ^Unit
+	Inherits@ranks: ^MarineRanks
+	Inherits@research: ^MarineResearch
+	Targetable:
+		TargetTypes: Ground, Vehicle
+	Targetable@REPAIR:
+		RequiresCondition: damaged
+		TargetTypes: Repair
+	GrantConditionOnDamageState@DAMAGED:
+		Condition: damaged
+		ValidDamageStates: Light, Medium, Heavy, Critical
+	Voiced:
+		VoiceSet: MarineStructureVoice
+	DeathSounds:
+	FireWarheadsOnDeath:
+		Weapon: TGMCBlastBig
+		EmptyWeapon: TGMCBlastBig
+	SpawnActorOnDeath:
+		Actor: rubble-medium
+	ActorLostNotification:
+	AttackFrontal:
+		Voice: Attack
+	WithInfantryBody:
+		MoveSequence: run
+		StandSequences: stand
+		DefaultAttackSequence: attack
+	WithIdleOverlay@TEAM:
+		Sequence: ring-64
+	Health:
+		HP: 480
+	Armor:
+		Type: Heavy
+	Selectable:
+		Bounds: 1536, 1792, -768, -1280
+	Mobile:
+		Locomotor: mech
+		Speed: 42
+	Armament@PRIMARY:
+		Weapon: TGMCMechCannon
+	Armament@SECONDARY:
+		Weapon: TGMCMechGun
+	Tooltip:
+		Name: actor-mech.name
+	Valued:
+		Cost: 450
+	Buildable:
+		Queue: Infantry
+		BuildAtProductionType: Infantry
+		BuildPaletteOrder: 60
+		Prerequisites: mech-bay
+		Description: actor-mech.description
+
+# Marine mortar crew: artillery. Long range and a wide splash, but a dead zone up close and thin skin.
+mortar-crew:
+	Inherits: ^Infantry
+	SpawnActorOnDeath:
+		Actor: mortar-crew-corpse
+		SkipMakeAnimations: false
+	Health:
+		HP: 80
+	Mobile:
+		Speed: 30
+	Armament@PRIMARY:
+		Weapon: TGMCMortar
+	Tooltip:
+		Name: actor-mortar-crew.name
+	Valued:
+		Cost: 220
+	Buildable:
+		Queue: Infantry
+		BuildAtProductionType: Infantry
+		BuildPaletteOrder: 70
+		Prerequisites: ordnance-depot
+		Description: actor-mortar-crew.description
+
 # What a dead marine leaves behind: it falls over (the `die` sequence, played once by the make animation), then lies
 # there for a while (`corpse`) before it is removed. TGMC has no marine death art, so mod/build_sprites.py draws both.
 ^MarineCorpse:
@@ -581,3 +754,8 @@ grenadier-corpse:
 	Inherits: ^MarineCorpse
 	RenderSprites:
 		Image: grenadier
+
+mortar-crew-corpse:
+	Inherits: ^MarineCorpse
+	RenderSprites:
+		Image: mortar-crew

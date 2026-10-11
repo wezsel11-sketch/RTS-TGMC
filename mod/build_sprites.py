@@ -17,7 +17,8 @@ frames, "rotate" turns a 1-dir state by that many degrees clockwise, "facings" t
 every frame (a muzzle flash or tracer that has to point along the shot), "swap_rg" swaps the red and green channels (the
 green xeno splatter becomes red marine blood), "size" scales the frames to that many pixels
 square, "fit" (w, h) shrinks them into a box of that size keeping the aspect ratio, "side" keeps one side (S, N, E, W) of a
-4-direction state, and "tick" sets the milliseconds per frame.
+4-direction state, "shift" (dx, dy) moves the picture inside its cell (to stand a mortar beside its crew), and "tick" sets the
+milliseconds per frame.
 
 A sequence may instead be a dict {"fall": layers, "frames": n, "tick": ms}: the layers are composited as for a stand pose, then
 turned over n frames into a body lying on the ground in a growing pool of blood (a marine has no death art of its own). With
@@ -76,6 +77,11 @@ XENO_2X2 = "icons/Xeno/2x2building.dmi"
 RESIN_WALL = "icons/obj/smooth_objects/resin-wall.dmi"
 MINING_DRILL = "icons/obj/mining_drill.dmi"
 CADE = "icons/obj/structures/barricades/metal.dmi"
+CRUSHER = "icons/Xeno/castes/crusher.dmi"
+BOILER = "icons/Xeno/castes/boiler.dmi"
+MECH = "icons/mecha/mech_medium.dmi"
+MORTAR = "icons/obj/machines/deployable/mortar.dmi"
+MECH_BAY = "icons/mecha/mech_bay.dmi"
 
 # OpenRA facing order (clockwise from north) -> which TGMC side to draw.
 FACING_NAMES = ["N", "NE", "E", "SE", "S", "SW", "W", "NW"]
@@ -94,6 +100,19 @@ GEAR = [(MARINE_ARMOR, "xarmor"), (FEET, "marine"), (MARINE_HELMETS, "helmet")]
 def marine(uniform, weapon):
     """Body, role uniform, armour, boots and helmet, then the weapon held in the right hand."""
     return [(HUMAN, "body_m"), (MARINE_UNIFORM, uniform)] + GEAR + [weapon]
+
+
+
+def mech_parts():
+    """The assault mech: TGMC's medium mech, a full-colour olive skin of five parts (legs, core, head, two arms), scaled from
+    96 to 64 pixels so it stands a little over twice the height of a marine."""
+    parts = ("legsprimary", "coreprimary", "headprimary", "leftarmprimary", "rightarmprimary")
+    return [(MECH, state, None, {"size": 64}) for state in parts]
+
+
+def boxed(layers, box, **more):
+    """The same layers, each fitted into a box, with its first frame only: a palette icon for something big."""
+    return [spec[:3] + (dict({"fit": box, "frames": (0, 1)}, **more),) for spec in layers]  # the scale-down replaces any "size"
 
 
 UNITS = {
@@ -205,6 +224,63 @@ UNITS = {
             # The grenade launcher's thump: a puff of dust at the muzzle, not a flash
             "flash": [(HEAVY_IMPACT, "heavyimpact", None, {"frames": (0, 9), "size": 32, "tick": 60})],
             "icon": "stand:S",
+        },
+    },
+    # Armour and artillery
+    "crusher": {
+        "sequences": {
+            "stand": [(CRUSHER, "Crusher Walking")],
+            "run": [(CRUSHER, "Crusher Charging")],
+            "die": [(CRUSHER, "Crusher Dead")],
+            "attack": "stand",
+            "icon": "stand:S",
+        },
+    },
+    "boiler": {
+        "sequences": {
+            "stand": [(BOILER, "Boiler Walking")],
+            "run": [(BOILER, "Boiler Running")],
+            "die": [(BOILER, "Boiler Dead")],
+            "attack": "stand",
+            "icon": "stand:S",
+        },
+    },
+    "mech": {
+        "sequences": {
+            "stand": mech_parts(),
+            "run": "stand",
+            "attack": "stand",
+            "icon": boxed(mech_parts(), (62, 46), side="S"),
+        },
+    },
+    "mortar-crew": {
+        "sequences": {
+            "stand": [(MORTAR, "mortar_deployed", None, {"shift": (6, 6)}), (HUMAN, "body_m", None, {"shift": (-5, 0)}),
+                      (MARINE_UNIFORM, "marine_jumpsuit", None, {"shift": (-5, 0)}), (MARINE_ARMOR, "xarmor", None, {"shift": (-5, 0)}),
+                      (FEET, "marine", None, {"shift": (-5, 0)}), (MARINE_HELMETS, "helmet", None, {"shift": (-5, 0)})],
+            "run": "stand",
+            "attack": "stand",
+            "die": {"fall": [(HUMAN, "body_m"), (MARINE_UNIFORM, "marine_jumpsuit")] + GEAR, "frames": 5, "tick": 90, "side": "S"},
+            "corpse": {"fall": [(HUMAN, "body_m"), (MARINE_UNIFORM, "marine_jumpsuit")] + GEAR, "frames": 5, "final": True, "side": "S"},
+            "icon": "stand:S",
+        },
+    },
+    "research-lab": {
+        "sequences": {
+            "idle": [(VENDING, "engivend")],
+            "icon": [(VENDING, "engivend", None, {"fit": (44, 44), "frames": (0, 1)})],
+        },
+    },
+    "hive-core": {
+        "sequences": {
+            "idle": [(XENO_2X2, "orb_idle")],
+            "icon": [(XENO_2X2, "orb_idle", None, {"fit": (44, 44), "frames": (0, 1)})],
+        },
+    },
+    "mech-bay": {
+        "sequences": {
+            "idle": [(MECH_BAY, "recharge_port", None, {"side": "S"})],
+            "icon": [(MECH_BAY, "recharge_port", None, {"side": "S", "fit": (44, 44), "frames": (0, 1)})],
         },
     },
     # Marine structures. Sentry is 4-dir (8 facings). Cryo pod and vendor are 1-dir and animate in place.
@@ -402,6 +478,13 @@ def layer_images(dmi, state, tint=None, opts=None):
     size = (opts or {}).get("size")
     if size:
         sides = {k: [img.resize((size, size), Image.LANCZOS) for img in frames] for k, frames in sides.items()}
+    shift = (opts or {}).get("shift")
+    if shift:  # move the picture inside its cell (a paste, so nothing wraps round the edge)
+        def shifted(img):
+            cell = Image.new("RGBA", img.size, (0, 0, 0, 0))
+            cell.paste(img, tuple(shift))
+            return cell
+        sides = {k: [shifted(img) for img in frames] for k, frames in sides.items()}
     fit = (opts or {}).get("fit")
     if fit:  # shrink to fit a (w, h) box, keeping the aspect ratio, centred on a transparent cell of that size
         def fitted(img):

@@ -59,6 +59,7 @@ Player:
 		CannotPlaceNotification: NoBuild
 	DeveloperMode:
 	TechTree:
+	GrantConditionOnPrerequisiteManager:
 	ScriptTriggers:
 	MissionObjectives:
 		WinNotification: Win

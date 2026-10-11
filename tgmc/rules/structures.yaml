@@ -147,6 +147,10 @@ resin-turret:
 
 resin-silo:
 	Inherits: ^Structure
+	ProximityExternalCondition@WEEDS:
+		Condition: on-weeds
+		Range: 6c0
+		AffectsParent: false
 	WithIdleOverlay@TEAM:
 		Sequence: plate-96x96
 	FireWarheadsOnDeath:
@@ -201,6 +205,10 @@ resin-silo:
 
 mini-silo:
 	Inherits: ^Structure
+	ProximityExternalCondition@WEEDS:
+		Condition: on-weeds
+		Range: 4c512
+		AffectsParent: false
 	WithIdleOverlay@TEAM:
 		Sequence: plate-64x64
 	FireWarheadsOnDeath:
@@ -242,6 +250,10 @@ mini-silo:
 
 weed-node:
 	Inherits: ^Structure
+	ProximityExternalCondition@WEEDS:
+		Condition: on-weeds
+		Range: 5c512
+		AffectsParent: false
 	Inherits@build: ^XenoMinorBuildable
 	Buildable:
 		Queue: XenoBuild
@@ -529,6 +541,82 @@ ordnance-depot:
 	Valued:
 		Cost: 400
 
+research-lab:
+	Inherits: ^Structure
+	Inherits@build: ^MarineBuildable
+	Buildable:
+		Queue: MarineBuild
+		BuildPaletteOrder: 90
+		BuildLimit: 1
+		Prerequisites: armory
+		Description: actor-research-lab.description
+	AmbientSound:
+		SoundFiles: amb-hum.ogg
+	Health:
+		HP: 450
+	Tooltip:
+		Name: actor-research-lab.name
+	Valued:
+		Cost: 400
+	# Orbital strike: aim it anywhere you can see. A moment after the marker lands, the blast comes down.
+	SpawnActorPower@ORBITAL:
+		Name: support-orbital.name
+		Description: support-orbital.description
+		Icon: orbital
+		ChargeInterval: 3750
+		Actor: orbital-strike
+		LifeTime: 100
+		EffectImage: fx-impact
+		EffectSequence: burst
+		EffectPalette: effect
+		SelectTargetSpeechNotification: SelectTarget
+		EndChargeSpeechNotification: AbilityReady
+
+mech-bay:
+	Inherits: ^Structure
+	Inherits@build: ^MarineBuildable
+	Buildable:
+		Queue: MarineBuild
+		BuildPaletteOrder: 80
+		BuildLimit: 1
+		Prerequisites: ordnance-depot
+		Description: actor-mech-bay.description
+	AmbientSound:
+		SoundFiles: amb-hum.ogg
+	Health:
+		HP: 500
+	Tooltip:
+		Name: actor-mech-bay.name
+	Valued:
+		Cost: 450
+
+hive-core:
+	Inherits: ^Structure
+	Inherits@build: ^XenoMajorBuildable
+	Buildable:
+		Queue: XenoBuild
+		BuildPaletteOrder: 75
+		BuildLimit: 1
+		Prerequisites: evolution-tower
+		Description: actor-hive-core.description
+	Voiced:
+		VoiceSet: XenoStructureVoice
+	Health:
+		HP: 450
+	Building:
+		Footprint: xx xx
+		Dimensions: 2, 2
+	Selectable:
+		Bounds: 1792, 1792, -896, -896
+	WithIdleOverlay@TEAM:
+		Sequence: plate-64x64
+	WithIdleAnimation:
+		Sequences: idle
+	Tooltip:
+		Name: actor-hive-core.name
+	Valued:
+		Cost: 400
+
 # Heaps of broken blocks left where a structure died. They fade away after a while.
 ^Rubble:
 	Immobile:
@@ -576,3 +664,19 @@ flare:
 		Type: CenterPosition
 	HiddenUnderFog:
 		Type: CenterPosition
+
+# The marker an orbital strike leaves: it has no picture, and after a second and a half it dies, and its death is the blast.
+orbital-strike:
+	Interactable:
+	Immobile:
+		OccupiesSpace: false
+	Health:
+		HP: 1
+	BodyOrientation:
+		QuantizedFacings: 1
+	HitShape:
+	KillsSelf:
+		Delay: 40
+	FireWarheadsOnDeath:
+		Weapon: TGMCOrbital
+		EmptyWeapon: TGMCOrbital

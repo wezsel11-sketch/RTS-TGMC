@@ -20,8 +20,14 @@ Container@PLAYER_WIDGETS:
 			Y: 0
 			Width: 240
 			Height: WINDOW_HEIGHT
-			Background: tgmc-panel
+			Background: tgui-window
 			Children:
+				Background@TITLE_BAR:
+					X: 0
+					Y: 0
+					Width: PARENT_WIDTH
+					Height: 36
+					Background: tgui-titlebar
 				Label@HEADER:
 					X: 8
 					Y: 6
@@ -105,7 +111,7 @@ Container@PLAYER_WIDGETS:
 					Y: PARENT_HEIGHT - 98
 					Width: 224
 					Height: 56
-					Background: tgmc-panel
+					Background: tgui-card
 					Children:
 						Label@GAME_TIMER:
 							Logic: GameTimerLogic

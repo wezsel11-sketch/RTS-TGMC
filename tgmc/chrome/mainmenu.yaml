@@ -1,3 +1,7 @@
+# TGMC main menu. Derived from OpenRA's mods/common/chrome/mainmenu.yaml (GPL-3.0).
+# Widget IDs and positions are unchanged so MainMenuLogic still finds them.
+# Changes: the button column is a TGUI window, buttons use the tab style, and each sub-menu has a title bar.
+
 Container@MAINMENU:
 	Logic: MainMenuLogic
 	Children:
@@ -29,16 +33,23 @@ Container@MAINMENU:
 			Align: Center
 			Font: Regular
 			Shadow: true
-		Container@MENUS:
+		Background@MENUS:
 			X: 13 + (WINDOW_WIDTH - 522) / 4 - WIDTH / 2
 			Y: WINDOW_HEIGHT / 2 - HEIGHT / 2
 			Width: 200
 			Height: 320
+			Background: tgui-window
 			Children:
 				Background@MAIN_MENU:
 					Width: PARENT_WIDTH
 					Height: PARENT_HEIGHT
 					Children:
+						Background@MAIN_TITLE_BAR:
+							X: 0
+							Y: 0
+							Width: PARENT_WIDTH
+							Height: 52
+							Background: tgui-titlebar
 						Label@MAINMENU_LABEL_TITLE:
 							X: 0
 							Y: 22
@@ -54,6 +65,7 @@ Container@MAINMENU:
 							Height: 30
 							Text: label-singleplayer-title
 							Font: Bold
+							Background: tgui-tab
 						Button@MULTIPLAYER_BUTTON:
 							X: PARENT_WIDTH / 2 - WIDTH / 2
 							Y: 100
@@ -61,6 +73,7 @@ Container@MAINMENU:
 							Height: 30
 							Text: label-multiplayer-title
 							Font: Bold
+							Background: tgui-tab
 						Button@SETTINGS_BUTTON:
 							X: PARENT_WIDTH / 2 - WIDTH / 2
 							Y: 140
@@ -68,6 +81,7 @@ Container@MAINMENU:
 							Height: 30
 							Text: button-settings-title
 							Font: Bold
+							Background: tgui-tab
 						Button@EXTRAS_BUTTON:
 							X: PARENT_WIDTH / 2 - WIDTH / 2
 							Y: 180
@@ -75,6 +89,7 @@ Container@MAINMENU:
 							Height: 30
 							Text: button-extras-title
 							Font: Bold
+							Background: tgui-tab
 						Button@CONTENT_BUTTON:
 							X: PARENT_WIDTH / 2 - WIDTH / 2
 							Y: 220
@@ -82,6 +97,7 @@ Container@MAINMENU:
 							Height: 30
 							Text: button-main-menu-content
 							Font: Bold
+							Background: tgui-tab
 						Button@QUIT_BUTTON:
 							X: PARENT_WIDTH / 2 - WIDTH / 2
 							Y: 260
@@ -89,10 +105,17 @@ Container@MAINMENU:
 							Height: 30
 							Text: button-quit
 							Font: Bold
+							Background: tgui-tab
 				Background@SINGLEPLAYER_MENU:
 					Width: PARENT_WIDTH
 					Height: PARENT_HEIGHT
 					Children:
+						Background@SINGLEPLAYER_TITLE_BAR:
+							X: 0
+							Y: 0
+							Width: PARENT_WIDTH
+							Height: 52
+							Background: tgui-titlebar
 						Label@SINGLEPLAYER_MENU_TITLE:
 							X: 0
 							Y: 20
@@ -108,6 +131,7 @@ Container@MAINMENU:
 							Height: 30
 							Text: button-singleplayer-menu-skirmish
 							Font: Bold
+							Background: tgui-tab
 						Button@MISSIONS_BUTTON:
 							X: PARENT_WIDTH / 2 - WIDTH / 2
 							Y: 100
@@ -115,6 +139,7 @@ Container@MAINMENU:
 							Height: 30
 							Text: label-missions-title
 							Font: Bold
+							Background: tgui-tab
 						Button@LOAD_BUTTON:
 							X: PARENT_WIDTH / 2 - WIDTH / 2
 							Y: 140
@@ -122,6 +147,7 @@ Container@MAINMENU:
 							Height: 30
 							Text: button-singleplayer-menu-load
 							Font: Bold
+							Background: tgui-tab
 						Button@BACK_BUTTON:
 							X: PARENT_WIDTH / 2 - WIDTH / 2
 							Key: escape
@@ -130,10 +156,17 @@ Container@MAINMENU:
 							Height: 30
 							Text: button-back
 							Font: Bold
+							Background: tgui-tab
 				Background@EXTRAS_MENU:
 					Width: PARENT_WIDTH
 					Height: PARENT_HEIGHT
 					Children:
+						Background@EXTRAS_TITLE_BAR:
+							X: 0
+							Y: 0
+							Width: PARENT_WIDTH
+							Height: 52
+							Background: tgui-titlebar
 						Label@EXTRAS_MENU_TITLE:
 							X: 0
 							Y: 20
@@ -149,6 +182,7 @@ Container@MAINMENU:
 							Height: 30
 							Text: button-extras-menu-replays
 							Font: Bold
+							Background: tgui-tab
 						Button@MUSIC_BUTTON:
 							X: PARENT_WIDTH / 2 - WIDTH / 2
 							Y: 100
@@ -156,6 +190,7 @@ Container@MAINMENU:
 							Height: 30
 							Text: label-music-title
 							Font: Bold
+							Background: tgui-tab
 						Button@MAP_EDITOR_BUTTON:
 							X: PARENT_WIDTH / 2 - WIDTH / 2
 							Y: 140
@@ -163,6 +198,7 @@ Container@MAINMENU:
 							Height: 30
 							Text: label-map-editor-title
 							Font: Bold
+							Background: tgui-tab
 						Button@ASSETBROWSER_BUTTON:
 							X: PARENT_WIDTH / 2 - WIDTH / 2
 							Y: 180
@@ -170,6 +206,7 @@ Container@MAINMENU:
 							Height: 30
 							Text: button-extras-menu-assetbrowser
 							Font: Bold
+							Background: tgui-tab
 						Button@CREDITS_BUTTON:
 							X: PARENT_WIDTH / 2 - WIDTH / 2
 							Y: 220
@@ -177,6 +214,7 @@ Container@MAINMENU:
 							Height: 30
 							Text: label-credits-title
 							Font: Bold
+							Background: tgui-tab
 						Button@BACK_BUTTON:
 							X: PARENT_WIDTH / 2 - WIDTH / 2
 							Key: escape
@@ -185,10 +223,17 @@ Container@MAINMENU:
 							Height: 30
 							Text: button-back
 							Font: Bold
+							Background: tgui-tab
 				Background@MAP_EDITOR_MENU:
 					Width: PARENT_WIDTH
 					Height: PARENT_HEIGHT
 					Children:
+						Background@MAP_EDITOR_TITLE_BAR:
+							X: 0
+							Y: 0
+							Width: PARENT_WIDTH
+							Height: 52
+							Background: tgui-titlebar
 						Label@MAP_EDITOR_MENU_TITLE:
 							X: 0
 							Y: 20
@@ -204,6 +249,7 @@ Container@MAINMENU:
 							Height: 30
 							Text: button-map-editor-new-map
 							Font: Bold
+							Background: tgui-tab
 						Button@LOAD_MAP_BUTTON:
 							X: PARENT_WIDTH / 2 - WIDTH / 2
 							Y: 100
@@ -211,6 +257,7 @@ Container@MAINMENU:
 							Height: 30
 							Text: button-map-editor-load-map
 							Font: Bold
+							Background: tgui-tab
 						Button@BACK_BUTTON:
 							X: PARENT_WIDTH / 2 - WIDTH / 2
 							Key: escape
@@ -219,6 +266,7 @@ Container@MAINMENU:
 							Height: 30
 							Text: button-back
 							Font: Bold
+							Background: tgui-tab
 		Container@PERFORMANCE_INFO:
 			Logic: PerfDebugLogic
 			Children:
@@ -230,7 +278,7 @@ Container@MAINMENU:
 					Contrast: true
 				Background@GRAPH_BG:
 					ClickThrough: true
-					Background: dialog4
+					Background: tgui-window
 					X: WINDOW_WIDTH - 240
 					Y: WINDOW_HEIGHT - 240
 					Width: 210

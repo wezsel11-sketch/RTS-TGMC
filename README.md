@@ -95,7 +95,7 @@ mod/                        converters and build script (Python 3, Pillow, ffmpe
   balance.sh                runs several AI-vs-AI matches (balance-aivai) in parallel and prints who won and when
   scenarios/                the Lua scripts those maps run (copied into each map by make_placeholders.py)
   check_mod.sh              runs OpenRA's own lint (--check-yaml, --check-missing-sprites) on the built mod and map
-  make_chrome.py            HUD atlas (chrome.png) and chrome.yaml: panels, buttons, icons, logo (no TGMC art)
+  make_chrome.py            TGUI-style UI atlas (olive, slate, amber) and chrome.yaml: windows, tabs, panels, icons, logo (no TGMC art)
 tgmc/                       the OpenRA mod (YAML and Fluent only)
   mod.yaml                  manifest
   rules/                    world, player, palettes, units, structures, weapons
@@ -103,6 +103,7 @@ tgmc/                       the OpenRA mod (YAML and Fluent only)
   audio/notifications.yaml  UI sound mapping
   tilesets/ground.yaml      one flat ground template
   cursors.yaml, fluent/     cursor names, display strings
+  chrome/                   main menu, Esc menu, in-game sidebar and observer banner (TGUI-style)
 build/                      generated; git-ignored
 ```
 
@@ -205,7 +206,7 @@ On a headless machine, run OpenRA under Xvfb with Mesa software GL
 - The AI (`rules/ai.yaml`) only trains units and sends them out in squads. It doesn't build structures.
   Pick "Skirmish AI" for a slot in the lobby.
 - The path menu -> Singleplayer -> Skirmish -> lobby (add a Skirmish AI, Start Game) was walked headless and works.
-  `tgmc/chrome/mainmenu.yaml` is OpenRA's main menu without the news feed, update notice and forum link.
+  `tgmc/chrome/mainmenu.yaml` is OpenRA's main menu in TGUI-style windows, without the news feed, update notice and player profile; `ingame-menu.yaml` does the same for the Esc menu.
 - Verified by running the mod headless (OpenRA bleed, `mod/check_mod.sh` and `mod/smoke.sh`): the lint passes with
   no errors or warnings, and on Landing Zone the camera starts on the base, the radar and production palette work,
   the vendor spawns queued marines, income ticks up, and a "Skirmish AI" in the xeno slot trains Runners that attack

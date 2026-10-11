@@ -41,6 +41,8 @@
 	Targetable@HEAL:
 		RequiresCondition: damaged
 		TargetTypes: Heal
+	Targetable@HUMAN:
+		TargetTypes: Human
 	GrantConditionOnDamageState@DAMAGED:
 		Condition: damaged
 		ValidDamageStates: Light, Medium, Heavy, Critical
@@ -54,6 +56,8 @@
 	Armament@PRIMARY:
 		Weapon: TGMCRifle
 	AttackFrontal:
+		Voice: Attack
+	ActorLostNotification:
 
 rifleman:
 	Inherits: ^Infantry
@@ -115,6 +119,8 @@ engineer:
 
 ^Xeno:
 	Inherits: ^Unit
+	Targetable@ALIEN:
+		TargetTypes: Alien
 	WithInfantryBody:
 		MoveSequence: run
 		StandSequences: stand
@@ -122,15 +128,17 @@ engineer:
 	WithDeathAnimation:
 		DeathSequence: die
 		FallbackSequence: die
-	Voiced:
-		VoiceSet: XenoVoice
 	DeathSounds:
 	Armament@PRIMARY:
 		Weapon: TGMCClaws
 	AttackFrontal:
+		Voice: Attack
+	ActorLostNotification:
 
 runner:
 	Inherits: ^Xeno
+	Voiced:
+		VoiceSet: RunnerVoice
 	Health:
 		HP: 100
 	Selectable:
@@ -148,6 +156,8 @@ runner:
 
 hunter:
 	Inherits: ^Xeno
+	Voiced:
+		VoiceSet: HunterVoice
 	Health:
 		HP: 130
 	Selectable:
@@ -165,6 +175,8 @@ hunter:
 
 sentinel:
 	Inherits: ^Xeno
+	Voiced:
+		VoiceSet: SentinelVoice
 	Health:
 		HP: 80
 	Selectable:
@@ -184,6 +196,8 @@ sentinel:
 
 drone:
 	Inherits: ^Xeno
+	Voiced:
+		VoiceSet: DroneVoice
 	Health:
 		HP: 70
 	Selectable:

@@ -9,6 +9,7 @@ FileSystem: DefaultFileSystem
 		^EngineDir
 		$tgmc: tgmc
 		^EngineDir|mods/common: common
+		tgmc|audio
 
 Rules:
 	tgmc|rules/palettes.yaml
@@ -107,6 +108,9 @@ Voices:
 
 Notifications:
 	tgmc|audio/notifications.yaml
+
+Music:
+	tgmc|audio/music.yaml
 
 Hotkeys:
 	common|hotkeys/game.yaml

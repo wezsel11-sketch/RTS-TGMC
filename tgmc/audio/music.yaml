@@ -1,0 +1,17 @@
+# Background music: TGMC's theme tracks. They are short (10 to 20 seconds), so the playlist loops often.
+theme-hopeful-1: Hopeful I
+	Filename: theme-hopeful-1
+	Extension: ogg
+	VolumeModifier: 0.8
+theme-melancholy-1: Melancholy I
+	Filename: theme-melancholy-1
+	Extension: ogg
+	VolumeModifier: 0.8
+theme-hopeful-2: Hopeful II
+	Filename: theme-hopeful-2
+	Extension: ogg
+	VolumeModifier: 0.8
+theme-melancholy-2: Melancholy II
+	Filename: theme-melancholy-2
+	Extension: ogg
+	VolumeModifier: 0.8

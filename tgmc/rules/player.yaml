@@ -13,13 +13,32 @@ Player:
 		BuildDurationModifier: 350
 		Factions: marines
 		DisplayOrder: 1
+		ReadyAudio: UnitReady
+		QueuedAudio: Training
+		BlockedAudio: NoBuild
+		LimitedAudio: BuildingInProgress
+		OnHoldAudio: OnHold
+		CancelledAudio: Cancelled
 	ClassicProductionQueue@Xeno:
 		Type: Xeno
 		BuildDurationModifier: 250
 		Factions: xenos
 		DisplayOrder: 2
+		ReadyAudio: UnitReady
+		QueuedAudio: Training
+		BlockedAudio: NoBuild
+		LimitedAudio: BuildingInProgress
+		OnHoldAudio: OnHold
+		CancelledAudio: Cancelled
 	DeveloperMode:
 	TechTree:
 	ScriptTriggers:
 	MissionObjectives:
+		WinNotification: Win
+		LoseNotification: Lose
+		LeaveNotification: Leave
+	DamageNotifier:
+		ValidTargets: Structure
+		Notification: BaseAttack
+		NotifyInterval: 20000
 	ConquestVictoryConditions:

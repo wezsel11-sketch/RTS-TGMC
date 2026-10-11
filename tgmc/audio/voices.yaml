@@ -1,30 +1,78 @@
-# Voice sets. Clips are built by mod/build_sounds.py. Select and Action are the phrases Mobile and
-# the attack traits ask for; Die is played by DeathSounds.
+# Voice sets. Clips are built by mod/build_sounds.py. The phrases are the ones the traits ask for: Select (clicked),
+# Action (given a move order), Attack (given an attack order) and Die (killed). Pools pick a clip at random without
+# repeating until every clip has played.
+#
+# Marines come in two recordings of each clip, male and female. Prefixes picks one per marine by its actor id, so a
+# squad is a mix and each marine keeps the same voice. The clip names below are bare; the full file name is
+# <prefix><clip>.ogg, for example marine-f-warcry-6.ogg. The audio folder is mounted as its own
+# package (see mod.yaml), so sounds are referred to by file name alone.
+
 MarineVoice:
 	DefaultVariant: .ogg
+	Prefixes:
+		marines: marine-m-, marine-f-
 	Voices:
-		Select: audio/marine-warcry
-		Action: audio/marine-warcry
-		Die: audio/marine-scream-1, audio/marine-scream-2, audio/marine-pain-1, audio/marine-pain-2
+		Select: warcry-1, warcry-6, warcry-10, warcry-11, warcry-13
+		Action: warcry-5, warcry-12, warcry-15, warcry-17, warcry-18, warcry-19
+		Attack: warcry-2, warcry-3, warcry-4, warcry-7, warcry-8, grenadethrow-1, grenadethrow-2, grenadethrow-3
+		Die: scream-1, scream-2, scream-3, scream-4, scream-5, gored-1, gored-2
 
 CorpsmanVoice:
 	DefaultVariant: .ogg
+	Prefixes:
+		marines: marine-m-, marine-f-
 	Voices:
-		Select: audio/marine-medic
-		Action: audio/marine-medic
-		Die: audio/marine-scream-1, audio/marine-scream-2, audio/marine-pain-1, audio/marine-pain-2
+		Select: medic-1
+		Action: warcry-5, warcry-15, warcry-17, warcry-18
+		Attack: warcry-2, warcry-3
+		Die: scream-1, scream-2, scream-3, scream-4, scream-5, gored-1, gored-2
 
-XenoVoice:
+# Xenos: one set per caste, no gender.
+RunnerVoice:
 	DefaultVariant: .ogg
 	Voices:
-		Select: audio/xeno-roar-1, audio/xeno-roar-2
-		Action: audio/runner-hiss
-		Die: audio/xeno-death
+		Select: xeno-larva-1, xeno-larva-2, xeno-larva-3, xeno-larva-4
+		Action: xeno-pounce-1, xeno-pounce-2, xeno-larva-2, xeno-growl-1
+		Attack: xeno-pounce-1, xeno-larva-1, xeno-larva-4, xeno-roar-10
+		Die: xeno-death-small, xeno-death-2
 
-# Structures: a click when selected or ordered, and an explosion when destroyed.
-StructureVoice:
+HunterVoice:
 	DefaultVariant: .ogg
 	Voices:
-		Select: audio/ui-click
-		Action: audio/ui-click
-		Die: audio/explosion
+		Select: xeno-growl-1, xeno-growl-2, xeno-roar-8, xeno-roar-10
+		Action: xeno-roar-1, xeno-roar-2, xeno-roar-3, xeno-roar-4
+		Attack: xeno-roar-5, xeno-roar-6, xeno-roar-7, xeno-roar-9, xeno-roar-11, xeno-roar-12
+		Die: xeno-death-1, xeno-death-2
+
+SentinelVoice:
+	DefaultVariant: .ogg
+	Voices:
+		Select: xeno-talk-1, xeno-talk-2, xeno-talk-3
+		Action: xeno-hiss-1, xeno-hiss-2, xeno-hiss-3
+		Attack: acid-spit-1, acid-spit-2, xeno-hiss-2
+		Die: xeno-death-2, xeno-yell
+
+DroneVoice:
+	DefaultVariant: .ogg
+	Voices:
+		Select: xeno-talk-1, xeno-talk-3
+		Action: xeno-talk-2, xeno-growl-4
+		Attack: xeno-hiss-1, xeno-hiss-2
+		Die: xeno-help-1, xeno-help-2
+
+# Structures: a click when selected or ordered, and their own noise when destroyed.
+MarineStructureVoice:
+	DefaultVariant: .ogg
+	Voices:
+		Select: ui-click
+		Action: ui-click
+		Attack: ui-click
+		Die: explosion-1, explosion-2, explosion-3, explosion-big
+
+XenoStructureVoice:
+	DefaultVariant: .ogg
+	Voices:
+		Select: resin-build
+		Action: resin-build
+		Attack: resin-build
+		Die: resin-break-1, resin-break-2, turret-death

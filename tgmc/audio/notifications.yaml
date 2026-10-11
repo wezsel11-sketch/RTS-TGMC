@@ -1,21 +1,41 @@
 # Notification sounds for the mod. Files live in audio/ (built by mod/build_sounds.py).
-# Placeholders: every name maps to a TGMC clip we already convert.
-# Names are bare: the engine appends DefaultVariant to each one.
+# Sounds are interface effects. Speech is what the ship's AI announces: production, alerts, game start, win and lose.
+# A notification with several files plays them in turn, at random.
 Sounds:
 	DefaultVariant: .ogg
 	Notifications:
-		ChatLine: audio/runner-hiss
-		ChatLineSound: audio/runner-hiss
-		ClickDisabledSound: audio/ui-deny
-		ClickSound: audio/ui-click
-		DevLevelUp: audio/rifle-fire
-		HideReplayChat: audio/runner-hiss
-		LobbyOptionChangedSound: audio/ui-ping
-		OpenGeneralChat: audio/runner-hiss
-		OpenTeamChat: audio/runner-hiss
-		PlayerJoinedSound: audio/ui-ping
-		PlayerLeftSound: audio/runner-hiss
-		PowerDown: audio/rifle-fire
-		RadarDown: audio/rifle-fire
-		RadarUp: audio/rifle-fire
-		TransientLineSound: audio/runner-hiss
+		ChatLine: ui-ping
+		ChatLineSound: ui-ping
+		ClickDisabledSound: ui-deny
+		ClickSound: ui-click
+		DevLevelUp: ui-confirm
+		HideReplayChat: ui-click
+		LobbyOptionChangedSound: ui-ping
+		OpenGeneralChat: ui-click
+		OpenTeamChat: ui-click
+		PlayerJoinedSound: ui-confirm
+		PlayerLeftSound: ui-deny
+		PowerDown: ui-deny
+		RadarDown: ui-deny
+		RadarUp: ui-confirm
+		TransientLineSound: ui-ping
+
+Speech:
+	DefaultVariant: .ogg
+	Notifications:
+		StartGame: ares-online
+		GameLoaded: ui-confirm
+		GameSaved: ui-confirm
+		Win: sting-win-1, sting-win-2
+		Lose: sting-loss-1, sting-loss-2
+		Leave: ui-click
+		UnitReady: ui-ping
+		Training: ui-confirm
+		NoBuild: ui-deny
+		BuildingInProgress: ui-deny
+		OnHold: ui-click
+		Cancelled: ui-click
+		UnitLost: alert
+		BaseAttack: siren
+		WaveIncoming: ares-code-red
+		WaveDistress: ares-distress

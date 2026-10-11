@@ -67,6 +67,7 @@ SendWave = function(index)
 	local wave = Config.waves[index]
 	WavesSent = index
 	UserInterface.SetMissionText("Wave " .. index .. " of " .. #Config.waves)
+	Media.PlaySpeechNotification(Marines, index == #Config.waves and "WaveDistress" or "WaveIncoming")
 
 	for i, unitType in ipairs(Expand(wave.units)) do
 		Trigger.AfterDelay(i * 6, function()

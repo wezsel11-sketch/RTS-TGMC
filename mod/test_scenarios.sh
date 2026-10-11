@@ -59,7 +59,12 @@ wait
 for dir in "$ROOT"/build/mod/tgmc/maps/scenario-*/; do
 	name=$(basename "$dir")
 	line=$(grep -h "TEST " "$OUT/$name/game.log" | sed 's/^Lua debug: //' | head -3)
-	if echo "$line" | grep -q "PASS"; then
+	badsound=$(grep -hE "does not exist|not a valid sound" "$OUT/$name/support/Logs/sound.log" "$OUT/$name/game.log" 2>/dev/null | head -2)
+	if [ -n "$badsound" ]; then
+		echo "FAIL  $name: a sound did not load"
+		echo "$badsound"
+		fail=1
+	elif echo "$line" | grep -q "PASS"; then
 		echo "pass  $name: $(echo "$line" | grep PASS | head -1)"
 	else
 		echo "FAIL  $name: ${line:-no TEST line printed}"

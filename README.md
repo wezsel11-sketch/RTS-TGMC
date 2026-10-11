@@ -135,8 +135,32 @@ On a headless machine, run OpenRA under Xvfb with Mesa software GL
   and SW and NW use W. `attack` reuses `stand`'s cells, so no art is duplicated.
 - **Facing check.** Actors placed at facing 0, 256, and 512 show the north (back), east
   (side), and south (front) sprites, as expected.
-- **Sounds.** Each `.ogg` is re-encoded to mono, 22050 Hz, Vorbis, and trimmed to 4 seconds.
-  OpenRA's `OggLoader` plays them directly.
+- **Sounds.** `build_sounds.py` converts about 150 TGMC clips. Each is re-encoded to Vorbis and scaled so its loudest
+  sample sits at a peak chosen for its kind (weapons and voices -3 dB, interface -9, announcer -6, ambience -16, music -6),
+  and trimmed to a per-kind length with a short fade. Effects and voices are mono 22 kHz; music is stereo 44.1 kHz.
+  The levels are numbers, not a mix anyone has heard. OpenRA's `OggLoader` plays them directly.
+  The `audio` folder is mounted as its own package in `mod.yaml`, so sounds are referred to by bare file name
+  (`rifle-fire-1.ogg`). OpenRA's file index lists only the top level of a mounted package, so a sound in a sub-folder
+  silently fails to load; the sound log reports it as "file does not exist".
+
+## Sound
+
+- **Marines** have a male and a female recording of every voice clip, and each marine keeps one voice (picked by actor id
+  through the voice set's `Prefixes`). Select, move, attack and death each have their own pool: warcries, grenade shouts,
+  screams and gored cries. The corpsman says "medic" when selected.
+- **Xenos** have a voice set per caste. Runner: small shrieks and pounces. Hunter: growls and heavy roars, with the long
+  death scream. Sentinel: talking, hisses and its spit. Drone: chatter and cries for help.
+- **Hits.** Rifles thud on aliens and structures, and now and then an alien cries out; claws thud on armour and marines
+  cry out (`Human` and `Alien` target types pick which). Acid splashes on impact.
+- **Structures** click when selected; marine ones explode when destroyed and hive ones break up with a resin crack.
+  The cryo pod and vendor hum, and a cave ambience plays across the map with long gaps.
+- **Announcer** (the ship's AI, ARES): game start, unit ready, queue and refusal pings, a siren when a building is attacked,
+  an alert when a unit is lost, code red and a distress beacon for Hold the Line waves, and win and lose stings.
+- **Music** is TGMC's four theme tracks (`neutral_hopeful` and `neutral_melancholy`). They run 10 to 20 seconds each, so
+  the playlist is about a minute long and repeats a lot; TGMC has no longer music.
+- `mod/lint_static.py` checks every sound name against `build_sounds.py`, including each clip of each prefixed voice set.
+  `scenario-sounds` plays every sound, announcer line and track, and `test_scenarios.sh` fails any scenario whose
+  `sound.log` says a file did not load. None of it has been heard: this machine has no audio device.
 
 ## Known gaps
 
@@ -145,9 +169,7 @@ On a headless machine, run OpenRA under Xvfb with Mesa software GL
 - Player colour remapping is off. The sprites are RGBA, so the `player` palette doesn't
   recolour them. Units are not coloured by owner.
 - Runners have no attack animation. `attack` reuses `stand`. The Runner's claws play the hiss on attack.
-- Sounds are wired to weapons (`Report`), voice sets (`audio/voices.yaml`, played on select, order and death)
-  and the UI click, deny and ping. The smoke test doesn't check audio, because the headless run has no
-  audio device. Structures click when selected and explode on death, with one shared sound.
+- Sounds are all unheard (no audio device here). See the Sound section.
 - Medic and engineer have no heal or repair animation (they reuse `attack`). Healing and repair are weapons
   with negative damage. Scenario tests cover heal, repair, victory and a rifleman-versus-Runner fight.
 - Weapons that use `InstantHit` need `TargetActorCenter: true`, or the hit lands on a position and does nothing.
@@ -178,8 +200,6 @@ On a headless machine, run OpenRA under Xvfb with Mesa software GL
   Hunters 130 HP; sentries do 10; the corpsman heals 20 every 60 ticks.
   Income is 15 cash every 2 s from the vendor and silo and 5 from a mini silo. None of this has had real play time.
 - Fog of war is drawn with plain black quadrant tiles, so edges look blocky.
-- The Runner's death sound was converted earlier and then dropped. `WithDeathAnimation` has no sound field, so
-  wire one in with `Voiced` when you add voice sets.
 
 ## Licenses
 

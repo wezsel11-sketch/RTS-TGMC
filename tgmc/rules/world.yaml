@@ -5,6 +5,7 @@
 	Selection:
 	ControlGroups:
 	MusicPlaylist:
+		StartingMusic: theme-hopeful-1
 	LoadWidgetAtGameStart:
 	CreateMapPlayers:
 	MapOptions:
@@ -12,6 +13,11 @@
 		TechLevelDropdownVisible: false
 	MapStartingLocations:
 	ScriptTriggers:
+	AmbientSound@hive:
+		SoundFiles: amb-hive.ogg
+		Delay: 100, 300
+		Interval: 150, 500
+	StartGameNotification:
 	ValidateOrder:
 	ObjectivesPanel:
 		PanelName: SKIRMISH_STATS

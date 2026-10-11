@@ -3,3 +3,17 @@ clock:
 	idle:
 		Filename: clock.png
 		Length: *
+
+# The rally point marker. Both sheets are drawn by mod/make_placeholders.py (no TGMC art).
+rallypoint:
+	flag:
+		Filename: rally-flag.png
+		Length: 4
+		Tick: 120
+		Offset: 8, -12
+		ZOffset: 2535
+	circles:
+		Filename: rally-circles.png
+		Length: 4
+		Tick: 160
+		ZOffset: 2047

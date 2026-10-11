@@ -89,6 +89,8 @@ resin-silo:
 	Exit@1:
 		SpawnOffset: 0,1024,0
 		ExitCell: 1,3
+	RallyPoint:
+		Path: 1, 6
 	Production:
 		Produces: Xeno
 	ProductionBar:
@@ -150,6 +152,8 @@ cryo-pod:
 	Exit@1:
 		SpawnOffset: 0,512,0
 		ExitCell: 0,2
+	RallyPoint:
+		Path: 0, 5
 	Production:
 		Produces: Infantry
 	ProductionBar:
@@ -169,6 +173,8 @@ vendor:
 	Exit@1:
 		SpawnOffset: 0,512,0
 		ExitCell: 0,1
+	RallyPoint:
+		Path: 0, 4
 	Production:
 		Produces: Infantry
 	ProductionBar:

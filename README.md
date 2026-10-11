@@ -67,7 +67,7 @@ mod/                        converters and build script (Python 3, Pillow, ffmpe
   make_placeholders.py      palette, cursor, clock, fog tiles and the maps (no TGMC art)
   lint_static.py            cross-reference check (sounds, weapons, voice sets, Fluent keys, sequences); build_mod.sh runs it
   smoke.sh                  launches the built mod headless on a map, screenshots it, fails on an engine exception
-  test_scenarios.sh         runs the scripted scenario maps (heal, repair, mend, victory, combat, waves, ai) and checks each prints PASS
+  test_scenarios.sh         runs the scripted scenario maps (heal, repair, mend, victory, combat, waves, ai, rally) and checks each prints PASS
   scenarios/                the Lua scripts those maps run (copied into each map by make_placeholders.py)
   check_mod.sh              runs OpenRA's own lint (--check-yaml, --check-missing-sprites) on the built mod and map
   make_chrome.py            HUD atlas (chrome.png) and chrome.yaml: panels, buttons, icons, logo (no TGMC art)

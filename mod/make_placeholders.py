@@ -4,6 +4,7 @@ Nothing here is TGMC art. It writes:
   tgmc.pal                      a flat grey 256-colour palette (OpenRA needs one for its palette setup)
   cursor.png                    a plain arrow for the default cursor
   shroud.png, fog.png           14 edge tiles each for unexplored and out-of-sight cells; shroudfull.png and fogfull.png
+  rally-flag.png, rally-circles.png  the rally point marker: a waving flag and pulsing ground rings
   clock.png                     production-icon clock overlay frames (62x46, a dark wedge that sweeps away)
   maps/test-field/map.{yaml,bin,png}   a 24x24 map with marines, runners, and one of each structure
   maps/landing-zone/map.{yaml,bin,png} a 40x28 two-base skirmish map: marines west, xenos east
@@ -125,6 +126,27 @@ def write_shroud_tiles(out, tile=32):
         full.save(os.path.join(out, f"{name}full.png"), pnginfo=meta)
 
 
+def write_rally_marker(out):
+    """A 4-frame waving flag (16x24) and 4 pulsing ground rings (32x24), tinted by the player palette's colour."""
+    flag = Image.new("RGBA", (16 * 4, 24), (0, 0, 0, 0))
+    for i in range(4):
+        d = ImageDraw.Draw(flag)
+        x = 16 * i
+        d.line([(x + 3, 2), (x + 3, 22)], fill=(200, 200, 200, 255), width=2)
+        wave = (0, 1, 0, -1)[i]
+        d.polygon([(x + 5, 3), (x + 14, 6 + wave), (x + 5, 10)], fill=(209, 154, 43, 255), outline=(40, 30, 10, 255))
+    circles = Image.new("RGBA", (32 * 4, 24), (0, 0, 0, 0))
+    for i in range(4):
+        d = ImageDraw.Draw(circles)
+        r = 4 + 3 * i
+        d.ellipse([32 * i + 16 - r, 12 - r // 2 - 1, 32 * i + 16 + r, 12 + r // 2 + 1], outline=(209, 154, 43, 255 - 50 * i), width=1)
+    for name, img, size in (("rally-flag", flag, "16,24"), ("rally-circles", circles, "32,24")):
+        meta = PngImagePlugin.PngInfo()
+        meta.add_text("FrameSize", size)
+        meta.add_text("FrameAmount", "4")
+        img.save(os.path.join(out, f"{name}.png"), pnginfo=meta)
+
+
 def write_clock(path):
     """Frame i darkens the part of the icon the production clock has not swept yet, clockwise from 12 o'clock."""
     rows = (CLOCK_FRAMES + CLOCK_COLS - 1) // CLOCK_COLS
@@ -185,6 +207,11 @@ SCENARIOS = {
     ]},
     "scenario-ai": {"scripts": ("test-ai",), "xeno_bot": "skirmish", "actors": [
         ("rifleman", "Marines", 3, 3, 512),
+        ("resin-silo", "Xenos", 16, 16, 0),
+    ]},
+    "scenario-rally": {"scripts": ("test-rally",), "actors": [
+        ("cryo-pod", "Marines", 6, 6, 0),
+        ("rifleman", "Marines", 20, 3, 0),
         ("resin-silo", "Xenos", 16, 16, 0),
     ]},
     "scenario-victory": _scenario("test-victory", [
@@ -287,6 +314,7 @@ def main():
     write_cursor(os.path.join(args.out, "cursor.png"))
     write_clock(os.path.join(args.out, "clock.png"))
     write_shroud_tiles(args.out, tile=32)
+    write_rally_marker(args.out)
     write_map(os.path.join(args.out, "maps", "test-field"), "TGMC test field", 24, 24, TEST_FIELD, "Lobby, Shellmap", [(10, 12), (14, 12)])
     write_map(os.path.join(args.out, "maps", "landing-zone"), "Landing Zone", 40, 28, LANDING_ZONE, "Lobby", [(6, 14), (33, 13)],
               ground=landing_zone_ground, category="Conquest")

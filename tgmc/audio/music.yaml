@@ -1,4 +1,6 @@
-# Background music: TGMC's theme tracks. They are short (10 to 20 seconds), so the playlist loops often.
+# Background music: every TGMC track that is music, plus its ambience loops as a calm backdrop. The themes are short
+# (10 to 20 s, the lobby theme runs close to three minutes). tgmc/scripts/music.lua plays them in a faction-aware order
+# and switches to the tense tracks in a fight; the playlist below is also what the in-game next/previous keys walk.
 theme-hopeful-1: Hopeful I
 	Filename: theme-hopeful-1
 	Extension: ogg
@@ -15,3 +17,179 @@ theme-melancholy-2: Melancholy II
 	Filename: theme-melancholy-2
 	Extension: ogg
 	VolumeModifier: 0.8
+theme-tense-1: Tense I
+	Filename: theme-tense-1
+	Extension: ogg
+	VolumeModifier: 0.8
+theme-tense-2: Tense II
+	Filename: theme-tense-2
+	Extension: ogg
+	VolumeModifier: 0.8
+theme-dread: Dread
+	Filename: theme-dread
+	Extension: ogg
+	VolumeModifier: 0.8
+theme-elevator: Elevator
+	Filename: theme-elevator
+	Extension: ogg
+	VolumeModifier: 0.8
+theme-lobby: Lobby Theme
+	Filename: theme-lobby
+	Extension: ogg
+	VolumeModifier: 0.8
+ambient-station-1: Ambience: Station 1
+	Filename: ambient-station-1
+	Extension: ogg
+	VolumeModifier: 0.9
+ambient-station-2: Ambience: Station 2
+	Filename: ambient-station-2
+	Extension: ogg
+	VolumeModifier: 0.9
+ambient-station-3: Ambience: Station 3
+	Filename: ambient-station-3
+	Extension: ogg
+	VolumeModifier: 0.9
+ambient-station-4: Ambience: Station 4
+	Filename: ambient-station-4
+	Extension: ogg
+	VolumeModifier: 0.9
+ambient-station-5: Ambience: Station 5
+	Filename: ambient-station-5
+	Extension: ogg
+	VolumeModifier: 0.9
+ambient-station-6: Ambience: Station 6
+	Filename: ambient-station-6
+	Extension: ogg
+	VolumeModifier: 0.9
+ambient-station-7: Ambience: Station 7
+	Filename: ambient-station-7
+	Extension: ogg
+	VolumeModifier: 0.9
+ambient-station-8: Ambience: Station 8
+	Filename: ambient-station-8
+	Extension: ogg
+	VolumeModifier: 0.9
+ambient-station-9: Ambience: Station 9
+	Filename: ambient-station-9
+	Extension: ogg
+	VolumeModifier: 0.9
+ambient-station-10: Ambience: Station 10
+	Filename: ambient-station-10
+	Extension: ogg
+	VolumeModifier: 0.9
+ambient-station-11: Ambience: Station 11
+	Filename: ambient-station-11
+	Extension: ogg
+	VolumeModifier: 0.9
+ambient-station-12: Ambience: Station 12
+	Filename: ambient-station-12
+	Extension: ogg
+	VolumeModifier: 0.9
+ambient-station-13: Ambience: Station 13
+	Filename: ambient-station-13
+	Extension: ogg
+	VolumeModifier: 0.9
+ambient-station-14: Ambience: Station 14
+	Filename: ambient-station-14
+	Extension: ogg
+	VolumeModifier: 0.9
+ambient-chapel-1: Ambience: Chapel 1
+	Filename: ambient-chapel-1
+	Extension: ogg
+	VolumeModifier: 0.9
+ambient-chapel-2: Ambience: Chapel 2
+	Filename: ambient-chapel-2
+	Extension: ogg
+	VolumeModifier: 0.9
+ambient-chapel-3: Ambience: Chapel 3
+	Filename: ambient-chapel-3
+	Extension: ogg
+	VolumeModifier: 0.9
+ambient-chapel-4: Ambience: Chapel 4
+	Filename: ambient-chapel-4
+	Extension: ogg
+	VolumeModifier: 0.9
+ambient-signal-1: Ambience: Signal 1
+	Filename: ambient-signal-1
+	Extension: ogg
+	VolumeModifier: 0.9
+ambient-signal-2: Ambience: Signal 2
+	Filename: ambient-signal-2
+	Extension: ogg
+	VolumeModifier: 0.9
+ambient-signal-3: Ambience: Signal 3
+	Filename: ambient-signal-3
+	Extension: ogg
+	VolumeModifier: 0.9
+ambient-signal-4: Ambience: Signal 4
+	Filename: ambient-signal-4
+	Extension: ogg
+	VolumeModifier: 0.9
+ambient-moon-1: Ambience: Moon 1
+	Filename: ambient-moon-1
+	Extension: ogg
+	VolumeModifier: 0.9
+ambient-moon-2: Ambience: Moon 2
+	Filename: ambient-moon-2
+	Extension: ogg
+	VolumeModifier: 0.9
+ambient-tech-1: Ambience: Tech 1
+	Filename: ambient-tech-1
+	Extension: ogg
+	VolumeModifier: 0.9
+ambient-tech-2: Ambience: Tech 2
+	Filename: ambient-tech-2
+	Extension: ogg
+	VolumeModifier: 0.9
+ambient-space: Ambience: Deep Space
+	Filename: ambient-space
+	Extension: ogg
+	VolumeModifier: 0.9
+ambient-lava-1: Ambience: Lava 1
+	Filename: ambient-lava-1
+	Extension: ogg
+	VolumeModifier: 0.9
+ambient-lava-2: Ambience: Lava 2
+	Filename: ambient-lava-2
+	Extension: ogg
+	VolumeModifier: 0.9
+ambient-lava-3: Ambience: Lava 3
+	Filename: ambient-lava-3
+	Extension: ogg
+	VolumeModifier: 0.9
+ambient-mine: Ambience: Mine
+	Filename: ambient-mine
+	Extension: ogg
+	VolumeModifier: 0.9
+ambient-malf: Ambience: Malfunction
+	Filename: ambient-malf
+	Extension: ogg
+	VolumeModifier: 0.9
+ambient-atmos-1: Ambience: Atmosphere 1
+	Filename: ambient-atmos-1
+	Extension: ogg
+	VolumeModifier: 0.9
+ambient-atmos-2: Ambience: Atmosphere 2
+	Filename: ambient-atmos-2
+	Extension: ogg
+	VolumeModifier: 0.9
+ambient-atmos-3: Ambience: Atmosphere 3
+	Filename: ambient-atmos-3
+	Extension: ogg
+	VolumeModifier: 0.9
+ambient-cave: Ambience: Cave
+	Filename: ambient-cave
+	Extension: ogg
+	VolumeModifier: 0.9
+ambient-ship: Ambience: Ship
+	Filename: ambient-ship
+	Extension: ogg
+	VolumeModifier: 0.9
+ambient-jungle: Ambience: Jungle
+	Filename: ambient-jungle
+	Extension: ogg
+	VolumeModifier: 0.9
+ambient-wind: Ambience: Wind
+	Filename: ambient-wind
+	Extension: ogg
+	VolumeModifier: 0.9

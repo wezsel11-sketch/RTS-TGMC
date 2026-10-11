@@ -10,6 +10,7 @@ loudness, so each one is re-encoded and level-matched:
   speech  mono 22050 Hz         -6 dB                    7 s    (the ARES announcer)
   amb     mono 22050 Hz         -16 dB                   8 s
   music   stereo 44100 Hz       -6 dB                    whole file
+  ambient stereo 44100 Hz       -12 dB                   75 s   (TGMC's ambience loops, played as calm music)
 
 A sound is (source path under the TGMC checkout, kind) or (source, kind, max seconds). Each file is scaled so its
 loudest sample sits at the kind's peak, which keeps weapons, voices and the interface at sensible levels relative to
@@ -36,6 +37,7 @@ KINDS = {
     "speech": (1, 22050, -6.0, 7.0, 4),
     "amb": (1, 22050, -16.0, 8.0, 4),
     "music": (2, 44100, -6.0, None, 5),
+    "ambient": (2, 44100, -12.0, 75.0, 4),
 }
 
 W = "sound/weapons"
@@ -53,6 +55,12 @@ SOUNDS = {
     "claw-swipe-1": (f"{W}/alien_claw_flesh1.ogg", "fx"),
     "claw-swipe-2": (f"{W}/alien_claw_flesh2.ogg", "fx"),
     "claw-swipe-3": (f"{W}/alien_claw_flesh3.ogg", "fx"),
+    "slam-1": (f"{EF}/slam1.ogg", "fx"),
+    "slam-2": (f"{EF}/slam2.ogg", "fx"),
+    "grenade-launch": (f"{G}/grenadelauncher.ogg", "fx", 2.5),
+    "spark-1": (f"{EF}/sparks1.ogg", "fx", 1.5),
+    "spark-2": (f"{EF}/sparks2.ogg", "fx", 1.5),
+    "splat": (f"{EF}/splat.ogg", "fx", 1.5),
     "acid-spit-1": (f"{A}/spitacid.ogg", "fx"),
     "acid-spit-2": (f"{A}/spitacid2.ogg", "fx"),
     "acid-impact": ("sound/bullets/acid_impact1.ogg", "fx", 2.0),
@@ -134,7 +142,39 @@ SOUNDS = {
     "sting-win-2": ("sound/theme/winning_triumph2.ogg", "music"),
     "sting-loss-1": ("sound/theme/sad_loss1.ogg", "music"),
     "sting-loss-2": ("sound/theme/sad_loss2.ogg", "music"),
+    # The rest of TGMC's music: two tense nuclear-alarm themes, a zombie-loss theme, the elevator track and the lobby theme
+    "theme-tense-1": ("sound/theme/nuclear_detonation1.ogg", "music"),
+    "theme-tense-2": ("sound/theme/nuclear_detonation2.ogg", "music"),
+    "theme-dread": ("sound/theme/zombies_loss.ogg", "music"),
+    "theme-elevator": ("sound/music/elevator/robocop-short.ogg", "music"),
+    "theme-lobby": ("config/lobby_themes/DawsonChristian.ogg", "music"),
 }
+
+# TGMC's ambience loops, played as a calm backdrop in the playlist. Name -> source file under sound/ambience.
+AMBIENT = {
+    **{f"ambient-station-{n}": f"ambigen{n}.ogg" for n in range(1, 15)},
+    **{f"ambient-chapel-{n}": f"ambicha{n}.ogg" for n in range(1, 5)},
+    **{f"ambient-signal-{n}": f"ambisin{n}.ogg" for n in range(1, 5)},
+    "ambient-moon-1": "ambimo1.ogg",
+    "ambient-moon-2": "ambimo2.ogg",
+    "ambient-tech-1": "ambitech.ogg",
+    "ambient-tech-2": "ambitech2.ogg",
+    "ambient-space": "ambispace.ogg",
+    "ambient-lava-1": "ambilava1.ogg",
+    "ambient-lava-2": "ambilava2.ogg",
+    "ambient-lava-3": "ambilava3.ogg",
+    "ambient-mine": "ambimine.ogg",
+    "ambient-malf": "ambimalf.ogg",
+    "ambient-atmos-1": "ambiatmos.ogg",
+    "ambient-atmos-2": "ambiatmos2.ogg",
+    "ambient-atmos-3": "ambiatm1.ogg",
+    "ambient-cave": "ambicave2.ogg",
+    "ambient-ship": "shipambience.ogg",
+    "ambient-jungle": "jungle_amb1.ogg",
+    "ambient-wind": "windambient.ogg",
+}
+for _name, _file in AMBIENT.items():
+    SOUNDS[_name] = (f"sound/ambience/{_file}", "ambient")
 
 # Marine voices come in a male and a female recording of each clip, under the same clip name in both. A clip name that
 # does not exist in both would leave half the marines silent, so only names present in both are listed.

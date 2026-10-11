@@ -51,6 +51,14 @@ def main():
         if clip not in build_sounds.SOUNDS:
             errors.append(f"music track {clip} is not made by build_sounds.py")
 
+    # The music script names tracks by their music.yaml key, and every track in the playlist should be in one of its pools
+    keys = top_level_keys(read("audio", "music.yaml"))
+    scripted = set(re.findall(r'"((?:theme|ambient)-[a-z0-9-]+)"', read("scripts", "music.lua")))
+    for track in sorted(scripted - keys):
+        errors.append(f"scripts/music.lua plays {track}, which is not in audio/music.yaml")
+    for track in sorted(keys - scripted):
+        errors.append(f"music track {track} is in audio/music.yaml but no pool in scripts/music.lua plays it")
+
     # Voice clips that sit behind a Prefixes list: <prefix><clip> must exist for every prefix of the set
     current, section, prefixes, clips = None, None, [], {}
     for raw in read("audio", "voices.yaml").splitlines():
@@ -118,6 +126,48 @@ def main():
             for s in (x.strip() for x in m.group(1).split(",")):
                 if s not in seqs[actor]:
                     errors.append(f"{actor} asks for sequence {s}, which build_sprites.py does not make for it")
+
+    # Muzzle flashes come from the actor's own sheet, so the actor must make the sequence its Armament names
+    actor = None
+    for line in all_rules.splitlines():
+        if re.match(r"^\^?[A-Za-z][\w-]*:\s*$", line):
+            actor = line.rstrip(": \t")
+        m = re.match(r"^\s+MuzzleSequence: (\S+)$", line)
+        if m and m.group(1) not in seqs.get(actor, ()):
+            errors.append(f"{actor} has MuzzleSequence {m.group(1)}, which build_sprites.py does not make for it")
+
+    # Weapon images: a projectile's Image and Sequences, and a CreateEffect's Image and Explosions, must be sequences
+    # that build_sprites.py makes (a projectile with no Sequences plays "idle"; an effect with no Image would play "explosion")
+    weapon, block, image, names = None, None, None, None
+
+    def check_block():
+        if block is None or (image is None and names is None):
+            return
+        if block == "Projectile" and image is None:
+            return
+        if image is None and block != "Projectile":
+            errors.append(f"{weapon} {block} names Explosions but no Image, so it looks in the engine's own 'explosion' image")
+        elif image not in seqs:
+            errors.append(f"{weapon} {block} uses image {image}, which build_sprites.py does not make")
+        else:
+            for n in (names if names is not None else (["idle"] if block == "Projectile" else [])):
+                if n not in seqs[image]:
+                    errors.append(f"{weapon} {block} asks for {image} sequence {n}, which build_sprites.py does not make")
+
+    for line in read("rules", "weapons.yaml").splitlines() + ["X:"]:
+        if re.match(r"^[A-Za-z^][\w-]*:", line) or re.match(r"^\t(Warhead@\S+|Projectile):", line):
+            check_block()
+            block, image, names = None, None, None
+            if line[0] != "\t":
+                weapon = line.split(":")[0]
+            else:
+                block = line.strip().split(":")[0]
+        m = re.match(r"^\t\t(Image|Explosions|Sequences): (.+)$", line)
+        if m and block:
+            if m.group(1) == "Image":
+                image = m.group(2).strip()
+            else:
+                names = [x.strip() for x in m.group(2).split(",")]
 
     # Every Buildable actor needs an icon sequence
     for m in re.finditer(r"^([a-z][\w-]*):\n((?:\t.*\n|\n)*)", all_rules, re.M):

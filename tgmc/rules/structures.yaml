@@ -148,7 +148,10 @@ sentry-turret:
 	Armament@PRIMARY:
 		Weapon: TGMCSentry
 		Turret: primary
+		MuzzleSequence: flash
+		LocalOffset: 300,0,300
 	AttackTurreted:
+	WithMuzzleOverlay:
 	AutoTarget:
 		InitialStance: AttackAnything
 	AutoTargetPriority@DEFAULT:

@@ -42,6 +42,12 @@ Sequences:
 	tgmc|sequences/grenadier.yaml
 	tgmc|sequences/warrior.yaml
 	tgmc|sequences/grenade.yaml
+	tgmc|sequences/fx-bullet.yaml
+	tgmc|sequences/fx-acid.yaml
+	tgmc|sequences/fx-impact.yaml
+	tgmc|sequences/fx-blast.yaml
+	tgmc|sequences/fx-blast-big.yaml
+	tgmc|sequences/fx-slam.yaml
 
 TileSets:
 	tgmc|tilesets/ground.yaml

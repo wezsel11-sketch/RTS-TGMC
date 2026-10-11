@@ -61,6 +61,10 @@
 
 rifleman:
 	Inherits: ^Infantry
+	Armament@PRIMARY:
+		MuzzleSequence: flash
+		LocalOffset: 256,0,200
+	WithMuzzleOverlay:
 	Buildable:
 		Queue: Infantry
 		BuildAtProductionType: Infantry
@@ -125,6 +129,9 @@ smartgunner:
 		Speed: 36
 	Armament@PRIMARY:
 		Weapon: TGMCSmartgun
+		MuzzleSequence: flash
+		LocalOffset: 256,0,200
+	WithMuzzleOverlay:
 	Tooltip:
 		Name: actor-smartgunner.name
 	Valued:
@@ -141,6 +148,9 @@ grenadier:
 		HP: 90
 	Armament@PRIMARY:
 		Weapon: TGMCGrenade
+		MuzzleSequence: flash
+		LocalOffset: 300,0,260
+	WithMuzzleOverlay:
 	Tooltip:
 		Name: actor-grenadier.name
 	Valued:

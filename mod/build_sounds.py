@@ -203,7 +203,10 @@ def main():
 
     os.makedirs(args.out, exist_ok=True)
     report = []
-    for name in sorted(SOUNDS):
+    names = sorted(SOUNDS)
+    for i, name in enumerate(names, 1):
+        if i == 1 or i % 20 == 0:
+            print(f"sounds: {i}/{len(names)} (ffmpeg, a few minutes on Windows)", flush=True)
         source, kind, limit = spec(name)
         src = os.path.join(args.tgmc, source)
         dst = os.path.join(args.out, f"{name}.ogg")

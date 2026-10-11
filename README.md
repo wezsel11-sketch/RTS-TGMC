@@ -72,7 +72,7 @@ The converters read these TGMC files:
   uniform states under the same kit. The `m_` jungle set is darker and hid the marines against the terrain.
 - Structures: `icons/Xeno/acid_turret.dmi`, `resin_silo.dmi`, `resin_pod.dmi`, and
   `icons/obj/machines/` (`sentry/sentry.dmi`, `cryogenics2.dmi`, `vending.dmi`).
-- About 150 sound clips (weapons, voices, announcer, music, ambience), listed in `SOUNDS` in `mod/build_sounds.py`.
+- About 150 sound clips (weapons, voices, announcer, music, ambience; about 200 with the full music set), listed in `SOUNDS` in `mod/build_sounds.py`.
 
 The exact list is `python3 mod/tgmc_paths.py`; `setup.sh` checks out only those files.
 
@@ -91,7 +91,7 @@ mod/                        converters and build script (Python 3, Pillow, ffmpe
   make_placeholders.py      palette, cursor, clock, fog tiles and the maps (no TGMC art)
   lint_static.py            cross-reference check (sounds, weapons, voice sets, Fluent keys, sequences); build_mod.sh runs it
   smoke.sh                  launches the built mod headless on a map, screenshots it, fails on an engine exception
-  test_scenarios.sh         runs the scripted scenario maps (heal, repair, mend, victory, combat, waves, ai, rally) and checks each prints PASS
+  test_scenarios.sh         runs the scripted scenario maps (heal, repair, mend, victory, combat, fx, waves, ai, rally) and checks each prints PASS
   balance.sh                runs several AI-vs-AI matches (balance-aivai) in parallel and prints who won and when
   scenarios/                the Lua scripts those maps run (copied into each map by make_placeholders.py)
   check_mod.sh              runs OpenRA's own lint (--check-yaml, --check-missing-sprites) on the built mod and map
@@ -101,6 +101,8 @@ tgmc/                       the OpenRA mod (YAML and Fluent only)
   rules/                    world, player, palettes, units, structures, weapons
   chrome/                   in-game HUD layouts (player sidebar, observer banner)
   audio/notifications.yaml  UI sound mapping
+  audio/music.yaml          the playlist: themes, tense tracks, lobby theme, ambience loops
+  scripts/music.lua         faction-aware, fight-aware music (the world's LuaScript)
   tilesets/ground.yaml      one flat ground template
   cursors.yaml, fluent/     cursor names, display strings
   chrome/                   main menu, Esc menu, in-game sidebar and observer banner (TGUI-style)
@@ -161,7 +163,7 @@ On a headless machine, run OpenRA under Xvfb with Mesa software GL
 - **Facing check.** Actors placed at facing 0, 256, and 512 show the north (back), east
   (side), and south (front) sprites, as expected.
 - **Sounds.** `build_sounds.py` converts about 150 TGMC clips. Each is re-encoded to Vorbis and scaled so its loudest
-  sample sits at a peak chosen for its kind (weapons and voices -3 dB, interface -9, announcer -6, ambience -16, music -6),
+  sample sits at a peak chosen for its kind (weapons and voices -3 dB, interface -9, announcer -6, ambience -16, music -6, ambience-as-music -12),
   and trimmed to a per-kind length with a short fade. Effects and voices are mono 22 kHz; music is stereo 44.1 kHz.
   The levels are numbers, not a mix anyone has heard. OpenRA's `OggLoader` plays them directly.
   The `audio` folder is mounted as its own package in `mod.yaml`, so sounds are referred to by bare file name
@@ -181,11 +183,36 @@ On a headless machine, run OpenRA under Xvfb with Mesa software GL
   The cryo pod and vendor hum, and a cave ambience plays across the map with long gaps.
 - **Announcer** (the ship's AI, ARES): game start, unit ready, queue and refusal pings, a siren when a building is attacked,
   an alert when a unit is lost, code red and a distress beacon for Hold the Line waves, and win and lose stings.
-- **Music** is TGMC's four theme tracks (`neutral_hopeful` and `neutral_melancholy`). They run 10 to 20 seconds each, so
-  the playlist is about a minute long and repeats a lot; TGMC has no longer music.
+- **Music** is every music track TGMC has, plus its ambience loops as a calm backdrop. TGMC's real music is short: the
+  four neutral themes (10 to 20 s), two tense themes (`nuclear_detonation`), the dread theme (`zombies_loss`), the elevator
+  track and the lobby theme (the only long one, about three minutes). Win and loss stings are not in the playlist. The 40
+  ambience loops (`ambigen`, `ambicha`, `ambisin`, `ambilava`, `ambicave` and others, capped at 75 s) are stereo music
+  at -12 dB. All of it is in `tgmc/audio/music.yaml`.
+  `tgmc/scripts/music.lua` plays it, because OpenRA's playlist cannot filter by faction. **Marines** get the hopeful themes,
+  elevator, lobby and station ambience; **xenos** get the melancholy and dread themes and the cave, lava and jungle
+  ambience; an observer gets a bit of both. A theme and an ambience track alternate. When an enemy comes within 8 cells of
+  one of your units or structures the tense tracks take over, and the calm ones return about 30 s after the fight.
+  The script is the world's `LuaScript`; a map with its own script (Hold the Line) lists it last. After the in-game
+  next/previous keys, OpenRA's own shuffled playlist (all tracks) continues. `mod/lint_static.py` checks every track
+  named in the script and playlist.
 - `mod/lint_static.py` checks every sound name against `build_sounds.py`, including each clip of each prefixed voice set.
   `scenario-sounds` plays every sound, announcer line and track, and `test_scenarios.sh` fails any scenario whose
   `sound.log` says a file did not load. None of it has been heard: this machine has no audio device.
+
+## Effects
+
+The effect sprites are TGMC art too (`fx-*` images in `build_sprites.py`) and are named by `tgmc/rules/weapons.yaml`:
+
+- **Guns spit bullets.** Rifle, smartgun and sentry shots fly as turned tracers (16 facings, the sentry's is heavier).
+  Riflemen, smartgunners and the sentry flash at the muzzle (`WithMuzzleOverlay`, sequence `flash` on the unit's own sheet).
+  Hits throw sparks on structures and acid-green gore on xenos.
+- **Grenadiers carry a grenade launcher.** It thumps (`grenadelauncher.ogg`) with a puff of smoke at the muzzle, lobs the
+  grenade on its arc and explodes with a fireball that fades into smoke, plus an explosion sound.
+- **Xenos spit acid.** The Sentinel and the resin turret fire a visible acid glob (a fast arc, with a wide enough splash to
+  land on a walking marine), which splashes green on impact.
+- **Melee and support hits.** Claws draw blood on marines and sparks on structures; the Warrior's slam kicks up a dust
+  shockwave; the corpsman's heal sparkles, the engineer's repair sparks and the drone's mend sparkles.
+- `mod/lint_static.py` checks each weapon's image and sequence names and each `MuzzleSequence`.
 
 ## Known gaps
 
@@ -198,6 +225,7 @@ On a headless machine, run OpenRA under Xvfb with Mesa software GL
 - Medic and engineer have no heal or repair animation (they reuse `attack`). Healing and repair are weapons
   with negative damage. Scenario tests cover heal, repair, victory and a rifleman-versus-Runner fight.
 - Weapons that use `InstantHit` need `TargetActorCenter: true`, or the hit lands on a position and does nothing.
+- Acid is now a projectile, so a fast runner can still outrun a glob. Effects have not been tuned by eye in a long match.
 - Terrain is flat tiles from TGMC's `jungle.dmi` and `ground_map.dmi`: grass (two variants), dirt road, a walkable
   ford and impassable water. There are no edge or transition tiles, so shorelines are hard. The test field is all grass.
 - The HUD is a command sidebar (radar, production palette with an Infantry and a Xeno tab, requisition, menu button); it reads the same for either faction. There is no selection readout, as that would need C#.
@@ -210,7 +238,7 @@ On a headless machine, run OpenRA under Xvfb with Mesa software GL
 - Verified by running the mod headless (OpenRA bleed, `mod/check_mod.sh` and `mod/smoke.sh`): the lint passes with
   no errors or warnings, and on Landing Zone the camera starts on the base, the radar and production palette work,
   the vendor spawns queued marines, income ticks up, and a "Skirmish AI" in the xeno slot trains Runners that attack
-  the marine base. `mod/test_scenarios.sh` checks heal, repair, mend, victory, combat, the wave script and the AI. The xeno seat was played on Landing Zone against a marine bot: silo, mini silos, all four castes, palette and tooltips work.
+  the marine base. `mod/test_scenarios.sh` checks heal, repair, mend, victory, combat, every effect-carrying weapon (`scenario-fx`), the wave script and the AI. The xeno seat was played on Landing Zone against a marine bot: silo, mini silos, all four castes, palette and tooltips work.
   Not yet checked: voices (no audio device).
 - AI against AI (`mod/balance.sh`, Landing Zone layout, fastest speed): the marines win about every time, in 2 to 5 minutes
   of game time. The xeno AI masses 12 to 17 units, attacks around minute one, and loses them crossing open ground to

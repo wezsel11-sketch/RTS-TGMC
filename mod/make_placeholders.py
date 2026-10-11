@@ -8,6 +8,7 @@ Nothing here is TGMC art. It writes:
   clock.png                     production-icon clock overlay frames (62x46, a dark wedge that sweeps away)
   maps/test-field/map.{yaml,bin,png}   a 24x24 map with marines, runners, and one of each structure
   maps/landing-zone/map.{yaml,bin,png} a 40x28 two-base skirmish map: marines west, xenos east
+  maps/hold-the-line/...        the survival map; its script list ends with tgmc|scripts/music.lua
 
 Usage: make_placeholders.py --out DIR
 """
@@ -229,6 +230,18 @@ SCENARIOS = {
     "balance-holdline": {"scripts": ("wave-survival", "test-holdline"), "marine_bot": "skirmish", "fast": True,
                          "drop_conquest": True, "size": (40, 28), "spawns": [(6, 14), (33, 13)], "ground": "landing_zone",
                          "actors": HOLD_THE_LINE, "extra_rules": "Player:\n\t-SquadManagerBotModule@marines:\n"},
+    # One of each effect-carrying weapon, each pair facing off a few cells apart (see scenarios/test-fx.lua)
+    "scenario-fx": {"scripts": ("test-fx",), "actors": [
+        ("rifleman", "Marines", 8, 8, 256),
+        ("hunter", "Xenos", 12, 8, 768),
+        ("smartgunner", "Marines", 8, 11, 256),
+        ("sentinel", "Xenos", 13, 11, 768),
+        ("grenadier", "Marines", 8, 14, 256),
+        ("resin-turret", "Xenos", 15, 14, 768),
+        ("sentry-turret", "Marines", 8, 17, 256),
+        ("warrior", "Xenos", 12, 17, 768),
+        ("resin-silo", "Xenos", 19, 19, 0),
+    ]},
     "scenario-sounds": {"scripts": ("test-sounds", "sound-list"), "generated": ("sound-list",), "actors": [
         ("rifleman", "Marines", 10, 10, 0),
         ("resin-silo", "Xenos", 16, 16, 0),
@@ -258,7 +271,8 @@ def write_sound_list(path):
 
 
 def write_map(folder, title, size_w, size_h, placed, visibility, spawns, scripts=(), ground=flat_ground,
-              category="Skirmish", drop_conquest=False, xeno_bot=None, marine_bot=None, fast=False, extra_rules=""):
+              category="Skirmish", drop_conquest=False, xeno_bot=None, marine_bot=None, fast=False, extra_rules="",
+              music=False):
     # A scenario map has no slot for the xenos: they are a scripted player, so Lua can find them and they never act.
     os.makedirs(folder, exist_ok=True)
     cells = size_w * size_h
@@ -279,7 +293,11 @@ def write_map(folder, title, size_w, size_h, placed, visibility, spawns, scripts
     rules_line = ""
     if scripts:
         rules_line = "Rules: rules.yaml\n\n"
-        rules = "World:\n\tLuaScript:\n\t\tScripts: " + ", ".join(f"{name}.lua" for name in scripts) + "\n"
+        listed = [f"{name}.lua" for name in scripts]
+        if music:
+            # A map's Scripts replaces the world's, which holds the music script. It goes last: it wraps the map's WorldLoaded.
+            listed.append("tgmc|scripts/music.lua")
+        rules = "World:\n\tLuaScript:\n\t\tScripts: " + ", ".join(listed) + "\n"
         if fast:
             # Scenario maps run at the fastest game speed so a long match (such as AI against AI) finishes quickly.
             rules += "World:\n\tMapOptions:\n\t\tGameSpeed: fastest\n"
@@ -374,7 +392,7 @@ def main():
                   ground=landing_zone_ground if sc.get("ground") == "landing_zone" else flat_ground)
     write_map(os.path.join(args.out, "maps", "hold-the-line"), "Hold the Line", 40, 28, HOLD_THE_LINE, "Lobby",
               [(6, 14), (33, 13)], scripts=("wave-survival",), ground=landing_zone_ground, category="Survival",
-              drop_conquest=True)
+              drop_conquest=True, music=True)
     print(f"placeholders written to {args.out}")
 
 

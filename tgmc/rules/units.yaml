@@ -38,6 +38,11 @@
 	Valued:
 		Cost: 100
 	GivesExperience:
+	WithIdleOverlay@TEAM:
+		Image: team
+		Sequence: ring-32
+		Palette: player
+		IsPlayerPalette: true
 
 # Veterancy. A unit gains experience when it kills (the victim's cost, or `Experience`), and each rank is reached at a
 # percentage of its own cost. The condition `rank` is granted once per rank, so `rank == 2` means second rank (the same
@@ -300,6 +305,8 @@ grenadier:
 
 runner:
 	Inherits: ^Xeno
+	WithIdleOverlay@TEAM:
+		Sequence: ring-64
 	Voiced:
 		VoiceSet: RunnerVoice
 	Health:
@@ -319,6 +326,8 @@ runner:
 
 hunter:
 	Inherits: ^Xeno
+	WithIdleOverlay@TEAM:
+		Sequence: ring-48
 	Voiced:
 		VoiceSet: HunterVoice
 	Health:
@@ -339,6 +348,8 @@ hunter:
 
 sentinel:
 	Inherits: ^Xeno
+	WithIdleOverlay@TEAM:
+		Sequence: ring-48
 	Voiced:
 		VoiceSet: SentinelVoice
 	Health:
@@ -361,6 +372,8 @@ sentinel:
 
 drone:
 	Inherits: ^Xeno
+	WithIdleOverlay@TEAM:
+		Sequence: ring-48
 	Voiced:
 		VoiceSet: DroneVoice
 	Health:
@@ -392,6 +405,8 @@ drone:
 
 warrior:
 	Inherits: ^Xeno
+	WithIdleOverlay@TEAM:
+		Sequence: ring-64
 	Voiced:
 		VoiceSet: HunterVoice
 	Health:
@@ -414,6 +429,8 @@ warrior:
 
 queen:
 	Inherits: ^Xeno
+	WithIdleOverlay@TEAM:
+		Sequence: ring-64
 	Voiced:
 		VoiceSet: HunterVoice
 	Health:

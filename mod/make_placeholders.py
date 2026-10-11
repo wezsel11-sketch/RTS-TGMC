@@ -6,6 +6,8 @@ Nothing here is TGMC art. It writes:
   shroud.png, fog.png           14 edge tiles each for unexplored and out-of-sight cells; shroudfull.png and fogfull.png
   rally-flag.png, rally-circles.png  the rally point marker: a waving flag and pulsing ground rings
   rank-pips.png                      one, two and three amber chevrons under a promoted unit
+  team-ring-N.png, team-plate-WxH.png indexed sprites in the player-colour range: a ring under each unit, a plate on each structure
+  fx-fire.png, rubble-WxH.png        flames over a nearly dead structure, and the heap it leaves behind
   wounds.png                         blood splotches drawn over a hurt marine: frame 0 for half health, 1 for a quarter, 2 for critical
   clock.png                     production-icon clock overlay frames (62x46, a dark wedge that sweeps away)
   maps/test-field/map.{yaml,bin,png}   a 24x24 map with marines, runners, and one of each structure
@@ -98,8 +100,12 @@ def landing_zone_ground(x, y):
 
 
 def palette_entries():
-    """A plain grey ramp. Only the palette-based paths read it; the TGMC-free tiles and sprites are RGBA."""
-    return [(i, i, i) for i in range(256)]
+    """A plain grey ramp. Only the palette-based paths read it; the TGMC-free tiles and sprites are RGBA.
+
+    Entries 80-95 are the player-colour remap range (rules/palettes.yaml): the remap keeps each entry's brightness, so
+    they run bright, 160 to 255, to give the team rings and plates a vivid owner colour."""
+    ramp = [(160 + 6 * (i - 80),) * 3 for i in range(80, 96)]
+    return [(i, i, i) for i in range(80)] + ramp + [(i, i, i) for i in range(96, 256)]
 
 
 def write_palette(path):
@@ -223,6 +229,81 @@ def write_rally_marker(out):
         img.save(os.path.join(out, f"{name}.png"), pnginfo=meta)
 
 
+TEAM_LO, TEAM_HI = 82, 95  # palette indices in the player-colour remap range; the ring is shaded between them
+
+
+def write_team_markers(out):
+    """Indexed sprites painted with the player-colour range, so the engine recolours them per owner (the TGMC unit
+    sprites are RGBA and cannot be recoloured). `team-ring-N.png` is an ellipse under a unit's feet in an NxN cell;
+    `team-plate-WxH.png` is a short bar along the bottom of a WxH structure cell."""
+    def sheet(size, draw):
+        img = Image.new("P", size, 0)
+        img.putpalette([c for rgb in palette_entries() for c in rgb])
+        draw(ImageDraw.Draw(img))
+        return img
+
+    def save(img, name):
+        meta = PngImagePlugin.PngInfo()
+        meta.add_text("FrameSize", f"{img.width},{img.height}")
+        meta.add_text("FrameAmount", "1")
+        img.save(os.path.join(out, name), pnginfo=meta, optimize=False)
+
+    for cell, feet, rx, ry in ((32, 29, 9, 3), (48, 44, 12, 4), (64, 59, 16, 5)):
+        def draw(d, cell=cell, feet=feet, rx=rx, ry=ry):
+            box = [cell // 2 - rx, feet - ry, cell // 2 + rx, feet + ry]
+            d.ellipse([box[0] - 1, box[1] - 1, box[2] + 1, box[3] + 1], outline=2, width=1)
+            d.ellipse(box, outline=TEAM_HI, width=2 if cell > 32 else 1)
+        save(sheet((cell, cell), draw), f"team-ring-{cell}.png")
+
+    # A plate sits along the bottom of the structure's footprint, so each footprint has its own cell size
+    for w, h in ((32, 32), (64, 64), (96, 96), (32, 64)):
+        def plate(d, w=w, h=h):
+            x0, x1, y1 = w // 2 - min(w // 2 - 3, 12), w // 2 + min(w // 2 - 3, 12), h - 3
+            d.rectangle([x0 - 1, y1 - 6, x1 + 1, y1 + 0], fill=2)
+            d.rectangle([x0, y1 - 5, x1, y1 - 1], fill=TEAM_HI)
+            d.rectangle([x0, y1 - 5, x1, y1 - 4], fill=TEAM_HI - 2)
+            d.rectangle([x0, y1 - 2, x1, y1 - 1], fill=TEAM_LO)
+        save(sheet((w, h), plate), f"team-plate-{w}x{h}.png")
+
+
+def write_ruin_art(out):
+    """`fx-fire.png`: four 24x32 frames of flames, drawn here, that flicker over a badly damaged structure.
+    `rubble-WxH.png`: a scorched heap of broken blocks for each structure footprint, left where a structure dies."""
+    import random
+    rnd = random.Random(7)
+
+    def save(img, name, frames):
+        meta = PngImagePlugin.PngInfo()
+        meta.add_text("FrameSize", f"{img.width // frames},{img.height}")
+        meta.add_text("FrameAmount", str(frames))
+        img.save(os.path.join(out, name), pnginfo=meta)
+
+    flames = Image.new("RGBA", (24 * 4, 32), (0, 0, 0, 0))
+    d = ImageDraw.Draw(flames)
+    for i in range(4):
+        for k, (bx, h) in enumerate(((6, 20), (12, 26), (18, 18))):
+            x, hh = 24 * i + bx, h + rnd.randint(-4, 3)
+            for col, scale in (((196, 40, 12, 230), 1.0), ((255, 150, 24, 240), 0.72), ((255, 232, 120, 250), 0.42)):
+                ht, wd = hh * scale, 6 * scale + 1
+                d.polygon([(x - wd, 31), (x - wd * 0.4 + rnd.randint(-1, 1), 31 - ht * 0.6), (x + rnd.randint(-1, 1), 31 - ht),
+                           (x + wd * 0.4, 31 - ht * 0.6), (x + wd, 31)], fill=col)
+    save(flames, "fx-fire.png", 4)
+
+    for w, h in ((32, 32), (64, 64), (96, 96)):
+        img = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+        d = ImageDraw.Draw(img)
+        # a dark scorch mark, then broken blocks of varied size heaped toward the middle
+        d.ellipse([w * 0.1, h * 0.25, w * 0.9, h * 0.95], fill=(18, 16, 14, 190))
+        for _ in range(int(w * h / 90)):
+            cx = w / 2 + rnd.gauss(0, w * 0.2)
+            cy = h * 0.62 + rnd.gauss(0, h * 0.14)
+            bw, bh = rnd.randint(2, max(3, w // 9)), rnd.randint(2, max(3, h // 12))
+            shade = rnd.randint(46, 104)
+            d.rectangle([cx - bw / 2, cy - bh / 2, cx + bw / 2, cy + bh / 2], fill=(shade, shade - 4, shade - 8, 255),
+                        outline=(20, 18, 16, 255))
+        save(img, f"rubble-{w}x{h}.png", 1)
+
+
 def write_wounds(out):
     """Three 32x32 frames of blood on a marine's torso, arm and leg. Each frame has the last one's marks plus more, so
     the overlay for a worse state replaces the milder one. Drawn once, for the front view, whichever way the marine faces."""
@@ -312,12 +393,24 @@ SCENARIOS = {
     # Marines at different health, ranks and one dying, to look at (mod/smoke.sh look-marines; scenarios/look-marines.lua)
     "look-marines": _scenario("look-marines", [("rifleman", "Marines", 6 + 2 * i, 10, 512) for i in range(5)]
                               + [("rifleman", "Marines", 6 + 2 * i, 13, 512) for i in range(4)]),
+    # Everything on show, to look at (mod/smoke.sh look-all; scenarios/look-all.lua)
+    "look-all": {"scripts": ("look-all",), "allied": True, "size": (36, 24), "spawns": [(4, 4), (30, 20)], "actors": (
+        [(u, "Marines", 4 + 2 * i, 4, 512) for i, u in enumerate(["rifleman", "medic", "engineer", "smartgunner", "grenadier"])]
+        + [(u, "Xenos", 4 + 2 * i, 7, 512) for i, u in enumerate(["runner", "hunter", "sentinel", "drone", "warrior", "queen"])]
+        + [(u, "Marines", 5 + 3 * i, 11, 0) for i, u in enumerate(["vendor", "cryo-pod", "armory", "ordnance-depot", "miner", "sentry-turret", "cade"])]
+        + [(u, "Xenos", 5 + 4 * i, 15, 0) for i, u in enumerate(["weed-node", "resin-turret", "mini-silo", "evolution-tower", "maturity-tower", "resin-wall"])]
+        + [("resin-silo", "Xenos", 30, 18, 0)])},
     # Ranks: a scripted promotion, and a runner that ranks up by killing (see scenarios/test-vet.lua). Spare marines keep the game going.
     "scenario-vet": _scenario("test-vet", [
         ("rifleman", "Marines", 10, 10, 512),
         ("rifleman", "Marines", 3, 3, 512),
         ("rifleman", "Marines", 4, 3, 512),
         ("runner", "Xenos", 12, 10, 0),
+    ]),
+    # A destroyed structure leaves rubble, which fades (see scenarios/test-ruin.lua)
+    "scenario-ruin": _scenario("test-ruin", [
+        ("armory", "Marines", 10, 10, 0),
+        ("rifleman", "Marines", 3, 3, 512),
     ]),
     "scenario-combat": _scenario("test-combat", [
         ("rifleman", "Marines", 10, 10, 512),
@@ -400,8 +493,8 @@ def write_sound_list(path):
 
 def write_map(folder, title, size_w, size_h, placed, visibility, spawns, scripts=(), ground=flat_ground,
               category="Skirmish", drop_conquest=False, xeno_bot=None, marine_bot=None, fast=False, extra_rules="",
-              music=False):
-    # A scenario map has no slot for the xenos: they are a scripted player, so Lua can find them and they never act.
+              music=False, allied=False):
+    # `allied` makes the two sides friends, so a viewer sees both (the look-* maps). A scenario map has no slot for the xenos: they are a scripted player, so Lua can find them and they never act.
     os.makedirs(folder, exist_ok=True)
     cells = size_w * size_h
     # map.bin: version byte, width, height, u32 tiles offset, u32 heights offset (0), u32 resources offset (0),
@@ -442,6 +535,9 @@ def write_map(folder, title, size_w, size_h, placed, visibility, spawns, scripts
             shutil.copyfile(os.path.join(os.path.dirname(os.path.abspath(__file__)), "scenarios", f"{name}.lua"),
                             os.path.join(folder, f"{name}.lua"))
 
+    # An allied (look-*) map also pins the two colours, so a screenshot shows the owner colouring
+    marine_rel = "\t\tAllies: Xenos\n\t\tLockColor: True\n" if allied else "\t\tEnemies: Xenos\n"
+    xeno_rel = "\t\tAllies: Marines\n\t\tLockColor: True\n" if allied else "\t\tEnemies: Marines\n"
     xeno_bot_line = f"\t\tBot: {xeno_bot}\n" if xeno_bot else ""
     marine_bot_line = f"\t\tBot: {marine_bot}\n" if marine_bot else ""
     # A map needs one playable slot even when both sides are bots. This one has no units and never wins or loses.
@@ -475,16 +571,16 @@ Players:
 		Playable: {not marine_bot}
 {marine_bot_line}		Faction: marines
 		LockFaction: True
-		Enemies: Xenos
-		Spawn: 1
+		Color: 3BA0FF
+{marine_rel}		Spawn: 1
 		LockSpawn: True
 	PlayerReference@Xenos:
 		Name: Xenos
 		Playable: {not script}
 {xeno_bot_line}		Faction: xenos
 		LockFaction: True
-		Enemies: Marines
-		Spawn: 2
+		Color: FF4B3B
+{xeno_rel}		Spawn: 2
 		LockSpawn: True
 {observer_block}
 Actors:
@@ -507,6 +603,8 @@ def main():
     write_clock(os.path.join(args.out, "clock.png"))
     write_shroud_tiles(args.out, tile=32)
     write_rally_marker(args.out)
+    write_team_markers(args.out)
+    write_ruin_art(args.out)
     write_wounds(args.out)
     write_rank_pips(args.out)
     write_map(os.path.join(args.out, "maps", "test-field"), "TGMC test field", 24, 24, TEST_FIELD, "Lobby, Shellmap", [(10, 12), (14, 12)])
@@ -518,7 +616,7 @@ def main():
                   sc.get("spawns", [(10, 8), (19, 17)]), scripts=sc["scripts"],
                   drop_conquest=sc.get("drop_conquest", False), xeno_bot=sc.get("xeno_bot"),
                   marine_bot=sc.get("marine_bot"), fast=sc.get("fast", True),
-                  extra_rules=sc.get("extra_rules", ""),
+                  extra_rules=sc.get("extra_rules", ""), allied=sc.get("allied", False),
                   ground=landing_zone_ground if sc.get("ground") == "landing_zone" else flat_ground)
     write_map(os.path.join(args.out, "maps", "hold-the-line"), "Hold the Line", 40, 28, HOLD_THE_LINE, "Lobby",
               [(6, 14), (33, 13)], scripts=("wave-survival",), ground=landing_zone_ground, category="Survival",

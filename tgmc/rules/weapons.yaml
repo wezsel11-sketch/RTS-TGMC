@@ -253,3 +253,18 @@ TGMCSlam:
 		ImpactSoundChance: 50
 		ValidRelationships: Enemy
 		ValidTargets: Human
+
+# A structure's death blast: only the picture. The death sound is the structure's own (DeathSounds), and nothing is damaged.
+TGMCBlastSmall:
+	Warhead@1Boom: CreateEffect
+		Image: fx-blast
+		Explosions: small
+		ForceDisplayAtGroundLevel: true
+		ValidTargets: Ground, Water, Structure
+
+TGMCBlastBig:
+	Warhead@1Boom: CreateEffect
+		Image: fx-blast-big
+		Explosions: big
+		ForceDisplayAtGroundLevel: true
+		ValidTargets: Ground, Water, Structure

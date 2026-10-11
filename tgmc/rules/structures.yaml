@@ -41,6 +41,36 @@
 	QuantizeFacingsFromSequence:
 		Sequence: idle
 	WithSpriteBody:
+	# Damage you can see (an overlay plays on a hit and carries on while the structure stays that damaged): smoke from half health, flames and a heavier plume from a quarter, a blast and a heap of rubble at death
+	WithDamageOverlay@SMOKE:
+		Image: fx-smoke
+		LoopSequence: small
+		LoopCount: 5000
+		MinimumDamageState: Heavy
+		MaximumDamageState: Heavy
+		Offset: 0, 0, 200
+	WithDamageOverlay@PLUME:
+		Image: fx-smoke
+		LoopSequence: big
+		LoopCount: 5000
+		MinimumDamageState: Critical
+		Offset: 120, -100, 400
+	WithDamageOverlay@FIRE:
+		Image: fx-fire
+		LoopSequence: flame
+		LoopCount: 5000
+		MinimumDamageState: Critical
+		Offset: -150, 120, 0
+	FireWarheadsOnDeath:
+		Weapon: TGMCBlastSmall
+		EmptyWeapon: TGMCBlastSmall
+	SpawnActorOnDeath:
+		Actor: rubble-small
+	WithIdleOverlay@TEAM:
+		Image: team
+		Sequence: plate-32x32
+		Palette: player
+		IsPlayerPalette: true
 	Valued:
 		Cost: 200
 
@@ -68,6 +98,10 @@
 	-MustBeDestroyed:
 	-AppearsOnRadar:
 	-ProvidesPrerequisite@buildingname:
+	-WithIdleOverlay@TEAM:
+	-FireWarheadsOnDeath:
+	-WithDamageOverlay@PLUME:
+	-WithDamageOverlay@FIRE:
 	RevealsShroud:
 		Range: 3c0
 	LineBuild:
@@ -113,6 +147,13 @@ resin-turret:
 
 resin-silo:
 	Inherits: ^Structure
+	WithIdleOverlay@TEAM:
+		Sequence: plate-96x96
+	FireWarheadsOnDeath:
+		Weapon: TGMCBlastBig
+		EmptyWeapon: TGMCBlastBig
+	SpawnActorOnDeath:
+		Actor: rubble-large
 	Inherits@build: ^XenoMajorBuildable
 	Buildable:
 		Queue: XenoBuild
@@ -160,6 +201,13 @@ resin-silo:
 
 mini-silo:
 	Inherits: ^Structure
+	WithIdleOverlay@TEAM:
+		Sequence: plate-64x64
+	FireWarheadsOnDeath:
+		Weapon: TGMCBlastSmall
+		EmptyWeapon: TGMCBlastSmall
+	SpawnActorOnDeath:
+		Actor: rubble-medium
 	Inherits@build: ^XenoMajorBuildable
 	Buildable:
 		Queue: XenoBuild
@@ -228,6 +276,13 @@ resin-wall:
 
 evolution-tower:
 	Inherits: ^Structure
+	WithIdleOverlay@TEAM:
+		Sequence: plate-64x64
+	FireWarheadsOnDeath:
+		Weapon: TGMCBlastBig
+		EmptyWeapon: TGMCBlastBig
+	SpawnActorOnDeath:
+		Actor: rubble-medium
 	Inherits@build: ^XenoMajorBuildable
 	Buildable:
 		Queue: XenoBuild
@@ -251,6 +306,13 @@ evolution-tower:
 
 maturity-tower:
 	Inherits: ^Structure
+	WithIdleOverlay@TEAM:
+		Sequence: plate-64x64
+	FireWarheadsOnDeath:
+		Weapon: TGMCBlastBig
+		EmptyWeapon: TGMCBlastBig
+	SpawnActorOnDeath:
+		Actor: rubble-medium
 	Inherits@build: ^XenoMajorBuildable
 	Buildable:
 		Queue: XenoBuild
@@ -339,6 +401,13 @@ vendor:
 
 cryo-pod:
 	Inherits: ^Structure
+	WithIdleOverlay@TEAM:
+		Sequence: plate-32x64
+	FireWarheadsOnDeath:
+		Weapon: TGMCBlastSmall
+		EmptyWeapon: TGMCBlastSmall
+	SpawnActorOnDeath:
+		Actor: rubble-small
 	Inherits@build: ^MarineBuildable
 	Buildable:
 		Queue: MarineBuild
@@ -443,3 +512,34 @@ ordnance-depot:
 		Name: actor-ordnance-depot.name
 	Valued:
 		Cost: 400
+
+# Heaps of broken blocks left where a structure died. They fade away after a while.
+^Rubble:
+	Immobile:
+		OccupiesSpace: false
+	RenderSprites:
+		Image: rubble
+		Palette: player
+	BodyOrientation:
+		QuantizedFacings: 1
+	WithSpriteBody:
+	HiddenUnderFog:
+		Type: CenterPosition
+	KillsSelf:
+		Delay: 1500
+		RemoveInstead: true
+
+rubble-small:
+	Inherits: ^Rubble
+	WithSpriteBody:
+		Sequence: small
+
+rubble-medium:
+	Inherits: ^Rubble
+	WithSpriteBody:
+		Sequence: medium
+
+rubble-large:
+	Inherits: ^Rubble
+	WithSpriteBody:
+		Sequence: large

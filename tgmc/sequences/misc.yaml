@@ -39,3 +39,58 @@ rank-pips:
 		Start: 1
 	rank-3:
 		Start: 2
+
+# Team colour. These are indexed sprites in the player-colour palette range (RGBA unit art cannot be recoloured), drawn by
+# mod/make_placeholders.py. Overlays in units.yaml and structures.yaml use them with IsPlayerPalette.
+team:
+	ring-32:
+		Filename: team-ring-32.png
+		Start: 0
+		ZOffset: -1023
+	ring-48:
+		Filename: team-ring-48.png
+		Start: 0
+		ZOffset: -1023
+	ring-64:
+		Filename: team-ring-64.png
+		Start: 0
+		ZOffset: -1023
+	plate-32x32:
+		Filename: team-plate-32x32.png
+		Start: 0
+		ZOffset: 512
+	plate-64x64:
+		Filename: team-plate-64x64.png
+		Start: 0
+		ZOffset: 512
+	plate-96x96:
+		Filename: team-plate-96x96.png
+		Start: 0
+		ZOffset: 512
+	plate-32x64:
+		Filename: team-plate-32x64.png
+		Start: 0
+		ZOffset: 512
+
+# Structure ruin art. fx-fire.png and the rubble sheets are drawn by mod/make_placeholders.py; fx-smoke comes from TGMC
+# (mod/build_sprites.py). The damage overlays and rubble actors that use them are in structures.yaml.
+fx-fire:
+	flame:
+		Filename: fx-fire.png
+		Length: 4
+		Tick: 90
+		ZOffset: 1024
+rubble:
+	Defaults:
+		Filename: rubble-32x32.png
+	small:
+		Start: 0
+		ZOffset: -1023
+	medium:
+		Filename: rubble-64x64.png
+		Start: 0
+		ZOffset: -1023
+	large:
+		Filename: rubble-96x96.png
+		Start: 0
+		ZOffset: -1023

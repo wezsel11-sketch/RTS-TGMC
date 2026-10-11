@@ -343,6 +343,13 @@ UNITS = {
     "fx-blast-big": {
         "sequences": {"big": [(FX96, "explosion", None, {"frames": (0, 65, 3), "tick": 40})]},
     },
+    # Smoke curling off a damaged structure: TGMC's small 4-frame wisp (one side of it), and the big soft puff for a dying one
+    "fx-smoke": {
+        "sequences": {
+            "small": [(FX32, "smoke", None, {"side": "S", "tick": 120, "fit": (48, 48)})],
+            "big": [(FX96, "smoke2", None, {"tick": 160, "fit": (48, 48)})],
+        },
+    },
     "fx-slam": {
         "sequences": {"slam": [(HEAVY_IMPACT, "heavyimpact", None, {"tick": 60})]},
     },

@@ -41,6 +41,7 @@ TEST_FIELD = [
     ("hunter", "Xenos", 13, 14, 256),
     ("sentinel", "Xenos", 14, 14, 256),
     ("drone", "Xenos", 15, 14, 256),
+    ("queen", "Xenos", 16, 12, 256),
     ("resin-turret", "Xenos", 17, 10, 0),
     ("resin-silo", "Xenos", 4, 4, 0),
     ("mini-silo", "Xenos", 18, 4, 0),
@@ -77,6 +78,7 @@ LANDING_ZONE = [
     ("hunter", "Xenos", 30, 14, 768),
     ("sentinel", "Xenos", 31, 13, 768),
     ("drone", "Xenos", 32, 16, 768),
+    ("queen", "Xenos", 32, 14, 768),
 ]
 
 
@@ -216,6 +218,13 @@ SCENARIOS = {
     ]},
     "scenario-ai": {"scripts": ("test-ai",), "xeno_bot": "skirmish", "actors": [
         ("rifleman", "Marines", 3, 3, 512),
+        ("resin-silo", "Xenos", 16, 16, 0),
+    ]},
+    # The tech tree and the Miner and Weed Node income (see scenarios/test-build.lua). The xeno side has a queen and a silo.
+    "scenario-build": {"scripts": ("test-build",), "actors": [
+        ("engineer", "Marines", 10, 10, 512),
+        ("cryo-pod", "Marines", 6, 6, 0),
+        ("queen", "Xenos", 20, 16, 0),
         ("resin-silo", "Xenos", 16, 16, 0),
     ]},
     "scenario-rally": {"scripts": ("test-rally",), "actors": [

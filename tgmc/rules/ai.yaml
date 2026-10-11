@@ -1,6 +1,6 @@
 # Skirmish AI. One bot drives either faction: it only builds what its queues offer, so a marine
-# bot trains marines and a xeno bot trains xenos. Structures are placed by the map; the bot
-# only trains units and sends them out in squads. Pattern: OpenRA mods/ra/rules/ai.yaml.
+# bot trains marines and a xeno bot trains xenos. The map places the starting base; the bot
+# then builds generators, tech and turrets, trains units and sends them out in squads. Pattern: OpenRA mods/ra/rules/ai.yaml.
 # Xenos are cheap and fast, so the xeno bot gathers a bigger group before it attacks.
 Player:
 	ModularBot@SkirmishAI:
@@ -26,17 +26,60 @@ Player:
 			hunter: 30
 			sentinel: 30
 			warrior: 15
+			queen: 10
+	# The bot has no builder to walk around, so its cryo pod and silo give it the build area (structures.yaml) and it
+	# places each finished structure in a ring around them. It never builds walls. The refinery counts are zeroed
+	# because the module otherwise holds back all unit production until it owns a refinery.
+	BaseBuilderBotModule@skirmish:
+		RequiresCondition: enable-skirmish-ai
+		BuildingQueues: MarineBuild, XenoBuild
+		ConstructionYardTypes: cryo-pod, resin-silo
+		InititalMinimumRefineryCount: 0
+		AdditionalMinimumRefineryCount: 0
+		NewProductionCashThreshold: 0
+		MinBaseRadius: 3
+		MaxBaseRadius: 9
+		ProductionMinCashRequirement: 100
+		BuildingFractions:
+			miner: 25
+			weed-node: 25
+			vendor: 8
+			cryo-pod: 6
+			mini-silo: 8
+			armory: 8
+			ordnance-depot: 8
+			evolution-tower: 8
+			maturity-tower: 8
+			sentry-turret: 12
+			resin-turret: 12
+		BuildingLimits:
+			miner: 6
+			weed-node: 6
+			vendor: 2
+			cryo-pod: 2
+			mini-silo: 3
+			armory: 1
+			ordnance-depot: 1
+			evolution-tower: 1
+			maturity-tower: 1
+			sentry-turret: 4
+			resin-turret: 4
+		BuildingDelays:
+			armory: 3000
+			ordnance-depot: 6000
+			evolution-tower: 3000
+			maturity-tower: 6000
 	SquadManagerBotModule@marines:
 		RequiresCondition: enable-skirmish-ai && !faction-xenos
 		SquadSize: 8
 		SquadSizeRandomBonus: 20
-		ExcludeFromSquadsTypes: medic, engineer, drone
+		ExcludeFromSquadsTypes: medic, engineer, drone, queen
 		ConstructionYardTypes: cryo-pod, resin-silo
-		ProtectionTypes: cryo-pod, vendor, resin-silo, mini-silo, sentry-turret, resin-turret
+		ProtectionTypes: cryo-pod, vendor, resin-silo, mini-silo, sentry-turret, resin-turret, miner, weed-node, armory, ordnance-depot, evolution-tower, maturity-tower
 	SquadManagerBotModule@xenos:
 		RequiresCondition: enable-skirmish-ai && faction-xenos
 		SquadSize: 14
 		SquadSizeRandomBonus: 20
-		ExcludeFromSquadsTypes: medic, engineer, drone
+		ExcludeFromSquadsTypes: medic, engineer, drone, queen
 		ConstructionYardTypes: cryo-pod, resin-silo
-		ProtectionTypes: cryo-pod, vendor, resin-silo, mini-silo, sentry-turret, resin-turret
+		ProtectionTypes: cryo-pod, vendor, resin-silo, mini-silo, sentry-turret, resin-turret, miner, weed-node, armory, ordnance-depot, evolution-tower, maturity-tower

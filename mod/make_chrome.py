@@ -315,7 +315,8 @@ ICONS = {
     "flags": {"marines": lambda: flag("M", OLIVE_DARK), "xenos": lambda: flag("X", (90, 30, 40, 255)),
               "Random": lambda: flag("?", SLATE), "spectator": lambda: flag("O", SLATE)},
     "production-icons": {n: (lambda n=n: glyph_tile(n)) for n in
-                         ["infantry", "infantry-disabled", "infantry-alert", "xeno", "xeno-disabled", "xeno-alert"]},
+                         ["infantry", "infantry-disabled", "infantry-alert", "xeno", "xeno-disabled", "xeno-alert",
+                          "build", "build-disabled", "build-alert"]},
 }
 
 # The highlighted checkbox state looks up its own mark collection; it reuses the plain one.

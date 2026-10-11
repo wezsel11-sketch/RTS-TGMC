@@ -111,6 +111,10 @@ engineer:
 		ForceTargetRelationships: None
 	AutoTargetPriority@DEFAULT:
 		ValidTargets: Structure
+	Production:
+		Produces: MarineBuild
+	GivesBuildableArea:
+		AreaTypes: marine-build
 	Tooltip:
 		Name: actor-engineer.name
 	Valued:
@@ -140,6 +144,7 @@ smartgunner:
 		Queue: Infantry
 		BuildAtProductionType: Infantry
 		BuildPaletteOrder: 40
+		Prerequisites: armory
 		Description: actor-smartgunner.description
 
 grenadier:
@@ -159,6 +164,7 @@ grenadier:
 		Queue: Infantry
 		BuildAtProductionType: Infantry
 		BuildPaletteOrder: 50
+		Prerequisites: ordnance-depot
 		Description: actor-grenadier.description
 
 ^Xeno:
@@ -215,6 +221,7 @@ hunter:
 	Buildable:
 		Queue: Xeno
 		BuildPaletteOrder: 20
+		Prerequisites: evolution-tower
 		Description: actor-hunter.description
 
 sentinel:
@@ -236,6 +243,7 @@ sentinel:
 	Buildable:
 		Queue: Xeno
 		BuildPaletteOrder: 30
+		Prerequisites: evolution-tower
 		Description: actor-sentinel.description
 
 drone:
@@ -256,6 +264,10 @@ drone:
 		ForceTargetRelationships: None
 	AutoTargetPriority@DEFAULT:
 		ValidTargets: Structure
+	Production:
+		Produces: XenoBuild
+	GivesBuildableArea:
+		AreaTypes: xeno-minor
 	Tooltip:
 		Name: actor-drone.name
 	Valued:
@@ -284,4 +296,34 @@ warrior:
 	Buildable:
 		Queue: Xeno
 		BuildPaletteOrder: 50
+		Prerequisites: maturity-tower
 		Description: actor-warrior.description
+
+queen:
+	Inherits: ^Xeno
+	Voiced:
+		VoiceSet: HunterVoice
+	Health:
+		HP: 300
+	Selectable:
+		Bounds: 1536, 1536, -768, -768
+	Mobile:
+		Speed: 40
+	Armament@PRIMARY:
+		Weapon: TGMCSlam
+	Production:
+		Produces: XenoBuild
+	GivesBuildableArea:
+		AreaTypes: xeno-minor, xeno-major
+	ProvidesPrerequisite:
+		Prerequisite: queen
+	Tooltip:
+		Name: actor-queen.name
+	Valued:
+		Cost: 400
+	Buildable:
+		Queue: Xeno
+		BuildPaletteOrder: 60
+		BuildLimit: 1
+		Prerequisites: resin-silo
+		Description: actor-queen.description

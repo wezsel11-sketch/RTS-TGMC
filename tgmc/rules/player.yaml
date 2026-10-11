@@ -30,6 +30,32 @@ Player:
 		LimitedAudio: BuildingInProgress
 		OnHoldAudio: OnHold
 		CancelledAudio: Cancelled
+	ClassicProductionQueue@MarineBuild:
+		Type: MarineBuild
+		Group: Build
+		BuildDurationModifier: 200
+		Factions: marines
+		DisplayOrder: 3
+		ReadyAudio: UnitReady
+		QueuedAudio: Training
+		BlockedAudio: NoBuild
+		LimitedAudio: BuildingInProgress
+		OnHoldAudio: OnHold
+		CancelledAudio: Cancelled
+	ClassicProductionQueue@XenoBuild:
+		Type: XenoBuild
+		Group: Build
+		BuildDurationModifier: 200
+		Factions: xenos
+		DisplayOrder: 3
+		ReadyAudio: UnitReady
+		QueuedAudio: Training
+		BlockedAudio: NoBuild
+		LimitedAudio: BuildingInProgress
+		OnHoldAudio: OnHold
+		CancelledAudio: Cancelled
+	PlaceBuilding:
+		CannotPlaceNotification: NoBuild
 	DeveloperMode:
 	TechTree:
 	ScriptTriggers:

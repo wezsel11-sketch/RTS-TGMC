@@ -35,9 +35,10 @@ end
 WorldLoaded = function()
 	local marines = Player.GetPlayer("Marines")
 	local xenos = Player.GetPlayer("Xenos")
-	local marineArmy = { "rifleman", "medic", "engineer" }
-	local xenoArmy = { "runner", "hunter", "sentinel", "drone" }
-	local structures = { "cryo-pod", "vendor", "sentry-turret", "resin-silo", "mini-silo", "resin-turret" }
+	local marineArmy = { "rifleman", "medic", "engineer", "smartgunner", "grenadier" }
+	local xenoArmy = { "runner", "hunter", "sentinel", "warrior", "drone" }
+	local structures = { "cryo-pod", "vendor", "sentry-turret", "resin-silo", "mini-silo", "resin-turret",
+		"miner", "armory", "ordnance-depot", "weed-node", "evolution-tower", "maturity-tower" }
 
 	local function finish(winner, ticks)
 		if reported then

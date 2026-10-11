@@ -1,4 +1,7 @@
-# Xeno structures. Sprites come from mod/build_sprites.py (resin-turret, resin-silo, mini-silo).
+# Structures. Sprites come from mod/build_sprites.py. Every structure is built from the sidebar's Build tab (the
+# MarineBuild and XenoBuild queues in player.yaml) and may only be placed within Adjacent cells of a builder unit that
+# gives the matching area type: engineers for marines, drones for minor xeno structures, the queen for any of them.
+# Maps pre-place the starting base. The skirmish AI has no builder to walk, so its cryo pod and silo give the area too.
 
 ^Structure:
 	Health:
@@ -40,8 +43,50 @@
 	Valued:
 		Cost: 200
 
+# Where a structure may be placed: within Adjacent cells of an actor with GivesBuildableArea of the same type.
+^MarineBuildable:
+	RequiresBuildableArea:
+		AreaTypes: marine-build
+		Adjacent: 5
+
+^XenoMinorBuildable:
+	RequiresBuildableArea:
+		AreaTypes: xeno-minor
+		Adjacent: 5
+
+^XenoMajorBuildable:
+	RequiresBuildableArea:
+		AreaTypes: xeno-major
+		Adjacent: 5
+
+# Walls: cheap, sturdy, not needed to win, and dragged out in a line (place one end, then the other).
+^Wall:
+	Inherits: ^Structure
+	Health:
+		HP: 350
+	-MustBeDestroyed:
+	-AppearsOnRadar:
+	-ProvidesPrerequisite@buildingname:
+	RevealsShroud:
+		Range: 3c0
+	LineBuild:
+		Range: 5
+		NodeTypes: wall
+	LineBuildNode:
+		Types: wall
+	Valued:
+		Cost: 20
+
+# ---------------------------------------------------------------- xeno
+
 resin-turret:
 	Inherits: ^Structure
+	Inherits@build: ^XenoMinorBuildable
+	Buildable:
+		Queue: XenoBuild
+		BuildPaletteOrder: 30
+		Prerequisites: evolution-tower
+		Description: actor-resin-turret.description
 	Voiced:
 		VoiceSet: XenoStructureVoice
 	Health:
@@ -67,6 +112,18 @@ resin-turret:
 
 resin-silo:
 	Inherits: ^Structure
+	Inherits@build: ^XenoMajorBuildable
+	Buildable:
+		Queue: XenoBuild
+		BuildPaletteOrder: 60
+		Prerequisites: queen
+		Description: actor-resin-silo.description
+	GrantConditionOnBotOwner@skirmish:
+		Condition: bot-owned
+		Bots: skirmish
+	GivesBuildableArea@bot:
+		RequiresCondition: bot-owned
+		AreaTypes: xeno-minor, xeno-major
 	Voiced:
 		VoiceSet: XenoStructureVoice
 	ProvidesRadar:
@@ -89,7 +146,7 @@ resin-silo:
 		Sequences: idle
 	CashTrickler:
 		Interval: 50
-		Amount: 15
+		Amount: 6
 	Exit@1:
 		SpawnOffset: 0,1024,0
 		ExitCell: 1,3
@@ -102,6 +159,12 @@ resin-silo:
 
 mini-silo:
 	Inherits: ^Structure
+	Inherits@build: ^XenoMajorBuildable
+	Buildable:
+		Queue: XenoBuild
+		BuildPaletteOrder: 40
+		Prerequisites: queen
+		Description: actor-mini-silo.description
 	Voiced:
 		VoiceSet: XenoStructureVoice
 	Building:
@@ -126,10 +189,215 @@ mini-silo:
 		Sequences: idle
 	CashTrickler:
 		Interval: 50
-		Amount: 5
+		Amount: 3
+
+weed-node:
+	Inherits: ^Structure
+	Inherits@build: ^XenoMinorBuildable
+	Buildable:
+		Queue: XenoBuild
+		BuildPaletteOrder: 10
+		BuildLimit: 6
+		Description: actor-weed-node.description
+	Voiced:
+		VoiceSet: XenoStructureVoice
+	Health:
+		HP: 250
+	Tooltip:
+		Name: actor-weed-node.name
+	Valued:
+		Cost: 120
+	WithIdleAnimation:
+		Sequences: idle
+	CashTrickler:
+		Interval: 50
+		Amount: 7
+
+resin-wall:
+	Inherits: ^Wall
+	Inherits@build: ^XenoMinorBuildable
+	Buildable:
+		Queue: XenoBuild
+		BuildPaletteOrder: 20
+		Description: actor-resin-wall.description
+	Voiced:
+		VoiceSet: XenoStructureVoice
+	Tooltip:
+		Name: actor-resin-wall.name
+
+evolution-tower:
+	Inherits: ^Structure
+	Inherits@build: ^XenoMajorBuildable
+	Buildable:
+		Queue: XenoBuild
+		BuildPaletteOrder: 50
+		BuildLimit: 1
+		Prerequisites: queen
+		Description: actor-evolution-tower.description
+	Voiced:
+		VoiceSet: XenoStructureVoice
+	Health:
+		HP: 500
+	Building:
+		Footprint: xx xx
+		Dimensions: 2, 2
+	Selectable:
+		Bounds: 1792, 1792, -896, -896
+	Tooltip:
+		Name: actor-evolution-tower.name
+	Valued:
+		Cost: 300
+
+maturity-tower:
+	Inherits: ^Structure
+	Inherits@build: ^XenoMajorBuildable
+	Buildable:
+		Queue: XenoBuild
+		BuildPaletteOrder: 70
+		BuildLimit: 1
+		Prerequisites: evolution-tower
+		Description: actor-maturity-tower.description
+	Voiced:
+		VoiceSet: XenoStructureVoice
+	Health:
+		HP: 600
+	Building:
+		Footprint: xx xx
+		Dimensions: 2, 2
+	Selectable:
+		Bounds: 1792, 1792, -896, -896
+	Tooltip:
+		Name: actor-maturity-tower.name
+	Valued:
+		Cost: 450
+
+# ---------------------------------------------------------------- marines
+
+miner:
+	Inherits: ^Structure
+	Inherits@build: ^MarineBuildable
+	Buildable:
+		Queue: MarineBuild
+		BuildPaletteOrder: 10
+		BuildLimit: 6
+		Description: actor-miner.description
+	AmbientSound:
+		SoundFiles: amb-hum.ogg
+	Health:
+		HP: 250
+	Tooltip:
+		Name: actor-miner.name
+	Valued:
+		Cost: 150
+	WithIdleAnimation:
+		Sequences: idle
+	CashTrickler:
+		Interval: 50
+		Amount: 8
+
+cade:
+	Inherits: ^Wall
+	Inherits@build: ^MarineBuildable
+	Buildable:
+		Queue: MarineBuild
+		BuildPaletteOrder: 20
+		Description: actor-cade.description
+	Tooltip:
+		Name: actor-cade.name
+
+vendor:
+	Inherits: ^Structure
+	Inherits@build: ^MarineBuildable
+	Buildable:
+		Queue: MarineBuild
+		BuildPaletteOrder: 30
+		Description: actor-vendor.description
+	AmbientSound:
+		SoundFiles: amb-hum.ogg
+	Building:
+		Footprint: x
+		Dimensions: 1, 1
+	Health:
+		HP: 200
+	Exit@1:
+		SpawnOffset: 0,512,0
+		ExitCell: 0,1
+	RallyPoint:
+		Path: 0, 4
+	Production:
+		Produces: Infantry
+	ProductionBar:
+		ProductionType: Infantry
+	CashTrickler:
+		Interval: 50
+		Amount: 6
+	Tooltip:
+		Name: actor-vendor.name
+	Valued:
+		Cost: 200
+
+cryo-pod:
+	Inherits: ^Structure
+	Inherits@build: ^MarineBuildable
+	Buildable:
+		Queue: MarineBuild
+		BuildPaletteOrder: 40
+		Description: actor-cryo-pod.description
+	GrantConditionOnBotOwner@skirmish:
+		Condition: bot-owned
+		Bots: skirmish
+	GivesBuildableArea@bot:
+		RequiresCondition: bot-owned
+		AreaTypes: marine-build
+	AmbientSound:
+		SoundFiles: amb-generator.ogg
+	ProvidesRadar:
+	Building:
+		Footprint: x x
+		Dimensions: 1, 2
+	Health:
+		HP: 250
+	WithIdleAnimation:
+		Sequences: active
+	Exit@1:
+		SpawnOffset: 0,512,0
+		ExitCell: 0,2
+	RallyPoint:
+		Path: 0, 5
+	Production:
+		Produces: Infantry
+	ProductionBar:
+		ProductionType: Infantry
+	Tooltip:
+		Name: actor-cryo-pod.name
+	Valued:
+		Cost: 300
+
+armory:
+	Inherits: ^Structure
+	Inherits@build: ^MarineBuildable
+	Buildable:
+		Queue: MarineBuild
+		BuildPaletteOrder: 50
+		BuildLimit: 1
+		Description: actor-armory.description
+	AmbientSound:
+		SoundFiles: amb-hum.ogg
+	Health:
+		HP: 400
+	Tooltip:
+		Name: actor-armory.name
+	Valued:
+		Cost: 300
 
 sentry-turret:
 	Inherits: ^Structure
+	Inherits@build: ^MarineBuildable
+	Buildable:
+		Queue: MarineBuild
+		BuildPaletteOrder: 60
+		Prerequisites: armory
+		Description: actor-sentry-turret.description
 	Health:
 		HP: 300
 	Building:
@@ -157,54 +425,20 @@ sentry-turret:
 	AutoTargetPriority@DEFAULT:
 		ValidTargets: Ground
 
-cryo-pod:
+ordnance-depot:
 	Inherits: ^Structure
-	AmbientSound:
-		SoundFiles: amb-generator.ogg
-	ProvidesRadar:
-	Building:
-		Footprint: x x
-		Dimensions: 1, 2
-	Health:
-		HP: 250
-	WithIdleAnimation:
-		Sequences: active
-	Exit@1:
-		SpawnOffset: 0,512,0
-		ExitCell: 0,2
-	RallyPoint:
-		Path: 0, 5
-	Production:
-		Produces: Infantry
-	ProductionBar:
-		ProductionType: Infantry
-	Tooltip:
-		Name: actor-cryo-pod.name
-	Valued:
-		Cost: 300
-
-vendor:
-	Inherits: ^Structure
+	Inherits@build: ^MarineBuildable
+	Buildable:
+		Queue: MarineBuild
+		BuildPaletteOrder: 70
+		BuildLimit: 1
+		Prerequisites: armory
+		Description: actor-ordnance-depot.description
 	AmbientSound:
 		SoundFiles: amb-hum.ogg
-	Building:
-		Footprint: x
-		Dimensions: 1, 1
 	Health:
-		HP: 200
-	Exit@1:
-		SpawnOffset: 0,512,0
-		ExitCell: 0,1
-	RallyPoint:
-		Path: 0, 4
-	Production:
-		Produces: Infantry
-	ProductionBar:
-		ProductionType: Infantry
-	CashTrickler:
-		Interval: 50
-		Amount: 15
+		HP: 450
 	Tooltip:
-		Name: actor-vendor.name
+		Name: actor-ordnance-depot.name
 	Valued:
-		Cost: 200
+		Cost: 400

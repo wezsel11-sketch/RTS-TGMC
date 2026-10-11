@@ -2,8 +2,8 @@
 
 An [OpenRA](https://github.com/OpenRA/OpenRA) mod that uses sprites and sounds from
 [Terra Gov Marine Corps (TGMC)](https://github.com/tgstation/terragov-marine-corps), the
-SS13-based game. It has marine infantry (rifleman, corpsman, engineer, smartgunner, grenadier), a few
-marine and xeno structures, and a TGMC-styled HUD. The xenos have a Runner, a Hunter, an acid-spitting Sentinel, a
+SS13-based game. It has marine infantry (rifleman, corpsman, engineer, smartgunner, grenadier), marine and xeno
+structures you build from a Build menu (supply generators, walls, tech), and a TGMC-styled HUD. The xenos have a Runner, a Hunter, an acid-spitting Sentinel, a
 structure-mending Drone and a heavy Warrior.
 
 **This repo holds scripts, YAML, and docs only.** No TGMC art or sound, no extracted or
@@ -39,7 +39,23 @@ the commits this mod was tested against (see the top of the script), so a later 
 - **Marines** start with a cryo pod, a vendor and a squad. Click the cryo pod and use the sidebar's *Infantry* tab to train riflemen,
   corpsmen (they heal), engineers (they repair), smartgunners (rapid spread fire) and grenadiers (splash). **Xenos** start with a resin silo and mini silos; use the *Xeno* tab for Runner,
   Hunter, Sentinel (spits acid), Drone (mends structures) and Warrior (wide melee slam).
-- **Cash** is a starting sum plus a trickle from the vendor and the silos. There is no harvesting.
+- **Building.** Both factions have a **Build** tab (the third button beside the production palette). Click a structure to queue
+  it; when its clock finishes, click its icon again and place it on the map. You can only place within 5 cells of a *builder*,
+  so send one to the site first (its build range is shown while you place):
+  - **Marines**: an **Engineer** builds everything.
+  - **Xenos**: a **Drone** builds minor structures (Weed Node, Resin Wall, Resin Turret); the **Queen** builds those and the big
+    ones too (Evolution and Maturity Towers, Silos). Train the Queen from a Resin Silo (one at a time); a match starts with one.
+    The Build tab is gone while you have no builder, so keep a spare. Walls are dragged: place one end, then the other.
+- **Tech.** Better units need a structure first:
+
+  | Marines | Needs | Xenos | Needs |
+  | --- | --- | --- | --- |
+  | Smartgunner, Sentry Turret | Armory | Hunter, Sentinel, Resin Turret | Evolution Tower |
+  | Grenadier | Ordnance Depot (needs an Armory) | Warrior | Maturity Tower (needs an Evolution Tower) |
+  | Rifleman, Corpsman, Engineer | nothing | Runner, Drone | nothing |
+
+- **Supplies.** The vendor and silos now give only a small trickle. The real income is the **Miner** (marines) and the
+  **Weed Node** (xenos), up to six of each. **Cade** (marines) and **Resin Wall** (xenos) are the cheap walls.
 - **Controls** are OpenRA's: left-click or drag to select, right-click to move or attack, `A` then click to attack-move,
   `S` to stop, `Ctrl`+number to group, and right-click a production building to set where new units gather (rally point).
   The game speed option "fastest" is the one the balance tests ran at.
@@ -70,8 +86,10 @@ The converters read these TGMC files:
   whose legs would hide them), `helmet` from `marine_helmets.dmi`, and the held weapon from `icons/mob/inhands/guns/`
   (`t18_w` rifle, `m44` pistol, `t19_w` SMG). The corpsman and engineer use the `marine_medic` / `marine_engineer`
   uniform states under the same kit. The `m_` jungle set is darker and hid the marines against the terrain.
-- Structures: `icons/Xeno/acid_turret.dmi`, `resin_silo.dmi`, `resin_pod.dmi`, and
-  `icons/obj/machines/` (`sentry/sentry.dmi`, `cryogenics2.dmi`, `vending.dmi`).
+- Structures: `icons/Xeno/acid_turret.dmi`, `resin_silo.dmi`, `resin_pod.dmi`, `weeds.dmi` (Weed Node), `2x2building.dmi` (Evolution
+  and Maturity Towers), `icons/obj/smooth_objects/resin-wall.dmi`, and `icons/obj/` (`mining_drill.dmi` for the Miner,
+  `structures/barricades/metal.dmi` for the Cade, `machines/` `sentry/sentry.dmi`, `cryogenics2.dmi`, `vending.dmi` for the Vendor, Armory
+  and Ordnance Depot). The Queen is `icons/Xeno/castes/queen.dmi`.
 - About 150 sound clips (weapons, voices, announcer, music, ambience; about 200 with the full music set), listed in `SOUNDS` in `mod/build_sounds.py`.
 
 The exact list is `python3 mod/tgmc_paths.py`; `setup.sh` checks out only those files.
@@ -141,7 +159,7 @@ six timed waves of Runners, Hunters and Sentinels coming from the east, and win 
 `mod/scenarios/wave-survival.lua`; its `Config` table at the top sets the spawn cells, wave sizes and delays.
 **Landing Zone** (40x28) is a skirmish map: marines in the west with a cryo pod
 and vendor, xenos in the east with a resin silo. Pick a faction in the lobby and build units from the
-sidebar palette. Cash comes from a starting amount plus a trickle from the vendor and the silos.
+sidebar palette. Cash comes from a starting amount, a small trickle from the vendor and the silos, and the Miners and Weed Nodes you build.
 The **test field** is a 24x24 map with three marines and three Runners at facings
 north, east, and south, plus a corpsman, an engineer, and one of each structure. The main menu
 opens, but the test field is the quickest way in: launch it with `Launch.Map`.
@@ -231,8 +249,16 @@ The effect sprites are TGMC art too (`fx-*` images in `build_sprites.py`) and ar
 - The HUD is a command sidebar (radar, production palette with an Infantry and a Xeno tab, requisition, menu button); it reads the same for either faction. There is no selection readout, as that would need C#.
   Production icons are the units' front-facing sprite. The clock overlay and the production tab icons are
   placeholders drawn by the scripts. Production buildings have no rally point yet.
-- The AI (`rules/ai.yaml`) only trains units and sends them out in squads. It doesn't build structures.
+- The AI (`rules/ai.yaml`) trains units, sends them out in squads, and builds generators, tech and turrets with OpenRA's base-builder
+  module (never walls). It has no builder to walk, so for the bot only, its cryo pod or silo counts as the build area.
   Pick "Skirmish AI" for a slot in the lobby.
+- The building system (Build tab, builder-range placement, tech gating, generators, walls) was checked headless: lint and
+  `--check-yaml` pass; `scenario-build` checks that the tech buildings unlock only once built and that a Miner and a Weed Node add income;
+  on Landing Zone (marine seat, driven with synthetic mouse clicks) the Build tab lists the structures with locked ones dimmed, a Miner and a Cade
+  built and placed next to the Engineer, and a placement 10 cells from every builder was refused. In AI-vs-AI both bots build generators,
+  tech and turrets (4 to 8 structures for the marines, 5 to 10 for the xenos by minute five); the marines still win (2 of 2 finished runs),
+  so the xenos need more help. Not yet seen in play: the xeno Build tab (Drone and Queen ranges), dragging a wall line, and any tuning of
+  the new income numbers (Miner +8 and Weed Node +7 every 2 s, base trickle 6, mini silo 3).
 - The path menu -> Singleplayer -> Skirmish -> lobby (add a Skirmish AI, Start Game) was walked headless and works.
   `tgmc/chrome/mainmenu.yaml` is OpenRA's main menu in TGUI-style windows, without the news feed, update notice and player profile; `ingame-menu.yaml` does the same for the Esc menu.
 - Verified by running the mod headless (OpenRA bleed, `mod/check_mod.sh` and `mod/smoke.sh`): the lint passes with
@@ -251,7 +277,8 @@ The effect sprites are TGMC art too (`fx-*` images in `build_sprites.py`) and ar
 - Tuning so far: the marine queue takes cost x 60% x 350% ticks (a rifleman is about 8 s) and the xeno queue x 250% (a Runner is about 3 s). Marines have
   120 HP and rifles do 14 every 15 ticks at 6 cells; Runners have 100 HP, run at speed 115 and claws do 20 every 14 ticks;
   Hunters 130 HP; sentries do 10; the corpsman heals 20 every 60 ticks.
-  Income is 15 cash every 2 s from the vendor and silo and 5 from a mini silo. None of this has had real play time.
+  Base income is 6 cash every 2 s from the vendor and silo and 3 from a mini silo (it was 15 and 5 before the Build tab); a Miner gives 8 and a Weed Node 7.
+  None of this has had real play time.
 - `mod/setup.sh` was run from an empty directory on a fresh clone (it installed .NET, built OpenRA, made the sparse TGMC clone, built
   and linted the mod in about two minutes on a fast connection); a second run skipped the finished steps, and the scenarios, the smoke test
   and `play.sh hold-the-line` all ran afterwards. Only Linux x64 has been tried. macOS and WSL are untested.

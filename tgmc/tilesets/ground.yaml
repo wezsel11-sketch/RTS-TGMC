@@ -3,7 +3,7 @@ General:
 	Id: TGMC
 	TileSize: 32, 32
 	SheetSize: 512
-	EditorTemplateOrder: Terrain, Road, Water
+	EditorTemplateOrder: Terrain, Road, Water, Blocked
 	HeightDebugColors: AA0000
 
 # Colours are the radar's view of each terrain; they match the averages build_tileset.py reports.
@@ -24,6 +24,19 @@ Terrain:
 		Type: Water
 		TargetTypes: Water
 		Color: 4D86B8
+	# Nothing walks on these: they are not in the foot locomotor's TerrainSpeeds (rules/world.yaml).
+	TerrainType@Rock:
+		Type: Rock
+		TargetTypes: Ground
+		Color: 3E352D
+	TerrainType@Wall:
+		Type: Wall
+		TargetTypes: Ground
+		Color: 8A9298
+	TerrainType@Brush:
+		Type: Brush
+		TargetTypes: Ground
+		Color: 22381F
 
 Templates:
 	Template@1:
@@ -58,3 +71,67 @@ Templates:
 		Categories: Road
 		Tiles:
 			0: Road
+	Template@5:
+		Id: 5
+		Images: rock1.png
+		Size: 1,1
+		PickAny: True
+		Categories: Blocked
+		Tiles:
+			0: Rock
+	Template@6:
+		Id: 6
+		Images: wall.png
+		Size: 1,1
+		PickAny: True
+		Categories: Blocked
+		Tiles:
+			0: Wall
+	Template@7:
+		Id: 7
+		Images: brush.png
+		Size: 1,1
+		PickAny: True
+		Categories: Blocked
+		Tiles:
+			0: Brush
+	Template@8:
+		Id: 8
+		Images: floor.png
+		Size: 1,1
+		PickAny: True
+		Categories: Road
+		Tiles:
+			0: Road
+	Template@9:
+		Id: 9
+		Images: cavedirt.png
+		Size: 1,1
+		PickAny: True
+		Categories: Terrain
+		Tiles:
+			0: Clear
+	Template@10:
+		Id: 10
+		Images: rock2.png
+		Size: 1,1
+		PickAny: True
+		Categories: Blocked
+		Tiles:
+			0: Rock
+	Template@11:
+		Id: 11
+		Images: plating.png
+		Size: 1,1
+		PickAny: True
+		Categories: Road
+		Tiles:
+			0: Road
+	Template@12:
+		Id: 12
+		Images: grass2.png
+		Size: 1,1
+		PickAny: True
+		Categories: Terrain
+		Tiles:
+			0: Clear

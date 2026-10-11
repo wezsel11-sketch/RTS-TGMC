@@ -120,6 +120,31 @@
 		TargetTypes: Heal
 	Targetable@HUMAN:
 		TargetTypes: Human
+	# Abilities that act on marines. A stun (Runner pounce) holds one in place for a moment, and a screech (Queen) slows and
+	# weakens every marine in an area. Both come from outside: a weapon's warhead, or the Queen's support power.
+	ExternalCondition@STUN:
+		Condition: stunned
+	ExternalCondition@SCREECH:
+		Condition: screeched
+	Mobile:
+		PauseOnCondition: stunned
+	Armament@PRIMARY:
+		PauseOnCondition: stunned
+	SpeedMultiplier@SCREECH:
+		Modifier: 40
+		RequiresCondition: screeched
+	ReloadDelayMultiplier@SCREECH:
+		Modifier: 200
+		RequiresCondition: screeched
+	WithColoredOverlay@STUN:
+		Color: 6fe0ff70
+		RequiresCondition: stunned
+	WithColoredOverlay@SCREECH:
+		Color: b455ff60
+		RequiresCondition: screeched
+	# Marines spot a stealthed xeno only up close
+	DetectCloaked:
+		Range: 2c0
 	GrantConditionOnDamageState@DAMAGED:
 		Condition: damaged
 		ValidDamageStates: Light, Medium, Heavy, Critical
@@ -305,6 +330,25 @@ grenadier:
 
 runner:
 	Inherits: ^Xeno
+	# Pounce: press the deploy key (F by default) for three seconds of sprinting, with claws that hit harder and stun.
+	# The ExternalCondition lets a map script start a pounce too (actor.GrantCondition("pouncing", ticks)).
+	ExternalCondition@POUNCE:
+		Condition: pouncing
+	GrantChargedConditionOnToggle@POUNCE:
+		ActivatedCondition: pouncing
+		ChargeDuration: 500
+		ConditionDuration: 75
+		Voice: Attack
+		DeactivatedColor: 8a5a2a
+		ActivatedColor: ffb030
+	SpeedMultiplier@POUNCE:
+		Modifier: 230
+		RequiresCondition: pouncing
+	Armament@PRIMARY:
+		RequiresCondition: !pouncing
+	Armament@POUNCE:
+		Weapon: TGMCPounce
+		RequiresCondition: pouncing
 	WithIdleOverlay@TEAM:
 		Sequence: ring-64
 	Voiced:
@@ -326,6 +370,25 @@ runner:
 
 hunter:
 	Inherits: ^Xeno
+	# Stealth: press the deploy key (F by default) to vanish for eight seconds. A hit or an attack gives the Hunter away,
+	# and turrets and nearby marines can see it. A map script can start it too (actor.GrantCondition("stealth", ticks)).
+	ExternalCondition@STEALTH:
+		Condition: stealth
+	GrantChargedConditionOnToggle@STEALTH:
+		ActivatedCondition: stealth
+		ChargeDuration: 750
+		ConditionDuration: 200
+		CanCancelCondition: true
+		Voice: Attack
+		DeactivatedColor: 4a5a6a
+		ActivatedColor: 7fb0d0
+	Cloak@STEALTH:
+		RequiresCondition: stealth
+		InitialDelay: 0
+		CloakDelay: 10
+		UncloakOn: Attack, Damage
+		CloakStyle: Alpha
+		CloakedAlpha: 0.3
 	WithIdleOverlay@TEAM:
 		Sequence: ring-48
 	Voiced:
@@ -429,6 +492,23 @@ warrior:
 
 queen:
 	Inherits: ^Xeno
+	# Screech: a support power while the Queen lives. Every marine within five cells of the target is slowed and shoots
+	# half as fast for seven seconds.
+	GrantExternalConditionPower@SCREECH:
+		OrderName: QueenScreech
+		Name: support-queen-screech.name
+		Description: support-queen-screech.description
+		Icon: screech
+		Sequence: stand
+		ChargeInterval: 2500
+		Condition: screeched
+		Duration: 175
+		Dimensions: 11, 11
+		Footprint: xxxxxxxxxxx xxxxxxxxxxx xxxxxxxxxxx xxxxxxxxxxx xxxxxxxxxxx xxxxxxxxxxx xxxxxxxxxxx xxxxxxxxxxx xxxxxxxxxxx xxxxxxxxxxx xxxxxxxxxxx
+		ValidRelationships: Enemy
+		OnFireSound: xeno-roar-1.ogg
+		SelectTargetSpeechNotification: SelectTarget
+		EndChargeSpeechNotification: AbilityReady
 	WithIdleOverlay@TEAM:
 		Sequence: ring-64
 	Voiced:

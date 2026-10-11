@@ -1,19 +1,55 @@
-# Skirmish AI. One bot drives either faction: it only builds what its queues offer, so a marine
-# bot trains marines and a xeno bot trains xenos. The map places the starting base; the bot
-# then builds generators, tech and turrets, trains units and sends them out in squads. Pattern: OpenRA mods/ra/rules/ai.yaml.
-# Xenos are cheap and fast, so the xeno bot gathers a bigger group before it attacks.
+# Skirmish AI, in three strengths: Easy, Normal (the "Skirmish AI" in the lobby) and Hard. One bot drives either faction: it only
+# builds what its queues offer, so a marine bot trains marines and a xeno bot trains xenos. The map places the starting base;
+# the bot then builds generators, tech and turrets, trains units and sends them out in squads. Pattern: OpenRA mods/ra/rules/ai.yaml.
+#
+# The three differ in how soon they attack and how much cash they hold back:
+#   Easy    waits about two minutes before its first attack, sends big groups, and only trains with plenty in the bank
+#   Normal  the strength the balance runs were tuned on
+#   Hard    attacks in small, frequent waves, trains whenever it can, and leans on the stronger units
+# Xenos are cheap and fast, so each xeno bot gathers a bigger group than the marine bot of the same strength. (A squad's size
+# is SquadSize plus a random 0 to SquadSizeRandomBonus - 1 units, not a percentage.)
 Player:
+	ModularBot@EasyAI:
+		Name: bot-easy-ai.name
+		Type: easy
 	ModularBot@SkirmishAI:
 		Name: bot-skirmish-ai.name
 		Type: skirmish
-	GrantConditionOnBotOwner@skirmish:
+	ModularBot@HardAI:
+		Name: bot-hard-ai.name
+		Type: hard
+	GrantConditionOnBotOwner@all:
 		Condition: enable-skirmish-ai
+		Bots: easy, skirmish, hard
+	GrantConditionOnBotOwner@easy:
+		Condition: ai-easy
+		Bots: easy
+	GrantConditionOnBotOwner@normal:
+		Condition: ai-normal
 		Bots: skirmish
+	GrantConditionOnBotOwner@hard:
+		Condition: ai-hard
+		Bots: hard
 	GrantConditionOnFaction@xenos:
 		Condition: faction-xenos
 		Factions: xenos
-	UnitBuilderBotModule@skirmish:
-		RequiresCondition: enable-skirmish-ai
+	UnitBuilderBotModule@easy:
+		RequiresCondition: ai-easy
+		UnitQueues: Infantry, Xeno
+		ProductionMinCashRequirement: 160
+		UnitsToBuild:
+			rifleman: 80
+			medic: 10
+			engineer: 10
+			smartgunner: 15
+			grenadier: 10
+			runner: 70
+			hunter: 20
+			sentinel: 20
+			warrior: 8
+			queen: 10
+	UnitBuilderBotModule@normal:
+		RequiresCondition: ai-normal
 		UnitQueues: Infantry, Xeno
 		ProductionMinCashRequirement: 60
 		UnitsToBuild:
@@ -26,6 +62,21 @@ Player:
 			hunter: 30
 			sentinel: 30
 			warrior: 15
+			queen: 10
+	UnitBuilderBotModule@hard:
+		RequiresCondition: ai-hard
+		UnitQueues: Infantry, Xeno
+		ProductionMinCashRequirement: 30
+		UnitsToBuild:
+			rifleman: 55
+			medic: 20
+			engineer: 15
+			smartgunner: 35
+			grenadier: 25
+			runner: 40
+			hunter: 40
+			sentinel: 35
+			warrior: 25
 			queen: 10
 	# The bot has no builder to walk around, so its cryo pod and silo give it the build area (structures.yaml) and it
 	# places each finished structure in a ring around them. It never builds walls. The refinery counts are zeroed
@@ -69,17 +120,70 @@ Player:
 			ordnance-depot: 6000
 			evolution-tower: 3000
 			maturity-tower: 6000
-	SquadManagerBotModule@marines:
-		RequiresCondition: enable-skirmish-ai && !faction-xenos
+	SquadManagerBotModule@easy-marines:
+		RequiresCondition: ai-easy && !faction-xenos
+		SquadSize: 12
+		SquadSizeRandomBonus: 8
+		AttackForceInterval: 150
+		MinimumAttackForceDelay: 3000
+		ExcludeFromSquadsTypes: medic, engineer, drone, queen
+		ConstructionYardTypes: cryo-pod, resin-silo
+		ProtectionTypes: cryo-pod, vendor, resin-silo, mini-silo, sentry-turret, resin-turret, miner, weed-node, armory, ordnance-depot, evolution-tower, maturity-tower
+	SquadManagerBotModule@easy-xenos:
+		RequiresCondition: ai-easy && faction-xenos
+		SquadSize: 20
+		SquadSizeRandomBonus: 8
+		AttackForceInterval: 150
+		MinimumAttackForceDelay: 3000
+		ExcludeFromSquadsTypes: medic, engineer, drone, queen
+		ConstructionYardTypes: cryo-pod, resin-silo
+		ProtectionTypes: cryo-pod, vendor, resin-silo, mini-silo, sentry-turret, resin-turret, miner, weed-node, armory, ordnance-depot, evolution-tower, maturity-tower
+	SquadManagerBotModule@normal-marines:
+		RequiresCondition: ai-normal && !faction-xenos
 		SquadSize: 8
 		SquadSizeRandomBonus: 20
+		AttackForceInterval: 75
+		MinimumAttackForceDelay: 0
 		ExcludeFromSquadsTypes: medic, engineer, drone, queen
 		ConstructionYardTypes: cryo-pod, resin-silo
 		ProtectionTypes: cryo-pod, vendor, resin-silo, mini-silo, sentry-turret, resin-turret, miner, weed-node, armory, ordnance-depot, evolution-tower, maturity-tower
-	SquadManagerBotModule@xenos:
-		RequiresCondition: enable-skirmish-ai && faction-xenos
+	SquadManagerBotModule@normal-xenos:
+		RequiresCondition: ai-normal && faction-xenos
 		SquadSize: 14
 		SquadSizeRandomBonus: 20
+		AttackForceInterval: 75
+		MinimumAttackForceDelay: 0
 		ExcludeFromSquadsTypes: medic, engineer, drone, queen
 		ConstructionYardTypes: cryo-pod, resin-silo
 		ProtectionTypes: cryo-pod, vendor, resin-silo, mini-silo, sentry-turret, resin-turret, miner, weed-node, armory, ordnance-depot, evolution-tower, maturity-tower
+	SquadManagerBotModule@hard-marines:
+		RequiresCondition: ai-hard && !faction-xenos
+		SquadSize: 5
+		SquadSizeRandomBonus: 5
+		AttackForceInterval: 50
+		MinimumAttackForceDelay: 0
+		ExcludeFromSquadsTypes: medic, engineer, drone, queen
+		ConstructionYardTypes: cryo-pod, resin-silo
+		ProtectionTypes: cryo-pod, vendor, resin-silo, mini-silo, sentry-turret, resin-turret, miner, weed-node, armory, ordnance-depot, evolution-tower, maturity-tower
+	SquadManagerBotModule@hard-xenos:
+		RequiresCondition: ai-hard && faction-xenos
+		SquadSize: 7
+		SquadSizeRandomBonus: 5
+		AttackForceInterval: 50
+		MinimumAttackForceDelay: 0
+		ExcludeFromSquadsTypes: medic, engineer, drone, queen
+		ConstructionYardTypes: cryo-pod, resin-silo
+		ProtectionTypes: cryo-pod, vendor, resin-silo, mini-silo, sentry-turret, resin-turret, miner, weed-node, armory, ordnance-depot, evolution-tower, maturity-tower
+	# The Queen's Screech: the xeno bot fires it when at least three marines are bunched within five cells
+	SupportPowerBotModule@screech:
+		RequiresCondition: enable-skirmish-ai && faction-xenos
+		Decisions:
+			screech:
+				OrderName: QueenScreech
+				MinimumAttractiveness: 3
+				Consideration@1:
+					Against: Enemy
+					Types: Human
+					Attractiveness: 1
+					TargetMetric: None
+					CheckRadius: 5c0

@@ -40,3 +40,5 @@ Speech:
 		BaseAttack: siren
 		WaveIncoming: ares-code-red
 		WaveDistress: ares-distress
+		SelectTarget: ui-click
+		AbilityReady: ui-ping

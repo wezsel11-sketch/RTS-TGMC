@@ -94,3 +94,23 @@ rubble:
 		Filename: rubble-96x96.png
 		Start: 0
 		ZOffset: -1023
+
+# Support power icons (62x46) and the Flare's light. Both sheets are drawn by mod/make_placeholders.py.
+icon:
+	Defaults:
+		Filename: icon.png
+	screech:
+		Start: 0
+	flare:
+		Start: 1
+flare:
+	idle:
+		Filename: flare.png
+		Length: 4
+		Tick: 90
+		ZOffset: 2048
+overlay:
+	target-select:
+		Filename: overlay.png
+		Start: 0
+		ZOffset: 1000

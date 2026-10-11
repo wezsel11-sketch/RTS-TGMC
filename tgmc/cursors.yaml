@@ -64,3 +64,7 @@ Cursors:
 			Start: 15
 			X: 16
 			Y: 16
+		generic-blocked:
+			Start: 16
+			X: 16
+			Y: 16

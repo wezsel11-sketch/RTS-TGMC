@@ -65,7 +65,7 @@ Container@PLAYER_WIDGETS:
 					X: 4
 					Y: 214
 					Width: 232
-					Height: PARENT_HEIGHT - 322
+					Height: PARENT_HEIGHT - 376
 					Children:
 						LogicTicker@PRODUCTION_TICKER:
 						ProductionPalette@PRODUCTION_PALETTE:
@@ -119,6 +119,24 @@ Container@PLAYER_WIDGETS:
 											X: 6
 											Y: 6
 											ImageCollection: production-icons
+				# Support powers (the Queen's Screech, the marines' Flare): one icon each, ready when the clock has run out
+				Container@SUPPORT_POWERS:
+					Logic: SupportPowerBinLogic
+					X: 4
+					Y: PARENT_HEIGHT - 158
+					Width: 232
+					Height: 46
+					Children:
+						SupportPowers@SUPPORT_PALETTE:
+							X: 2
+							IconSize: 62, 46
+							IconMargin: 2
+							Horizontal: true
+							TooltipContainer: TOOLTIP_CONTAINER
+							ReadyText: supportpowers-support-powers-palette.ready
+							HoldText: supportpowers-support-powers-palette.hold
+							HotkeyPrefix: SupportPower
+							HotkeyCount: 3
 				Background@READOUT_PANEL:
 					X: 8
 					Y: PARENT_HEIGHT - 98

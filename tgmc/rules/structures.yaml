@@ -403,6 +403,20 @@ cryo-pod:
 	Inherits: ^Structure
 	WithIdleOverlay@TEAM:
 		Sequence: plate-32x64
+	# Flare: a support power (needs an Armory) that lights up a wide patch of the map for twelve seconds.
+	SpawnActorPower@FLARE:
+		Name: support-flare.name
+		Description: support-flare.description
+		Icon: flare
+		Prerequisites: armory
+		ChargeInterval: 1250
+		Actor: flare
+		LifeTime: 300
+		EffectImage: fx-impact
+		EffectSequence: burst
+		EffectPalette: effect
+		SelectTargetSpeechNotification: SelectTarget
+		EndChargeSpeechNotification: AbilityReady
 	FireWarheadsOnDeath:
 		Weapon: TGMCBlastSmall
 		EmptyWeapon: TGMCBlastSmall
@@ -494,6 +508,8 @@ sentry-turret:
 		InitialStance: AttackAnything
 	AutoTargetPriority@DEFAULT:
 		ValidTargets: Ground
+	DetectCloaked:
+		Range: 5c0
 
 ordnance-depot:
 	Inherits: ^Structure
@@ -543,3 +559,20 @@ rubble-large:
 	Inherits: ^Rubble
 	WithSpriteBody:
 		Sequence: large
+
+# The light a Flare leaves on the ground: it reveals the fog round it for the marines that fired it, until the power removes it.
+flare:
+	Interactable:
+	Immobile:
+		OccupiesSpace: false
+	RenderSprites:
+		Palette: effect
+	BodyOrientation:
+		QuantizedFacings: 1
+	WithSpriteBody:
+		Sequence: idle
+	RevealsShroud:
+		Range: 13c0
+		Type: CenterPosition
+	HiddenUnderFog:
+		Type: CenterPosition

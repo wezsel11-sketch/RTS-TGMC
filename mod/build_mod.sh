@@ -24,6 +24,7 @@ cp -R "$ROOT/tgmc/." "$OUT/"
 "$PY" -I "$HERE/build_tileset.py" --tgmc "$TGMC" --out "$OUT"
 "$PY" -I "$HERE/make_placeholders.py" --out "$OUT"
 "$PY" -I "$HERE/make_chrome.py" --out "$OUT"
+"$PY" -I "$HERE/build_map.py" --tgmc "$TGMC" --out "$OUT"
 
 if [ -n "${OPENRA_DIR:-}" ]; then
 	mkdir -p "$OPENRA_DIR/mods"

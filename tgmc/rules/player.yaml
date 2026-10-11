@@ -54,6 +54,7 @@ Player:
 		LimitedAudio: BuildingInProgress
 		OnHoldAudio: OnHold
 		CancelledAudio: Cancelled
+	SupportPowerManager:
 	PlaceBuilding:
 		CannotPlaceNotification: NoBuild
 	DeveloperMode:

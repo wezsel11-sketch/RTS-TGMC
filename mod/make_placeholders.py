@@ -8,6 +8,7 @@ Nothing here is TGMC art. It writes:
   rank-pips.png                      one, two and three amber chevrons under a promoted unit
   team-ring-N.png, team-plate-WxH.png indexed sprites in the player-colour range: a ring under each unit, a plate on each structure
   fx-fire.png, rubble-WxH.png        flames over a nearly dead structure, and the heap it leaves behind
+  icon.png, flare.png, overlay.png   support power icons, the light a Flare leaves, and the aiming tint
   wounds.png                         blood splotches drawn over a hurt marine: frame 0 for half health, 1 for a quarter, 2 for critical
   clock.png                     production-icon clock overlay frames (62x46, a dark wedge that sweeps away)
   maps/test-field/map.{yaml,bin,png}   a 24x24 map with marines, runners, and one of each structure
@@ -119,7 +120,7 @@ CURSORS = [
     ("default", 0, 0), ("move", 16, 16), ("move-blocked", 16, 16), ("attackmove", 16, 16), ("attackmove-blocked", 16, 16),
     ("assaultmove", 16, 16), ("assaultmove-blocked", 16, 16), ("attack", 16, 16), ("attackoutsiderange", 16, 16),
     ("heal", 16, 16), ("heal-blocked", 16, 16), ("repair", 16, 16), ("repair-blocked", 16, 16), ("ability", 16, 16),
-    ("deploy", 16, 16), ("deploy-blocked", 16, 16),
+    ("deploy", 16, 16), ("deploy-blocked", 16, 16), ("generic-blocked", 16, 16),
 ]
 GREEN, RED, AMBER, GREY, BLUE, WHITE = (88, 214, 96), (232, 64, 56), (255, 190, 48), (150, 150, 150), (90, 170, 255), (240, 240, 240)
 
@@ -167,6 +168,8 @@ def _cursor_cell(name):
         line([(8, 24), (20, 12)], col, 4); ring(5, col, 2, 22, 10)
     elif name == "ability":
         ring(10, BLUE); line([(16, 6), (16, 26)], BLUE); line([(6, 16), (26, 16)], BLUE); ring(3, WHITE, 1)
+    elif name == "generic-blocked":
+        ring(10, GREY); slash()
     elif name.startswith("deploy"):
         col = BLUE if name == "deploy" else GREY
         ring(10, col); line([(16, 8), (16, 23)], col, 3); line([(10, 17), (16, 24), (22, 17)], col, 3)
@@ -304,6 +307,59 @@ def write_ruin_art(out):
         save(img, f"rubble-{w}x{h}.png", 1)
 
 
+def write_ability_art(out):
+    """`icon.png`: the 62x46 icons of the support powers (Screech, Flare). `flare.png`: four 48x48 frames of the light a
+    Flare leaves on the ground. Drawn here, no TGMC art."""
+    icons = Image.new("RGBA", (62 * 2, 46), (0, 0, 0, 0))
+    for i in range(2):
+        cell = Image.new("RGBA", (62, 46), (22, 28, 24, 255))
+        d = ImageDraw.Draw(cell)
+        d.rectangle([0, 0, 61, 45], outline=(88, 100, 70, 255))
+        if i == 0:  # Screech: a mouth of sound waves
+            for r, a in ((6, 255), (12, 200), (18, 140), (24, 90)):
+                d.arc([31 - r, 23 - r, 31 + r, 23 + r], 300, 60, fill=(190, 90, 255, a), width=3)
+                d.arc([31 - r, 23 - r, 31 + r, 23 + r], 120, 240, fill=(190, 90, 255, a), width=3)
+            d.ellipse([27, 19, 35, 27], fill=(235, 200, 255, 255))
+        else:  # Flare: a bright star with a trail
+            d.line([(14, 40), (31, 23)], fill=(150, 80, 20, 255), width=3)
+            for ang in range(0, 360, 45):
+                dx, dy = math.cos(math.radians(ang)), math.sin(math.radians(ang))
+                length = 17 if ang % 90 == 0 else 11
+                d.line([(33, 21), (33 + dx * length, 21 + dy * length)], fill=(255, 205, 80, 255), width=2)
+            d.ellipse([27, 15, 39, 27], fill=(255, 245, 190, 255))
+        icons.paste(cell, (62 * i, 0))
+    meta = PngImagePlugin.PngInfo()
+    meta.add_text("FrameSize", "62,46")
+    meta.add_text("FrameAmount", "2")
+    icons.save(os.path.join(out, "icon.png"), pnginfo=meta)
+
+    # The tint a support power puts on each cell it will affect while you aim it
+    cell = Image.new("RGBA", (32, 32), (180, 90, 255, 60))
+    ImageDraw.Draw(cell).rectangle([0, 0, 31, 31], outline=(210, 140, 255, 150))
+    meta = PngImagePlugin.PngInfo()
+    meta.add_text("FrameSize", "32,32")
+    meta.add_text("FrameAmount", "1")
+    cell.save(os.path.join(out, "overlay.png"), pnginfo=meta)
+
+    size = 48
+    flare = Image.new("RGBA", (size * 4, size), (0, 0, 0, 0))
+    for i in range(4):
+        glow = Image.new("RGBA", (size, size), (0, 0, 0, 0))
+        px = glow.load()
+        radius = 21 - (i % 2) * 2
+        for y in range(size):
+            for x in range(size):
+                dist = math.hypot(x - size / 2, y - size / 2)
+                if dist < radius:
+                    t = 1 - dist / radius
+                    px[x, y] = (255, int(150 + 100 * t), int(40 + 140 * t * t), int(190 * t + 40))
+        flare.paste(glow, (size * i, 0))
+    meta = PngImagePlugin.PngInfo()
+    meta.add_text("FrameSize", f"{size},{size}")
+    meta.add_text("FrameAmount", "4")
+    flare.save(os.path.join(out, "flare.png"), pnginfo=meta)
+
+
 def write_wounds(out):
     """Three 32x32 frames of blood on a marine's torso, arm and leg. Each frame has the last one's marks plus more, so
     the overlay for a worse state replaces the milder one. Drawn once, for the front view, whichever way the marine faces."""
@@ -412,6 +468,15 @@ SCENARIOS = {
         ("armory", "Marines", 10, 10, 0),
         ("rifleman", "Marines", 3, 3, 512),
     ]),
+    # Pounce, stealth, screech and flare, each against a control (see scenarios/test-abilities.lua)
+    "scenario-abilities": {"scripts": ("test-abilities",), "size": (40, 30), "actors": [
+        ("runner", "Xenos", 3, 3, 256), ("rifleman", "Marines", 8, 3, 768),
+        ("rifleman", "Marines", 30, 14, 768),
+        ("hunter", "Xenos", 16, 3, 256), ("rifleman", "Marines", 22, 3, 768),
+        ("hunter", "Xenos", 16, 9, 256), ("rifleman", "Marines", 22, 9, 768),
+        ("rifleman", "Marines", 3, 17, 256), ("rifleman", "Marines", 3, 20, 256),
+        ("resin-silo", "Xenos", 34, 25, 0),
+    ]},
     "scenario-combat": _scenario("test-combat", [
         ("rifleman", "Marines", 10, 10, 512),
         ("runner", "Xenos", 13, 10, 0),
@@ -439,6 +504,13 @@ SCENARIOS = {
         ("queen", "Xenos", 20, 16, 0),
         ("resin-silo", "Xenos", 16, 16, 0),
     ]},
+    # The Skirmish AI at each strength spends its cash on units (see scenarios/test-ai-levels.lua)
+    "scenario-ai-easy": {"scripts": ("test-ai-level-easy",), "xeno_bot": "easy", "size": (40, 28), "actors": [
+        ("rifleman", "Marines", 3, 3, 512), ("resin-silo", "Xenos", 33, 21, 0)]},
+    "scenario-ai-normal": {"scripts": ("test-ai-level-normal",), "xeno_bot": "skirmish", "size": (40, 28), "actors": [
+        ("rifleman", "Marines", 3, 3, 512), ("resin-silo", "Xenos", 33, 21, 0)]},
+    "scenario-ai-hard": {"scripts": ("test-ai-level-hard",), "xeno_bot": "hard", "size": (40, 28), "actors": [
+        ("rifleman", "Marines", 3, 3, 512), ("resin-silo", "Xenos", 33, 21, 0)]},
     "scenario-rally": {"scripts": ("test-rally",), "actors": [
         ("cryo-pod", "Marines", 6, 6, 0),
         ("rifleman", "Marines", 20, 3, 0),
@@ -450,7 +522,7 @@ SCENARIOS = {
     # Hold the Line with a marine bot that stays home (its squad module is removed), to see if six waves are survivable.
     "balance-holdline": {"scripts": ("wave-survival", "test-holdline"), "marine_bot": "skirmish", "fast": True,
                          "drop_conquest": True, "size": (40, 28), "spawns": [(6, 14), (33, 13)], "ground": "landing_zone",
-                         "actors": HOLD_THE_LINE, "extra_rules": "Player:\n\t-SquadManagerBotModule@marines:\n"},
+                         "actors": HOLD_THE_LINE, "extra_rules": "Player:\n\t-SquadManagerBotModule@normal-marines:\n"},
     # One of each effect-carrying weapon, each pair facing off a few cells apart (see scenarios/test-fx.lua)
     "scenario-fx": {"scripts": ("test-fx",), "actors": [
         ("rifleman", "Marines", 8, 8, 256),
@@ -493,7 +565,7 @@ def write_sound_list(path):
 
 def write_map(folder, title, size_w, size_h, placed, visibility, spawns, scripts=(), ground=flat_ground,
               category="Skirmish", drop_conquest=False, xeno_bot=None, marine_bot=None, fast=False, extra_rules="",
-              music=False, allied=False):
+              music=False, allied=False, preview=None):
     # `allied` makes the two sides friends, so a viewer sees both (the look-* maps). A scenario map has no slot for the xenos: they are a scripted player, so Lua can find them and they never act.
     os.makedirs(folder, exist_ok=True)
     cells = size_w * size_h
@@ -531,6 +603,12 @@ def write_map(folder, title, size_w, size_h, placed, visibility, spawns, scripts
         for name in scripts:
             if name == "sound-list":
                 write_sound_list(os.path.join(folder, "sound-list.lua"))
+                continue
+            if name.startswith("test-ai-level-"):  # test-ai-levels.lua with the bot strength filled in
+                template = open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "scenarios", "test-ai-levels.lua"),
+                                encoding="utf-8").read()
+                with open(os.path.join(folder, f"{name}.lua"), "w", encoding="utf-8", newline="\n") as f:
+                    f.write(template.replace("__LEVEL__", name.split("-")[-1]))
                 continue
             shutil.copyfile(os.path.join(os.path.dirname(os.path.abspath(__file__)), "scenarios", f"{name}.lua"),
                             os.path.join(folder, f"{name}.lua"))
@@ -588,7 +666,8 @@ Actors:
     with open(os.path.join(folder, "map.yaml"), "w", encoding="utf-8", newline="\n") as f:
         f.write(yaml)
 
-    preview = Image.new("RGBA", (size_w, size_h), (0x2E, 0x52, 0x30, 255))
+    if preview is None:
+        preview = Image.new("RGBA", (size_w, size_h), (0x2E, 0x52, 0x30, 255))
     preview.save(os.path.join(folder, "map.png"))
 
 
@@ -605,6 +684,7 @@ def main():
     write_rally_marker(args.out)
     write_team_markers(args.out)
     write_ruin_art(args.out)
+    write_ability_art(args.out)
     write_wounds(args.out)
     write_rank_pips(args.out)
     write_map(os.path.join(args.out, "maps", "test-field"), "TGMC test field", 24, 24, TEST_FIELD, "Lobby, Shellmap", [(10, 12), (14, 12)])

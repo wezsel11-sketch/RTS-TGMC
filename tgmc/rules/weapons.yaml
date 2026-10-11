@@ -268,3 +268,14 @@ TGMCBlastBig:
 		Explosions: big
 		ForceDisplayAtGroundLevel: true
 		ValidTargets: Ground, Water, Structure
+
+# Runner Pounce (while the `pouncing` condition is on, see units.yaml): the claws hit harder and stun a marine for two seconds.
+TGMCPounce:
+	Inherits: TGMCClaws
+	Warhead@1Dam: TargetDamage
+		Damage: 36
+	Warhead@6Stun: GrantExternalCondition
+		Condition: stunned
+		Duration: 50
+		ValidRelationships: Enemy
+		ValidTargets: Human

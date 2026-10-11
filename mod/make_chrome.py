@@ -29,6 +29,12 @@ AMBER_DIM = (140, 100, 30, 255)
 RED = (150, 44, 44, 255)
 GREY = (70, 72, 74, 255)
 GREY_DIM = (48, 49, 50, 255)
+# TGUI-style window tones: a darker body than SLATE, so cards and rails read as raised panels.
+TGUI_BODY = (24, 27, 30, 255)
+TGUI_RAIL = (18, 21, 23, 255)
+TGUI_TAB = (34, 40, 32, 255)
+TGUI_EDGE = (60, 70, 52, 255)
+TGUI_TRACK = (16, 18, 20, 255)
 
 # Collection name -> (fill, border). Names decide the state: hover, pressed, disabled, highlighted.
 PANEL_COLLECTIONS = [
@@ -36,6 +42,8 @@ PANEL_COLLECTIONS = [
     "dialog5", "mainmenu-border", "sidebar", "tooltip-separator", "separator", "newsbutton",
     "loadscreen-stripe", "textfield", "table", "scrollheader", "observer-scrollheader",
     "observer-scrollitem", "scrollpanel-bg", "slider-track",
+    "tgui-window", "tgui-titlebar", "tgui-rail", "tgui-card", "tgui-card-header", "tgui-bar-track",
+    "tgui-bar-fill",
 ]
 BUTTON_COLLECTIONS = [
     "button", "button-hover", "button-pressed", "button-disabled",
@@ -46,10 +54,33 @@ BUTTON_COLLECTIONS = [
     "observer-scrollpanel-button-pressed", "slider-thumb",
     "checkbox-toggle", "checkbox-toggle-hover", "checkbox-toggle-pressed",
     "checkbox-toggle-highlighted", "checkbox-pressed", "checkbox-disabled",
+    "tgui-tab", "tgui-tab-hover", "tgui-tab-pressed", "tgui-tab-disabled", "tgui-tab-active",
 ]
 
 
 def style_for(name):
+    if name == "tgui-window":
+        return TGUI_BODY, TGUI_EDGE
+    if name == "tgui-titlebar":
+        return OLIVE_DARK, AMBER_DIM
+    if name == "tgui-rail":
+        return TGUI_RAIL, OLIVE_DARK
+    if name in ("tgui-card", "tgui-card-header"):
+        return (OLIVE_DARK if name == "tgui-card-header" else SLATE), OLIVE
+    if name == "tgui-bar-track":
+        return TGUI_TRACK, GREY
+    if name == "tgui-bar-fill":
+        return OLIVE_HI, OLIVE_HI
+    if name == "tgui-tab":
+        return TGUI_TAB, TGUI_EDGE
+    if name == "tgui-tab-hover":
+        return OLIVE, OLIVE_HI
+    if name == "tgui-tab-pressed":
+        return OLIVE_DARK, AMBER_DIM
+    if name == "tgui-tab-disabled":
+        return GREY_DIM, GREY
+    if name == "tgui-tab-active":
+        return OLIVE, AMBER
     if name in ("slider-thumb",):
         return OLIVE_HI, AMBER
     if "disabled" in name:

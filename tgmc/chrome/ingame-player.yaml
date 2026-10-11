@@ -15,13 +15,25 @@ Container@PLAYER_WIDGETS:
 			CombineWithGroupKeyPrefix: ControlGroupCombineWith
 			JumpToGroupKeyPrefix: ControlGroupJumpTo
 		LogicTicker@SIDEBAR_TICKER:
+		Background@DEBUG_MARKER:
+			X: 0
+			Y: 0
+			Width: 200
+			Height: 200
+			Background: tgui-tab-active
 		Background@TGMC_SIDEBAR:
 			X: WINDOW_WIDTH - 240
 			Y: 0
 			Width: 240
 			Height: WINDOW_HEIGHT
-			Background: tgmc-panel
+			Background: tgui-window
 			Children:
+				Background@TITLE_BAR:
+					X: 0
+					Y: 0
+					Width: PARENT_WIDTH
+					Height: 36
+					Background: tgui-titlebar
 				Label@HEADER:
 					X: 8
 					Y: 6
@@ -58,8 +70,14 @@ Container@PLAYER_WIDGETS:
 					Y: 282
 					Width: 224
 					Height: 120
-					Background: tgmc-selection
+					Background: tgui-card
 					Children:
+						Background@SELECTION_HEADER:
+							X: 0
+							Y: 0
+							Width: PARENT_WIDTH
+							Height: 24
+							Background: tgui-card-header
 						Label@SELECTION_TITLE:
 							X: 8
 							Y: 6
@@ -80,7 +98,7 @@ Container@PLAYER_WIDGETS:
 					Y: 410
 					Width: 224
 					Height: 56
-					Background: tgmc-panel
+					Background: tgui-card
 					Children:
 						Label@GAME_TIMER:
 							Logic: GameTimerLogic

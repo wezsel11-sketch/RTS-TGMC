@@ -223,6 +223,9 @@ On a headless machine, run OpenRA under Xvfb with Mesa software GL
   120 HP and rifles do 14 every 15 ticks at 6 cells; Runners have 100 HP, run at speed 115 and claws do 20 every 14 ticks;
   Hunters 130 HP; sentries do 10; the corpsman heals 20 every 60 ticks.
   Income is 15 cash every 2 s from the vendor and silo and 5 from a mini silo. None of this has had real play time.
+- `mod/setup.sh` was run from an empty directory on a fresh clone (it installed .NET, built OpenRA, made the sparse TGMC clone, built
+  and linted the mod in about two minutes on a fast connection); a second run skipped the finished steps, and the scenarios, the smoke test
+  and `play.sh hold-the-line` all ran afterwards. Only Linux x64 has been tried. macOS and WSL are untested.
 - Fog of war is drawn with plain black quadrant tiles, so edges look blocky.
 
 ## Licenses

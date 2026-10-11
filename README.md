@@ -308,12 +308,13 @@ The effect sprites are TGMC art too (`fx-*` images in `build_sprites.py`) and ar
   the vendor spawns queued marines, income ticks up, and a "Skirmish AI" in the xeno slot trains Runners that attack
   the marine base. `mod/test_scenarios.sh` checks heal, repair, mend, victory, combat, every effect-carrying weapon (`scenario-fx`), the wave script and the AI. The xeno seat was played on Landing Zone against a marine bot: silo, mini silos, all four castes, palette and tooltips work.
   Not yet checked: voices (no audio device).
-- AI against AI (`mod/balance.sh`, Landing Zone layout, fastest speed, the Normal bot on both sides), measured after veterancy, abilities, the
-  Crusher, Boiler, mech and mortar, and research were added: the marines won 3 of 4 (at about 8000, 8500 and 10500 ticks) and the fourth was
-  still undecided at the time limit, the xenos trading waves of 2 to 17 units against marine structures at 20 to 40% health. Earlier, before
-  those additions, the marines won almost every match in 2 to 5 minutes of game time without the xenos reaching a structure, so the xenos are
-  closer than they were, but the marines still have the better of it. On LV-624 the marines won 2 of 3 (at about 12000 ticks) and one was undecided.
-  A human xeno player who attacks from several sides at once should do better than the AI.
+- AI against AI (`mod/balance.sh`, Landing Zone layout, fastest speed, the Normal bot on both sides). The balance history, one batch of four
+  runs each time: before veterancy, abilities and the new units the marines won almost every match in 2 to 5 minutes of game time and the xenos never
+  reached a structure. With veterancy, abilities, cursors and map changes in (but not yet the Crusher, Boiler, mech, mortar or research) the marines won
+  3 of 4, at about 8000, 8500 and 10500 ticks, and one stalled. With everything in, the final state: the xenos won 1 (at 11000 ticks), the marines won 0, and 3 were
+  still being fought at the time limit (13500 ticks), both sides at 4 to 12 units and several structures down to 5 to 40% health. So the lopsidedness is gone, and
+  the matches are now slow and swingy, close to a stalemate; four runs is a small sample, and nobody has played it. On LV-624 (before the new units) the marines won
+  2 of 3 at about 12000 ticks and one stalled. A human xeno player who attacks from several sides at once should do better than the AI.
 - Hold the Line against a marine bot that holds the base (`mod/balance.sh 4 420 balance-holdline`): the marines win all
   four runs, finishing the last wave (16 Runners, 10 Hunters, 8 Sentinels) with about 30 units and 2 or 3 of their 5
   buildings. The waves attack-move to the marine base because `Hunt()` cannot see across the map for a scripted player.

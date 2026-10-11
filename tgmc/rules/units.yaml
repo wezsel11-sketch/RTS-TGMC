@@ -134,7 +134,6 @@ smartgunner:
 		BuildAtProductionType: Infantry
 		BuildPaletteOrder: 40
 		Description: actor-smartgunner.description
-		Prerequisites: marines
 
 grenadier:
 	Inherits: ^Infantry
@@ -151,7 +150,6 @@ grenadier:
 		BuildAtProductionType: Infantry
 		BuildPaletteOrder: 50
 		Description: actor-grenadier.description
-		Prerequisites: marines
 
 ^Xeno:
 	Inherits: ^Unit

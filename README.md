@@ -17,11 +17,44 @@ some are ShareAlike. Use the mod for yourself. Do not sell it, do not host or
 redistribute the built mod, and do not publish TGMC-derived art or audio. See
 [Licenses](#licenses) below.
 
+## Quick start
+
+You need `git`, `make`, `python3` with Pillow, `ffmpeg` (with libvorbis) and a POSIX shell. Linux and macOS work; on Windows use WSL.
+No .NET? The script installs a .NET 10 SDK into `build/tools`, and nothing outside `build/` is touched.
+
+```sh
+git clone -b claude/hopeful-heisenberg-6kyjk9 https://github.com/wezsel11-sketch/RTS-TGMC.git
+cd RTS-TGMC
+sh mod/setup.sh      # fetches OpenRA and the TGMC art, builds and checks the mod (about 10 minutes the first time)
+sh mod/play.sh       # main menu; or `sh mod/play.sh landing-zone` to jump straight into a map
+```
+
+`setup.sh` is safe to re-run: it skips finished steps and picks up changes to the converters. It pins OpenRA and TGMC to
+the commits this mod was tested against (see the top of the script), so a later change in either cannot break it.
+
+## How to play
+
+- **Main menu -> Singleplayer -> Skirmish.** Pick **Landing Zone** (two-player skirmish) or **Hold the Line** (marines against waves).
+  In Landing Zone choose a faction for yourself and set the other slot to **Skirmish AI**, then Start Game.
+- **Marines** start with a cryo pod, a vendor and a squad. Click the cryo pod and use the sidebar's *Infantry* tab to train riflemen,
+  corpsmen (they heal) and engineers (they repair). **Xenos** start with a resin silo and mini silos; use the *Xeno* tab for Runner,
+  Hunter, Sentinel (spits acid) and Drone (mends structures).
+- **Cash** is a starting sum plus a trickle from the vendor and the silos. There is no harvesting.
+- **Controls** are OpenRA's: left-click or drag to select, right-click to move or attack, `A` then click to attack-move,
+  `S` to stop, `Ctrl`+number to group, and right-click a production building to set where new units gather (rally point).
+  The game speed option "fastest" is the one the balance tests ran at.
+- **Win** by destroying every enemy structure and unit that counts (Conquest). In Hold the Line you win by destroying the
+  sixth wave and lose when your units are gone.
+
+What to try and report: whether the sounds are the right loudness and mix (this is the first time anyone hears them), whether
+a match feels fair from either side (the AI-vs-AI tests say the marines win easily), and anything that looks or behaves oddly.
+Logs and replays are in OpenRA's support directory (`~/.config/OpenRA` on Linux, `~/Library/Application Support/OpenRA` on macOS).
+
 ## Inputs
 
 | Input | Where | Notes |
 | --- | --- | --- |
-| TGMC checkout | `https://github.com/tgstation/terragov-marine-corps` | Shallow clone is fine. Use `GIT_LFS_SKIP_SMUDGE=1`. The art is in the repo as plain `.dmi`/`.ogg` files. |
+| TGMC checkout | `https://github.com/tgstation/terragov-marine-corps` | `setup.sh` makes a sparse, blob-less clone. A shallow clone is fine too. Use `GIT_LFS_SKIP_SMUDGE=1`. The art is in the repo as plain `.dmi`/`.ogg` files. |
 | OpenRA source | `https://github.com/OpenRA/OpenRA` | Targets .NET 10. Build with `make all`. Release builds also work. |
 | .NET 10 SDK | Microsoft's package feed | Needed only to build OpenRA. |
 
@@ -37,28 +70,19 @@ The converters read these TGMC files:
   whose legs would hide them), `helmet` from `marine_helmets.dmi`, and the held weapon from `icons/mob/inhands/guns/`
   (`t18_w` rifle, `m44` pistol, `t19_w` SMG). The corpsman and engineer use the `marine_medic` / `marine_engineer`
   uniform states under the same kit. The `m_` jungle set is darker and hid the marines against the terrain.
-- `icons/Xeno/castes/hunter.dmi`, `sentinel.dmi` and `drone.dmi` (48px; Hunter and Sentinel have animated walks and runs,
-  so each file has a still and an animated state of the same name, and the converter uses the animated one).
-- `icons/Xeno/castes/runner.dmi` states `Runner Walking`, `Runner Running`, and `Runner Dead`, for the Runner.
-- Marine gear: TGMC's standard marine kit in jungle camo: `m_xarmor` from `icons/mob/clothing/suits/marine_armor.dmi`,
-  `marine` boots from `icons/mob/clothing/feet.dmi` (drawn over the armour, whose legs would hide them), `m_helmet`
-  from `marine_helmets.dmi`, and the held weapon from `icons/mob/inhands/guns/` (`t18_w` rifle, `m44` pistol,
-  `t19_w` SMG). The corpsman and engineer use the `marine_medic` / `marine_engineer` uniform states under the same kit.
-- `icons/Xeno/castes/hunter.dmi`, `sentinel.dmi` and `drone.dmi` (48px; Hunter and Sentinel have animated walks and runs,
-  so each file has a still and an animated state of the same name, and the converter uses the animated one).
-- `icons/Xeno/castes/runner.dmi` states `Runner Walking`, `Runner Running`, and `Runner Dead`, for the Runner.
-- Marine gear: Mark I modular armour from `icons/mob/modular/mark_one/infantry.dmi` (`leg`, `chest`, `arm`, `helm`, tinted
-  olive by the converter, since TGMC tints it in code), and the held weapon from `icons/mob/inhands/guns/`
-  (`t18_w` rifle, `m44` pistol, `t19_w` SMG). The corpsman and engineer use the `marine_medic` / `marine_engineer`
-  uniform states under the same armour.
 - Structures: `icons/Xeno/acid_turret.dmi`, `resin_silo.dmi`, `resin_pod.dmi`, and
   `icons/obj/machines/` (`sentry/sentry.dmi`, `cryogenics2.dmi`, `vending.dmi`).
-- `sound/weapons/guns/fire/autorifle-1.ogg` (rifle fire) and `sound/voice/alien/hiss1.ogg` (Runner hiss).
+- About 150 sound clips (weapons, voices, announcer, music, ambience), listed in `SOUNDS` in `mod/build_sounds.py`.
+
+The exact list is `python3 mod/tgmc_paths.py`; `setup.sh` checks out only those files.
 
 ## Layout
 
 ```
 mod/                        converters and build script (Python 3, Pillow, ffmpeg with libvorbis)
+  setup.sh                  one-command bootstrap: OpenRA, TGMC art (sparse clone), mod build, lint
+  play.sh                   starts the game on the main menu or a map
+  tgmc_paths.py             lists the TGMC files the converters read (setup.sh sparse-checks out exactly these)
   build_mod.sh              assembles build/mod/tgmc and optionally links it into an OpenRA tree
   tgmc_dmi.py               BYOND .dmi reader: state metadata and frame slicing
   build_sprites.py          .dmi states -> PNG sheets + OpenRA sequence YAML (8 facings)
@@ -85,9 +109,9 @@ build/                      generated; git-ignored
 The Doom mod in `aliens-vs-predators-with-tgmc-models` is where these converters started.
 `tgmc_dmi.py` and the sound converter follow its extractor and sound builder.
 
-## Build and smoke test
+## Build by hand
 
-Do these in order. Paths are examples.
+`mod/setup.sh` does all of this. The steps are here for a different layout (your own OpenRA checkout, a full TGMC clone). Paths are examples.
 
 ```sh
 # 1. Build OpenRA from source (needs the .NET 10 SDK)

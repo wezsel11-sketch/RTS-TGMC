@@ -35,9 +35,10 @@ def read_description(path):
 
 
 def parse_meta(text):
-    """Return (icon_width, icon_height, states) where each state is {name, dirs, frames, first}.
+    """Return (icon_width, icon_height, states) where each state is {name, dirs, frames, delays, first}.
 
-    `first` is the index of the state's first icon in the packed sheet.
+    `first` is the index of the state's first icon in the packed sheet. `delays` is the per-frame
+    delay in BYOND ticks (deciseconds), or an empty list when the state does not give one.
     """
     width = height = None
     states = []
@@ -53,12 +54,14 @@ def parse_meta(text):
             if cur is not None:
                 index += cur["dirs"] * cur["frames"]
             name = re.search(r'"(.*)"', line).group(1)
-            cur = {"name": name, "dirs": 1, "frames": 1, "first": index}
+            cur = {"name": name, "dirs": 1, "frames": 1, "delays": [], "first": index}
             states.append(cur)
         elif cur is not None and line.startswith("dirs"):
             cur["dirs"] = int(line.split("=")[1])
         elif cur is not None and line.startswith("frames"):
             cur["frames"] = int(line.split("=")[1])
+        elif cur is not None and line.startswith("delay"):
+            cur["delays"] = [int(float(v)) for v in line.split("=")[1].split(",")]
     return width or 32, height or 32, states
 
 
@@ -73,7 +76,10 @@ class Dmi:
         self.icon_w, self.icon_h, self.states = parse_meta(text)
         self.sheet = Image.open(path).convert("RGBA")
         self.cols = self.sheet.width // self.icon_w
-        self._by_name = {s["name"]: s for s in self.states}
+        # BYOND uses the first state with a given name. Some TGMC castes (hunter) repeat a name.
+        self._by_name = {}
+        for s in self.states:
+            self._by_name.setdefault(s["name"], s)
 
     def has_state(self, name):
         return name in self._by_name

@@ -1,22 +1,60 @@
 General:
 	Name: tileset-tgmc
 	Id: TGMC
+	TileSize: 32, 32
 	SheetSize: 512
-	EditorTemplateOrder: Terrain
+	EditorTemplateOrder: Terrain, Road, Water
 	HeightDebugColors: AA0000
 
+# Colours are the radar's view of each terrain; they match the averages build_tileset.py reports.
 Terrain:
 	TerrainType@Clear:
 		Type: Clear
 		TargetTypes: Ground
-		Color: 3B5A2F
+		Color: 2E5230
+	TerrainType@Road:
+		Type: Road
+		TargetTypes: Ground
+		Color: 5C4C37
+	TerrainType@Ford:
+		Type: Ford
+		TargetTypes: Ground
+		Color: 92A6A1
+	TerrainType@Water:
+		Type: Water
+		TargetTypes: Water
+		Color: 4D86B8
 
 Templates:
 	Template@1:
 		Id: 1
-		Images: ground.png
+		Images: grass1.png, grass2.png
 		Size: 1,1
 		PickAny: True
 		Categories: Terrain
 		Tiles:
 			0: Clear
+	Template@2:
+		Id: 2
+		Images: water.png
+		Size: 1,1
+		PickAny: True
+		Categories: Water
+		Tiles:
+			0: Water
+	Template@3:
+		Id: 3
+		Images: ford.png
+		Size: 1,1
+		PickAny: True
+		Categories: Water
+		Tiles:
+			0: Ford
+	Template@4:
+		Id: 4
+		Images: dirt.png
+		Size: 1,1
+		PickAny: True
+		Categories: Road
+		Tiles:
+			0: Road

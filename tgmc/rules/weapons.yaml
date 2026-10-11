@@ -1,24 +1,155 @@
 TGMCRifle:
 	Range: 6c0
-	ReloadDelay: 12
-	Report: audio/rifle-fire.ogg
+	ReloadDelay: 15
+	Report: rifle-fire-1.ogg, rifle-fire-2.ogg, rifle-fire-3.ogg
 	Projectile: Bullet
 		Speed: 600
 	Warhead@1Dam: SpreadDamage
-		Damage: 12
-		Spread: 1c0
+		Damage: 14
+		Spread: 128
+		ValidRelationships: Enemy
+	Warhead@2Hit: CreateEffect
+		ImpactSounds: hit-bullet-1.ogg, hit-bullet-2.ogg, hit-bullet-3.ogg, hit-bullet-4.ogg
+		ImpactSoundChance: 55
+		ValidRelationships: Enemy
+		ValidTargets: Alien, Structure
+	Warhead@3Cry: CreateEffect
+		ImpactSounds: xeno-larva-1.ogg, xeno-larva-2.ogg, xeno-larva-3.ogg, xeno-larva-4.ogg, xeno-growl-1.ogg
+		ImpactSoundChance: 18
+		ValidRelationships: Enemy
+		ValidTargets: Alien
+
+TGMCSentry:
+	Inherits: TGMCRifle
+	Report: sentry-fire.ogg
+	Warhead@1Dam: SpreadDamage
+		Damage: 10
+
+TGMCHeal:
+	Range: 3c0
+	ReloadDelay: 60
+	Report: heal.ogg
+	ValidTargets: Heal
+	TargetActorCenter: true
+	Projectile: InstantHit
+	Warhead@1Dam: TargetDamage
+		Damage: -20
+		ValidRelationships: Ally
+		ValidTargets: Heal
+
+TGMCRepair:
+	Range: 2c0
+	ReloadDelay: 40
+	Report: repair.ogg
+	ValidTargets: Repair
+	TargetActorCenter: true
+	Projectile: InstantHit
+	Warhead@1Dam: TargetDamage
+		Damage: -30
+		ValidRelationships: Ally
+		ValidTargets: Repair
 
 TGMCClaws:
 	Range: 1c256
-	ReloadDelay: 15
-	Report: audio/runner-hiss.ogg
+	ReloadDelay: 14
+	Report: claw-swipe-1.ogg, claw-swipe-2.ogg, claw-swipe-3.ogg
+	TargetActorCenter: true
 	Projectile: InstantHit
 	Warhead@1Dam: TargetDamage
 		Damage: 20
+	Warhead@2Hit: CreateEffect
+		ImpactSounds: hit-armor-1.ogg, hit-armor-2.ogg, hit-armor-3.ogg
+		ImpactSoundChance: 50
+		ValidRelationships: Enemy
+		ValidTargets: Human
+	Warhead@3Cry: CreateEffect
+		ImpactSounds: marine-m-pain-1.ogg, marine-m-pain-2.ogg, marine-m-pain-3.ogg, marine-f-pain-1.ogg, marine-f-pain-2.ogg, marine-f-pain-3.ogg, marine-m-gored-1.ogg
+		ImpactSoundChance: 45
+		ValidRelationships: Enemy
+		ValidTargets: Human
+
+TGMCSpit:
+	Range: 5c0
+	ReloadDelay: 30
+	Report: acid-spit-1.ogg, acid-spit-2.ogg
+	TargetActorCenter: true
+	Projectile: InstantHit
+	Warhead@1Dam: TargetDamage
+		Damage: 16
+	Warhead@2Hit: CreateEffect
+		ImpactSounds: acid-impact.ogg
+		ImpactSoundChance: 70
+		ValidRelationships: Enemy
+		ValidTargets: Ground, Water
+
+TGMCMend:
+	Range: 2c0
+	ReloadDelay: 40
+	Report: resin-build.ogg
+	ValidTargets: Repair
+	TargetActorCenter: true
+	Projectile: InstantHit
+	Warhead@1Dam: TargetDamage
+		Damage: -30
+		ValidRelationships: Ally
+		ValidTargets: Repair
 
 TGMCAcid:
 	Range: 6c0
 	ReloadDelay: 25
+	Report: acid-spit-1.ogg, acid-spit-2.ogg
+	TargetActorCenter: true
 	Projectile: InstantHit
 	Warhead@1Dam: TargetDamage
 		Damage: 30
+	Warhead@2Hit: CreateEffect
+		ImpactSounds: acid-impact.ogg
+		ImpactSoundChance: 70
+		ValidRelationships: Enemy
+		ValidTargets: Ground, Water
+
+# Marine gunners. Smartgunner: fast, spread bullets. Grenadier: lobbed, splash.
+TGMCSmartgun:
+	Range: 7c0
+	ReloadDelay: 5
+	Report: rifle-fire-1.ogg, rifle-fire-2.ogg, rifle-fire-3.ogg
+	Projectile: Bullet
+		Speed: 900
+		Inaccuracy: 256
+		InaccuracyType: Maximum
+	Warhead@1Dam: SpreadDamage
+		Damage: 7
+		Spread: 1c0
+		ValidRelationships: Enemy
+	Warhead@2Hit: CreateEffect
+		ImpactSounds: hit-bullet-1.ogg, hit-bullet-2.ogg, hit-bullet-3.ogg, hit-bullet-4.ogg
+		ImpactSoundChance: 40
+		ValidRelationships: Enemy
+		ValidTargets: Alien, Structure
+
+TGMCGrenade:
+	Range: 8c0
+	ReloadDelay: 40
+	Projectile: Bullet
+		Speed: 280
+		Image: grenade
+		Shadow: true
+		LaunchAngle: 165
+		Blockable: false
+	Warhead@1Dam: SpreadDamage
+		Damage: 45
+		Spread: 2c0
+		Falloff: 100, 50, 20, 0
+		ValidRelationships: Enemy
+
+# Xeno Warrior: a wide melee slam.
+TGMCSlam:
+	Range: 1c512
+	ReloadDelay: 35
+	Report: claw-swipe-1.ogg, claw-swipe-2.ogg, claw-swipe-3.ogg
+	Projectile: InstantHit
+	Warhead@1Dam: SpreadDamage
+		Damage: 30
+		Spread: 1c256
+		Falloff: 100, 60, 25
+		ValidRelationships: Enemy

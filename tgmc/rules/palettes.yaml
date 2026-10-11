@@ -26,16 +26,29 @@
 		Name: effect
 		Filename: tgmc.pal
 		ShadowIndex: 4
+	PaletteFromRGBA@shroud:
+		Name: shroud
+		R: 0
+		G: 0
+		B: 0
+		A: 255
+	PaletteFromRGBA@fog:
+		Name: fog
+		R: 0
+		G: 0
+		B: 0
+		A: 128
 	PaletteFromRGBA@shadow:
 		Name: shadow
 		R: 0
 		G: 0
 		B: 0
 		A: 140
-	IndexedPlayerPalette:
+	ColorPickerPalette@colorpicker:
+		Name: colorpicker
 		BasePalette: player
-		BaseName: player
 		RemapIndex: 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95
-		PlayerIndex:
-			marines: 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95
-			xenos: 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95
+		AllowModifiers: false
+	PlayerColorPalette:
+		BasePalette: player
+		RemapIndex: 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95

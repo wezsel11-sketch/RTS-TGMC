@@ -27,5 +27,7 @@ Container@OBSERVER_WIDGETS:
 			Height: 26
 			Background: sidebar-button
 			Key: escape
+			Text: hud-menu
+			Font: Bold
 			DisableWorldSounds: true
 			VisualHeight: 0

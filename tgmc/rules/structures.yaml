@@ -6,6 +6,16 @@
 	Building:
 		Footprint: x
 		Dimensions: 1, 1
+		TerrainTypes: Clear, Road
+	RevealsShroud:
+		Range: 8c0
+	FrozenUnderFog:
+	MustBeDestroyed:
+	AppearsOnRadar:
+	ProvidesPrerequisite@buildingname:
+	Voiced:
+		VoiceSet: MarineStructureVoice
+	DeathSounds:
 	Selectable:
 		Bounds: 512, 512, -256, -256
 	HitShape:
@@ -15,6 +25,12 @@
 			BottomRight: 512, 512
 	Targetable:
 		TargetTypes: Ground, Structure
+	Targetable@REPAIR:
+		RequiresCondition: damaged
+		TargetTypes: Repair
+	GrantConditionOnDamageState@DAMAGED:
+		Condition: damaged
+		ValidDamageStates: Light, Medium, Heavy, Critical
 	RenderSprites:
 		Palette: player
 	BodyOrientation:
@@ -26,6 +42,8 @@
 
 resin-turret:
 	Inherits: ^Structure
+	Voiced:
+		VoiceSet: XenoStructureVoice
 	Health:
 		HP: 400
 	Tooltip:
@@ -44,12 +62,23 @@ resin-turret:
 	AttackTurreted:
 	AutoTarget:
 		InitialStance: AttackAnything
+	AutoTargetPriority@DEFAULT:
+		ValidTargets: Ground
 
 resin-silo:
 	Inherits: ^Structure
+	Voiced:
+		VoiceSet: XenoStructureVoice
+	ProvidesRadar:
 	Building:
-		Footprint: xx xx
-		Dimensions: 2, 2
+		Footprint: xxx xxx xxx
+		Dimensions: 3, 3
+	Selectable:
+		Bounds: 2560, 2560, -1280, -1280
+	HitShape:
+		Type: Rectangle
+			TopLeft: -1536, -1536
+			BottomRight: 1536, 1536
 	StoresPlayerResources:
 		Capacity: 1000
 	Tooltip:
@@ -58,20 +87,46 @@ resin-silo:
 		Cost: 400
 	WithIdleAnimation:
 		Sequences: idle
+	CashTrickler:
+		Interval: 50
+		Amount: 15
+	Exit@1:
+		SpawnOffset: 0,1024,0
+		ExitCell: 1,3
+	RallyPoint:
+		Path: 1, 6
+	Production:
+		Produces: Xeno
+	ProductionBar:
+		ProductionType: Xeno
 
 mini-silo:
 	Inherits: ^Structure
+	Voiced:
+		VoiceSet: XenoStructureVoice
 	Building:
 		Footprint: xx xx
 		Dimensions: 2, 2
 	StoresPlayerResources:
 		Capacity: 300
+	Exit@1:
+		SpawnOffset: 0,512,0
+		ExitCell: 0,2
+	RallyPoint:
+		Path: 0, 5
+	Production:
+		Produces: Xeno
+	ProductionBar:
+		ProductionType: Xeno
 	Tooltip:
 		Name: actor-mini-silo.name
 	Valued:
 		Cost: 150
 	WithIdleAnimation:
 		Sequences: idle
+	CashTrickler:
+		Interval: 50
+		Amount: 5
 
 sentry-turret:
 	Inherits: ^Structure
@@ -91,14 +146,19 @@ sentry-turret:
 	Turreted:
 		TurnSpeed: 20
 	Armament@PRIMARY:
-		Weapon: TGMCRifle
+		Weapon: TGMCSentry
 		Turret: primary
 	AttackTurreted:
 	AutoTarget:
 		InitialStance: AttackAnything
+	AutoTargetPriority@DEFAULT:
+		ValidTargets: Ground
 
 cryo-pod:
 	Inherits: ^Structure
+	AmbientSound:
+		SoundFiles: amb-generator.ogg
+	ProvidesRadar:
 	Building:
 		Footprint: x x
 		Dimensions: 1, 2
@@ -106,8 +166,15 @@ cryo-pod:
 		HP: 250
 	WithIdleAnimation:
 		Sequences: active
+	Exit@1:
+		SpawnOffset: 0,512,0
+		ExitCell: 0,2
+	RallyPoint:
+		Path: 0, 5
 	Production:
 		Produces: Infantry
+	ProductionBar:
+		ProductionType: Infantry
 	Tooltip:
 		Name: actor-cryo-pod.name
 	Valued:
@@ -115,13 +182,25 @@ cryo-pod:
 
 vendor:
 	Inherits: ^Structure
+	AmbientSound:
+		SoundFiles: amb-hum.ogg
 	Building:
 		Footprint: x
 		Dimensions: 1, 1
 	Health:
 		HP: 200
+	Exit@1:
+		SpawnOffset: 0,512,0
+		ExitCell: 0,1
+	RallyPoint:
+		Path: 0, 4
 	Production:
 		Produces: Infantry
+	ProductionBar:
+		ProductionType: Infantry
+	CashTrickler:
+		Interval: 50
+		Amount: 15
 	Tooltip:
 		Name: actor-vendor.name
 	Valued:

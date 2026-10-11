@@ -3,7 +3,7 @@
 
 ^Unit:
 	Health:
-		HP: 100
+		HP: 120
 	Mobile:
 		Locomotor: foot
 		Speed: 43
@@ -19,6 +19,14 @@
 		TargetTypes: Ground, Infantry
 	AutoTarget:
 		InitialStance: AttackAnything
+	AutoTargetPriority@DEFAULT:
+		ValidTargets: Ground
+	RevealsShroud:
+		Range: 7c0
+	HiddenUnderFog:
+	MustBeDestroyed:
+	AppearsOnRadar:
+	ScriptTriggers:
 	AttackMove:
 	RenderSprites:
 		Palette: player
@@ -30,6 +38,17 @@
 
 ^Infantry:
 	Inherits: ^Unit
+	Targetable@HEAL:
+		RequiresCondition: damaged
+		TargetTypes: Heal
+	Targetable@HUMAN:
+		TargetTypes: Human
+	GrantConditionOnDamageState@DAMAGED:
+		Condition: damaged
+		ValidDamageStates: Light, Medium, Heavy, Critical
+	Voiced:
+		VoiceSet: MarineVoice
+	DeathSounds:
 	WithInfantryBody:
 		MoveSequence: run
 		StandSequences: stand
@@ -37,6 +56,8 @@
 	Armament@PRIMARY:
 		Weapon: TGMCRifle
 	AttackFrontal:
+		Voice: Attack
+	ActorLostNotification:
 
 rifleman:
 	Inherits: ^Infantry
@@ -53,7 +74,17 @@ rifleman:
 medic:
 	Inherits: ^Infantry
 	Health:
-		HP: 90
+		HP: 100
+	Voiced:
+		VoiceSet: CorpsmanVoice
+	Armament@PRIMARY:
+		Weapon: TGMCHeal
+		Cursor: heal
+		OutsideRangeCursor: heal-blocked
+		TargetRelationships: Ally
+		ForceTargetRelationships: None
+	AutoTargetPriority@DEFAULT:
+		ValidTargets: Infantry
 	Tooltip:
 		Name: actor-medic.name
 	Valued:
@@ -67,7 +98,15 @@ medic:
 engineer:
 	Inherits: ^Infantry
 	Health:
-		HP: 100
+		HP: 110
+	Armament@PRIMARY:
+		Weapon: TGMCRepair
+		Cursor: repair
+		OutsideRangeCursor: repair-blocked
+		TargetRelationships: Ally
+		ForceTargetRelationships: None
+	AutoTargetPriority@DEFAULT:
+		ValidTargets: Structure
 	Tooltip:
 		Name: actor-engineer.name
 	Valued:
@@ -78,24 +117,161 @@ engineer:
 		BuildPaletteOrder: 30
 		Description: actor-engineer.description
 
-runner:
-	Inherits: ^Unit
+smartgunner:
+	Inherits: ^Infantry
 	Health:
-		HP: 120
-	Selectable:
-		Bounds: 1024, 768, -512, -512
+		HP: 130
 	Mobile:
-		Speed: 90
+		Speed: 36
+	Armament@PRIMARY:
+		Weapon: TGMCSmartgun
+	Tooltip:
+		Name: actor-smartgunner.name
+	Valued:
+		Cost: 200
+	Buildable:
+		Queue: Infantry
+		BuildAtProductionType: Infantry
+		BuildPaletteOrder: 40
+		Description: actor-smartgunner.description
+
+grenadier:
+	Inherits: ^Infantry
+	Health:
+		HP: 90
+	Armament@PRIMARY:
+		Weapon: TGMCGrenade
+	Tooltip:
+		Name: actor-grenadier.name
+	Valued:
+		Cost: 180
+	Buildable:
+		Queue: Infantry
+		BuildAtProductionType: Infantry
+		BuildPaletteOrder: 50
+		Description: actor-grenadier.description
+
+^Xeno:
+	Inherits: ^Unit
+	Targetable@ALIEN:
+		TargetTypes: Alien
 	WithInfantryBody:
 		MoveSequence: run
 		StandSequences: stand
 		DefaultAttackSequence: attack
 	WithDeathAnimation:
 		DeathSequence: die
+		FallbackSequence: die
+	DeathSounds:
 	Armament@PRIMARY:
 		Weapon: TGMCClaws
 	AttackFrontal:
+		Voice: Attack
+	ActorLostNotification:
+
+runner:
+	Inherits: ^Xeno
+	Voiced:
+		VoiceSet: RunnerVoice
+	Health:
+		HP: 100
+	Selectable:
+		Bounds: 1024, 768, -512, -512
+	Mobile:
+		Speed: 115
 	Tooltip:
 		Name: actor-runner.name
 	Valued:
 		Cost: 50
+	Buildable:
+		Queue: Xeno
+		BuildPaletteOrder: 10
+		Description: actor-runner.description
+
+hunter:
+	Inherits: ^Xeno
+	Voiced:
+		VoiceSet: HunterVoice
+	Health:
+		HP: 130
+	Selectable:
+		Bounds: 768, 768, -384, -512
+	Mobile:
+		Speed: 70
+	Tooltip:
+		Name: actor-hunter.name
+	Valued:
+		Cost: 90
+	Buildable:
+		Queue: Xeno
+		BuildPaletteOrder: 20
+		Description: actor-hunter.description
+
+sentinel:
+	Inherits: ^Xeno
+	Voiced:
+		VoiceSet: SentinelVoice
+	Health:
+		HP: 80
+	Selectable:
+		Bounds: 768, 768, -384, -512
+	Mobile:
+		Speed: 55
+	Armament@PRIMARY:
+		Weapon: TGMCSpit
+	Tooltip:
+		Name: actor-sentinel.name
+	Valued:
+		Cost: 110
+	Buildable:
+		Queue: Xeno
+		BuildPaletteOrder: 30
+		Description: actor-sentinel.description
+
+drone:
+	Inherits: ^Xeno
+	Voiced:
+		VoiceSet: DroneVoice
+	Health:
+		HP: 70
+	Selectable:
+		Bounds: 768, 768, -384, -512
+	Mobile:
+		Speed: 50
+	Armament@PRIMARY:
+		Weapon: TGMCMend
+		Cursor: repair
+		OutsideRangeCursor: repair-blocked
+		TargetRelationships: Ally
+		ForceTargetRelationships: None
+	AutoTargetPriority@DEFAULT:
+		ValidTargets: Structure
+	Tooltip:
+		Name: actor-drone.name
+	Valued:
+		Cost: 60
+	Buildable:
+		Queue: Xeno
+		BuildPaletteOrder: 40
+		Description: actor-drone.description
+
+warrior:
+	Inherits: ^Xeno
+	Voiced:
+		VoiceSet: HunterVoice
+	Health:
+		HP: 260
+	Selectable:
+		Bounds: 1024, 1024, -512, -512
+	Mobile:
+		Speed: 32
+	Armament@PRIMARY:
+		Weapon: TGMCSlam
+	Tooltip:
+		Name: actor-warrior.name
+	Valued:
+		Cost: 200
+	Buildable:
+		Queue: Xeno
+		BuildPaletteOrder: 50
+		Description: actor-warrior.description

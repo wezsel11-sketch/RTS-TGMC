@@ -9,11 +9,13 @@ FileSystem: DefaultFileSystem
 		^EngineDir
 		$tgmc: tgmc
 		^EngineDir|mods/common: common
+		tgmc|audio
 
 Rules:
 	tgmc|rules/palettes.yaml
 	tgmc|rules/world.yaml
 	tgmc|rules/player.yaml
+	tgmc|rules/ai.yaml
 	tgmc|rules/units.yaml
 	tgmc|rules/structures.yaml
 
@@ -21,8 +23,13 @@ Weapons:
 	tgmc|rules/weapons.yaml
 
 Sequences:
+	tgmc|sequences/misc.yaml
+	tgmc|sequences/shroud.yaml
 	tgmc|sequences/rifleman.yaml
 	tgmc|sequences/runner.yaml
+	tgmc|sequences/hunter.yaml
+	tgmc|sequences/sentinel.yaml
+	tgmc|sequences/drone.yaml
 	tgmc|sequences/medic.yaml
 	tgmc|sequences/engineer.yaml
 	tgmc|sequences/sentry-turret.yaml
@@ -31,6 +38,10 @@ Sequences:
 	tgmc|sequences/resin-turret.yaml
 	tgmc|sequences/resin-silo.yaml
 	tgmc|sequences/mini-silo.yaml
+	tgmc|sequences/smartgunner.yaml
+	tgmc|sequences/grenadier.yaml
+	tgmc|sequences/warrior.yaml
+	tgmc|sequences/grenade.yaml
 
 TileSets:
 	tgmc|tilesets/ground.yaml
@@ -96,8 +107,14 @@ ChromeLayout:
 	common|chrome/playerprofile.yaml
 	common|chrome/text-notifications.yaml
 
+Voices:
+	tgmc|audio/voices.yaml
+
 Notifications:
 	tgmc|audio/notifications.yaml
+
+Music:
+	tgmc|audio/music.yaml
 
 Hotkeys:
 	common|hotkeys/game.yaml
@@ -116,6 +133,7 @@ FluentMessages:
 	common|fluent/ingame-debug.ftl
 	common|fluent/hotkeys.ftl
 	common|fluent/rules.ftl
+	tgmc|fluent/overrides.ftl
 
 LoadScreen: BlankLoadScreen
 
@@ -159,10 +177,10 @@ Fonts:
 Missions:
 
 MapFolders:
-	tgmc|maps
+	tgmc|maps: System
 
 MapGrid:
-	TileSize: 24, 24
+	Type: Rectangular
 
 DefaultOrderGenerator: UnitOrderGenerator
 
@@ -186,4 +204,8 @@ GameSpeeds:
 		default:
 			Name: options-game-speed.normal
 			Timestep: 40
+			OrderLatency: 3
+		fastest:
+			Name: options-game-speed.fastest
+			Timestep: 8
 			OrderLatency: 3

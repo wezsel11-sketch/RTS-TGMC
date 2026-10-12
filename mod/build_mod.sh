@@ -14,6 +14,7 @@ OUT="$ROOT/build/mod/tgmc"
 PY=${PYTHON:-python3}
 
 "$PY" -I "$HERE/lint_static.py"
+"$PY" -I "$HERE/test_effects.py"
 
 rm -rf "$OUT"
 mkdir -p "$OUT"

@@ -9,6 +9,15 @@ from PIL import Image
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import build_sprites  # noqa: E402
+import lint_static  # noqa: E402
+
+# Rule text uses tab indentation, like the real files.
+RULES = (
+    "^Unit:\n\tHealth:\n\t\tHP: 1\n"
+    "^Xeno:\n\tInherits: ^Unit\n\tWithDeathAnimation:\n\t\tDeathSequence: die\n\t\tDeathTypes:\n\t\t\tExplosionDeath: -gib\n"
+    "runner:\n\tInherits: ^Xeno\n\tHealth:\n\t\tHP: 2\n"
+)
+BOOM = "TGMCBoom:\n\tRange: 6c0\n\tWarhead@1Dam: SpreadDamage\n\t\tDamageTypes: ExplosionDeath\n"
 
 
 def test_fade_frames_alpha():
@@ -29,6 +38,21 @@ def test_pad_to_rejects_larger():
     except SystemExit:
         return
     raise AssertionError("pad_to accepted an image bigger than the cell")
+
+
+def test_death_types_clean():
+    assert lint_static.check_death_types(RULES, BOOM, {"runner": {"die", "die-gib"}}) == []
+
+
+def test_death_types_missing_sequence():
+    errors = lint_static.check_death_types(RULES, BOOM, {"runner": {"die"}})
+    assert len(errors) == 1 and "runner" in errors[0] and "die-gib" in errors[0]
+
+
+def test_death_types_unlisted_damage_type():
+    fire = BOOM.replace("ExplosionDeath", "FireDeath")
+    errors = lint_static.check_death_types(RULES, fire, {"runner": {"die", "die-gib"}})
+    assert len(errors) == 1 and "FireDeath" in errors[0]
 
 
 if __name__ == "__main__":

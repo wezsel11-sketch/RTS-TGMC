@@ -27,6 +27,43 @@ def top_level_keys(text):
     return set(re.findall(r"^([^\s#][^:]*):", text, re.M))
 
 
+def check_death_types(rules, weapons, seqs):
+    """WithDeathAnimation picks `die` + a suffix by the killing warhead's damage type, and plays nothing when the type is
+    not listed. So every actor with that trait (own or inherited) must list each DamageTypes value a weapon uses, and
+    must have the sequence each entry names."""
+    blocks = {m.group(1): m.group(2)
+              for m in re.finditer(r"^(\^?[A-Za-z][\w-]*):[ \t]*\n((?:[ \t]+.*\n|[ \t]*\n)*)", rules + "\n", re.M)}
+
+    def chain(name):  # the actor, then its ancestors, nearest first
+        out, todo = [], [name]
+        while todo:
+            n = todo.pop(0)
+            if n in blocks and n not in out:
+                out.append(n)
+                todo += re.findall(r"^\tInherits(?:@\w+)?: (\S+)", blocks[n], re.M)
+        return out
+
+    used = set()
+    for m in re.finditer(r"^\s+DamageTypes: (.+)$", weapons, re.M):
+        used |= {t.strip() for t in m.group(1).split(",")}
+    errors = []
+    for actor in sorted(seqs):
+        bodies = [blocks[n] for n in chain(actor)]
+        if not any("WithDeathAnimation" in b for b in bodies):
+            continue
+        listed = {}
+        for b in reversed(bodies):  # farthest ancestor first, so the nearest entry wins
+            m = re.search(r"^\t\tDeathTypes:\n((?:\t\t\t.*\n)*)", b, re.M)
+            if m:
+                listed.update(re.findall(r"^\t\t\t(\w+): (\S+)", m.group(1), re.M))
+        for t, suffix in listed.items():
+            if "die" + suffix not in seqs[actor]:
+                errors.append(f"{actor} maps {t} to sequence die{suffix}, which build_sprites.py does not make for it")
+        for t in sorted(used - set(listed)):
+            errors.append(f"{actor} has no DeathTypes entry for damage type {t}, so a kill by it plays no death animation")
+    return errors
+
+
 def main():
     errors = []
     rules = {n: read("rules", n) for n in os.listdir(os.path.join(MOD, "rules"))}
@@ -126,6 +163,8 @@ def main():
             for s in (x.strip() for x in m.group(1).split(",")):
                 if s not in seqs[actor]:
                     errors.append(f"{actor} asks for sequence {s}, which build_sprites.py does not make for it")
+
+    errors += check_death_types(all_rules, rules["weapons.yaml"], seqs)
 
     # Muzzle flashes come from the actor's own sheet, so the actor must make the sequence its Armament names
     actor = None

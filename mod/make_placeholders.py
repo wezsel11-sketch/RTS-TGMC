@@ -95,6 +95,49 @@ def landing_zone_ground(x, y):
     return flat_ground(x, y)
 
 
+def _ellipse(x, y, cx, cy, rx, ry):
+    return ((x - cx) / rx) ** 2 + ((y - cy) / ry) ** 2 <= 1
+
+
+def _road(x, y, row, x0, x1):
+    return y == row and x0 <= x <= x1
+
+
+def canyon_run_ground(x, y):
+    """52x28. Water walls leave a six-wide lane down the middle and two two-wide trails along the edges: one choke, two flanks."""
+    if 15 <= x <= 36:
+        if 11 <= y <= 16:
+            return (DIRT if y in (13, 14) else GRASS), 0
+        return (GRASS, 0) if y in (3, 4, 23, 24) else (WATER, 0)
+    return (DIRT, 0) if _road(x, y, 13, 6, 45) else (GRASS, 0)
+
+
+def jungle_crossing_ground(x, y):
+    """44x28. A lake in the middle: go round it by the north or south shore, or wade the causeway through the centre."""
+    if _ellipse(x, y, 22, 13.5, 7, 9):
+        return (FORD, 0) if y in (13, 14) else (WATER, 0)
+    if any(_ellipse(x, y, cx, cy, 2, 2) for cx, cy in ((12, 5), (12, 22), (32, 5), (32, 22))):
+        return WATER, 0
+    return (DIRT, 0) if _road(x, y, 13, 6, 38) else (GRASS, 0)
+
+
+def close_quarters_ground(x, y):
+    """34x28. The bases are 13 cells apart, split by a thin river with fords. The xenos' fast rush has little ground to cross."""
+    if x in (16, 17):
+        return (FORD, 0) if y in (3, 4, 12, 13, 14, 15, 23, 24) else (WATER, 0)
+    if any(_ellipse(x, y, cx, cy, 2, 3) for cx, cy in ((13, 7), (20, 20), (13, 21), (20, 6))):
+        return WATER, 0
+    return (DIRT, 0) if _road(x, y, 13, 6, 27) else (GRASS, 0)
+
+
+def great_plains_ground(x, y):
+    """64x40. Open grass and scattered ponds; a long walk, so tech and walls matter more than a first rush."""
+    ponds = ((20, 12, 3, 3), (28, 26, 4, 3), (32, 19, 3, 2), (38, 10, 3, 3), (42, 28, 3, 3), (24, 32, 2, 2), (46, 18, 2, 3))
+    if any(_ellipse(x, y, *pond) for pond in ponds):
+        return WATER, 0
+    return (DIRT, 0) if _road(x, y, 19, 6, 58) or (x == 32 and 4 <= y <= 36 and not _ellipse(x, y, 32, 19, 3, 2)) else (GRASS, 0)
+
+
 def palette_entries():
     """A plain grey ramp. Only the palette-based paths read it; the TGMC-free tiles and sprites are RGBA."""
     return [(i, i, i) for i in range(256)]
@@ -255,6 +298,19 @@ HOLD_THE_LINE = [a for a in LANDING_ZONE if a[1] == "Marines"] + [
     ("rifleman", "Marines", 8, 15, 256),
     ("rifleman", "Marines", 8, 11, 256),
 ]
+
+def _skirmish_actors(xeno_dx, dy):
+    """Landing Zone's two bases, the xeno one moved by xeno_dx and both by dy."""
+    return [(n, o, x + (xeno_dx if o == "Xenos" else 0), y + dy, f) for n, o, x, y, f in LANDING_ZONE]
+
+
+# name: (title, width, height, xeno base shift, vertical shift of both bases, ground). Marines west, xenos east, like Landing Zone.
+SKIRMISH_MAPS = {
+    "canyon-run": ("Canyon Run", 52, 28, 12, 0, canyon_run_ground),
+    "jungle-crossing": ("Jungle Crossing", 44, 28, 4, 0, jungle_crossing_ground),
+    "close-quarters": ("Close Quarters", 34, 28, -6, 0, close_quarters_ground),
+    "great-plains": ("Great Plains", 64, 40, 24, 6, great_plains_ground),
+}
 
 SCENARIOS = {
     "scenario-heal": _scenario("test-heal", [
@@ -440,7 +496,9 @@ Actors:
     with open(os.path.join(folder, "map.yaml"), "w", encoding="utf-8", newline="\n") as f:
         f.write(yaml)
 
-    preview = Image.new("RGBA", (size_w, size_h), (0x2E, 0x52, 0x30, 255))
+    colours = {GRASS: (0x2E, 0x52, 0x30, 255), WATER: (0x1C, 0x3A, 0x5E, 255), FORD: (0x4A, 0x72, 0x86, 255), DIRT: (0x7A, 0x62, 0x40, 255)}
+    preview = Image.new("RGBA", (size_w, size_h))
+    preview.putdata([colours[ground(x, y)[0]] for y in range(size_h) for x in range(size_w)])
     preview.save(os.path.join(folder, "map.png"))
 
 
@@ -459,6 +517,12 @@ def main():
     write_map(os.path.join(args.out, "maps", "test-field"), "TGMC test field", 24, 24, TEST_FIELD, "Lobby, Shellmap", [(10, 12), (14, 12)])
     write_map(os.path.join(args.out, "maps", "landing-zone"), "Landing Zone", 40, 28, LANDING_ZONE, "Lobby", [(6, 14), (33, 13)],
               ground=landing_zone_ground, category="Conquest")
+    for name, (title, w, h, xeno_dx, dy, ground) in SKIRMISH_MAPS.items():
+        actors = _skirmish_actors(xeno_dx, dy)
+        for _, _, x, y, _ in actors:
+            assert 2 <= x <= w - 3 and 2 <= y <= h - 3 and ground(x, y)[0] != WATER, f"{name}: actor at {x},{y} is off the map or in water"
+        write_map(os.path.join(args.out, "maps", name), title, w, h, actors, "Lobby", [(6, 14 + dy), (33 + xeno_dx, 13 + dy)],
+                  ground=ground, category="Conquest")
     for name, sc in SCENARIOS.items():
         width, height = sc.get("size", (24, 24))
         write_map(os.path.join(args.out, "maps", name), name, width, height, sc["actors"], "MissionSelector",

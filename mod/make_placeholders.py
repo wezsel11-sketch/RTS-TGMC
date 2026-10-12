@@ -116,15 +116,28 @@ def write_cursor(path):
 
 
 def write_shroud_tiles(out, tile=32):
-    """Edge tiles for ShroudRenderer. Frame i - 1 darkens the quadrants named by the bits of i (1 TL, 2 TR, 4 BR, 8 BL)."""
+    """Edge tiles for ShroudRenderer. Frame i - 1 darkens the quadrants named by the bits of i (1 TL, 2 TR, 4 BR, 8 BL).
+
+    Each quadrant's darkness is a value at its centre, bilinearly blended across the tile, so the edge fades over
+    about half a tile instead of stepping at the quadrant border.
+    """
     half = tile // 2
-    quadrants = {1: (0, 0), 2: (half, 0), 4: (half, half), 8: (0, half)}
+    centres = {1: (half / 2, half / 2), 2: (half + half / 2, half / 2), 4: (half + half / 2, half + half / 2), 8: (half / 2, half + half / 2)}
     for name, alpha in (("shroud", 255), ("fog", 128)):
         sheet = Image.new("RGBA", (tile * 14, tile), (0, 0, 0, 0))
+        px = sheet.load()
         for pattern in range(1, 15):
-            for bit, (x, y) in quadrants.items():
-                if pattern & bit:
-                    sheet.paste((0, 0, 0, alpha), (tile * (pattern - 1) + x, y, tile * (pattern - 1) + x + half, y + half))
+            # Quadrant darkness at each centre, in TL, TR, BR, BL order
+            corners = [1.0 if pattern & bit else 0.0 for bit in (1, 2, 4, 8)]
+            for y in range(tile):
+                for x in range(tile):
+                    # Bilinear blend of the four centres, clamped to the tile
+                    u = min(max((x + 0.5 - centres[1][0]) / half, 0.0), 1.0)
+                    v = min(max((y + 0.5 - centres[1][1]) / half, 0.0), 1.0)
+                    top = corners[0] * (1 - u) + corners[1] * u
+                    bottom = corners[3] * (1 - u) + corners[2] * u
+                    a = int(round(alpha * (top * (1 - v) + bottom * v)))
+                    px[tile * (pattern - 1) + x, y] = (0, 0, 0, a)
         meta = PngImagePlugin.PngInfo()
         meta.add_text("FrameSize", f"{tile},{tile}")
         meta.add_text("FrameAmount", "14")
@@ -155,6 +168,60 @@ def write_rally_marker(out):
         meta = PngImagePlugin.PngInfo()
         meta.add_text("FrameSize", size)
         meta.add_text("FrameAmount", "4")
+        img.save(os.path.join(out, f"{name}.png"), pnginfo=meta)
+
+
+def write_repair_fx(out):
+    """Medic and engineer signals, drawn here rather than from TGMC: 8 frames each, 24x24.
+
+    heal-plus.png: three green crosses that rise and fade, for a heal. repair-wrench.png: a steel wrench that rocks on a
+    pivot, with sparks at the jaw, for a repair on a machine or a building.
+    """
+    size, frames = 24, 8
+    plus_green, plus_dark = (120, 230, 100, 255), (20, 60, 20, 255)
+
+    # Heals get a wider 32 px frame so three crosses 10 px apart fit with room between them
+    hsize = 32
+    heal = Image.new("RGBA", (hsize * frames, hsize), (0, 0, 0, 0))
+    for i in range(frames):
+        frame = Image.new("RGBA", (hsize, hsize), (0, 0, 0, 0))
+        d = ImageDraw.Draw(frame)
+        rise = int(i * 1.5)
+        alpha = 255 if i < frames - 2 else 120
+        # each cross is 7x7 (2 px arms) with a 1 px dark outline; the middle one sits a little higher
+        for cx, lift in ((6, 0), (16, 3), (26, 0)):
+            cy = 26 - rise - lift
+            for off, fill in ((1, plus_dark), (0, plus_green[:3] + (alpha,))):
+                d.rectangle([cx - 3 - off, cy - 1 - off, cx + 3 + off, cy + 1 + off], fill=fill)
+                d.rectangle([cx - 1 - off, cy - 3 - off, cx + 1 + off, cy + 3 + off], fill=fill)
+        heal.paste(frame, (hsize * i, 0))
+
+    steel, steel_dark, spark = (190, 196, 204, 255), (40, 42, 48, 255), (255, 220, 80, 255)
+    # The wrench is drawn once, upright, then turned by each frame's angle about the sheet's centre.
+    base = Image.new("RGBA", (size, size), (0, 0, 0, 0))
+    d = ImageDraw.Draw(base)
+    d.line([(9, 21), (15, 13)], fill=steel_dark, width=5)  # handle outline
+    d.line([(9, 21), (15, 13)], fill=steel, width=3)
+    d.ellipse([9, 2, 21, 14], fill=steel_dark)  # jaw outline
+    d.ellipse([10, 3, 20, 13], fill=steel)
+    d.rectangle([14, 4, 19, 8], fill=(0, 0, 0, 0))  # the open jaw
+    angles = (-30, -15, 0, 15, 30, 15, 0, -15)
+    wrench = Image.new("RGBA", (size * frames, size), (0, 0, 0, 0))
+    for i, angle in enumerate(angles):
+        frame = base.rotate(angle, resample=Image.BICUBIC, center=(size / 2, size / 2))
+        if i in (1, 2, 3, 4, 5):
+            # short rays from the jaw, three of the five directions per frame so the sparks flicker
+            sd = ImageDraw.Draw(frame)
+            jaw = (13, 6)
+            rays = ((-1, -1), (1, -1), (2, 0), (1, 1), (-1, 1))
+            for dx, dy in (rays[(i + k) % len(rays)] for k in range(3)):
+                sd.line([jaw, (jaw[0] + 3 * dx, jaw[1] + 3 * dy)], fill=spark, width=1)
+        wrench.paste(frame, (size * i, 0), frame)
+
+    for name, img, fs in (("heal-plus", heal, hsize), ("repair-wrench", wrench, size)):
+        meta = PngImagePlugin.PngInfo()
+        meta.add_text("FrameSize", f"{fs},{fs}")
+        meta.add_text("FrameAmount", str(frames))
         img.save(os.path.join(out, f"{name}.png"), pnginfo=meta)
 
 
@@ -388,6 +455,7 @@ def main():
     write_clock(os.path.join(args.out, "clock.png"))
     write_shroud_tiles(args.out, tile=32)
     write_rally_marker(args.out)
+    write_repair_fx(args.out)
     write_map(os.path.join(args.out, "maps", "test-field"), "TGMC test field", 24, 24, TEST_FIELD, "Lobby, Shellmap", [(10, 12), (14, 12)])
     write_map(os.path.join(args.out, "maps", "landing-zone"), "Landing Zone", 40, 28, LANDING_ZONE, "Lobby", [(6, 14), (33, 13)],
               ground=landing_zone_ground, category="Conquest")

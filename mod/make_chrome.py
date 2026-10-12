@@ -267,6 +267,47 @@ def vline(colour, h=19):
     return img
 
 
+# Production tab pictograms, drawn at 16x16 in the sidebar's light ink. They are our own shapes, not TGMC art.
+PARCHMENT = (226, 222, 196, 255)
+
+
+def rifle(colour):
+    img, d = _canvas(16, 16)
+    d.polygon([(1, 6), (4, 6), (4, 11), (2, 11)], fill=colour)  # stock
+    d.rectangle([4, 7, 13, 8], fill=colour)  # barrel
+    d.rectangle([11, 5, 12, 6], fill=colour)  # sight
+    d.polygon([(7, 9), (9, 9), (9, 13), (7, 13)], fill=colour)  # magazine
+    return img
+
+
+def claw(colour):
+    img, d = _canvas(16, 16)
+    for start, end in (((3, 2), (6, 13)), ((7, 2), (9, 14)), ((11, 3), (13, 12))):
+        d.line([start, end], fill=colour, width=2)
+    return img
+
+
+def hammer(colour):
+    img, d = _canvas(16, 16)
+    d.line([(4, 14), (10, 7)], fill=colour, width=2)  # handle
+    d.polygon([(7, 3), (13, 4), (12, 8), (6, 7)], fill=colour)  # head
+    return img
+
+
+PICTOGRAMS = {"infantry": rifle, "xeno": claw, "build": hammer}
+
+
+def production_icon(name):
+    """infantry/xeno/build in the light ink; -disabled is grey (the tab is locked), -alert amber (something is ready)."""
+    base = name.split("-")[0]
+    colour = PARCHMENT
+    if name.endswith("-disabled"):
+        colour = GREY
+    elif name.endswith("-alert"):
+        colour = AMBER
+    return PICTOGRAMS[base](colour)
+
+
 ICONS = {
     "checkmark-tick": {
         "checked": lambda: tick(AMBER), "checked-pressed": lambda: tick(AMBER_DIM),
@@ -314,7 +355,7 @@ ICONS = {
                   "enemy_owned": lambda: diamond(RED), "player_owned": lambda: diamond(OLIVE_HI)},
     "flags": {"marines": lambda: flag("M", OLIVE_DARK), "xenos": lambda: flag("X", (90, 30, 40, 255)),
               "Random": lambda: flag("?", SLATE), "spectator": lambda: flag("O", SLATE)},
-    "production-icons": {n: (lambda n=n: glyph_tile(n)) for n in
+    "production-icons": {n: (lambda n=n: production_icon(n)) for n in
                          ["infantry", "infantry-disabled", "infantry-alert", "xeno", "xeno-disabled", "xeno-alert",
                           "build", "build-disabled", "build-alert"]},
 }

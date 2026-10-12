@@ -84,12 +84,16 @@ FACING_SOURCE = {"N": "N", "NE": "E", "E": "E", "SE": "E", "S": "S", "SW": "W", 
 # TGMC's standard marine kit, the unprefixed states, which are a mottled grey-brown pattern camo that shows up well
 # against green terrain (the "m_" jungle set is dark and blends in). The boots go over the armour, whose legs would
 # otherwise hide them.
-GEAR = [(MARINE_ARMOR, "xarmor"), (FEET, "marine"), (MARINE_HELMETS, "helmet")]
+# Team colour, one per faction (the same for every player on that side): a multiply tint over the cloth. Marine cloth
+# (the uniform and the armour) goes blue; the xeno units go red. Skin, helmets, boots and weapons keep their own colours.
+MARINE_TEAM = (120, 150, 255)
+XENO_TEAM = (255, 150, 150)
+GEAR = [(MARINE_ARMOR, "xarmor", MARINE_TEAM), (FEET, "marine"), (MARINE_HELMETS, "helmet")]
 
 
 def marine(uniform, weapon):
     """Body, role uniform, armour, boots and helmet, then the weapon held in the right hand."""
-    return [(HUMAN, "body_m"), (MARINE_UNIFORM, uniform)] + GEAR + [weapon]
+    return [(HUMAN, "body_m"), (MARINE_UNIFORM, uniform, MARINE_TEAM)] + GEAR + [weapon]
 
 
 UNITS = {
@@ -98,6 +102,7 @@ UNITS = {
             "stand": marine("marine_jumpsuit", (RIFLES, "t18_w")),
             "run": "stand",
             "attack": "stand",
+            "die": [(HUMAN, "husk")],
             "flash": [(PROJECTILES, "muzzle_bullet", None, {"rotate": 90, "facings": 8, "tick": 50})],
             "icon": "stand:S",
         },
@@ -157,6 +162,7 @@ UNITS = {
             "stand": marine("marine_medic", (PISTOLS, "m44")),
             "run": "stand",
             "attack": "stand",
+            "die": [(HUMAN, "husk")],
             "icon": "stand:S",
         },
     },
@@ -165,6 +171,7 @@ UNITS = {
             "stand": marine("marine_engineer", (SMGS, "t19_w")),
             "run": "stand",
             "attack": "stand",
+            "die": [(HUMAN, "husk")],
             "icon": "stand:S",
         },
     },
@@ -174,6 +181,7 @@ UNITS = {
             "stand": marine("marine_assault_crewman", (RIFLES, "t18_w")),
             "run": "stand",
             "attack": "stand",
+            "die": [(HUMAN, "husk")],
             "flash": [(PROJECTILES, "muzzle_bullet", None, {"rotate": 90, "facings": 8, "tick": 35})],
             "icon": "stand:S",
         },
@@ -183,6 +191,7 @@ UNITS = {
             "stand": marine("pilot_spec", (RIFLES, "t18_w")),
             "run": "stand",
             "attack": "stand",
+            "die": [(HUMAN, "husk")],
             # The grenade launcher's thump: a puff of dust at the muzzle, not a flash
             "flash": [(HEAVY_IMPACT, "heavyimpact", None, {"frames": (0, 9), "size": 32, "tick": 60})],
             "icon": "stand:S",
@@ -327,7 +336,29 @@ UNITS = {
     "fx-slam": {
         "sequences": {"slam": [(HEAVY_IMPACT, "heavyimpact", None, {"tick": 60})]},
     },
+    # A runner's claw swipe, drawn over whatever it hits (the runner has no attack frames of its own in TGMC)
+    "fx-claw": {
+        "sequences": {"slash": [(FX32, "claw", None, {"tick": 60})]},
+    },
 }
+
+
+def team_layer(layer, rgb):
+    """The layer with a team tint, unless it already has its own. Layers are (dmi, state[, tint[, options]])."""
+    if len(layer) == 2:
+        return layer + (rgb,)
+    if layer[2] is None:
+        return (layer[0], layer[1], rgb) + tuple(layer[3:])
+    return layer
+
+
+# Xeno units take the xeno team colour on every layer
+XENO_UNITS = ["runner", "hunter", "sentinel", "drone", "warrior", "queen"]
+for _unit in XENO_UNITS:
+    _seqs = UNITS[_unit]["sequences"]
+    for _name, _value in _seqs.items():
+        if isinstance(_value, list):
+            _seqs[_name] = [team_layer(layer, XENO_TEAM) for layer in _value]
 
 
 def tinted(img, rgb):

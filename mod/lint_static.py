@@ -117,6 +117,19 @@ def main():
 
     # Sequences: the actors that build_sprites.py makes, and the sequence names the rules ask for
     seqs = {u: set(spec["sequences"]) for u, spec in build_sprites.UNITS.items()}
+    # Effect actors drawn without TGMC art (make_placeholders.py) are declared in tgmc/sequences/*.yaml: each top-level
+    # key is an actor and each tab-indented key under it is one of its sequences.
+    seq_dir = os.path.join(MOD, "sequences")
+    for fn in sorted(os.listdir(seq_dir)):
+        if not fn.endswith(".yaml"):
+            continue
+        actor = None
+        for line in read("sequences", fn).splitlines():
+            if re.match(r"^[A-Za-z][\w-]*:\s*$", line):
+                actor = line.split(":")[0]
+                seqs.setdefault(actor, set())
+            elif actor and (m := re.match(r"^	([A-Za-z][\w-]*):\s*$", line)):
+                seqs[actor].add(m.group(1))
     actor = None
     for line in all_rules.splitlines():
         if re.match(r"^\^?[A-Za-z][\w-]*:\s*$", line):

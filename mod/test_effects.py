@@ -49,6 +49,13 @@ def test_death_types_missing_sequence():
     assert len(errors) == 1 and "runner" in errors[0] and "die-gib" in errors[0]
 
 
+def test_death_types_see_past_a_comment_line():
+    # A comment at column 0 inside a block is valid MiniYaml and must not end the block
+    commented = RULES.replace("\tInherits: ^Unit\n", "\tInherits: ^Unit\n# a comment\n\n")
+    errors = lint_static.check_death_types(commented, BOOM, {"runner": {"die"}})
+    assert len(errors) == 1 and "die-gib" in errors[0]
+
+
 def test_death_types_unlisted_damage_type():
     fire = BOOM.replace("ExplosionDeath", "FireDeath")
     errors = lint_static.check_death_types(RULES, fire, {"runner": {"die", "die-gib"}})

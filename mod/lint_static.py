@@ -32,7 +32,7 @@ def check_death_types(rules, weapons, seqs):
     not listed. So every actor with that trait (own or inherited) must list each DamageTypes value a weapon uses, and
     must have the sequence each entry names."""
     blocks = {m.group(1): m.group(2)
-              for m in re.finditer(r"^(\^?[A-Za-z][\w-]*):[ \t]*\n((?:[ \t]+.*\n|[ \t]*\n)*)", rules + "\n", re.M)}
+              for m in re.finditer(r"^(\^?[A-Za-z][\w-]*):[ \t]*\n((?:[ \t]+.*\n|[ \t]*\n|#.*\n)*)", rules + "\n", re.M)}
 
     def chain(name):  # the actor, then its ancestors, nearest first
         out, todo = [], [name]

@@ -57,6 +57,8 @@ Sequences:
 	tgmc|sequences/fx-blast.yaml
 	tgmc|sequences/fx-blast-big.yaml
 	tgmc|sequences/fx-slam.yaml
+	tgmc|sequences/fx-slam-big.yaml
+	tgmc|sequences/fx-claw.yaml
 
 TileSets:
 	tgmc|tilesets/ground.yaml

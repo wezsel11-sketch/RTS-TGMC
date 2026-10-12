@@ -24,6 +24,7 @@ tileset-tgmc = TGMC test ground
 hud-header = TGMC // COMMAND
 hud-faction = MARINES VS XENOS
 hud-cash = REQUISITION
+hud-build-hint = Builders place within 5 cells
 hud-menu = MENU
 hud-observer-title = TGMC // OBSERVER
 actor-resin-turret =

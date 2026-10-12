@@ -65,7 +65,7 @@ Container@PLAYER_WIDGETS:
 					X: 4
 					Y: 214
 					Width: 232
-					Height: PARENT_HEIGHT - 322
+					Height: PARENT_HEIGHT - 342
 					Children:
 						LogicTicker@PRODUCTION_TICKER:
 						ProductionPalette@PRODUCTION_PALETTE:
@@ -121,9 +121,9 @@ Container@PLAYER_WIDGETS:
 											ImageCollection: production-icons
 				Background@READOUT_PANEL:
 					X: 8
-					Y: PARENT_HEIGHT - 98
+					Y: PARENT_HEIGHT - 118
 					Width: 224
-					Height: 56
+					Height: 76
 					Background: tgui-card
 					Children:
 						Label@GAME_TIMER:
@@ -151,6 +151,14 @@ Container@PLAYER_WIDGETS:
 							Font: Bold
 							TooltipContainer: TOOLTIP_CONTAINER
 							TooltipTemplate: SIMPLE_TOOLTIP
+						Label@BUILD_HINT:
+							X: 8
+							Y: 50
+							Width: PARENT_WIDTH - 16
+							Height: 18
+							Text: hud-build-hint
+							Font: Tiny
+							Align: Center
 				MenuButton@OPTIONS_BUTTON:
 					X: 8
 					Y: PARENT_HEIGHT - 34

@@ -24,6 +24,10 @@ Terrain:
 		Type: Water
 		TargetTypes: Water
 		Color: 4D86B8
+	TerrainType@Rock:
+		Type: Rock
+		TargetTypes: Rock
+		Color: B2B2B2
 
 Templates:
 	Template@1:
@@ -58,3 +62,11 @@ Templates:
 		Categories: Road
 		Tiles:
 			0: Road
+	Template@5:
+		Id: 5
+		Images: rock.png
+		Size: 1,1
+		PickAny: True
+		Categories: Terrain
+		Tiles:
+			0: Rock

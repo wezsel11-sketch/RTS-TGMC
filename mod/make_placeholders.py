@@ -24,11 +24,12 @@ from PIL import Image, ImageDraw, PngImagePlugin
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import build_sounds  # noqa: E402
+import tgmc_dmm  # noqa: E402
 
 CLOCK_W, CLOCK_H, CLOCK_FRAMES, CLOCK_COLS = 62, 46, 30, 6  # matches the sidebar palette's IconSize
 # Template ids in tilesets/ground.yaml. Grass lists two images, which the engine picks between per cell. The byte
 # after the id in map.bin is the tile's index within a multi-cell template, so it is 0 for every one of these.
-GRASS, WATER, FORD, DIRT = 1, 2, 3, 4
+GRASS, WATER, FORD, DIRT, ROCK = 1, 2, 3, 4, 5
 
 # (actor, owner, x, y, facing). Facing is in OpenRA angle units: 0 = north, 512 = south.
 TEST_FIELD = [
@@ -496,15 +497,54 @@ Actors:
     with open(os.path.join(folder, "map.yaml"), "w", encoding="utf-8", newline="\n") as f:
         f.write(yaml)
 
-    colours = {GRASS: (0x2E, 0x52, 0x30, 255), WATER: (0x1C, 0x3A, 0x5E, 255), FORD: (0x4A, 0x72, 0x86, 255), DIRT: (0x7A, 0x62, 0x40, 255)}
+    colours = {ROCK: (0x3A, 0x3A, 0x3A, 255), GRASS: (0x2E, 0x52, 0x30, 255), WATER: (0x1C, 0x3A, 0x5E, 255), FORD: (0x4A, 0x72, 0x86, 255), DIRT: (0x7A, 0x62, 0x40, 255)}
     preview = Image.new("RGBA", (size_w, size_h))
     preview.putdata([colours[ground(x, y)[0]] for y in range(size_h) for x in range(size_w)])
     preview.save(os.path.join(folder, "map.png"))
 
 
+def write_tgmc_map(folder, title, rows, marines, xenos):
+    """A skirmish map from a converted TGMC map. Landing Zone's two bases go at the given centres, on open ground."""
+    h, w = len(rows), len(rows[0])
+    land = [list(r) for r in rows]
+    centres = {"Marines": (marines, (6, 14)), "Xenos": (xenos, (33, 13))}
+
+    def place(actors, owner):
+        # Slide the base around the chosen centre to where most of its cells already are land. A base is its actors and its spawn point.
+        (cx, cy), (bx, by) = centres[owner]
+        pts = [(x, y) for _, o, x, y, _ in actors if o == owner] + [(bx, by)]
+        fits = lambda dx, dy: sum(land[y + dy][x + dx] in "GDF" for x, y in pts)  # noqa: E731
+        shifts = [(i, j) for i in range(-6, 7) for j in range(-6, 7)
+                  if all(2 <= x + cx - bx + i <= w - 3 and 2 <= y + cy - by + j <= h - 3 for x, y in pts)]
+        i, j = max(shifts, key=lambda s: (fits(cx - bx + s[0], cy - by + s[1]), -abs(s[0]) - abs(s[1])))
+        dx, dy = cx - bx + i, cy - by + j
+        for x, y in pts:  # clear what is left: each cell and the ring around it
+            for ax in range(x + dx - 1, x + dx + 2):
+                for ay in range(y + dy - 1, y + dy + 2):
+                    if 1 <= ax < w - 1 and 1 <= ay < h - 1 and land[ay][ax] in "RW":
+                        land[ay][ax] = "D"
+        return [(n, o, x + dx, y + dy, f) for n, o, x, y, f in actors if o == owner], (bx + dx, by + dy)
+
+    actors, spawn_m = place(LANDING_ZONE, "Marines")
+    xeno_actors, spawn_x = place(LANDING_ZONE, "Xenos")
+    # The bases must be joined by walkable ground, or the match can never be won.
+    seen, todo = {spawn_m}, [spawn_m]
+    while todo:
+        x, y = todo.pop()
+        for n in ((x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1)):
+            if n not in seen and 1 <= n[0] < w - 1 and 1 <= n[1] < h - 1 and land[n[1]][n[0]] in "GDF":
+                seen.add(n)
+                todo.append(n)
+    assert spawn_x in seen, f"{title}: the xeno base at {spawn_x} cannot be reached from the marine base at {spawn_m}"
+    codes = {"G": GRASS, "D": DIRT, "F": FORD, "W": WATER, "R": ROCK}
+    write_map(folder, title, w, h, actors + xeno_actors, "Lobby", [spawn_m, spawn_x],
+              ground=lambda x, y: (codes[land[y][x]], 0), category="Conquest")
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--out", required=True)
+    ap.add_argument("--tgmc", help="a TGMC checkout; with it the maps converted from TGMC's own (tgmc_dmm.MAPS) are written too")
     args = ap.parse_args()
 
     os.makedirs(args.out, exist_ok=True)
@@ -523,6 +563,9 @@ def main():
             assert 2 <= x <= w - 3 and 2 <= y <= h - 3 and ground(x, y)[0] != WATER, f"{name}: actor at {x},{y} is off the map or in water"
         write_map(os.path.join(args.out, "maps", name), title, w, h, actors, "Lobby", [(6, 14 + dy), (33 + xeno_dx, 13 + dy)],
                   ground=ground, category="Conquest")
+    if args.tgmc:
+        for name, spec in tgmc_dmm.MAPS.items():
+            write_tgmc_map(os.path.join(args.out, "maps", name), spec["title"], *tgmc_dmm.load(args.tgmc, spec))
     for name, sc in SCENARIOS.items():
         width, height = sc.get("size", (24, 24))
         write_map(os.path.join(args.out, "maps", name), name, width, height, sc["actors"], "MissionSelector",

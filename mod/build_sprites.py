@@ -17,7 +17,9 @@ frames, "rotate" turns a 1-dir state by that many degrees clockwise, "facings" t
 every frame (a muzzle flash or tracer that has to point along the shot), "swap_rg" swaps the red and green channels (the
 green xeno splatter becomes red marine blood), "size" scales the frames to that many pixels
 square, "fit" (w, h) shrinks them into a box of that size keeping the aspect ratio, "side" keeps one side (S, N, E, W) of a
-4-direction state, and "tick" sets the milliseconds per frame.
+4-direction state, and "tick" sets the milliseconds per frame. On the first layer of a sequence, "fade" (N) turns the composited still pose
+into N frames that fade out. A unit may also carry "cell": (w, h), which centres every frame of its sheet on a cell that
+size (a 32px marine sheet that has to hold TGMC's 64px gib frames).
 
 Animation timing comes from the .dmi `delay` list (deciseconds per frame). OpenRA has one `Tick`
 (ms per frame) per sequence, so Tick is the GCD of the delays and a frame that holds longer is
@@ -410,6 +412,24 @@ def composite(layers):
     return out
 
 
+def fade_frames(img, count):
+    """`count` copies of img whose alpha falls linearly: the first is untouched, the last is 1/count visible."""
+    frames = []
+    for i in range(count):
+        r, g, b, a = img.convert("RGBA").split()
+        frames.append(Image.merge("RGBA", (r, g, b, a.point(lambda v, i=i: round(v * (count - i) / count)))))
+    return frames
+
+
+def pad_to(img, size):
+    """Centre img, unscaled, on a transparent cell of `size`."""
+    if img.width > size[0] or img.height > size[1]:
+        raise SystemExit(f"a {img.size} frame does not fit a {tuple(size)} cell")
+    cell = Image.new("RGBA", tuple(size), (0, 0, 0, 0))
+    cell.paste(img, ((size[0] - img.width) // 2, (size[1] - img.height) // 2))
+    return cell
+
+
 def frame_timing(delays):
     """Map BYOND per-frame delays (deciseconds) to (tick_ms, frame indices to show), or (None, None).
 
@@ -423,8 +443,9 @@ def frame_timing(delays):
     return unit * 100, order
 
 
-def render_sequences(tgmc, sequences):
-    """Composite every non-alias sequence in `sequences` into one list of cells.
+def render_sequences(tgmc, sequences, cell=None):
+    """Composite every non-alias sequence in `sequences` into one list of cells. With `cell`, every frame is centred on a
+    transparent cell of that size, so art of different sizes can share one sheet.
 
     Returns (cells, cell_size, seq_defs, aliases)."""
     sheet_cells = []      # PIL images, appended in cell order
@@ -442,11 +463,16 @@ def render_sequences(tgmc, sequences):
                   for (dmi, state), spec in zip(dmis, layer_specs)]
         sides = composite(layers)
         first_opts = layer_specs[0][3] if len(layer_specs[0]) > 3 else {}
+        if "fade" in first_opts:  # a still pose that fades out over N frames
+            sides = {k: fade_frames(frames[0], first_opts["fade"]) for k, frames in sides.items()}
         size = (dmis[0][0].icon_w, dmis[0][0].icon_h)
         if "size" in first_opts:
             size = (first_opts["size"], first_opts["size"])
         if "fit" in first_opts:
             size = tuple(first_opts["fit"])
+        if cell:
+            sides = {k: [pad_to(img, cell) for img in frames] for k, frames in sides.items()}
+            size = tuple(cell)
         if cell_size is None:
             cell_size = size
         elif cell_size != size:
@@ -496,7 +522,7 @@ def build_unit(tgmc, unit, spec, out_dir):
     own_icon = icon_spec is not None and not isinstance(icon_spec, str)
     main = {k: v for k, v in spec["sequences"].items() if not (own_icon and k == "icon")}
     try:
-        sheet_cells, cell_size, seq_defs, aliases = render_sequences(tgmc, main)
+        sheet_cells, cell_size, seq_defs, aliases = render_sequences(tgmc, main, spec.get("cell"))
     except SystemExit as e:
         raise SystemExit(f"{unit}: {e}")
     icon_cells = None

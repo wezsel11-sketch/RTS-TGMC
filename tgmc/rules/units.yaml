@@ -178,6 +178,8 @@ grenadier:
 	WithDeathAnimation:
 		DeathSequence: die
 		FallbackSequence: die
+		DeathTypes:
+			ExplosionDeath: -gib
 	DeathSounds:
 	Armament@PRIMARY:
 		Weapon: TGMCClaws

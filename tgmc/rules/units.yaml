@@ -49,6 +49,11 @@
 	Voiced:
 		VoiceSet: MarineVoice
 	DeathSounds:
+	WithDeathAnimation:
+		DeathSequence: die
+		FallbackSequence: die
+		DeathTypes:
+			ExplosionDeath: -gib
 	WithInfantryBody:
 		MoveSequence: run
 		StandSequences: stand

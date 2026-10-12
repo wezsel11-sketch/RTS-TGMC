@@ -221,6 +221,7 @@ TGMCGrenade:
 		Damage: 45
 		Spread: 2c0
 		Falloff: 100, 50, 20, 0
+		DamageTypes: ExplosionDeath
 		ValidRelationships: Enemy
 	Warhead@2Boom: CreateEffect
 		Image: fx-blast

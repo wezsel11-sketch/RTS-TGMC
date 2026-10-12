@@ -54,6 +54,7 @@ RESIN_POD = "icons/Xeno/resin_pod.dmi"
 SENTRY = "icons/obj/machines/deployable/sentry/sentry.dmi"
 MARINE_ARMOR = "icons/mob/clothing/suits/marine_armor.dmi"
 MARINE_HELMETS = "icons/mob/clothing/headwear/marine_helmets.dmi"
+HUMAN_GIB = "icons/mob/human_gib.dmi"
 FEET = "icons/mob/clothing/feet.dmi"
 RIFLES = "icons/mob/inhands/guns/rifles_right_1.dmi"
 SMGS = "icons/mob/inhands/guns/submachineguns_right_1.dmi"
@@ -94,10 +95,25 @@ def marine(uniform, weapon):
     return [(HUMAN, "body_m"), (MARINE_UNIFORM, uniform)] + GEAR + [weapon]
 
 
+def marine_die(uniform, weapon):
+    """The marine's pose, front on, fading out over 6 frames: the death animation for a kill that is not an explosion."""
+    layers = [(HUMAN, "body_m"), (MARINE_UNIFORM, uniform)] + GEAR + [weapon]
+    layers = [layer + (None, {"side": "S"}) for layer in layers]
+    layers[0] = layers[0][:2] + (None, {"side": "S", "fade": 6, "tick": 70})
+    return layers
+
+
+# TGMC's human gib is 64px and the marine is 32px, so the marine sheets hold 64px cells.
+MARINE_CELL = (64, 64)
+MARINE_GIB = [(HUMAN_GIB, "default", None, {"tick": 70})]
+
 UNITS = {
     "rifleman": {
+        "cell": MARINE_CELL,
         "sequences": {
             "stand": marine("marine_jumpsuit", (RIFLES, "t18_w")),
+            "die": marine_die("marine_jumpsuit", (RIFLES, "t18_w")),
+            "die-gib": MARINE_GIB,
             "run": "stand",
             "attack": "stand",
             "flash": [(PROJECTILES, "muzzle_bullet", None, {"rotate": 90, "facings": 8, "tick": 50})],
@@ -160,16 +176,22 @@ UNITS = {
     },
     # Marine roles. Same body as the rifleman, with the role's uniform state on top.
     "medic": {
+        "cell": MARINE_CELL,
         "sequences": {
             "stand": marine("marine_medic", (PISTOLS, "m44")),
+            "die": marine_die("marine_medic", (PISTOLS, "m44")),
+            "die-gib": MARINE_GIB,
             "run": "stand",
             "attack": "stand",
             "icon": "stand:S",
         },
     },
     "engineer": {
+        "cell": MARINE_CELL,
         "sequences": {
             "stand": marine("marine_engineer", (SMGS, "t19_w")),
+            "die": marine_die("marine_engineer", (SMGS, "t19_w")),
+            "die-gib": MARINE_GIB,
             "run": "stand",
             "attack": "stand",
             "icon": "stand:S",
@@ -177,8 +199,11 @@ UNITS = {
     },
     # Marine gunners. Same kit as the other roles with their own uniform state; the weapon art is the rifle's.
     "smartgunner": {
+        "cell": MARINE_CELL,
         "sequences": {
             "stand": marine("marine_assault_crewman", (RIFLES, "t18_w")),
+            "die": marine_die("marine_assault_crewman", (RIFLES, "t18_w")),
+            "die-gib": MARINE_GIB,
             "run": "stand",
             "attack": "stand",
             "flash": [(PROJECTILES, "muzzle_bullet", None, {"rotate": 90, "facings": 8, "tick": 35})],
@@ -186,8 +211,11 @@ UNITS = {
         },
     },
     "grenadier": {
+        "cell": MARINE_CELL,
         "sequences": {
             "stand": marine("pilot_spec", (RIFLES, "t18_w")),
+            "die": marine_die("pilot_spec", (RIFLES, "t18_w")),
+            "die-gib": MARINE_GIB,
             "run": "stand",
             "attack": "stand",
             # The grenade launcher's thump: a puff of dust at the muzzle, not a flash

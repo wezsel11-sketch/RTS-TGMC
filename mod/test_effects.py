@@ -55,6 +55,18 @@ def test_death_types_unlisted_damage_type():
     assert len(errors) == 1 and "FireDeath" in errors[0]
 
 
+def test_only_grenade_tags_explosions():
+    path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "tgmc", "rules", "weapons.yaml")
+    with open(path, encoding="utf-8") as f:
+        text = f.read()
+    # A blank line separates weapons; comments above one belong to its block, so keep only the name line
+    names = set()
+    for block in text.split("\n\n"):
+        if "DamageTypes:" in block:
+            names |= {line.split(":")[0] for line in block.splitlines() if line and line[0].isalpha()}
+    assert names == {"TGMCGrenade"}, names
+
+
 if __name__ == "__main__":
     for name, fn in sorted(globals().items()):
         if name.startswith("test_") and callable(fn):

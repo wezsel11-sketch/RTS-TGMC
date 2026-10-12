@@ -52,8 +52,8 @@ TGMCHeal:
 		ValidRelationships: Ally
 		ValidTargets: Heal
 	Warhead@2Fx: CreateEffect
-		Image: fx-impact
-		Explosions: heal
+		Image: heal-plus
+		Explosions: idle
 		ValidRelationships: Ally
 		ValidTargets: Heal
 
@@ -69,8 +69,8 @@ TGMCRepair:
 		ValidRelationships: Ally
 		ValidTargets: Repair
 	Warhead@2Fx: CreateEffect
-		Image: fx-impact
-		Explosions: spark
+		Image: repair-wrench
+		Explosions: idle
 		ImpactSounds: spark-1.ogg, spark-2.ogg
 		ImpactSoundChance: 40
 		ValidRelationships: Ally
@@ -108,8 +108,8 @@ TGMCClaws:
 		ValidRelationships: Enemy
 		ValidTargets: Structure
 	Warhead@6Slash: CreateEffect
-		Image: fx-impact
-		Explosions: claw, claw2
+		Image: fx-claw
+		Explosions: slash
 		ValidRelationships: Enemy
 		ValidTargets: Human, Structure
 

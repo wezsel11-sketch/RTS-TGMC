@@ -19,6 +19,7 @@ import tgmc_dmi  # noqa: E402
 
 JUNGLE = "icons/turf/jungle.dmi"
 GROUND = "icons/turf/ground_map.dmi"
+CAVE = "icons/turf/walls/cave.dmi"
 
 TILES = {
     "grass1": (JUNGLE, "grass1", 0),
@@ -26,6 +27,7 @@ TILES = {
     "dirt": (GROUND, "dirt", 0),
     "ford": (GROUND, "seashallow", 0),
     "water": (GROUND, "seadeep", 0),
+    "rock": (CAVE, "cave-255", 0),
 }
 
 

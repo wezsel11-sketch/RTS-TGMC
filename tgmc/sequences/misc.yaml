@@ -17,3 +17,19 @@ rallypoint:
 		Length: 4
 		Tick: 160
 		ZOffset: 2047
+
+# Medic and engineer signals: a heal's three green crosses and a repair's rocking wrench. Both sheets are drawn by
+# mod/make_placeholders.py (no TGMC art). The weapons in weapons.yaml name these actors as their effect Image.
+heal-plus:
+	idle:
+		Filename: heal-plus.png
+		Length: 8
+		Tick: 100
+		ZOffset: 2000
+
+repair-wrench:
+	idle:
+		Filename: repair-wrench.png
+		Length: 8
+		Tick: 100
+		ZOffset: 2000

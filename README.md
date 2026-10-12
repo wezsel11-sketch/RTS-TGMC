@@ -19,7 +19,7 @@ redistribute the built mod, and do not publish TGMC-derived art or audio. See
 
 ## Quick start
 
-You need `git`, `make`, `python3` with Pillow, `ffmpeg` (with libvorbis) and a POSIX shell. Linux and macOS work; on Windows use WSL.
+You need `git`, `make`, `python3` with Pillow, `ffmpeg` (with libvorbis) and a POSIX shell. Linux x64 is the only tested platform; macOS is untested, and on Windows use WSL.
 No .NET? The script installs a .NET 10 SDK into `build/tools`, and nothing outside `build/` is touched.
 
 ```sh
@@ -34,7 +34,7 @@ the commits this mod was tested against (see the top of the script), so a later 
 
 ## How to play
 
-- **Main menu -> Singleplayer -> Skirmish.** Pick **Landing Zone** (two-player skirmish) or **Hold the Line** (marines against waves).
+- **Main menu -> Singleplayer -> Skirmish.** Pick a skirmish map (**Landing Zone**, **Canyon Run**, **Jungle Crossing**, **Close Quarters**, **Great Plains**, plus four converted from TGMC's own maps: **LV-624**, **Big Red**, **Whiskey Outpost**, **Desert Dam**) or **Hold the Line** (marines against waves).
   In Landing Zone choose a faction for yourself and set the other slot to **Skirmish AI**, then Start Game.
 - **Marines** start with a cryo pod, a vendor and a squad. Click the cryo pod and use the sidebar's *Infantry* tab to train riflemen,
   corpsmen (they heal), engineers (they repair), smartgunners (rapid spread fire) and grenadiers (splash). **Xenos** start with a resin silo and mini silos; use the *Xeno* tab for Runner,
@@ -77,7 +77,8 @@ Logs and replays are in OpenRA's support directory (`~/.config/OpenRA` on Linux,
 The converters read these TGMC files:
 
 - `icons/mob/human.dmi` state `body_m`, with `icons/mob/clothing/uniforms/marine_uniforms.dmi` state `marine_jumpsuit` on top, for the rifleman.
-- Terrain tiles: `icons/turf/jungle.dmi` (`grass1`, `grass2`) and `icons/turf/ground_map.dmi` (`dirt`, `seashallow`, `seadeep`).
+- Terrain tiles: `icons/turf/jungle.dmi` (`grass1`, `grass2`), `icons/turf/ground_map.dmi` (`dirt`, `seashallow`, `seadeep`) and `icons/turf/walls/cave.dmi` (`cave-255`, the impassable rock).
+- Maps: `_maps/map_files/` `LV624/LV624.dmm`, `BigRed_v2/BigRed_v2.dmm`, `Whiskey_Outpost/Whiskey_Outpost_v2.dmm` and `desertdam/desertdam.dmm`, read for their turfs only (see Maps from TGMC).
 - `icons/Xeno/castes/hunter.dmi`, `sentinel.dmi` and `drone.dmi` (48px; Hunter and Sentinel have animated walks and runs,
   so each file has a still and an animated state of the same name, and the converter uses the animated one).
 - `icons/Xeno/castes/runner.dmi` states `Runner Walking`, `Runner Running`, and `Runner Dead`, for the Runner.
@@ -106,10 +107,11 @@ mod/                        converters and build script (Python 3, Pillow, ffmpe
   build_sprites.py          .dmi states -> PNG sheets + OpenRA sequence YAML (8 facings)
   build_sounds.py           TGMC .ogg -> mono 22050 Hz Vorbis .ogg
   build_tileset.py          TGMC floor tiles (jungle grass, dirt, shallow and deep water) -> 32px PNG tiles
-  make_placeholders.py      palette, cursor, clock, fog tiles and the maps (no TGMC art)
+  make_placeholders.py      palette, cursor, clock, fog tiles and the maps (no TGMC art; the maps from TGMC need `--tgmc`)
+  tgmc_dmm.py               reads TGMC .dmm maps and converts them to terrain for the four converted skirmish maps
   lint_static.py            cross-reference check (sounds, weapons, voice sets, Fluent keys, sequences); build_mod.sh runs it
   smoke.sh                  launches the built mod headless on a map, screenshots it, fails on an engine exception
-  test_scenarios.sh         runs the scripted scenario maps (heal, repair, mend, victory, combat, fx, waves, ai, rally) and checks each prints PASS
+  test_scenarios.sh         runs the scripted scenario maps (heal, repair, mend, victory, combat, fx, waves, ai, rally, build) and checks each prints PASS; test-aivai and test-holdline run through balance.sh, and test-sounds plays every sound to listen to
   balance.sh                runs several AI-vs-AI matches (balance-aivai) in parallel and prints who won and when
   scenarios/                the Lua scripts those maps run (copied into each map by make_placeholders.py)
   check_mod.sh              runs OpenRA's own lint (--check-yaml, --check-missing-sprites) on the built mod and map
@@ -117,7 +119,6 @@ mod/                        converters and build script (Python 3, Pillow, ffmpe
 tgmc/                       the OpenRA mod (YAML and Fluent only)
   mod.yaml                  manifest
   rules/                    world, player, palettes, units, structures, weapons
-  chrome/                   in-game HUD layouts (player sidebar, observer banner)
   audio/notifications.yaml  UI sound mapping
   audio/music.yaml          the playlist: themes, tense tracks, lobby theme, ambience loops
   scripts/music.lua         faction-aware, fight-aware music (the world's LuaScript)
@@ -154,7 +155,36 @@ MAP=$(sh utility.sh tgmc --map-hash ~/openra-tgmc-mod/build/mod/tgmc/maps/test-f
 ./launch-game.sh Game.Mod=tgmc Launch.Map=$MAP
 ```
 
-There are three maps. **Hold the Line** is a survival map: the marines (one human player, no xeno slot) hold their base against
+There are eleven playable maps: nine skirmish maps (Landing Zone, four hand-made, four converted from TGMC), Hold the Line and the test field. The four hand-made skirmish maps reuse Landing Zone's two bases (marines west, xenos east) on different
+ground, so they play differently without any new rules (`SKIRMISH_MAPS` in `mod/make_placeholders.py`; the terrain is a function per map):
+
+| Map | Size | Character |
+| --- | --- | --- |
+| Canyon Run | 52x28 | Water walls leave one six-wide lane and two two-wide edge trails: a choke for the marines, flanks for the xenos. |
+| Jungle Crossing | 44x28 | A lake in the middle: north shore, south shore, or the wading causeway through the centre. |
+| Close Quarters | 34x28 | Bases 13 cells apart behind a thin river with fords; the xeno rush has little ground to cross. |
+| Great Plains | 64x40 | Open grass and ponds, a long walk: tech, walls and Miners matter more than a first rush. |
+
+### Maps from TGMC
+
+`mod/tgmc_dmm.py` reads TGMC's own `.dmm` map files and shrinks each one into an OpenRA skirmish map, so the ground is TGMC's. This only
+happens at build time, from the TGMC checkout (`make_placeholders.py --tgmc`); no converted map is committed. Only the turfs are read: walls,
+cave rock, space and dense jungle become **rock** (impassable), deep water becomes impassable water, shallow river and coast become a ford,
+grass and jungle become grass, and every floor and dirt becomes the walkable dirt tile. Objects, doors and buildings are ignored, so a
+walled compound is open ground where its wall was one tile thin. The map is cropped to its open ground and shrunk by a factor
+(2 or 3 TGMC tiles to a cell); a cell is rock when more than half of its tiles are.
+Each map gets Landing Zone's two bases, slid to the nearest open ground around the spot chosen in `MAPS`, and the build fails if the
+two are not joined by walkable ground.
+
+| Map | Size | From |
+| --- | --- | --- |
+| LV-624 | 110x89 | `LV624.dmm`: jungle colony and landing site in the south, the river across the middle, cave systems to the north. Marines west, xenos in the north caves. |
+| Big Red | 75x71 | `BigRed_v2.dmm`: the Solaris Ridge corridors and compounds, nothing but dirt and rock. |
+| Whiskey Outpost | 60x67 | `Whiskey_Outpost_v2.dmm`: the fortified compound in the north against a jungle that floods in the middle. Marines north, xenos south. |
+| Desert Dam | 81x77 | `desertdam.dmm`: two sides of the colony split by the river; cross at the fords. |
+
+
+The original three: **Hold the Line** is a survival map: the marines (one human player, no xeno slot) hold their base against
 six timed waves of Runners, Hunters and Sentinels coming from the east, and win by destroying the last wave. The script is
 `mod/scenarios/wave-survival.lua`; its `Config` table at the top sets the spawn cells, wave sizes and delays.
 **Landing Zone** (40x28) is a skirmish map: marines in the west with a cryo pod
@@ -231,34 +261,38 @@ The effect sprites are TGMC art too (`fx-*` images in `build_sprites.py`) and ar
 - **Melee and support hits.** Claws draw blood and a TGMC claw slash on marines and sparks plus the slash on structures; the
   Warrior's slam kicks up a dust shockwave and TGMC's slam impact ring; the corpsman's heal sparkles, the engineer's repair
   sparks and the drone's mend sparkles.
-- **Deaths and gibs.** A marine fades out when killed. Xenos play TGMC's dead pose. A kill by an explosion (the grenade, the
+- **Deaths and gibs.** A marine dies as TGMC's husk body and the xenos play TGMC's dead pose. A kill by an explosion (the grenade, the
   only warhead with `DamageTypes: ExplosionDeath`) gibs a marine, Runner, Hunter, Sentinel or Drone with TGMC's gib
   animation; the Warrior and Queen are too heavy and play their plain death. `WithDeathAnimation` picks the sequence by
   damage type (`die` plus the `DeathTypes` suffix), and plays nothing for a damage type it does not list, so
   `lint_static.py` checks that every unit lists every damage type a weapon uses. The marine sheets are built with
   64px cells (`cell` in `build_sprites.py`) to hold the 64px gib frames.
 - `mod/lint_static.py` checks each weapon's image and sequence names, each `MuzzleSequence` and the death types.
-  `mod/test_effects.py` tests the sprite builder's fade and padding and the death-type lint; `build_mod.sh` runs it.
+  `mod/test_effects.py` tests the sprite builder's fade option and padding and the death-type lint; `build_mod.sh` runs it.
   `scenario-gib` kills every unit type, some as an explosion would.
 
 ## Known gaps
 
 - A gib leaves no corpse or blood decal and no particles: an OpenRA death animation ends with its sequence. TGMC's human
   gib animation opens on an unclothed body, so a marine in armour pops to a bare body as it bursts.
-- The marine's `run` sequence aliases `stand`, because TGMC's human sheet has only a standing state.
-- Player colour remapping is off. The sprites are RGBA, so the `player` palette doesn't
-  recolour them. Units are not coloured by owner.
-- Runners have no attack animation. `attack` reuses `stand`. The Runner's claws play the hiss on attack.
+- The marine dies to TGMC's `husk` body, which stands upright (TGMC has no lying-down human). Its `run` sequence aliases
+  `stand`, because TGMC's human sheet has only a standing state.
+- Units are coloured by team, not by player: marine cloth is blue and xeno units are red, a fixed multiply tint in
+  `mod/build_sprites.py` (`MARINE_TEAM`, `XENO_TEAM`). Two players on one side share a colour. Per-player remapping is off:
+  the sprites are RGBA, so the `player` palette doesn't recolour them.
+- Runners have no attack frames: `attack` reuses `stand`. A hit shows TGMC's claw slash (`fx-claw`), and the claws play the hiss on attack.
 - Sounds are all unheard (no audio device here). See the Sound section.
-- Medic and engineer have no heal or repair animation (they reuse `attack`). Healing and repair are weapons
-  with negative damage. Scenario tests cover heal, repair, victory and a rifleman-versus-Runner fight.
+- Medic and engineer signals are drawn here, not from TGMC: a green + + + over a healed unit, and a rocking wrench with
+  sparks over a repaired machine or building (`write_repair_fx` in `mod/make_placeholders.py`). They are the effects on
+  `TGMCHeal` and `TGMCRepair`, so they play on the target. Healing and repair are weapons with negative damage. Scenario tests cover heal, repair, victory and a rifleman-versus-Runner fight.
 - Weapons that use `InstantHit` need `TargetActorCenter: true`, or the hit lands on a position and does nothing.
 - Acid is now a projectile, so a fast runner can still outrun a glob. Effects have not been tuned by eye in a long match.
-- Terrain is flat tiles from TGMC's `jungle.dmi` and `ground_map.dmi`: grass (two variants), dirt road, a walkable
-  ford and impassable water. There are no edge or transition tiles, so shorelines are hard. The test field is all grass.
+- Terrain is flat tiles from TGMC's `jungle.dmi`, `ground_map.dmi` and `cave.dmi`: grass (two variants), dirt road, a walkable
+  ford, impassable water and impassable rock. There are no edge or transition tiles, so shorelines are hard. The test field is all grass.
 - The HUD is a command sidebar (radar, production palette with an Infantry and a Xeno tab, requisition, menu button); it reads the same for either faction. There is no selection readout, as that would need C#.
-  Production icons are the units' front-facing sprite. The clock overlay and the production tab icons are
-  placeholders drawn by the scripts. Production buildings have no rally point yet.
+  Production icons are the units' front-facing sprite. The clock overlay is still a placeholder. The production tab icons are
+  pictograms (rifle, claw, hammer) drawn by `mod/make_chrome.py`. The readout card under the palette has a Build-range hint,
+  "Builders place within 5 cells", shown on every tab.
 - The AI (`rules/ai.yaml`) trains units, sends them out in squads, and builds generators, tech and turrets with OpenRA's base-builder
   module (never walls). It has no builder to walk, so for the bot only, its cryo pod or silo counts as the build area.
   Pick "Skirmish AI" for a slot in the lobby.
@@ -285,14 +319,14 @@ The effect sprites are TGMC art too (`fx-*` images in `build_sprites.py`) and ar
   four runs, finishing the last wave (16 Runners, 10 Hunters, 8 Sentinels) with about 30 units and 2 or 3 of their 5
   buildings. The waves attack-move to the marine base because `Hunt()` cannot see across the map for a scripted player.
 - Tuning so far: the marine queue takes cost x 60% x 350% ticks (a rifleman is about 8 s) and the xeno queue x 250% (a Runner is about 3 s). Marines have
-  120 HP and rifles do 14 every 15 ticks at 6 cells; Runners have 100 HP, run at speed 115 and claws do 20 every 14 ticks;
+  120 HP and rifles do 14 every 15 ticks at 6 cells; Runners have 120 HP (raised from 100 so the early push survives rifles), run at speed 115 and claws do 20 every 14 ticks;
   Hunters 130 HP; sentries do 10; the corpsman heals 20 every 60 ticks.
   Base income is 6 cash every 2 s from the vendor and silo and 3 from a mini silo (it was 15 and 5 before the Build tab); a Miner gives 8 and a Weed Node 7.
   None of this has had real play time.
 - `mod/setup.sh` was run from an empty directory on a fresh clone (it installed .NET, built OpenRA, made the sparse TGMC clone, built
   and linted the mod in about two minutes on a fast connection); a second run skipped the finished steps, and the scenarios, the smoke test
   and `play.sh hold-the-line` all ran afterwards. Only Linux x64 has been tried. macOS and WSL are untested.
-- Fog of war is drawn with plain black quadrant tiles, so edges look blocky.
+- Fog of war edges blend over half a tile (`write_shroud_tiles`), smoother than the old quadrant steps. Not yet checked in play.
 - The in-game MENU button now opens the Esc menu (the sidebar carries `MenuButtonsChromeLogic`). Checked headless: the menu, its objectives
   panel and Settings open with no missing sprites. The Smartgunner, Grenadier and Warrior are new and have had the scenario tests but no play time.
 

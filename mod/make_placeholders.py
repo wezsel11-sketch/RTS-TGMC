@@ -24,11 +24,12 @@ from PIL import Image, ImageDraw, PngImagePlugin
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import build_sounds  # noqa: E402
+import tgmc_dmm  # noqa: E402
 
 CLOCK_W, CLOCK_H, CLOCK_FRAMES, CLOCK_COLS = 62, 46, 30, 6  # matches the sidebar palette's IconSize
 # Template ids in tilesets/ground.yaml. Grass lists two images, which the engine picks between per cell. The byte
 # after the id in map.bin is the tile's index within a multi-cell template, so it is 0 for every one of these.
-GRASS, WATER, FORD, DIRT = 1, 2, 3, 4
+GRASS, WATER, FORD, DIRT, ROCK = 1, 2, 3, 4, 5
 
 # (actor, owner, x, y, facing). Facing is in OpenRA angle units: 0 = north, 512 = south.
 TEST_FIELD = [
@@ -95,6 +96,49 @@ def landing_zone_ground(x, y):
     return flat_ground(x, y)
 
 
+def _ellipse(x, y, cx, cy, rx, ry):
+    return ((x - cx) / rx) ** 2 + ((y - cy) / ry) ** 2 <= 1
+
+
+def _road(x, y, row, x0, x1):
+    return y == row and x0 <= x <= x1
+
+
+def canyon_run_ground(x, y):
+    """52x28. Water walls leave a six-wide lane down the middle and two two-wide trails along the edges: one choke, two flanks."""
+    if 15 <= x <= 36:
+        if 11 <= y <= 16:
+            return (DIRT if y in (13, 14) else GRASS), 0
+        return (GRASS, 0) if y in (3, 4, 23, 24) else (WATER, 0)
+    return (DIRT, 0) if _road(x, y, 13, 6, 45) else (GRASS, 0)
+
+
+def jungle_crossing_ground(x, y):
+    """44x28. A lake in the middle: go round it by the north or south shore, or wade the causeway through the centre."""
+    if _ellipse(x, y, 22, 13.5, 7, 9):
+        return (FORD, 0) if y in (13, 14) else (WATER, 0)
+    if any(_ellipse(x, y, cx, cy, 2, 2) for cx, cy in ((12, 5), (12, 22), (32, 5), (32, 22))):
+        return WATER, 0
+    return (DIRT, 0) if _road(x, y, 13, 6, 38) else (GRASS, 0)
+
+
+def close_quarters_ground(x, y):
+    """34x28. The bases are 13 cells apart, split by a thin river with fords. The xenos' fast rush has little ground to cross."""
+    if x in (16, 17):
+        return (FORD, 0) if y in (3, 4, 12, 13, 14, 15, 23, 24) else (WATER, 0)
+    if any(_ellipse(x, y, cx, cy, 2, 3) for cx, cy in ((13, 7), (20, 20), (13, 21), (20, 6))):
+        return WATER, 0
+    return (DIRT, 0) if _road(x, y, 13, 6, 27) else (GRASS, 0)
+
+
+def great_plains_ground(x, y):
+    """64x40. Open grass and scattered ponds; a long walk, so tech and walls matter more than a first rush."""
+    ponds = ((20, 12, 3, 3), (28, 26, 4, 3), (32, 19, 3, 2), (38, 10, 3, 3), (42, 28, 3, 3), (24, 32, 2, 2), (46, 18, 2, 3))
+    if any(_ellipse(x, y, *pond) for pond in ponds):
+        return WATER, 0
+    return (DIRT, 0) if _road(x, y, 19, 6, 58) or (x == 32 and 4 <= y <= 36 and not _ellipse(x, y, 32, 19, 3, 2)) else (GRASS, 0)
+
+
 def palette_entries():
     """A plain grey ramp. Only the palette-based paths read it; the TGMC-free tiles and sprites are RGBA."""
     return [(i, i, i) for i in range(256)]
@@ -116,15 +160,28 @@ def write_cursor(path):
 
 
 def write_shroud_tiles(out, tile=32):
-    """Edge tiles for ShroudRenderer. Frame i - 1 darkens the quadrants named by the bits of i (1 TL, 2 TR, 4 BR, 8 BL)."""
+    """Edge tiles for ShroudRenderer. Frame i - 1 darkens the quadrants named by the bits of i (1 TL, 2 TR, 4 BR, 8 BL).
+
+    Each quadrant's darkness is a value at its centre, bilinearly blended across the tile, so the edge fades over
+    about half a tile instead of stepping at the quadrant border.
+    """
     half = tile // 2
-    quadrants = {1: (0, 0), 2: (half, 0), 4: (half, half), 8: (0, half)}
+    centres = {1: (half / 2, half / 2), 2: (half + half / 2, half / 2), 4: (half + half / 2, half + half / 2), 8: (half / 2, half + half / 2)}
     for name, alpha in (("shroud", 255), ("fog", 128)):
         sheet = Image.new("RGBA", (tile * 14, tile), (0, 0, 0, 0))
+        px = sheet.load()
         for pattern in range(1, 15):
-            for bit, (x, y) in quadrants.items():
-                if pattern & bit:
-                    sheet.paste((0, 0, 0, alpha), (tile * (pattern - 1) + x, y, tile * (pattern - 1) + x + half, y + half))
+            # Quadrant darkness at each centre, in TL, TR, BR, BL order
+            corners = [1.0 if pattern & bit else 0.0 for bit in (1, 2, 4, 8)]
+            for y in range(tile):
+                for x in range(tile):
+                    # Bilinear blend of the four centres, clamped to the tile
+                    u = min(max((x + 0.5 - centres[1][0]) / half, 0.0), 1.0)
+                    v = min(max((y + 0.5 - centres[1][1]) / half, 0.0), 1.0)
+                    top = corners[0] * (1 - u) + corners[1] * u
+                    bottom = corners[3] * (1 - u) + corners[2] * u
+                    a = int(round(alpha * (top * (1 - v) + bottom * v)))
+                    px[tile * (pattern - 1) + x, y] = (0, 0, 0, a)
         meta = PngImagePlugin.PngInfo()
         meta.add_text("FrameSize", f"{tile},{tile}")
         meta.add_text("FrameAmount", "14")
@@ -158,6 +215,60 @@ def write_rally_marker(out):
         img.save(os.path.join(out, f"{name}.png"), pnginfo=meta)
 
 
+def write_repair_fx(out):
+    """Medic and engineer signals, drawn here rather than from TGMC: 8 frames each, 24x24.
+
+    heal-plus.png: three green crosses that rise and fade, for a heal. repair-wrench.png: a steel wrench that rocks on a
+    pivot, with sparks at the jaw, for a repair on a machine or a building.
+    """
+    size, frames = 24, 8
+    plus_green, plus_dark = (120, 230, 100, 255), (20, 60, 20, 255)
+
+    # Heals get a wider 32 px frame so three crosses 10 px apart fit with room between them
+    hsize = 32
+    heal = Image.new("RGBA", (hsize * frames, hsize), (0, 0, 0, 0))
+    for i in range(frames):
+        frame = Image.new("RGBA", (hsize, hsize), (0, 0, 0, 0))
+        d = ImageDraw.Draw(frame)
+        rise = int(i * 1.5)
+        alpha = 255 if i < frames - 2 else 120
+        # each cross is 7x7 (2 px arms) with a 1 px dark outline; the middle one sits a little higher
+        for cx, lift in ((6, 0), (16, 3), (26, 0)):
+            cy = 26 - rise - lift
+            for off, fill in ((1, plus_dark), (0, plus_green[:3] + (alpha,))):
+                d.rectangle([cx - 3 - off, cy - 1 - off, cx + 3 + off, cy + 1 + off], fill=fill)
+                d.rectangle([cx - 1 - off, cy - 3 - off, cx + 1 + off, cy + 3 + off], fill=fill)
+        heal.paste(frame, (hsize * i, 0))
+
+    steel, steel_dark, spark = (190, 196, 204, 255), (40, 42, 48, 255), (255, 220, 80, 255)
+    # The wrench is drawn once, upright, then turned by each frame's angle about the sheet's centre.
+    base = Image.new("RGBA", (size, size), (0, 0, 0, 0))
+    d = ImageDraw.Draw(base)
+    d.line([(9, 21), (15, 13)], fill=steel_dark, width=5)  # handle outline
+    d.line([(9, 21), (15, 13)], fill=steel, width=3)
+    d.ellipse([9, 2, 21, 14], fill=steel_dark)  # jaw outline
+    d.ellipse([10, 3, 20, 13], fill=steel)
+    d.rectangle([14, 4, 19, 8], fill=(0, 0, 0, 0))  # the open jaw
+    angles = (-30, -15, 0, 15, 30, 15, 0, -15)
+    wrench = Image.new("RGBA", (size * frames, size), (0, 0, 0, 0))
+    for i, angle in enumerate(angles):
+        frame = base.rotate(angle, resample=Image.BICUBIC, center=(size / 2, size / 2))
+        if i in (1, 2, 3, 4, 5):
+            # short rays from the jaw, three of the five directions per frame so the sparks flicker
+            sd = ImageDraw.Draw(frame)
+            jaw = (13, 6)
+            rays = ((-1, -1), (1, -1), (2, 0), (1, 1), (-1, 1))
+            for dx, dy in (rays[(i + k) % len(rays)] for k in range(3)):
+                sd.line([jaw, (jaw[0] + 3 * dx, jaw[1] + 3 * dy)], fill=spark, width=1)
+        wrench.paste(frame, (size * i, 0), frame)
+
+    for name, img, fs in (("heal-plus", heal, hsize), ("repair-wrench", wrench, size)):
+        meta = PngImagePlugin.PngInfo()
+        meta.add_text("FrameSize", f"{fs},{fs}")
+        meta.add_text("FrameAmount", str(frames))
+        img.save(os.path.join(out, f"{name}.png"), pnginfo=meta)
+
+
 def write_clock(path):
     """Frame i darkens the part of the icon the production clock has not swept yet, clockwise from 12 o'clock."""
     rows = (CLOCK_FRAMES + CLOCK_COLS - 1) // CLOCK_COLS
@@ -188,6 +299,19 @@ HOLD_THE_LINE = [a for a in LANDING_ZONE if a[1] == "Marines"] + [
     ("rifleman", "Marines", 8, 15, 256),
     ("rifleman", "Marines", 8, 11, 256),
 ]
+
+def _skirmish_actors(xeno_dx, dy):
+    """Landing Zone's two bases, the xeno one moved by xeno_dx and both by dy."""
+    return [(n, o, x + (xeno_dx if o == "Xenos" else 0), y + dy, f) for n, o, x, y, f in LANDING_ZONE]
+
+
+# name: (title, width, height, xeno base shift, vertical shift of both bases, ground). Marines west, xenos east, like Landing Zone.
+SKIRMISH_MAPS = {
+    "canyon-run": ("Canyon Run", 52, 28, 12, 0, canyon_run_ground),
+    "jungle-crossing": ("Jungle Crossing", 44, 28, 4, 0, jungle_crossing_ground),
+    "close-quarters": ("Close Quarters", 34, 28, -6, 0, close_quarters_ground),
+    "great-plains": ("Great Plains", 64, 40, 24, 6, great_plains_ground),
+}
 
 SCENARIOS = {
     "scenario-heal": _scenario("test-heal", [
@@ -381,13 +505,54 @@ Actors:
     with open(os.path.join(folder, "map.yaml"), "w", encoding="utf-8", newline="\n") as f:
         f.write(yaml)
 
-    preview = Image.new("RGBA", (size_w, size_h), (0x2E, 0x52, 0x30, 255))
+    colours = {ROCK: (0x3A, 0x3A, 0x3A, 255), GRASS: (0x2E, 0x52, 0x30, 255), WATER: (0x1C, 0x3A, 0x5E, 255), FORD: (0x4A, 0x72, 0x86, 255), DIRT: (0x7A, 0x62, 0x40, 255)}
+    preview = Image.new("RGBA", (size_w, size_h))
+    preview.putdata([colours[ground(x, y)[0]] for y in range(size_h) for x in range(size_w)])
     preview.save(os.path.join(folder, "map.png"))
+
+
+def write_tgmc_map(folder, title, rows, marines, xenos):
+    """A skirmish map from a converted TGMC map. Landing Zone's two bases go at the given centres, on open ground."""
+    h, w = len(rows), len(rows[0])
+    land = [list(r) for r in rows]
+    centres = {"Marines": (marines, (6, 14)), "Xenos": (xenos, (33, 13))}
+
+    def place(actors, owner):
+        # Slide the base around the chosen centre to where most of its cells already are land. A base is its actors and its spawn point.
+        (cx, cy), (bx, by) = centres[owner]
+        pts = [(x, y) for _, o, x, y, _ in actors if o == owner] + [(bx, by)]
+        fits = lambda dx, dy: sum(land[y + dy][x + dx] in "GDF" for x, y in pts)  # noqa: E731
+        shifts = [(i, j) for i in range(-6, 7) for j in range(-6, 7)
+                  if all(2 <= x + cx - bx + i <= w - 3 and 2 <= y + cy - by + j <= h - 3 for x, y in pts)]
+        i, j = max(shifts, key=lambda s: (fits(cx - bx + s[0], cy - by + s[1]), -abs(s[0]) - abs(s[1])))
+        dx, dy = cx - bx + i, cy - by + j
+        for x, y in pts:  # clear what is left: each cell and the ring around it
+            for ax in range(x + dx - 1, x + dx + 2):
+                for ay in range(y + dy - 1, y + dy + 2):
+                    if 1 <= ax < w - 1 and 1 <= ay < h - 1 and land[ay][ax] in "RW":
+                        land[ay][ax] = "D"
+        return [(n, o, x + dx, y + dy, f) for n, o, x, y, f in actors if o == owner], (bx + dx, by + dy)
+
+    actors, spawn_m = place(LANDING_ZONE, "Marines")
+    xeno_actors, spawn_x = place(LANDING_ZONE, "Xenos")
+    # The bases must be joined by walkable ground, or the match can never be won.
+    seen, todo = {spawn_m}, [spawn_m]
+    while todo:
+        x, y = todo.pop()
+        for n in ((x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1)):
+            if n not in seen and 1 <= n[0] < w - 1 and 1 <= n[1] < h - 1 and land[n[1]][n[0]] in "GDF":
+                seen.add(n)
+                todo.append(n)
+    assert spawn_x in seen, f"{title}: the xeno base at {spawn_x} cannot be reached from the marine base at {spawn_m}"
+    codes = {"G": GRASS, "D": DIRT, "F": FORD, "W": WATER, "R": ROCK}
+    write_map(folder, title, w, h, actors + xeno_actors, "Lobby", [spawn_m, spawn_x],
+              ground=lambda x, y: (codes[land[y][x]], 0), category="Conquest")
 
 
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--out", required=True)
+    ap.add_argument("--tgmc", help="a TGMC checkout; with it the maps converted from TGMC's own (tgmc_dmm.MAPS) are written too")
     args = ap.parse_args()
 
     os.makedirs(args.out, exist_ok=True)
@@ -396,9 +561,19 @@ def main():
     write_clock(os.path.join(args.out, "clock.png"))
     write_shroud_tiles(args.out, tile=32)
     write_rally_marker(args.out)
+    write_repair_fx(args.out)
     write_map(os.path.join(args.out, "maps", "test-field"), "TGMC test field", 24, 24, TEST_FIELD, "Lobby, Shellmap", [(10, 12), (14, 12)])
     write_map(os.path.join(args.out, "maps", "landing-zone"), "Landing Zone", 40, 28, LANDING_ZONE, "Lobby", [(6, 14), (33, 13)],
               ground=landing_zone_ground, category="Conquest")
+    for name, (title, w, h, xeno_dx, dy, ground) in SKIRMISH_MAPS.items():
+        actors = _skirmish_actors(xeno_dx, dy)
+        for _, _, x, y, _ in actors:
+            assert 2 <= x <= w - 3 and 2 <= y <= h - 3 and ground(x, y)[0] != WATER, f"{name}: actor at {x},{y} is off the map or in water"
+        write_map(os.path.join(args.out, "maps", name), title, w, h, actors, "Lobby", [(6, 14 + dy), (33 + xeno_dx, 13 + dy)],
+                  ground=ground, category="Conquest")
+    if args.tgmc:
+        for name, spec in tgmc_dmm.MAPS.items():
+            write_tgmc_map(os.path.join(args.out, "maps", name), spec["title"], *tgmc_dmm.load(args.tgmc, spec))
     for name, sc in SCENARIOS.items():
         width, height = sc.get("size", (24, 24))
         write_map(os.path.join(args.out, "maps", name), name, width, height, sc["actors"], "MissionSelector",

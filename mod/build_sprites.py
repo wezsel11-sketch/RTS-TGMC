@@ -87,20 +87,16 @@ FACING_SOURCE = {"N": "N", "NE": "E", "E": "E", "SE": "E", "S": "S", "SW": "W", 
 # TGMC's standard marine kit, the unprefixed states, which are a mottled grey-brown pattern camo that shows up well
 # against green terrain (the "m_" jungle set is dark and blends in). The boots go over the armour, whose legs would
 # otherwise hide them.
-GEAR = [(MARINE_ARMOR, "xarmor"), (FEET, "marine"), (MARINE_HELMETS, "helmet")]
+# Team colour, one per faction (the same for every player on that side): a multiply tint over the cloth. Marine cloth
+# (the uniform and the armour) goes blue; the xeno units go red. Skin, helmets, boots and weapons keep their own colours.
+MARINE_TEAM = (120, 150, 255)
+XENO_TEAM = (255, 150, 150)
+GEAR = [(MARINE_ARMOR, "xarmor", MARINE_TEAM), (FEET, "marine"), (MARINE_HELMETS, "helmet")]
 
 
 def marine(uniform, weapon):
     """Body, role uniform, armour, boots and helmet, then the weapon held in the right hand."""
-    return [(HUMAN, "body_m"), (MARINE_UNIFORM, uniform)] + GEAR + [weapon]
-
-
-def marine_die(uniform, weapon):
-    """The marine's pose, front on, fading out over 6 frames: the death animation for a kill that is not an explosion."""
-    layers = [(HUMAN, "body_m"), (MARINE_UNIFORM, uniform)] + GEAR + [weapon]
-    layers = [layer + (None, {"side": "S"}) for layer in layers]
-    layers[0] = layers[0][:2] + (None, {"side": "S", "fade": 6, "tick": 70})
-    return layers
+    return [(HUMAN, "body_m"), (MARINE_UNIFORM, uniform, MARINE_TEAM)] + GEAR + [weapon]
 
 
 # TGMC's human gib is 64px and the marine is 32px, so the marine sheets hold 64px cells.
@@ -112,10 +108,10 @@ UNITS = {
         "cell": MARINE_CELL,
         "sequences": {
             "stand": marine("marine_jumpsuit", (RIFLES, "t18_w")),
-            "die": marine_die("marine_jumpsuit", (RIFLES, "t18_w")),
             "die-gib": MARINE_GIB,
             "run": "stand",
             "attack": "stand",
+            "die": [(HUMAN, "husk")],
             "flash": [(PROJECTILES, "muzzle_bullet", None, {"rotate": 90, "facings": 8, "tick": 50})],
             "icon": "stand:S",
         },
@@ -179,10 +175,10 @@ UNITS = {
         "cell": MARINE_CELL,
         "sequences": {
             "stand": marine("marine_medic", (PISTOLS, "m44")),
-            "die": marine_die("marine_medic", (PISTOLS, "m44")),
             "die-gib": MARINE_GIB,
             "run": "stand",
             "attack": "stand",
+            "die": [(HUMAN, "husk")],
             "icon": "stand:S",
         },
     },
@@ -190,10 +186,10 @@ UNITS = {
         "cell": MARINE_CELL,
         "sequences": {
             "stand": marine("marine_engineer", (SMGS, "t19_w")),
-            "die": marine_die("marine_engineer", (SMGS, "t19_w")),
             "die-gib": MARINE_GIB,
             "run": "stand",
             "attack": "stand",
+            "die": [(HUMAN, "husk")],
             "icon": "stand:S",
         },
     },
@@ -202,10 +198,10 @@ UNITS = {
         "cell": MARINE_CELL,
         "sequences": {
             "stand": marine("marine_assault_crewman", (RIFLES, "t18_w")),
-            "die": marine_die("marine_assault_crewman", (RIFLES, "t18_w")),
             "die-gib": MARINE_GIB,
             "run": "stand",
             "attack": "stand",
+            "die": [(HUMAN, "husk")],
             "flash": [(PROJECTILES, "muzzle_bullet", None, {"rotate": 90, "facings": 8, "tick": 35})],
             "icon": "stand:S",
         },
@@ -214,10 +210,10 @@ UNITS = {
         "cell": MARINE_CELL,
         "sequences": {
             "stand": marine("pilot_spec", (RIFLES, "t18_w")),
-            "die": marine_die("pilot_spec", (RIFLES, "t18_w")),
             "die-gib": MARINE_GIB,
             "run": "stand",
             "attack": "stand",
+            "die": [(HUMAN, "husk")],
             # The grenade launcher's thump: a puff of dust at the muzzle, not a flash
             "flash": [(HEAVY_IMPACT, "heavyimpact", None, {"frames": (0, 9), "size": 32, "tick": 60})],
             "icon": "stand:S",
@@ -348,8 +344,6 @@ UNITS = {
             "gore": [(XENO_FX, "splatter", None, {"tick": 70})],
             "heal": [(FX32, "sparkle", None, {"tick": 60})],
             "burst": [(FX32, "explosion", None, {"tick": 40})],
-            "claw": [(FX32, "claw", None, {"tick": 60})],
-            "claw2": [(FX32, "claw2", None, {"tick": 60})],
         },
     },
     # The 65-frame TGMC explosions are a fireball that fades into smoke; every third frame at one tick each is about a second
@@ -368,7 +362,29 @@ UNITS = {
     "fx-slam-big": {
         "sequences": {"impact": [(FX96, "throw_impact_s", None, {"tick": 60})]},
     },
+    # A runner's claw swipe, drawn over whatever it hits (the runner has no attack frames of its own in TGMC)
+    "fx-claw": {
+        "sequences": {"slash": [(FX32, "claw", None, {"tick": 60})]},
+    },
 }
+
+
+def team_layer(layer, rgb):
+    """The layer with a team tint, unless it already has its own. Layers are (dmi, state[, tint[, options]])."""
+    if len(layer) == 2:
+        return layer + (rgb,)
+    if layer[2] is None:
+        return (layer[0], layer[1], rgb) + tuple(layer[3:])
+    return layer
+
+
+# Xeno units take the xeno team colour on every layer
+XENO_UNITS = ["runner", "hunter", "sentinel", "drone", "warrior", "queen"]
+for _unit in XENO_UNITS:
+    _seqs = UNITS[_unit]["sequences"]
+    for _name, _value in _seqs.items():
+        if isinstance(_value, list):
+            _seqs[_name] = [team_layer(layer, XENO_TEAM) for layer in _value]
 
 
 def tinted(img, rgb):

@@ -2,7 +2,7 @@
 # Start the game.
 #
 #   mod/play.sh                  main menu
-#   mod/play.sh landing-zone     go straight into a map (landing-zone, hold-the-line, test-field)
+#   mod/play.sh landing-zone     go straight into a map (landing-zone, canyon-run, jungle-crossing, close-quarters, great-plains, lv-624, big-red, whiskey-outpost, desert-dam, hold-the-line, test-field)
 #   mod/play.sh landing-zone Game.Mod=...   anything after the map (or after --) goes to OpenRA unchanged
 #
 # Run mod/setup.sh first. Settings, logs and replays go to OpenRA's usual support directory, not into this repo.

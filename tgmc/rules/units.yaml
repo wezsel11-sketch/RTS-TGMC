@@ -197,7 +197,7 @@ runner:
 	Voiced:
 		VoiceSet: RunnerVoice
 	Health:
-		HP: 100
+		HP: 120
 	Selectable:
 		Bounds: 1024, 768, -512, -512
 	Mobile:

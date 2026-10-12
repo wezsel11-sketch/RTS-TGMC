@@ -23,7 +23,7 @@ cp -R "$ROOT/tgmc/." "$OUT/"
 "$PY" -I "$HERE/build_sprites.py" --tgmc "$TGMC" --out "$OUT"
 "$PY" -I "$HERE/build_sounds.py" --tgmc "$TGMC" --out "$OUT/audio"
 "$PY" -I "$HERE/build_tileset.py" --tgmc "$TGMC" --out "$OUT"
-"$PY" -I "$HERE/make_placeholders.py" --out "$OUT"
+"$PY" -I "$HERE/make_placeholders.py" --tgmc "$TGMC" --out "$OUT"
 "$PY" -I "$HERE/make_chrome.py" --out "$OUT"
 
 if [ -n "${OPENRA_DIR:-}" ]; then

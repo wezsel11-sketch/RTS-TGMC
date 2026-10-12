@@ -34,7 +34,7 @@ the commits this mod was tested against (see the top of the script), so a later 
 
 ## How to play
 
-- **Main menu -> Singleplayer -> Skirmish.** Pick a skirmish map (**Landing Zone**, **Canyon Run**, **Jungle Crossing**, **Close Quarters**, **Great Plains**, plus four named after TGMC maps: **LV-624**, **Big Red**, **Whiskey Outpost**, **Desert Dam**) or **Hold the Line** (marines against waves).
+- **Main menu -> Singleplayer -> Skirmish.** Pick a skirmish map (**Landing Zone**, **Canyon Run**, **Jungle Crossing**, **Close Quarters**, **Great Plains**, plus four converted from TGMC's own maps: **LV-624**, **Big Red**, **Whiskey Outpost**, **Desert Dam**) or **Hold the Line** (marines against waves).
   In Landing Zone choose a faction for yourself and set the other slot to **Skirmish AI**, then Start Game.
 - **Marines** start with a cryo pod, a vendor and a squad. Click the cryo pod and use the sidebar's *Infantry* tab to train riflemen,
   corpsmen (they heal), engineers (they repair), smartgunners (rapid spread fire) and grenadiers (splash). **Xenos** start with a resin silo and mini silos; use the *Xeno* tab for Runner,
@@ -77,7 +77,8 @@ Logs and replays are in OpenRA's support directory (`~/.config/OpenRA` on Linux,
 The converters read these TGMC files:
 
 - `icons/mob/human.dmi` state `body_m`, with `icons/mob/clothing/uniforms/marine_uniforms.dmi` state `marine_jumpsuit` on top, for the rifleman.
-- Terrain tiles: `icons/turf/jungle.dmi` (`grass1`, `grass2`) and `icons/turf/ground_map.dmi` (`dirt`, `seashallow`, `seadeep`).
+- Terrain tiles: `icons/turf/jungle.dmi` (`grass1`, `grass2`), `icons/turf/ground_map.dmi` (`dirt`, `seashallow`, `seadeep`) and `icons/turf/walls/cave.dmi` (`cave-255`, the impassable rock).
+- Maps: `_maps/map_files/` `LV624/LV624.dmm`, `BigRed_v2/BigRed_v2.dmm`, `Whiskey_Outpost/Whiskey_Outpost_v2.dmm` and `desertdam/desertdam.dmm`, read for their turfs only (see Maps from TGMC).
 - `icons/Xeno/castes/hunter.dmi`, `sentinel.dmi` and `drone.dmi` (48px; Hunter and Sentinel have animated walks and runs,
   so each file has a still and an animated state of the same name, and the converter uses the animated one).
 - `icons/Xeno/castes/runner.dmi` states `Runner Walking`, `Runner Running`, and `Runner Dead`, for the Runner.
@@ -106,7 +107,8 @@ mod/                        converters and build script (Python 3, Pillow, ffmpe
   build_sprites.py          .dmi states -> PNG sheets + OpenRA sequence YAML (8 facings)
   build_sounds.py           TGMC .ogg -> mono 22050 Hz Vorbis .ogg
   build_tileset.py          TGMC floor tiles (jungle grass, dirt, shallow and deep water) -> 32px PNG tiles
-  make_placeholders.py      palette, cursor, clock, fog tiles and the maps (no TGMC art)
+  make_placeholders.py      palette, cursor, clock, fog tiles and the maps (no TGMC art; the maps from TGMC need `--tgmc`)
+  tgmc_dmm.py               reads TGMC .dmm maps and converts them to terrain for the four converted skirmish maps
   lint_static.py            cross-reference check (sounds, weapons, voice sets, Fluent keys, sequences); build_mod.sh runs it
   smoke.sh                  launches the built mod headless on a map, screenshots it, fails on an engine exception
   test_scenarios.sh         runs the scripted scenario maps (heal, repair, mend, victory, combat, fx, waves, ai, rally, build) and checks each prints PASS; test-aivai and test-holdline run through balance.sh, and test-sounds plays every sound to listen to
@@ -153,7 +155,7 @@ MAP=$(sh utility.sh tgmc --map-hash ~/openra-tgmc-mod/build/mod/tgmc/maps/test-f
 ./launch-game.sh Game.Mod=tgmc Launch.Map=$MAP
 ```
 
-There are eleven playable maps. The eight extra skirmish maps reuse Landing Zone's two bases (marines west, xenos east) on different
+There are eleven playable maps: nine skirmish maps (Landing Zone, four hand-made, four converted from TGMC), Hold the Line and the test field. The four hand-made skirmish maps reuse Landing Zone's two bases (marines west, xenos east) on different
 ground, so they play differently without any new rules (`SKIRMISH_MAPS` in `mod/make_placeholders.py`; the terrain is a function per map):
 
 | Map | Size | Character |
@@ -162,10 +164,25 @@ ground, so they play differently without any new rules (`SKIRMISH_MAPS` in `mod/
 | Jungle Crossing | 44x28 | A lake in the middle: north shore, south shore, or the wading causeway through the centre. |
 | Close Quarters | 34x28 | Bases 13 cells apart behind a thin river with fords; the xeno rush has little ground to cross. |
 | Great Plains | 64x40 | Open grass and ponds, a long walk: tech, walls and Miners matter more than a first rush. |
-| LV-624 | 56x36 | Jungle river with three fords, a ruined dirt crossroads on the central ford, ponds in the undergrowth. |
-| Big Red | 60x32 | Bare dirt wasteland, three oases in the middle, no cover: a long open run for both sides. |
-| Whiskey Outpost | 48x28 | The marines dig in behind a water trench with three fords; a dirt yard on their side. |
-| Desert Dam | 56x32 | A reservoir splits the map; the dam is the only dry way across, with two long fords at the far ends. |
+
+### Maps from TGMC
+
+`mod/tgmc_dmm.py` reads TGMC's own `.dmm` map files and shrinks each one into an OpenRA skirmish map, so the ground is TGMC's. This only
+happens at build time, from the TGMC checkout (`make_placeholders.py --tgmc`); no converted map is committed. Only the turfs are read: walls,
+cave rock, space and dense jungle become **rock** (impassable), deep water becomes impassable water, shallow river and coast become a ford,
+grass and jungle become grass, and every floor and dirt becomes the walkable dirt tile. Objects, doors and buildings are ignored, so a
+walled compound is open ground where its wall was one tile thin. The map is cropped to its open ground and shrunk by a factor
+(2 or 3 TGMC tiles to a cell); a cell is rock when more than half of its tiles are.
+Each map gets Landing Zone's two bases, slid to the nearest open ground around the spot chosen in `MAPS`, and the build fails if the
+two are not joined by walkable ground.
+
+| Map | Size | From |
+| --- | --- | --- |
+| LV-624 | 110x89 | `LV624.dmm`: jungle colony and landing site in the south, the river across the middle, cave systems to the north. Marines west, xenos in the north caves. |
+| Big Red | 75x71 | `BigRed_v2.dmm`: the Solaris Ridge corridors and compounds, nothing but dirt and rock. |
+| Whiskey Outpost | 60x67 | `Whiskey_Outpost_v2.dmm`: the fortified compound in the north against a jungle that floods in the middle. Marines north, xenos south. |
+| Desert Dam | 81x77 | `desertdam.dmm`: two sides of the colony split by the river; cross at the fords. |
+
 
 The original three: **Hold the Line** is a survival map: the marines (one human player, no xeno slot) hold their base against
 six timed waves of Runners, Hunters and Sentinels coming from the east, and win by destroying the last wave. The script is
@@ -259,8 +276,8 @@ The effect sprites are TGMC art too (`fx-*` images in `build_sprites.py`) and ar
   `TGMCHeal` and `TGMCRepair`, so they play on the target. Healing and repair are weapons with negative damage. Scenario tests cover heal, repair, victory and a rifleman-versus-Runner fight.
 - Weapons that use `InstantHit` need `TargetActorCenter: true`, or the hit lands on a position and does nothing.
 - Acid is now a projectile, so a fast runner can still outrun a glob. Effects have not been tuned by eye in a long match.
-- Terrain is flat tiles from TGMC's `jungle.dmi` and `ground_map.dmi`: grass (two variants), dirt road, a walkable
-  ford and impassable water. There are no edge or transition tiles, so shorelines are hard. The test field is all grass.
+- Terrain is flat tiles from TGMC's `jungle.dmi`, `ground_map.dmi` and `cave.dmi`: grass (two variants), dirt road, a walkable
+  ford, impassable water and impassable rock. There are no edge or transition tiles, so shorelines are hard. The test field is all grass.
 - The HUD is a command sidebar (radar, production palette with an Infantry and a Xeno tab, requisition, menu button); it reads the same for either faction. There is no selection readout, as that would need C#.
   Production icons are the units' front-facing sprite. The clock overlay is still a placeholder. The production tab icons are
   pictograms (rifle, claw, hammer) drawn by `mod/make_chrome.py`. The readout card under the palette has a Build-range hint,

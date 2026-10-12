@@ -1,6 +1,6 @@
 """Print every TGMC file the converters read, one repo-relative path per line.
 
-The list is derived from build_sprites.UNITS, build_sounds.SOUNDS and build_tileset.TILES, so a new sprite, sound
+The list is derived from build_sprites.UNITS, build_sounds.SOUNDS, build_tileset.TILES and tgmc_dmm.MAPS, so a new sprite, sound
 or tile cannot be left out of the sparse checkout that setup.sh makes. Use it with
 `git sparse-checkout set --no-cone --stdin`.
 """
@@ -12,6 +12,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import build_sounds  # noqa: E402
 import build_sprites  # noqa: E402
 import build_tileset  # noqa: E402
+import tgmc_dmm  # noqa: E402
 
 
 def paths():
@@ -26,6 +27,7 @@ def paths():
         found.add(entry[0])
     for entry in build_tileset.TILES.values():
         found.add(entry[0])
+    found.update(tgmc_dmm.paths())
     return sorted(found)
 
 

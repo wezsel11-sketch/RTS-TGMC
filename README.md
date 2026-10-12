@@ -34,7 +34,7 @@ the commits this mod was tested against (see the top of the script), so a later 
 
 ## How to play
 
-- **Main menu -> Singleplayer -> Skirmish.** Pick a skirmish map (**Landing Zone**, **Canyon Run**, **Jungle Crossing**, **Close Quarters**, **Great Plains**) or **Hold the Line** (marines against waves).
+- **Main menu -> Singleplayer -> Skirmish.** Pick a skirmish map (**Landing Zone**, **Canyon Run**, **Jungle Crossing**, **Close Quarters**, **Great Plains**, plus four named after TGMC maps: **LV-624**, **Big Red**, **Whiskey Outpost**, **Desert Dam**) or **Hold the Line** (marines against waves).
   In Landing Zone choose a faction for yourself and set the other slot to **Skirmish AI**, then Start Game.
 - **Marines** start with a cryo pod, a vendor and a squad. Click the cryo pod and use the sidebar's *Infantry* tab to train riflemen,
   corpsmen (they heal), engineers (they repair), smartgunners (rapid spread fire) and grenadiers (splash). **Xenos** start with a resin silo and mini silos; use the *Xeno* tab for Runner,
@@ -153,7 +153,7 @@ MAP=$(sh utility.sh tgmc --map-hash ~/openra-tgmc-mod/build/mod/tgmc/maps/test-f
 ./launch-game.sh Game.Mod=tgmc Launch.Map=$MAP
 ```
 
-There are seven playable maps. The four extra skirmish maps reuse Landing Zone's two bases (marines west, xenos east) on different
+There are eleven playable maps. The eight extra skirmish maps reuse Landing Zone's two bases (marines west, xenos east) on different
 ground, so they play differently without any new rules (`SKIRMISH_MAPS` in `mod/make_placeholders.py`; the terrain is a function per map):
 
 | Map | Size | Character |
@@ -162,6 +162,10 @@ ground, so they play differently without any new rules (`SKIRMISH_MAPS` in `mod/
 | Jungle Crossing | 44x28 | A lake in the middle: north shore, south shore, or the wading causeway through the centre. |
 | Close Quarters | 34x28 | Bases 13 cells apart behind a thin river with fords; the xeno rush has little ground to cross. |
 | Great Plains | 64x40 | Open grass and ponds, a long walk: tech, walls and Miners matter more than a first rush. |
+| LV-624 | 56x36 | Jungle river with three fords, a ruined dirt crossroads on the central ford, ponds in the undergrowth. |
+| Big Red | 60x32 | Bare dirt wasteland, three oases in the middle, no cover: a long open run for both sides. |
+| Whiskey Outpost | 48x28 | The marines dig in behind a water trench with three fords; a dirt yard on their side. |
+| Desert Dam | 56x32 | A reservoir splits the map; the dam is the only dry way across, with two long fords at the far ends. |
 
 The original three: **Hold the Line** is a survival map: the marines (one human player, no xeno slot) hold their base against
 six timed waves of Runners, Hunters and Sentinels coming from the east, and win by destroying the last wave. The script is

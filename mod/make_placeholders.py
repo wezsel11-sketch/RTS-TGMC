@@ -285,6 +285,45 @@ def write_clock(path):
     sheet.save(path, pnginfo=meta)
 
 
+def lv624_ground(x, y):
+    """56x36, after LV-624. A jungle river runs north to south with three fords, a dirt crossroads and ruins in the middle, and ponds in the thick jungle."""
+    if 27 <= x <= 28 and not _ellipse(x, y, 27.5, 19, 3, 2):
+        return (FORD, 0) if y in (5, 6, 17, 18, 19, 20, 31, 32) else (WATER, 0)
+    if any(_ellipse(x, y, cx, cy, 3, 2) for cx, cy in ((14, 6), (14, 32), (41, 4), (41, 34), (20, 26), (35, 12))):
+        return WATER, 0
+    if _road(x, y, 19, 6, 49) or (x == 27 and 14 <= y <= 24) or (21 <= x <= 34 and 16 <= y <= 22 and (x in (21, 34) or y in (16, 22))):
+        return DIRT, 0
+    return GRASS, 0
+
+
+def big_red_ground(x, y):
+    """60x32, after Big Red. Dry dirt wasteland with almost no cover: two oases and a grass dune in the middle, a long open run for both sides."""
+    oases = ((22, 8), (38, 24), (30, 16))
+    if any(_ellipse(x, y, cx, cy, 3, 2) for cx, cy in oases):
+        return WATER, 0
+    if any(_ellipse(x, y, cx, cy, 6, 4) for cx, cy in oases):
+        return GRASS, 0
+    return DIRT, 0
+
+
+def whiskey_outpost_ground(x, y):
+    """48x28, after Whiskey Outpost. The marines dig in behind a water trench with three fords; the xenos have to come through the gaps."""
+    if x in (14, 15):
+        return (FORD, 0) if y in (6, 7, 13, 14, 20, 21) else (WATER, 0)
+    if x <= 13 or _road(x, y, 13, 16, 41):
+        return DIRT, 0
+    return GRASS, 0
+
+
+def desert_dam_ground(x, y):
+    """56x32, after Desert Dam. A reservoir splits the map; the dam is the only dry way across, with two long fords at the far ends."""
+    if 25 <= x <= 30:
+        if 14 <= y <= 17:
+            return DIRT, 0
+        return (FORD, 0) if y in (2, 3, 28, 29) else (WATER, 0)
+    return (DIRT, 0) if _road(x, y, 15, 6, 49) else (GRASS, 0)
+
+
 # Scenario maps for mod/test_scenarios.sh. Each runs a Lua script from mod/scenarios, copied into the map folder
 # (the map lint only accepts scripts inside the map), that prints a PASS or FAIL line.
 # A far-off xeno silo keeps the game from ending at tick zero, where it is not part of the test.
@@ -310,6 +349,10 @@ SKIRMISH_MAPS = {
     "jungle-crossing": ("Jungle Crossing", 44, 28, 4, 0, jungle_crossing_ground),
     "close-quarters": ("Close Quarters", 34, 28, -6, 0, close_quarters_ground),
     "great-plains": ("Great Plains", 64, 40, 24, 6, great_plains_ground),
+    "lv-624": ("LV-624", 56, 36, 16, 4, lv624_ground),
+    "big-red": ("Big Red", 60, 32, 20, 2, big_red_ground),
+    "whiskey-outpost": ("Whiskey Outpost", 48, 28, 8, 0, whiskey_outpost_ground),
+    "desert-dam": ("Desert Dam", 56, 32, 16, 2, desert_dam_ground),
 }
 
 SCENARIOS = {

@@ -107,6 +107,11 @@ TGMCClaws:
 		Explosions: spark
 		ValidRelationships: Enemy
 		ValidTargets: Structure
+	Warhead@6Slash: CreateEffect
+		Image: fx-impact
+		Explosions: claw, claw2
+		ValidRelationships: Enemy
+		ValidTargets: Human, Structure
 
 # Sentinel spit: a lobbed acid glob. It is fast and splashes wide enough to land on a walking target.
 TGMCSpit:
@@ -254,3 +259,8 @@ TGMCSlam:
 		ImpactSoundChance: 50
 		ValidRelationships: Enemy
 		ValidTargets: Human
+	Warhead@4Impact: CreateEffect
+		Image: fx-slam-big
+		Explosions: impact
+		ForceDisplayAtGroundLevel: true
+		ValidTargets: Ground, Water, Structure

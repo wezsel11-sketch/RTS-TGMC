@@ -348,6 +348,8 @@ UNITS = {
             "gore": [(XENO_FX, "splatter", None, {"tick": 70})],
             "heal": [(FX32, "sparkle", None, {"tick": 60})],
             "burst": [(FX32, "explosion", None, {"tick": 40})],
+            "claw": [(FX32, "claw", None, {"tick": 60})],
+            "claw2": [(FX32, "claw2", None, {"tick": 60})],
         },
     },
     # The 65-frame TGMC explosions are a fireball that fades into smoke; every third frame at one tick each is about a second
@@ -362,6 +364,9 @@ UNITS = {
     },
     "fx-slam": {
         "sequences": {"slam": [(HEAVY_IMPACT, "heavyimpact", None, {"tick": 60})]},
+    },
+    "fx-slam-big": {
+        "sequences": {"impact": [(FX96, "throw_impact_s", None, {"tick": 60})]},
     },
 }
 

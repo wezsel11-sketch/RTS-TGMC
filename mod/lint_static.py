@@ -154,6 +154,10 @@ def main():
 
     # Sequences: the actors that build_sprites.py makes, and the sequence names the rules ask for
     seqs = {u: set(spec["sequences"]) for u, spec in build_sprites.UNITS.items()}
+    # A generated sequence file mod.yaml does not list is never loaded: the game then crashes the first time it plays that image
+    registered = set(re.findall(r"\|sequences/([\w-]+)\.yaml", read("mod.yaml")))
+    for u in sorted(set(seqs) - registered):
+        errors.append(f"build_sprites.py makes sequences/{u}.yaml but mod.yaml's Sequences list does not load it")
     # Effect actors drawn without TGMC art (make_placeholders.py) are declared in tgmc/sequences/*.yaml: each top-level
     # key is an actor and each tab-indented key under it is one of its sequences.
     seq_dir = os.path.join(MOD, "sequences")

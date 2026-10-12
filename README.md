@@ -258,12 +258,23 @@ The effect sprites are TGMC art too (`fx-*` images in `build_sprites.py`) and ar
   grenade on its arc and explodes with a fireball that fades into smoke, plus an explosion sound.
 - **Xenos spit acid.** The Sentinel and the resin turret fire a visible acid glob (a fast arc, with a wide enough splash to
   land on a walking marine), which splashes green on impact.
-- **Melee and support hits.** Claws draw blood on marines and sparks on structures; the Warrior's slam kicks up a dust
-  shockwave; the corpsman's heal sparkles, the engineer's repair sparks and the drone's mend sparkles.
-- `mod/lint_static.py` checks each weapon's image and sequence names and each `MuzzleSequence`.
+- **Melee and support hits.** Claws draw blood and a TGMC claw slash on marines and sparks plus the slash on structures; the
+  Warrior's slam kicks up a dust shockwave and TGMC's slam impact ring; the corpsman's heal sparkles, the engineer's repair
+  sparks and the drone's mend sparkles.
+- **Deaths and gibs.** A marine dies as TGMC's husk body and the xenos play TGMC's dead pose. A kill by an explosion (the grenade, the
+  only warhead with `DamageTypes: ExplosionDeath`) gibs a marine, Runner, Hunter, Sentinel or Drone with TGMC's gib
+  animation; the Warrior and Queen are too heavy and play their plain death. `WithDeathAnimation` picks the sequence by
+  damage type (`die` plus the `DeathTypes` suffix), and plays nothing for a damage type it does not list, so
+  `lint_static.py` checks that every unit lists every damage type a weapon uses. The marine sheets are built with
+  64px cells (`cell` in `build_sprites.py`) to hold the 64px gib frames.
+- `mod/lint_static.py` checks each weapon's image and sequence names, each `MuzzleSequence` and the death types.
+  `mod/test_effects.py` tests the sprite builder's fade option and padding and the death-type lint; `build_mod.sh` runs it.
+  `scenario-gib` kills every unit type, some as an explosion would.
 
 ## Known gaps
 
+- A gib leaves no corpse or blood decal and no particles: an OpenRA death animation ends with its sequence. TGMC's human
+  gib animation opens on an unclothed body, so a marine in armour pops to a bare body as it bursts.
 - The marine dies to TGMC's `husk` body, which stands upright (TGMC has no lying-down human). Its `run` sequence aliases
   `stand`, because TGMC's human sheet has only a standing state.
 - Units are coloured by team, not by player: marine cloth is blue and xeno units are red, a fixed multiply tint in

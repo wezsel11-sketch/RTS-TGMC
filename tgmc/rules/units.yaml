@@ -52,6 +52,8 @@
 	WithDeathAnimation:
 		DeathSequence: die
 		FallbackSequence: die
+		DeathTypes:
+			ExplosionDeath: -gib
 	WithInfantryBody:
 		MoveSequence: run
 		StandSequences: stand
@@ -181,6 +183,8 @@ grenadier:
 	WithDeathAnimation:
 		DeathSequence: die
 		FallbackSequence: die
+		DeathTypes:
+			ExplosionDeath: -gib
 	DeathSounds:
 	Armament@PRIMARY:
 		Weapon: TGMCClaws

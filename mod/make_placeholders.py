@@ -251,6 +251,14 @@ SCENARIOS = {
         ("warrior", "Xenos", 12, 17, 768),
         ("resin-silo", "Xenos", 19, 19, 0),
     ]},
+    # Every unit type dies once, some by explosion (see scenarios/test-gib.lua). Conquest is dropped: the marines all die.
+    "scenario-gib": {"scripts": ("test-gib",), "drop_conquest": True, "actors": [
+        ("rifleman", "Marines", 6, 6, 512), ("medic", "Marines", 6, 8, 512), ("engineer", "Marines", 6, 10, 512),
+        ("smartgunner", "Marines", 6, 12, 512), ("grenadier", "Marines", 6, 14, 512),
+        ("runner", "Xenos", 12, 6, 0), ("hunter", "Xenos", 12, 8, 0), ("sentinel", "Xenos", 12, 10, 0),
+        ("drone", "Xenos", 12, 12, 0), ("warrior", "Xenos", 12, 14, 0), ("queen", "Xenos", 12, 16, 0),
+        ("resin-silo", "Xenos", 19, 19, 0),
+    ]},
     "scenario-sounds": {"scripts": ("test-sounds", "sound-list"), "generated": ("sound-list",), "actors": [
         ("rifleman", "Marines", 10, 10, 0),
         ("resin-silo", "Xenos", 16, 16, 0),

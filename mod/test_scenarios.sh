@@ -64,6 +64,11 @@ for dir in "$ROOT"/build/mod/tgmc/maps/scenario-*/; do
 		echo "FAIL  $name: a sound did not load"
 		echo "$badsound"
 		fail=1
+	elif ls "$OUT/$name"/support/Logs/exception* >/dev/null 2>&1; then
+		# A missing sprite sequence only throws when it renders, which can be after the script printed PASS
+		echo "FAIL  $name: the engine logged an exception"
+		sed -n 7,10p "$OUT/$name"/support/Logs/exception*
+		fail=1
 	elif echo "$line" | grep -q "PASS"; then
 		echo "pass  $name: $(echo "$line" | grep PASS | head -1)"
 	else

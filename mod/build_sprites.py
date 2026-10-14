@@ -87,6 +87,7 @@ FX96 = "icons/effects/96x96.dmi"
 FX32 = "icons/effects/effects.dmi"
 FIRE = "icons/effects/fire.dmi"
 BLOOD = "icons/effects/blood.dmi"
+ARTILLERY = "icons/obj/items/ammo/artillery.dmi"
 CHEMSMOKE = "icons/effects/chemsmoke.dmi"
 CASINGS = "icons/obj/items/casings.dmi"
 HEAVY_IMPACT = "icons/effects/heavyimpact.dmi"
@@ -857,6 +858,13 @@ UNITS = {
     # Projectile images. Weapons refer to these by name (Bullet Image:), not as actors.
     "grenade": {
         "sequences": {"idle": [(GRENADE, "grenade")]},
+    },
+    # The mortar and howitzer shells in flight (TGMC's ammo icons), turned to point along the arc, so they do not look like the HE grenade.
+    "mortar-shell": {
+        "sequences": {"idle": [(ARTILLERY, "mortar_he", None, {"facings": 16})]},
+    },
+    "howitzer-shell": {
+        "sequences": {"idle": [(ARTILLERY, "howitzer", None, {"facings": 16})]},
     },
     # Effect images, also named by weapons (Bullet Image, CreateEffect Image). One sheet per cell size.
     # The bullet art points up, so 16 turned copies make a tracer that flies along the shot.

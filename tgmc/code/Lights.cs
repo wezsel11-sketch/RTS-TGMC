@@ -20,6 +20,9 @@ namespace OpenRA.Mods.TGMC.Traits
 		public readonly int HeavyDamage = 60;
 		public readonly string HeavySequence = "muzzle-heavy";
 
+		[Desc("Ticks between two glows from one unit, so a burst does not pile up into a blinding flash.")]
+		public readonly int Interval = 7;
+
 		[Desc("Weapons that reach no further than this (claws, bites) give no glow.")]
 		public readonly WDist MinRange = new(2048);
 
@@ -29,6 +32,7 @@ namespace OpenRA.Mods.TGMC.Traits
 	public class MuzzleGlow : INotifyAttack
 	{
 		readonly MuzzleGlowInfo info;
+		int lastGlow = -1000;
 
 		public MuzzleGlow(MuzzleGlowInfo info) { this.info = info; }
 
@@ -40,8 +44,10 @@ namespace OpenRA.Mods.TGMC.Traits
 				return;
 
 			var weapon = a.Weapon;
-			if (weapon.Range < info.MinRange)
+			if (weapon.Range < info.MinRange || self.World.WorldTick - lastGlow < info.Interval)
 				return;
+
+			lastGlow = self.World.WorldTick;
 
 			var heavy = false;
 			foreach (var w in weapon.Warheads)
@@ -71,7 +77,7 @@ namespace OpenRA.Mods.TGMC.Traits
 		public readonly Color Color = Color.FromArgb(255, 255, 235, 200);
 
 		[Desc("The flash never gets brighter than this (0 to 255).")]
-		public readonly int MaxAlpha = 150;
+		public readonly int MaxAlpha = 70;
 
 		public override object Create(ActorInitializer init) { return new BlastFlash(this); }
 	}

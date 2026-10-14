@@ -98,6 +98,8 @@ Sequences:
 	tgmc|sequences/fx-blast.yaml
 	tgmc|sequences/fx-blast-big.yaml
 	tgmc|sequences/fx-smoke.yaml
+	tgmc|sequences/mortar-shell.yaml
+	tgmc|sequences/howitzer-shell.yaml
 	tgmc|sequences/fx-slam.yaml
 	tgmc|sequences/fx-blood.yaml
 	tgmc|sequences/fx-blood-xeno.yaml

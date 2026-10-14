@@ -125,76 +125,76 @@ fx-light:
 		Filename: light-warm.png
 		Length: 6
 		Tick: 35
-		Scale: 0.55
+		Scale: .45
 		BlendMode: Additive
 		ZOffset: 2047
 	muzzle-heavy:
-		Filename: light-white.png
+		Filename: light-warm.png
 		Length: 6
 		Tick: 50
-		Scale: 0.9
+		Scale: .6
 		BlendMode: Additive
 		ZOffset: 2047
 	muzzle-green:
 		Filename: light-green.png
 		Length: 6
 		Tick: 45
-		Scale: 0.6
+		Scale: .5
 		BlendMode: Additive
 		ZOffset: 2047
 	impact:
-		Filename: light-white.png
+		Filename: light-warm.png
 		Length: 6
 		Tick: 40
-		Scale: 0.5
+		Scale: .4
 		BlendMode: Additive
 		ZOffset: 2047
 	blast:
 		Filename: light-warm.png
 		Length: 6
 		Tick: 70
-		Scale: 1.8
+		Scale: 1.4
 		BlendMode: Additive
 		ZOffset: 2047
 	blast-big:
 		Filename: light-warm.png
 		Length: 6
 		Tick: 110
-		Scale: 3.0
+		Scale: 2.2
 		BlendMode: Additive
 		ZOffset: 2047
 	acid:
 		Filename: light-green.png
 		Length: 6
 		Tick: 90
-		Scale: 1.2
+		Scale: 1.0
 		BlendMode: Additive
 		ZOffset: 2047
 	rocket:
 		Filename: light-warm.png
 		Length: 6
 		Tick: 25
-		Scale: 0.7
+		Scale: .5
 		BlendMode: Additive
 		ZOffset: 2047
 	glow-fire:
 		Filename: light-fire.png
 		Length: 6
 		Tick: 120
-		Scale: 1.5
+		Scale: 1.2
 		BlendMode: Additive
 		ZOffset: 2047
 	glow-acid:
 		Filename: light-acidloop.png
 		Length: 6
 		Tick: 200
-		Scale: 1.0
+		Scale: .9
 		BlendMode: Additive
 		ZOffset: 2047
 	glow-gas:
 		Filename: light-acidloop.png
 		Length: 6
 		Tick: 240
-		Scale: 2.2
+		Scale: 1.8
 		BlendMode: Additive
 		ZOffset: 2047

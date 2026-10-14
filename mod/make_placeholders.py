@@ -338,7 +338,7 @@ def write_lights(out):
                     r = math.hypot(x - size / 2 + 0.5, y - size / 2 + 0.5) / (size / 2)
                     if r >= 1:
                         continue
-                    a = (1 - r) ** 2 * level
+                    a = (1 - r) ** 2.2 * level * 0.55
                     px[size * f + x, y] = rgb + (int(255 * a),)
         meta = PngImagePlugin.PngInfo()
         meta.add_text("FrameSize", f"{size},{size}")

@@ -109,7 +109,7 @@ TGMCSadar:
 		Multiplier: 1, 1
 	Warhead@7Flash: FlashScreen
 		Duration: 5
-		Strength: 40
+		Strength: 22
 	Warhead@1Dam: ExplosiveDamage
 		Damage: 80
 		# TGMC's SADAR rocket: devastation 0, heavy 4, light 6.
@@ -126,6 +126,7 @@ TGMCMortar:
 	Report: mortar-fire.ogg
 	# The shell whistles at the spot where it will land, shortly before it does.
 	Projectile: Shell
+		Image: mortar-shell
 		WhistleSounds: mortar-whistle.ogg, mortar-long-whistle.ogg
 		WhistleLead: 50
 	# A mortar shell: a blast about five cells across like TGMC's (devastation 1, heavy 2, light 5), a shake, and dust that hangs over the ground.
@@ -152,7 +153,7 @@ TGMCMortar:
 		Multiplier: 1, 1
 	Warhead@7Flash: FlashScreen
 		Duration: 6
-		Strength: 45
+		Strength: 24
 	Warhead@1Dam: ExplosiveDamage
 		Damage: 70
 		Range: 0c0, 1c0, 2c0, 5c0
@@ -174,6 +175,7 @@ TGMCHowitzer:
 	ReloadDelay: 240
 	Report: howitzer-fire.ogg
 	Projectile: Shell
+		Image: howitzer-shell
 		WhistleSounds: howitzer-whistle.ogg
 		WhistleLead: 90
 	Warhead@2Boom: CreateEffect
@@ -193,7 +195,7 @@ TGMCHowitzer:
 		Multiplier: 1, 1
 	Warhead@7Flash: FlashScreen
 		Duration: 12
-		Strength: 100
+		Strength: 55
 	Warhead@1Dam: ExplosiveDamage
 		Damage: 150
 		Range: 0c0, 1c0, 6c0, 8c0
@@ -925,7 +927,7 @@ TGMCCasBomb:
 		Multiplier: 1, 1
 	Warhead@7Flash: FlashScreen
 		Duration: 8
-		Strength: 70
+		Strength: 38
 
 # CAS ammo types, after TGMC's dropship ammo (code/game/objects/structures/dropship_ammo.dm). Each is one blast of a strike set up in
 # structures.yaml (CondorStrikePower). All hurt friend and foe alike.
@@ -986,7 +988,7 @@ TGMCCasWidow:
 		Multiplier: 1, 1
 	Warhead@7Flash: FlashScreen
 		Duration: 6
-		Strength: 50
+		Strength: 27
 
 TGMCCasNapalm:
 	Inherits: TGMCCasMini
@@ -1011,7 +1013,7 @@ TGMCCasNapalm:
 		Multiplier: 1, 1
 	Warhead@7Flash: FlashScreen
 		Duration: 10
-		Strength: 80
+		Strength: 44
 
 # The fire napalm and lasers leave behind, hit every few ticks at random spots (LingerWeapon).
 TGMCCasFire:
@@ -1040,7 +1042,7 @@ TGMCCasFatty:
 		Multiplier: 1, 1
 	Warhead@7Flash: FlashScreen
 		Duration: 8
-		Strength: 70
+		Strength: 38
 
 TGMCCasCluster:
 	Inherits: TGMCCasMini
@@ -1107,7 +1109,7 @@ TGMCCasMoab:
 		Multiplier: 1, 1
 	Warhead@7Flash: FlashScreen
 		Duration: 22
-		Strength: 210
+		Strength: 115
 
 # What a unit leaves where it dies: a splash of blood (marines) or acid-green gore (xenos). Fired by FireWarheadsOnDeath.
 TGMCDeathBlood:

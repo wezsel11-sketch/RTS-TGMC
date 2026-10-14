@@ -143,7 +143,8 @@ def centred(layer, size=(64, 32)):
 
 def guns(weapon):
     """The layers a gun adds to a marine. A two-handed gun is TGMC's wielded state, which both its right-hand and its left-hand sheet
-    draw; drawing both made the marine look like he carried two guns, so each facing uses the one that shows the gun better."""
+    draw; drawing both made the marine look like he carried two guns, so each facing uses the one that shows the gun better, plus the
+    other hand's glove (see _with_hand)."""
     left = TWO_HANDED_LEFT.get(weapon[0])
     if not left:
         return [weapon]
@@ -1043,6 +1044,35 @@ def _opaque(frames):
     return sum(1 for img in frames for a in img.getchannel("A").getdata() if a)
 
 
+def _with_hand(gun, other, limit=14):
+    """The gun image with the other hand's glove added. Each hand's sheet shows the whole gun and only its own glove; the small blobs
+    (the glove) that the other sheet has outside the gun are laid on, but not its larger slivers, which would double the gun."""
+    gun = gun.convert("RGBA").copy()
+    other = other.convert("RGBA")
+    have, got = gun.load(), other.load()
+    width, height = other.size
+    free = {(x, y) for x in range(width) for y in range(height) if got[x, y][3] > 0 and have[x, y][3] == 0}
+    seen = set()
+    for start in sorted(free):
+        if start in seen:
+            continue
+        blob, stack = [start], [start]
+        seen.add(start)
+        while stack:
+            x, y = stack.pop()
+            for dx in (-1, 0, 1):
+                for dy in (-1, 0, 1):
+                    q = (x + dx, y + dy)
+                    if q in free and q not in seen:
+                        seen.add(q)
+                        stack.append(q)
+                        blob.append(q)
+        if len(blob) <= limit:
+            for x, y in blob:
+                have[x, y] = got[x, y]
+    return gun
+
+
 def _layer_images(dmi, state, tint=None, opts=None):
     """Return {side: [frame images]} for S/N/E/W, {"*": [frame images]} for a 1-dir state, or, with the "facings"
     option, {0..facings-1: [frame images]} for a 1-dir state turned to each facing (facing 0 points north).
@@ -1053,7 +1083,11 @@ def _layer_images(dmi, state, tint=None, opts=None):
         rest = {k: v for k, v in opts.items() if k != "or_sheet"}
         first = _layer_images(dmi, state, tint, rest)
         second = _layer_images(opts["or_sheet"], state, tint, rest)
-        return {k: (second[k] if _opaque(second[k]) > _opaque(first[k]) else first[k]) for k in first}
+        merged = {}
+        for k in first:
+            better, other = (second[k], first[k]) if _opaque(second[k]) > _opaque(first[k]) else (first[k], second[k])
+            merged[k] = [_with_hand(a, b) for a, b in zip(better, other)]
+        return merged
     frames = dmi.frames(state)
     if "frames" in opts:
         frames = frames[slice(*opts["frames"])]

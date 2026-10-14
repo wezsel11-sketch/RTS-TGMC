@@ -67,7 +67,7 @@ FLAMER = "icons/mob/inhands/guns/special_right_1.dmi"
 SMGS = "icons/mob/inhands/guns/submachineguns_right_1.dmi"
 SHOTGUNS = "icons/mob/inhands/guns/shotguns_right_1.dmi"
 PISTOLS = "icons/mob/inhands/guns/pistols_right_1.dmi"
-# The left-hand sheets: TGMC draws a two-handed gun in both hands, the same state on the right and the left sheet.
+# The left-hand sheets: a two-handed gun has the same wielded state on the right and the left sheet (see guns()).
 TWO_HANDED_LEFT = {
     RIFLES: "icons/mob/inhands/guns/rifles_left_1.dmi",
     MG60: "icons/mob/inhands/guns/machineguns_left_64.dmi",
@@ -142,10 +142,17 @@ def centred(layer, size=(64, 32)):
 
 
 def guns(weapon):
-    """The layers a gun adds to a marine: a two-handed one is drawn in both hands, the same state on TGMC's left-hand sheet
-    and its right-hand sheet."""
+    """The layers a gun adds to a marine. A two-handed gun is TGMC's wielded state, which both its right-hand and its left-hand sheet
+    draw; drawing both made the marine look like he carried two guns, so each facing uses the one that shows the gun better."""
     left = TWO_HANDED_LEFT.get(weapon[0])
-    return [(left,) + tuple(weapon[1:]), weapon] if left else [weapon]
+    if not left:
+        return [weapon]
+
+    # One gun, not one per hand: for each facing, the sheet (right hand or left hand) that shows the gun better.
+    parts = list(weapon) + [None] * (3 - len(weapon))
+    opts = dict(parts[3]) if len(parts) > 3 and parts[3] else {}
+    opts["or_sheet"] = left
+    return [(weapon[0], weapon[1], parts[2], opts)]
 
 
 def with_gun(body, weapon):
@@ -1032,10 +1039,21 @@ def tinted(img, rgb):
     return out
 
 
+def _opaque(frames):
+    return sum(1 for img in frames for a in img.getchannel("A").getdata() if a)
+
+
 def _layer_images(dmi, state, tint=None, opts=None):
     """Return {side: [frame images]} for S/N/E/W, {"*": [frame images]} for a 1-dir state, or, with the "facings"
-    option, {0..facings-1: [frame images]} for a 1-dir state turned to each facing (facing 0 points north)."""
+    option, {0..facings-1: [frame images]} for a 1-dir state turned to each facing (facing 0 points north).
+    With "or_sheet" (a second .dmi with the same state) each side comes from whichever sheet shows more of the gun there: a two-handed
+    gun is one gun, in the hand that holds it toward the viewer, not one in each hand."""
     opts = opts or {}
+    if "or_sheet" in opts:
+        rest = {k: v for k, v in opts.items() if k != "or_sheet"}
+        first = _layer_images(dmi, state, tint, rest)
+        second = _layer_images(opts["or_sheet"], state, tint, rest)
+        return {k: (second[k] if _opaque(second[k]) > _opaque(first[k]) else first[k]) for k in first}
     frames = dmi.frames(state)
     if "frames" in opts:
         frames = frames[slice(*opts["frames"])]
@@ -1179,8 +1197,13 @@ def render_sequences(tgmc, sequences, cell=None):
             aliases.append((seq_name, layer_specs))
             continue
         dmis = [(tgmc_dmi.Dmi(os.path.join(tgmc, spec[0])), spec[1]) for spec in layer_specs]
-        layers = [(dmi, state, layer_images(dmi, state, spec[2] if len(spec) > 2 else None,
-                                            spec[3] if len(spec) > 3 else None))
+        def options(spec):
+            opts = spec[3] if len(spec) > 3 else None
+            if opts and isinstance(opts.get("or_sheet"), str):  # the second sheet of a two-handed gun, loaded here
+                opts = dict(opts, or_sheet=tgmc_dmi.Dmi(os.path.join(tgmc, opts["or_sheet"])))
+            return opts
+
+        layers = [(dmi, state, layer_images(dmi, state, spec[2] if len(spec) > 2 else None, options(spec)))
                   for (dmi, state), spec in zip(dmis, layer_specs)]
         sides = composite(layers)
         first_opts = layer_specs[0][3] if len(layer_specs[0]) > 3 else {}

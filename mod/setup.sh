@@ -10,7 +10,7 @@
 #   build/tools/dotnet              .NET 10 SDK, installed only if there is none on the machine
 #
 # Overrides (environment): OPENRA_DIR, TGMC, TGMC_REF, DOTNET_CHANNEL. Needs git, python3 with Pillow, ffmpeg with libvorbis,
-# make, curl (only to install .NET), and a POSIX shell. Linux and macOS work; on Windows use WSL.
+# make, curl (only to install .NET), and a POSIX shell. Linux and macOS work; on Windows run setup.cmd (mod/bootstrap.py).
 # The TGMC art and sound are CC-BY-NC(-SA): the result is for your own use, never to be shared.
 set -eu
 
@@ -36,7 +36,7 @@ step "Checking prerequisites"
 case $(uname -s) in
 	Linux) hint_pkg="sudo apt install git python3-pil ffmpeg make   (or your distribution's equivalents)" ;;
 	Darwin) hint_pkg="brew install git python pillow ffmpeg make" ;;
-	*) hint_pkg="install git, Python 3 with Pillow, ffmpeg and make (on Windows, use WSL)" ;;
+	*) hint_pkg="install git, Python 3 with Pillow, ffmpeg and make (on Windows, run setup.cmd instead)" ;;
 esac
 missing=
 for tool in git make bash ffmpeg ffprobe "$PY"; do

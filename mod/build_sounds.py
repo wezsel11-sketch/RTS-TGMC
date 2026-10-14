@@ -56,8 +56,8 @@ SOUNDS = {
     # One firing sound per weapon, from TGMC's own gun sounds
     "rifle-fire-4": (f"{G}/m41a_3.ogg", "fx"),
     "rifle-fire-5": (f"{G}/m41a_4.ogg", "fx"),
-    "mg60-fire-1": (f"{G}/gun_mg60.ogg", "fx"),
-    "mg60-fire-2": (f"{G}/gun_mg60_low.ogg", "fx"),
+    "mg60-fire-1": (f"{G}/tgmc/kinetic/gun_mg60.ogg", "fx"),
+    "mg60-fire-2": (f"{G}/tgmc/kinetic/gun_mg60_low.ogg", "fx"),
     "minigun-fire": (f"{G}/minigun.ogg", "fx"),
     "sniper-fire-1": (f"{G}/svd1.ogg", "fx"),
     "sniper-fire-2": (f"{G}/svd2.ogg", "fx"),

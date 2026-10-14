@@ -21,18 +21,43 @@ redistribute the built mod, and do not publish TGMC-derived art or audio. See
 
 ## Quick start
 
-You need `git`, `make`, `python3` with Pillow, `ffmpeg` (with libvorbis) and a POSIX shell. Linux x64 is the only tested platform; macOS is untested, and on Windows use WSL.
+You need `git`, `python3` with Pillow and `ffmpeg` (with libvorbis). Linux and macOS also need `make` and a POSIX shell; Windows does not (OpenRA builds itself there).
+Linux x64 is the tested platform. Windows 11 is supported through the same steps in Python (see below), but it has not been run on a real Windows machine yet:
+if something fails there, WSL2 with the Linux steps is the fallback, and the issue is worth reporting.
 No .NET? The script installs a .NET 10 SDK into `build/tools`, and nothing outside `build/` is touched.
 
+### Linux and macOS
+
 ```sh
-git clone -b claude/hopeful-heisenberg-6kyjk9 https://github.com/wezsel11-sketch/RTS-TGMC.git
+git clone -b ccr-c31f20d2-inlmko https://github.com/wezsel11-sketch/RTS-TGMC.git
 cd RTS-TGMC
 sh mod/setup.sh      # fetches OpenRA and the TGMC art, builds and checks the mod (about 10 minutes the first time)
 sh mod/play.sh       # main menu; or `sh mod/play.sh landing-zone` to jump straight into a map
 ```
 
-`setup.sh` is safe to re-run: it skips finished steps and picks up changes to the converters. It pins OpenRA and TGMC to
-the commits this mod was tested against (see the top of the script), so a later change in either cannot break it.
+### Windows 11
+
+Open PowerShell in the folder you want the game in, then:
+
+```powershell
+git clone -b ccr-c31f20d2-inlmko https://github.com/wezsel11-sketch/RTS-TGMC.git
+cd RTS-TGMC
+powershell -ExecutionPolicy Bypass -File mod\windows-prereqs.ps1   # once: installs Git, Python, ffmpeg and Pillow with winget
+```
+
+Close the window, open a **new** one in `RTS-TGMC` (so the new programs are on the PATH), and run:
+
+```powershell
+setup.cmd            # fetches OpenRA and the TGMC art, builds and checks the mod (about 15 minutes the first time)
+play.cmd             # main menu; or `play.cmd landing-zone` to jump straight into a map
+```
+
+`setup.cmd` and `play.cmd` run `mod/bootstrap.py` and `mod/play.py`, the same steps as the shell scripts. Both work on Linux and macOS too
+(`python3 mod/bootstrap.py`). On Windows the mod folder is linked into OpenRA with a junction, or copied if a junction cannot be made.
+The test scripts (`mod/test_scenarios.sh`, `smoke.sh`, `balance.sh`) are Linux-only; use WSL2 for those.
+
+`setup` is safe to re-run: it skips finished steps and picks up changes to the converters. It pins OpenRA and TGMC to
+the commits this mod was tested against (see the top of `mod/bootstrap.py`), so a later change in either cannot break it.
 
 ## How to play
 

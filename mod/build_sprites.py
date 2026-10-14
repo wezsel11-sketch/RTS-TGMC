@@ -527,7 +527,7 @@ UNITS = {
     "sniper": {
         "cell": MARINE_CELL,
         "sequences": {
-            "stand": marine("marine_jumpsuit", (MARKSMAN, "svd", None, {"big": True})),
+            "stand": marine("marine_jumpsuit", (MARKSMAN, "svd_w", None, {"big": True})),
             "die-gib": MARINE_GIB,
             "run": "stand",
             "attack": "stand",
@@ -539,7 +539,7 @@ UNITS = {
     "rocketeer": {
         "cell": MARINE_CELL,
         "sequences": {
-            "stand": marine("marine_jumpsuit", (SADAR, "sadar_100", None, {"big": True})),
+            "stand": marine("marine_jumpsuit", (SADAR, "sadar_100_w", None, {"big": True})),
             "die-gib": MARINE_GIB,
             "run": "stand",
             "attack": "stand",
@@ -575,7 +575,7 @@ UNITS = {
     "flamer": {
         "cell": MARINE_CELL,
         "sequences": {
-            "stand": marine("marine_jumpsuit", (FLAMER, "m240")),
+            "stand": marine("marine_jumpsuit", (FLAMER, "m240_w")),
             "die-gib": MARINE_GIB,
             "run": "stand",
             "attack": "stand",
@@ -587,7 +587,7 @@ UNITS = {
     "machinegunner": {
         "cell": MARINE_CELL,
         "sequences": {
-            "stand": marine("marine_jumpsuit", (MG60, "t60", None, {"big": True})),
+            "stand": marine("marine_jumpsuit", (MG60, "t60_w", None, {"big": True})),
             "die-gib": MARINE_GIB,
             "run": "stand",
             "attack": "stand",
@@ -612,7 +612,7 @@ UNITS = {
     "heavygunner": {
         "cell": MARINE_CELL,
         "sequences": {
-            "stand": jaeger("gugnir", (MG60, "v41", None, {"big": True})),
+            "stand": jaeger("gugnir", (MG60, "v41_w", None, {"big": True})),
             "die-gib": MARINE_GIB,
             "run": "stand",
             "attack": "stand",

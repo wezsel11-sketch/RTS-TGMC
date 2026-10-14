@@ -1,0 +1,17 @@
+<!doctype html><meta charset=utf-8><link rel=stylesheet href=common.css>
+<style>
+:root{--acc:#ff7a3c;--line:rgba(255,160,100,.4)}
+body:before{content:'';position:absolute;inset:0;background:linear-gradient(90deg,rgba(6,8,12,.94) 0,rgba(6,8,12,.55) 45%,transparent 75%)}
+.title{left:80px;top:150px}.title small{letter-spacing:.5em;font-size:13px;color:var(--acc)}
+.title h1{font-size:92px;line-height:.95;font-weight:900;letter-spacing:.02em;margin-top:10px}.title h1 em{font-style:normal;color:var(--acc)}
+.title p{margin-top:18px;max-width:480px;opacity:.75;font-size:15px;line-height:1.5}
+.bar{left:80px;right:80px;bottom:60px;display:flex;gap:18px}
+.card{flex:1;height:120px;border:1px solid var(--line);border-radius:6px;background:rgba(10,12,16,.78);padding:18px;position:relative;overflow:hidden}
+.card.on{background:linear-gradient(135deg,rgba(255,122,60,.35),rgba(10,12,16,.85));border-color:var(--acc)}
+.card b{font-size:20px;letter-spacing:.12em}.card span{position:absolute;left:18px;bottom:16px;font-size:12px;opacity:.7}
+.card:after{content:attr(data-n);position:absolute;right:14px;top:6px;font-size:44px;font-weight:900;opacity:.12}
+.corner{right:80px;top:50px;font-size:12px;letter-spacing:.2em;opacity:.6}
+</style>
+<div class="abs title"><small>OPERATION</small><h1>MARINES<br><em>VS</em> XENOS</h1><p>Hold the line or take the hive. Two factions, one hostile world, and no one coming to help.</p></div>
+<div class="abs corner">BUILD 0.1 &nbsp;|&nbsp; TGMC</div>
+<div class="abs bar"><div class="card on" data-n=1><b>SKIRMISH</b><span>Play a match against the AI</span></div><div class=card data-n=2><b>HOLD THE LINE</b><span>Survive six waves</span></div><div class=card data-n=3><b>CAMPAIGN</b><span>Missions, coming soon</span></div><div class=card data-n=4><b>CODEX</b><span>Units and structures</span></div><div class=card data-n=5><b>SETTINGS</b><span>Video, sound, keys</span></div></div>

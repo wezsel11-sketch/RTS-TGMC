@@ -1,0 +1,18 @@
+<!doctype html><meta charset=utf-8><link rel=stylesheet href=common.css>
+<style>
+:root{--acc:#4fb3ff;--amb:#ffb43c;--glass:rgba(12,18,28,.86);--line:rgba(120,180,255,.35)}
+.panel{position:absolute;background:var(--glass);border:1px solid var(--line);border-radius:12px}
+h3{font-size:12px;letter-spacing:.2em;opacity:.65;padding:14px 16px 8px}
+.players{left:30px;top:30px;width:360px;height:560px}.slot{margin:6px 14px;height:54px;border-radius:8px;border:1px solid var(--line);display:flex;align-items:center;padding:0 14px;gap:12px;background:rgba(255,255,255,.03)}
+.slot i{width:30px;height:30px;border-radius:6px}.m{background:#4a6ee0}.x{background:#d6504a}.slot small{margin-left:auto;opacity:.6}
+.map{left:410px;top:30px;width:480px;height:560px}.prev{margin:0 16px;height:250px;border-radius:8px;border:1px solid var(--line);background:#16301c radial-gradient(circle at 35% 55%,#2c5e34 0 28%,transparent 29%),radial-gradient(circle at 70% 40%,#3d3f32 0 22%,transparent 23%)}
+.opt{margin:8px 16px;display:flex;justify-content:space-between;font-size:14px;padding:9px 12px;border-radius:6px;background:rgba(255,255,255,.04)}.opt b{color:var(--amb)}
+.chat{left:910px;top:30px;width:340px;height:560px;padding:0}.chat p{font-size:12px;padding:4px 16px;opacity:.85}
+.bar{left:30px;right:30px;bottom:24px;height:64px;display:flex;align-items:center;justify-content:space-between;padding:0 24px}
+.btn{padding:12px 34px;border-radius:8px;border:1px solid var(--line);font-size:15px;letter-spacing:.1em}.go{background:var(--acc);color:#04121f;font-weight:700;border-color:var(--acc)}
+</style>
+<div class=vig></div>
+<div class="panel players"><h3>PLAYERS</h3><div class=slot><i class=m></i>You <small>Marines</small></div><div class=slot><i class=x></i>Skirmish AI (Hard) <small>Xenos</small></div><div class=slot style="opacity:.4">Open slot</div></div>
+<div class="panel map"><h3>MAP — LV-624</h3><div class=prev></div><div class=opt>Starting requisition <b>1000</b></div><div class=opt>Burst time <b>60 s</b></div><div class=opt>Floating damage numbers <b>On</b></div><div class=opt>Tile step <b>Off</b></div></div>
+<div class="panel chat"><h3>CHAT</h3><p>Lobby opened.</p><p>Skirmish AI (Hard) joined.</p></div>
+<div class="panel bar"><div class=btn>BACK</div><div class="btn go">START GAME</div></div>

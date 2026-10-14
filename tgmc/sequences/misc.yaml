@@ -33,3 +33,168 @@ repair-wrench:
 		Length: 8
 		Tick: 100
 		ZOffset: 2000
+
+# The move-order click effect (OpenRA's terrain flash). Drawn by mod/make_placeholders.py (no TGMC art).
+moveflsh:
+	idle:
+		Filename: moveflsh.png
+		Length: 4
+		Tick: 60
+		ZOffset: 2000
+
+# The CAS ammo types' palette icons, drawn by mod/make_placeholders.py (no TGMC art); frame order is CAS_ICONS there.
+cas-icon:
+	cas:
+		Filename: cas-icon.png
+		Start: 0
+		Length: 1
+	gun:
+		Filename: cas-icon.png
+		Start: 1
+		Length: 1
+	minirocket:
+		Filename: cas-icon.png
+		Start: 2
+		Length: 1
+	flare:
+		Filename: cas-icon.png
+		Start: 3
+		Length: 1
+	widowmaker:
+		Filename: cas-icon.png
+		Start: 4
+		Length: 1
+	laser:
+		Filename: cas-icon.png
+		Start: 5
+		Length: 1
+	napalm:
+		Filename: cas-icon.png
+		Start: 6
+		Length: 1
+	fatty:
+		Filename: cas-icon.png
+		Start: 7
+		Length: 1
+	moab:
+		Filename: cas-icon.png
+		Start: 8
+		Length: 1
+
+# The building ghost's cell tiles, drawn by mod/make_placeholders.py (the engine's placement preview needs this image).
+overlay:
+	build-valid:
+		Filename: overlay.png
+		Start: 0
+		Length: 1
+	build-invalid:
+		Filename: overlay.png
+		Start: 1
+		Length: 1
+	target-select:
+		Filename: overlay.png
+		Start: 0
+		Length: 1
+
+# The hive powers' palette icons, drawn by mod/make_placeholders.py (no TGMC art); frame order is HIVE_ICONS there.
+hive-icon:
+	cure:
+		Filename: hive-icon.png
+		Start: 0
+		Length: 1
+	burrowed:
+		Filename: hive-icon.png
+		Start: 1
+		Length: 1
+	rage:
+		Filename: hive-icon.png
+		Start: 2
+		Length: 1
+
+# Drawn by mod/make_placeholders.py: a green puddle that pulses.
+acid-pool:
+	idle:
+		Filename: acid-pool.png
+		Length: 4
+		Tick: 160
+
+# Lighting: soft additive glows (drawn by mod/make_placeholders.py, no TGMC art) that brighten the ground around a muzzle flash, a blast,
+# a splash of acid or a fire. Weapons name them in an extra CreateEffect warhead; MuzzleGlow (tgmc/code/Lights.cs) plays the muzzle ones.
+fx-light:
+	muzzle:
+		Filename: light-warm.png
+		Length: 6
+		Tick: 35
+		Scale: 0.55
+		BlendMode: Additive
+		ZOffset: 2047
+	muzzle-heavy:
+		Filename: light-white.png
+		Length: 6
+		Tick: 50
+		Scale: 0.9
+		BlendMode: Additive
+		ZOffset: 2047
+	muzzle-green:
+		Filename: light-green.png
+		Length: 6
+		Tick: 45
+		Scale: 0.6
+		BlendMode: Additive
+		ZOffset: 2047
+	impact:
+		Filename: light-white.png
+		Length: 6
+		Tick: 40
+		Scale: 0.5
+		BlendMode: Additive
+		ZOffset: 2047
+	blast:
+		Filename: light-warm.png
+		Length: 6
+		Tick: 70
+		Scale: 1.8
+		BlendMode: Additive
+		ZOffset: 2047
+	blast-big:
+		Filename: light-warm.png
+		Length: 6
+		Tick: 110
+		Scale: 3.0
+		BlendMode: Additive
+		ZOffset: 2047
+	acid:
+		Filename: light-green.png
+		Length: 6
+		Tick: 90
+		Scale: 1.2
+		BlendMode: Additive
+		ZOffset: 2047
+	rocket:
+		Filename: light-warm.png
+		Length: 6
+		Tick: 25
+		Scale: 0.7
+		BlendMode: Additive
+		ZOffset: 2047
+	glow-fire:
+		Filename: light-fire.png
+		Length: 6
+		Tick: 120
+		Scale: 1.5
+		BlendMode: Additive
+		ZOffset: 2047
+	glow-acid:
+		Filename: light-acidloop.png
+		Length: 6
+		Tick: 200
+		Scale: 1.0
+		BlendMode: Additive
+		ZOffset: 2047
+	glow-gas:
+		Filename: light-acidloop.png
+		Length: 6
+		Tick: 240
+		Scale: 2.2
+		BlendMode: Additive
+		ZOffset: 2047

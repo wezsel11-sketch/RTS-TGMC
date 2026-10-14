@@ -90,6 +90,10 @@ MAPS = {
     "desert-dam": {"title": "Desert Dam", "file": "_maps/map_files/desertdam/desertdam.dmm", "factor": 3, "marines": (40, 150), "xenos": (200, 150)},
 }
 
+# The same maps at TGMC's own size, one cell per tile (the ones above are shrunk to 1/2 or 1/3 so a match does not take an hour).
+for _name, _spec in list(MAPS.items()):
+    MAPS[_name + "-full"] = dict(_spec, title=_spec["title"] + " (full size)", factor=1)
+
 
 def paths():
     return sorted(m["file"] for m in MAPS.values())

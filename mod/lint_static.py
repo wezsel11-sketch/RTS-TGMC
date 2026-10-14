@@ -49,7 +49,7 @@ def check_death_types(rules, weapons, seqs):
     errors = []
     for actor in sorted(seqs):
         bodies = [blocks[n] for n in chain(actor)]
-        if not any("WithDeathAnimation" in b for b in bodies):
+        if not any("WithDeathAnimation" in b or "WithLingeringCorpse" in b for b in bodies):
             continue
         listed = {}
         for b in reversed(bodies):  # farthest ancestor first, so the nearest entry wins

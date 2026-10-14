@@ -1,0 +1,35 @@
+<!doctype html><meta charset=utf-8><link rel=stylesheet href=common.css>
+<style>
+:root{--acc:#ff9a3d;--ink:rgba(8,10,14,.72);--hair:rgba(255,255,255,.14)}
+.pill{position:absolute;background:var(--ink);border:1px solid var(--hair);border-radius:999px;padding:8px 18px;font-size:13px;display:flex;gap:16px;align-items:center;backdrop-filter:blur(8px)}
+.pill b{font-weight:700}.pill .a{color:var(--acc)}
+.minimap{position:absolute;right:16px;top:16px;width:190px;height:190px;border-radius:50%;background:#0b1118 radial-gradient(circle at 40% 45%,#264d2c 0 55%,#0b1118 56%);border:2px solid var(--hair);box-shadow:0 0 0 4px var(--ink)}
+.minimap i{position:absolute;width:7px;height:7px;background:#ff5a4f;border-radius:50%}.minimap u{position:absolute;width:7px;height:7px;background:#6fd0ff;border-radius:50%}
+.hot{position:absolute;left:50%;transform:translateX(-50%);bottom:16px;display:flex;gap:8px;align-items:flex-end}
+.slot{width:62px;height:62px;border-radius:12px;background:var(--ink);border:1px solid var(--hair);position:relative;display:flex;align-items:center;justify-content:center;font-size:11px;backdrop-filter:blur(8px)}
+.slot kbd{position:absolute;top:4px;left:7px;font:700 10px 'Lato';color:var(--acc)}
+.slot s{position:absolute;bottom:4px;right:6px;text-decoration:none;font-size:10px;opacity:.7}
+.slot.cd:after{content:'';position:absolute;inset:0;border-radius:12px;background:conic-gradient(rgba(0,0,0,.65) 0 38%,transparent 38%)}
+.slot.sel{border-color:var(--acc);box-shadow:0 0 14px rgba(255,154,61,.45)}
+.sep{width:14px}
+.info{position:absolute;left:16px;bottom:16px;width:310px;background:var(--ink);border:1px solid var(--hair);border-radius:16px;padding:14px;backdrop-filter:blur(8px)}
+.info h3{font-size:18px}.info small{opacity:.6;font-size:12px}
+.info .bar{height:6px;margin:8px 0}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chips span{padding:3px 9px;border-radius:999px;background:rgba(255,255,255,.1);font-size:11px}
+.chips .w{background:rgba(255,90,79,.25);color:#ffb0a8}
+.feed{position:absolute;left:16px;top:16px;display:flex;flex-direction:column;gap:6px;font-size:12px}
+.feed div{background:var(--ink);border-left:3px solid var(--acc);border-radius:6px;padding:6px 12px;width:240px}
+.feed .r{border-color:#ff5a4f}.feed .g{border-color:#46d36b}
+.cas{position:absolute;right:16px;bottom:16px;width:190px;background:var(--ink);border:1px solid var(--hair);border-radius:16px;padding:12px;font-size:12px}
+.cas b{font-size:14px}.cas .bar{margin-top:8px}
+</style>
+<div class=vig></div>
+<div class=pill style="left:50%;transform:translateX(-50%);top:14px"><span class=a>◆ <b>1000</b></span><span>+0/min</span><span>Army <b>4</b></span><span>00:02</span></div>
+<div class=feed><div class=r>Marine facehugged</div><div class=g>Barracks complete</div><div>Hunter spotted · NE</div></div>
+<div class=minimap><i style="left:120px;top:60px"></i><i style="left:128px;top:70px"></i><u style="left:76px;top:96px"></u><u style="left:84px;top:104px"></u></div>
+<div class=info><h3>6 marines</h3><small>Squad · 582 / 710 HP</small><div class=bar><i style="width:82%;background:linear-gradient(90deg,#ffb43c,#46d36b)"></i></div><div class=chips><span>Rifle ×3</span><span>Medic ×1</span><span class=w>Infected ×1</span><span>Aggressive</span></div></div>
+<div class=hot>
+<div class="slot sel"><kbd>1</kbd>Rifle<s>100</s></div><div class=slot><kbd>2</kbd>Medic<s>140</s></div><div class=slot><kbd>3</kbd>Engi<s>120</s></div><div class=slot><kbd>4</kbd>Smart<s>230</s></div><div class=sep></div>
+<div class=slot><kbd>E</kbd>Evolve</div><div class=slot><kbd>S</kbd>Stop</div><div class="slot cd"><kbd>F</kbd>Evade</div><div class=slot><kbd>H</kbd>Hold</div></div>
+<div class=cas><b>CAS · Bomb run</b><div style="opacity:.65;margin-top:2px">Charging · 62%</div><div class=bar><i style="width:62%;background:var(--acc)"></i></div></div>

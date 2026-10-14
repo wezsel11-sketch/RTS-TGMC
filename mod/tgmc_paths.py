@@ -28,6 +28,7 @@ def paths():
     for entry in build_tileset.TILES.values():
         found.add(entry[0])
     found.update(tgmc_dmm.paths())
+    found.update(build_sprites.CONDOR_FILES)
     return sorted(found)
 
 

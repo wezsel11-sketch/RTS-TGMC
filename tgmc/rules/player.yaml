@@ -8,9 +8,10 @@ Player:
 		SelectableCash: 500, 1000, 2500, 5000
 		DefaultCash: 1000
 	PlayerRadarTerrain:
-	ClassicProductionQueue@Infantry:
+	# One unit per production building is built at the same time (MultiProductionQueue in tgmc/code/ProductionQueues.cs).
+	MultiProductionQueue@Infantry:
 		Type: Infantry
-		BuildDurationModifier: 350
+		BuildDurationModifier: 280
 		Factions: marines
 		DisplayOrder: 1
 		ReadyAudio: UnitReady
@@ -19,9 +20,9 @@ Player:
 		LimitedAudio: BuildingInProgress
 		OnHoldAudio: OnHold
 		CancelledAudio: Cancelled
-	ClassicProductionQueue@Xeno:
+	MultiProductionQueue@Xeno:
 		Type: Xeno
-		BuildDurationModifier: 250
+		BuildDurationModifier: 200
 		Factions: xenos
 		DisplayOrder: 2
 		ReadyAudio: UnitReady
@@ -33,7 +34,7 @@ Player:
 	ClassicProductionQueue@MarineBuild:
 		Type: MarineBuild
 		Group: Build
-		BuildDurationModifier: 200
+		BuildDurationModifier: 110
 		Factions: marines
 		DisplayOrder: 3
 		ReadyAudio: UnitReady
@@ -45,7 +46,7 @@ Player:
 	ClassicProductionQueue@XenoBuild:
 		Type: XenoBuild
 		Group: Build
-		BuildDurationModifier: 200
+		BuildDurationModifier: 110
 		Factions: xenos
 		DisplayOrder: 3
 		ReadyAudio: UnitReady
@@ -54,6 +55,7 @@ Player:
 		LimitedAudio: BuildingInProgress
 		OnHoldAudio: OnHold
 		CancelledAudio: Cancelled
+	SupportPowerManager:
 	PlaceBuilding:
 		CannotPlaceNotification: NoBuild
 	DeveloperMode:
@@ -67,4 +69,5 @@ Player:
 		ValidTargets: Structure
 		Notification: BaseAttack
 		NotifyInterval: 20000
+	PlayerStatistics:
 	ConquestVictoryConditions:

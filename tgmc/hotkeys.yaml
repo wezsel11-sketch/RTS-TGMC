@@ -1,0 +1,70 @@
+# The mod's own hotkeys.
+TgmcHelp: F1
+	Description: hotkey-description-tgmchelp
+	Types: World
+	Contexts: player, spectator
+
+TgmcStepN: KP_8
+	Description: hotkey-description-tgmcstepn
+	Types: World
+	Contexts: player
+
+TgmcStepS: KP_2
+	Description: hotkey-description-tgmcsteps
+	Types: World
+	Contexts: player
+
+TgmcStepW: KP_4
+	Description: hotkey-description-tgmcstepw
+	Types: World
+	Contexts: player
+
+TgmcStepE: KP_6
+	Description: hotkey-description-tgmcstepe
+	Types: World
+	Contexts: player
+
+TgmcStepNW: KP_7
+	Description: hotkey-description-tgmcstepnw
+	Types: World
+	Contexts: player
+
+TgmcStepNE: KP_9
+	Description: hotkey-description-tgmcstepne
+	Types: World
+	Contexts: player
+
+TgmcStepSW: KP_1
+	Description: hotkey-description-tgmcstepsw
+	Types: World
+	Contexts: player
+
+TgmcStepSE: KP_3
+	Description: hotkey-description-tgmcstepse
+	Types: World
+	Contexts: player
+
+TgmcAbility1: R
+	Description: hotkey-description-tgmcability1
+	Types: World
+	Contexts: player
+
+TgmcAbility2: T
+	Description: hotkey-description-tgmcability2
+	Types: World
+	Contexts: player
+
+TgmcSelectIdle: I
+	Description: hotkey-description-tgmcselectidle
+	Types: World
+	Contexts: player
+
+TgmcSelectWounded: U
+	Description: hotkey-description-tgmcselectwounded
+	Types: World
+	Contexts: player
+
+TgmcSelectAllOfType: W Ctrl
+	Description: hotkey-description-tgmcselectalloftype
+	Types: World
+	Contexts: player

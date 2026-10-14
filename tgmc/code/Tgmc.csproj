@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Built against the pinned OpenRA engine by mod/build_mod.sh. The engine directory is passed in by OPENRA_BIN. -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <AssemblyName>Tgmc</AssemblyName>
+    <RootNamespace>OpenRA.Mods.TGMC</RootNamespace>
+    <Nullable>disable</Nullable>
+    <EnableDefaultCompileItems>true</EnableDefaultCompileItems>
+    <OpenRABin Condition="'$(OPENRA_BIN)' != ''">$(OPENRA_BIN)</OpenRABin>
+    <OpenRABin Condition="'$(OPENRA_BIN)' == ''">$(MSBuildProjectDirectory)/../../build/OpenRA/bin</OpenRABin>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="OpenRA.Game">
+      <HintPath>$(OpenRABin)/OpenRA.Game.dll</HintPath>
+    </Reference>
+    <Reference Include="OpenRA.Mods.Common">
+      <HintPath>$(OpenRABin)/OpenRA.Mods.Common.dll</HintPath>
+    </Reference>
+    <!-- WPos carries the Lua binding interfaces from Eluant, so overloads that take a WPos need it in view. -->
+    <Reference Include="Eluant">
+      <HintPath>$(OpenRABin)/Eluant.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>

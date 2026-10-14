@@ -9,13 +9,21 @@ WorldLoaded = function()
 	pod.RallyPoint = target
 
 	local built
-	local queued = marines.Build({ "rifleman" }, function(units)
-		built = units[1]
+	local queued
+	local first = marines.GetActorsByType("rifleman")[1]
+	-- The unit queue wakes up on the first tick, so ask for the build a moment after the world loads.
+	Trigger.AfterDelay(5, function()
+		queued = marines.QueueUnit("rifleman")
 	end)
 
 	local function poll(ticks)
 		if reported then
 			return
+		end
+		for _, r in ipairs(marines.GetActorsByType("rifleman")) do
+			if r ~= first then
+				built = r
+			end
 		end
 		if built ~= nil and not built.IsDead then
 			local dx, dy = built.Location.X - target.X, built.Location.Y - target.Y

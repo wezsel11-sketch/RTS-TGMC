@@ -1,0 +1,43 @@
+<!doctype html><meta charset=utf-8><link rel=stylesheet href=common.css>
+<style>
+:root{--acc:#c8a23a;--green:#46d36b;--panel:#161b13;--edge:#3b4a2c}
+.side{position:absolute;right:0;top:0;bottom:0;width:300px;background:linear-gradient(#1a2016,#10140d);border-left:2px solid var(--edge);box-shadow:-8px 0 30px rgba(0,0,0,.55);padding:12px;display:flex;flex-direction:column;gap:10px}
+.logo{display:flex;align-items:center;justify-content:space-between;padding:4px 6px}
+.logo b{letter-spacing:.2em;font-size:15px;color:var(--acc)}
+.logo small{opacity:.6;font-size:10px;letter-spacing:.15em}
+.card{background:var(--panel);border:1px solid var(--edge);border-radius:6px;padding:8px}
+.radar{height:150px;position:relative;background:#0a0e08 radial-gradient(circle at 45% 45%,#1f4426 0 50%,#0a0e08 51%);border:1px solid var(--acc)}
+.radar:after{content:'';position:absolute;inset:0;background:repeating-linear-gradient(0deg,rgba(0,0,0,.18) 0 1px,transparent 1px 3px)}
+.tabs{display:flex;gap:4px}.tabs div{flex:1;height:28px;border-radius:4px;background:#1d2418;border:1px solid var(--edge);display:flex;align-items:center;justify-content:center;font-size:11px;letter-spacing:.1em}
+.tabs .on{background:var(--acc);color:#121;font-weight:700}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.tile{aspect-ratio:1.1;border-radius:5px;border:1px solid var(--edge);background:linear-gradient(135deg,#2a3320,#171d12);position:relative;display:flex;align-items:flex-end;justify-content:center;font-size:10px;padding-bottom:4px}
+.tile i{position:absolute;top:3px;right:4px;font-style:normal;font-size:10px;color:var(--acc)}
+.tile.prog:before{content:'';position:absolute;inset:0;background:conic-gradient(rgba(0,0,0,.6) 0 62%,transparent 62%);border-radius:5px}
+.tile b{position:absolute;top:3px;left:5px;font-size:11px}
+.sel h3{font-size:16px;letter-spacing:.04em}
+.sel .bar{margin:6px 0}
+.cmds{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-top:6px}
+.cmds div{height:30px;border-radius:4px;background:#1d2418;border:1px solid var(--edge);font-size:10px;display:flex;align-items:center;justify-content:center}
+.cmds .on{border-color:var(--acc);color:var(--acc)}
+.res{display:flex;justify-content:space-between;align-items:baseline}
+.res b{font-size:24px;color:var(--acc)}
+.menu{height:34px;border-radius:5px;background:var(--acc);color:#14180e;font-weight:800;letter-spacing:.2em;display:flex;align-items:center;justify-content:center}
+.chip{position:absolute;top:12px;left:14px;display:flex;gap:10px}
+.chip div{background:rgba(16,20,13,.85);border:1px solid var(--edge);border-radius:5px;padding:6px 12px;font-size:13px}
+.chip b{color:var(--acc)}
+.log{position:absolute;left:14px;top:60px;width:230px;background:rgba(16,20,13,.8);border:1px solid var(--edge);border-radius:6px;padding:8px;font-size:12px;line-height:1.6}
+</style>
+<div class=vig></div>
+<div class=chip><div>Income <b>+0/min</b></div><div>Army <b>4</b></div><div>⏱ 00:02</div><div style="margin-left:6px">Codex</div></div>
+<div class=log><div style="color:#ff8a7a">▲ Marine facehugged</div><div style="color:#8fe3a2">✚ Barracks complete</div><div>● Hunter spotted</div></div>
+<div class=side>
+ <div class=logo><b>TGMC // COMMAND</b><small>MARINES VS XENOS</small></div>
+ <div class="card radar"></div>
+ <div class=tabs><div class=on>INFANTRY</div><div>STRUCT</div><div>SUPPORT</div></div>
+ <div class="card grid"><div class=tile><b>Q</b><i>100</i>Rifle</div><div class=tile><b>W</b><i>140</i>Medic</div><div class="tile prog"><b>E</b><i>120</i>Engi</div><div class=tile><b>A</b><i>230</i>Smart</div><div class=tile><b>S</b><i>260</i>Sniper</div><div class=tile><b>D</b><i>200</i>Rocket</div></div>
+ <div class="card sel"><h3>6 units</h3><div style="font-size:11px;opacity:.65">Health 582 / 710</div><div class=bar><i style="width:82%;background:linear-gradient(90deg,#d9b13a,#46d36b)"></i></div>
+  <div class=cmds><div>Evolve</div><div>Devolve</div><div>Stop</div><div>Scat</div><div class=on>Attack</div><div>Guard</div><div>Return</div><div>Hold</div></div></div>
+ <div class="card res"><span style="font-size:11px;letter-spacing:.12em;opacity:.7">REQUISITION</span><b>1000</b></div>
+ <div class=menu>MENU</div>
+</div>

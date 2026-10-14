@@ -39,10 +39,10 @@ Container@INGAME_ROOT:
 					Align: Center
 					Contrast: true
 				WorldInteractionController@INTERACTION_CONTROLLER:
-					Width: WINDOW_WIDTH - 240
+					Width: WINDOW_WIDTH
 					Height: WINDOW_HEIGHT
 				ViewportController:
-					Width: WINDOW_WIDTH - 240
+					Width: WINDOW_WIDTH
 					Height: WINDOW_HEIGHT
 					TooltipContainer: TOOLTIP_CONTAINER
 					ZoomInKey: ZoomIn

@@ -4,10 +4,11 @@
 ^Unit:
 	Health:
 		HP: 120
-	Mobile:
+	TgmcMobile:
 		Locomotor: foot
-		Speed: 43
-		TurnSpeed: 20
+		Speed: 54
+		TurnSpeed: 160
+		PauseOnCondition: stunned
 	Selectable:
 		Bounds: 512, 768, -256, -512
 	HitShape:
@@ -28,6 +29,41 @@
 	AppearsOnRadar:
 	ScriptTriggers:
 	AttackMove:
+	SpreadOut:
+	# What you have selected must be easy to see: brackets, a health bar, and a ring that breathes.
+	SelectionDecorations:
+	SelectionRing:
+	# Ranged weapons light up the ground at the muzzle for a moment (see fx-light in sequences/misc.yaml).
+	MuzzleGlow:
+	# Damage and healing float up from the unit as numbers (a lobby option switches them off).
+	DamageNumbers:
+	# Each shot does 85 to 115 percent of its weapon's damage.
+	DamageVariation:
+	# Warheads can stun a unit with this condition (pounce, stomp): it stands still and does not fire until it wears off.
+	ExternalCondition@stun:
+		Condition: stunned
+	# Caught in a gas cloud: slower and tinted green while it lasts.
+	ExternalCondition@gassed:
+		Condition: gassed
+	SpeedMultiplier@gassed:
+		RequiresCondition: gassed
+		Modifier: 60
+	WithColoredOverlay@gassed:
+		RequiresCondition: gassed
+		Color: 70FF4050
+	# A unit hit by a bullet or a claw flashes white for a moment, so you can see who is under fire.
+	ExternalCondition@hitflash:
+		Condition: hitflash
+	WithColoredOverlay@hitflash:
+		RequiresCondition: hitflash
+		Color: FFFFFF90
+	# Firing on the move is inaccurate: scatter is tripled while walking (weapons set their own base Inaccuracy).
+	GrantConditionOnMovement@moving:
+		Condition: moving
+		ValidMovementTypes: Horizontal
+	InaccuracyMultiplier@moving:
+		RequiresCondition: moving
+		Modifier: 300
 	RenderSprites:
 		Palette: player
 	BodyOrientation:
@@ -38,37 +74,147 @@
 
 ^Infantry:
 	Inherits: ^Unit
+	# Marines bleed where they are hit, and drip when badly hurt (the blood lies on the floor for about half a minute).
+	Bleeds:
+	# Rifles and the like fling brass out of the right side (the casing sprite is TGMC's casings.dmi).
+	EjectsCasings:
+		Weapons: TGMCRifle, TGMCCarbine, TGMCM412, TGMCSMG, TGMCShotgun, TGMCSmartgun, TGMCSniper, TGMCMG60
 	Targetable@HEAL:
 		RequiresCondition: damaged
 		TargetTypes: Heal
 	Targetable@HUMAN:
 		TargetTypes: Human
+	FireWarheadsOnDeath:
+		Weapon: TGMCDeathBlood
+		EmptyWeapon: TGMCDeathBlood
+	DetectCloaked:
+		Range: 2c0
+	# An Ammo Station nearby speeds the reload.
+	ExternalCondition@resupply:
+		Condition: resupplied
+	ReloadAmmoDelayMultiplier@resupply:
+		RequiresCondition: resupplied
+		Modifier: 35
+	# A facehugger can latch onto a marine that carries no embryo. Healing clears it; otherwise it bursts into a larva.
+	Targetable@INFEST:
+		TargetTypes: Infestable
+		RequiresCondition: !infected
+	# An infected marine is a heal target even at full health, so corpsmen and medbays go for him first.
+	Targetable@INFECTED:
+		TargetTypes: Infected
+		RequiresCondition: infected
+	Infestable:
+		InfectSounds: xeno-hiss-1.ogg, xeno-hiss-2.ogg, xeno-hiss-3.ogg
+		CrySounds: preburst-1.ogg, preburst-2.ogg, preburst-3.ogg
+		BurstSounds: chestburst-1.ogg, chestburst-2.ogg
+		CureSounds: heal.ogg
+	WithColoredOverlay@infected:
+		RequiresCondition: infected
+		Color: 55FF5566
 	GrantConditionOnDamageState@DAMAGED:
 		Condition: damaged
 		ValidDamageStates: Light, Medium, Heavy, Critical
 	Voiced:
 		VoiceSet: MarineVoice
 	DeathSounds:
-	WithDeathAnimation:
+	# The body lies where it fell for 20 seconds, then fades away.
+	WithLingeringCorpse:
 		DeathSequence: die
 		FallbackSequence: die
 		DeathTypes:
 			ExplosionDeath: -gib
+	# A marine that is down does not walk.
+	TgmcMobile:
+		PauseOnCondition: hugged || stunned
 	WithInfantryBody:
+		RequiresCondition: !hugged
 		MoveSequence: run
 		StandSequences: stand
 		DefaultAttackSequence: attack
+	# Knocked flat by a facehugger: lies on his side and does nothing until it lets go.
+	WithInfantryBody@hugged:
+		RequiresCondition: hugged
+		MoveSequence: down
+		StandSequences: down
 	Armament@PRIMARY:
 		Weapon: TGMCRifle
-	AttackFrontal:
+	AttackWhileMoving:
+		FacingTolerance: 40
 		Voice: Attack
+		PauseOnCondition: hugged || stunned
 	ActorLostNotification:
+	# A magazine: it empties, then the marine reloads (the reload starts a moment after the last shot). Each kind of
+	# marine sets its own size and reload time.
+	AmmoPool:
+		Ammo: 30
+		AmmoCondition: ammo
+	ReloadAmmoPool:
+		Delay: 60
+		Count: 30
+		ResetOnFire: true
+		Sound: reload-rifle.ogg
+	AmmoBar:
+	# Words over a marine's head: what is wrong with him, and his magazine when selected.
+	StatusLabel@hugged:
+		RequiresCondition: hugged
+		Text: FACEHUGGED
+		Color: FF4040
+	StatusLabel@infected:
+		RequiresCondition: infected && !hugged
+		Text: INFECTED
+		Color: FF6060
+	StatusLabel@stunned:
+		RequiresCondition: stunned
+		Text: STUNNED
+		Color: FFD040
+		Line: 1
+	StatusLabel@reload:
+		RequiresCondition: !ammo
+		Text: RELOADING
+		Color: FFA040
+		Line: 2
+		OnlyWhenSelected: true
+	StatusLabel@lowammo:
+		RequiresCondition: ammo > 0 && ammo < 6
+		Text: LOW AMMO
+		Color: FFC060
+		Line: 2
+		OnlyWhenSelected: true
 
 rifleman:
 	Inherits: ^Infantry
+	# Each rifleman carries one of three basic rifles, chosen at random when he is made: T-12 assault rifle, T-18 carbine
+	# or M412. They differ in sprite (stand-carbine, stand-m412) and in weapon.
+	GrantRandomCondition:
+		Conditions: gun-ar, gun-carbine, gun-m412
 	Armament@PRIMARY:
+		RequiresCondition: gun-ar
 		MuzzleSequence: flash
 		LocalOffset: 256,0,200
+	Armament@CARBINE:
+		Name: primary
+		Weapon: TGMCCarbine
+		RequiresCondition: gun-carbine
+		MuzzleSequence: flash
+		LocalOffset: 256,0,200
+	Armament@M412:
+		Name: primary
+		Weapon: TGMCM412
+		RequiresCondition: gun-m412
+		MuzzleSequence: flash
+		LocalOffset: 256,0,200
+	WithInfantryBody:
+		RequiresCondition: !hugged && gun-ar
+	WithInfantryBody@carbine:
+		RequiresCondition: !hugged && gun-carbine
+		MoveSequence: stand-carbine
+		StandSequences: stand-carbine
+		DefaultAttackSequence: stand-carbine
+	WithInfantryBody@m412:
+		RequiresCondition: !hugged && gun-m412
+		MoveSequence: stand-m412
+		StandSequences: stand-m412
+		DefaultAttackSequence: stand-m412
 	WithMuzzleOverlay:
 	Buildable:
 		Queue: Infantry
@@ -82,6 +228,30 @@ rifleman:
 
 medic:
 	Inherits: ^Infantry
+	-StatusLabel@reload:
+	-StatusLabel@lowammo:
+	-AmmoBar:
+	AmmoBar@gun:
+		AmmoPool: gun
+	# A submachine gun as well as the hypospray: the gun has its own small magazine.
+	-AmmoPool:
+	-ReloadAmmoPool:
+	Armament@GUN:
+		Name: gun
+		Weapon: TGMCSMG
+	AmmoPool@gun:
+		Name: gun
+		Armaments: gun
+		Ammo: 40
+	ReloadAmmoPool@gun:
+		AmmoPool: gun
+		Delay: 60
+		Count: 40
+		ResetOnFire: true
+		Sound: reload-smg.ogg
+	AutoTargetPriority@GUN:
+		ValidTargets: Ground
+		Priority: 0
 	Health:
 		HP: 100
 	Voiced:
@@ -92,8 +262,14 @@ medic:
 		OutsideRangeCursor: heal-blocked
 		TargetRelationships: Ally
 		ForceTargetRelationships: None
+	# Heal range is short, and marines spread out, so look further and walk over to a wounded one.
+	AutoTarget:
+		ScanRadius: 6
 	AutoTargetPriority@DEFAULT:
 		ValidTargets: Infantry
+	AutoTargetPriority@INFECTED:
+		ValidTargets: Infected
+		Priority: 10
 	Tooltip:
 		Name: actor-medic.name
 	Valued:
@@ -106,6 +282,30 @@ medic:
 
 engineer:
 	Inherits: ^Infantry
+	-StatusLabel@reload:
+	-StatusLabel@lowammo:
+	-AmmoBar:
+	AmmoBar@gun:
+		AmmoPool: gun
+	# A shotgun as well as the repair torch: the gun has its own small magazine.
+	-AmmoPool:
+	-ReloadAmmoPool:
+	Armament@GUN:
+		Name: gun
+		Weapon: TGMCShotgun
+	AmmoPool@gun:
+		Name: gun
+		Armaments: gun
+		Ammo: 12
+	ReloadAmmoPool@gun:
+		AmmoPool: gun
+		Delay: 70
+		Count: 12
+		ResetOnFire: true
+		Sound: reload-shotgun.ogg
+	AutoTargetPriority@GUN:
+		ValidTargets: Ground
+		Priority: 0
 	Health:
 		HP: 110
 	Armament@PRIMARY:
@@ -114,6 +314,8 @@ engineer:
 		OutsideRangeCursor: repair-blocked
 		TargetRelationships: Ally
 		ForceTargetRelationships: None
+	AutoTarget:
+		ScanRadius: 5
 	AutoTargetPriority@DEFAULT:
 		ValidTargets: Structure
 	Production:
@@ -130,12 +332,172 @@ engineer:
 		BuildPaletteOrder: 30
 		Description: actor-engineer.description
 
+# Jaeger Mk.II marines: the same man in three weights of armour. Light (scout, skirmisher) is fast and fragile, medium (trooper, ranger) takes a
+# little less from every hit, heavy (assault, and the heavy gunner and demolitionist further down) is slow and shrugs off claws and acid.
+scout:
+	Inherits: ^Infantry
+	AmmoPool:
+		Ammo: 40
+	ReloadAmmoPool:
+		Delay: 60
+		Count: 40
+		Sound: reload-smg.ogg
+	Health:
+		HP: 85
+	TgmcMobile:
+		Speed: 68
+	# Scouts see further than other marines.
+	RevealsShroud:
+		Range: 10c0
+	Armament@PRIMARY:
+		Weapon: TGMCSMG
+		MuzzleSequence: flash
+		LocalOffset: 256,0,200
+	WithMuzzleOverlay:
+	Tooltip:
+		Name: actor-scout.name
+	Valued:
+		Cost: 90
+	Buildable:
+		Queue: Infantry
+		BuildAtProductionType: Infantry
+		BuildPaletteOrder: 12
+		Description: actor-scout.description
+
+skirmisher:
+	Inherits: ^Infantry
+	AmmoPool:
+		Ammo: 8
+	ReloadAmmoPool:
+		Delay: 80
+		Count: 8
+		Sound: reload-shotgun.ogg
+	Health:
+		HP: 95
+	TgmcMobile:
+		Speed: 62
+	Armament@PRIMARY:
+		Weapon: TGMCShotgun
+		MuzzleSequence: flash
+		LocalOffset: 256,0,200
+	WithMuzzleOverlay:
+	Tooltip:
+		Name: actor-skirmisher.name
+	Valued:
+		Cost: 130
+	Buildable:
+		Queue: Infantry
+		BuildAtProductionType: Infantry
+		BuildPaletteOrder: 41
+		Prerequisites: armory
+		Description: actor-skirmisher.description
+
+trooper:
+	Inherits: ^Infantry
+	AmmoPool:
+		Ammo: 30
+	ReloadAmmoPool:
+		Delay: 70
+		Count: 30
+		Sound: reload-rifle.ogg
+	Health:
+		HP: 140
+	TgmcMobile:
+		Speed: 52
+	DamageMultiplier@armor:
+		Modifier: 88
+	Armament@PRIMARY:
+		Weapon: TGMCRifle
+		MuzzleSequence: flash
+		LocalOffset: 256,0,200
+	WithMuzzleOverlay:
+	Tooltip:
+		Name: actor-trooper.name
+	Valued:
+		Cost: 140
+	Buildable:
+		Queue: Infantry
+		BuildAtProductionType: Infantry
+		BuildPaletteOrder: 13
+		Prerequisites: armory
+		Description: actor-trooper.description
+
+ranger:
+	Inherits: ^Infantry
+	AmmoPool:
+		Ammo: 30
+	ReloadAmmoPool:
+		Delay: 70
+		Count: 30
+		Sound: reload-rifle.ogg
+	Health:
+		HP: 110
+	TgmcMobile:
+		Speed: 54
+	DamageMultiplier@armor:
+		Modifier: 92
+	RevealsShroud:
+		Range: 9c0
+	Armament@PRIMARY:
+		Weapon: TGMCM412
+		MuzzleSequence: flash
+		LocalOffset: 256,0,200
+	WithMuzzleOverlay:
+	Tooltip:
+		Name: actor-ranger.name
+	Valued:
+		Cost: 170
+	Buildable:
+		Queue: Infantry
+		BuildAtProductionType: Infantry
+		BuildPaletteOrder: 14
+		Prerequisites: armory
+		Description: actor-ranger.description
+
+assault:
+	Inherits: ^Infantry
+	AmmoPool:
+		Ammo: 60
+	ReloadAmmoPool:
+		Delay: 110
+		Count: 60
+		Sound: reload-rifle.ogg
+	Health:
+		HP: 240
+	TgmcMobile:
+		Speed: 34
+	Selectable:
+		Bounds: 640, 832, -320, -544
+	Armor:
+		Type: HeavyMarine
+	Armament@PRIMARY:
+		Weapon: TGMCCarbine
+		MuzzleSequence: flash
+		LocalOffset: 256,0,200
+	WithMuzzleOverlay:
+	Tooltip:
+		Name: actor-assault.name
+	Valued:
+		Cost: 280
+	Buildable:
+		Queue: Infantry
+		BuildAtProductionType: Infantry
+		BuildPaletteOrder: 54
+		Prerequisites: ordnance-depot
+		Description: actor-assault.description
+
 smartgunner:
 	Inherits: ^Infantry
+	AmmoPool:
+		Ammo: 60
+	ReloadAmmoPool:
+		Delay: 100
+		Count: 60
+		Sound: reload-mg.ogg
 	Health:
 		HP: 130
-	Mobile:
-		Speed: 36
+	TgmcMobile:
+		Speed: 45
 	Armament@PRIMARY:
 		Weapon: TGMCSmartgun
 		MuzzleSequence: flash
@@ -152,8 +514,185 @@ smartgunner:
 		Prerequisites: armory
 		Description: actor-smartgunner.description
 
+sniper:
+	Inherits: ^Infantry
+	AmmoPool:
+		Ammo: 10
+	ReloadAmmoPool:
+		Delay: 70
+		Count: 10
+		Sound: reload-sniper.ogg
+	# Heavy weapon: this one stops to shoot.
+	AttackWhileMoving:
+		FireWhileMoving: false
+	Health:
+		HP: 110
+	TgmcMobile:
+		Speed: 40
+	Armament@PRIMARY:
+		Weapon: TGMCSniper
+		MuzzleSequence: flash
+		LocalOffset: 256,0,200
+	WithMuzzleOverlay:
+	Tooltip:
+		Name: actor-sniper.name
+	Valued:
+		Cost: 260
+	Buildable:
+		Queue: Infantry
+		BuildAtProductionType: Infantry
+		BuildPaletteOrder: 46
+		Prerequisites: armory
+		Description: actor-sniper.description
+
+rocketeer:
+	Inherits: ^Infantry
+	AmmoPool:
+		Ammo: 3
+	ReloadAmmoPool:
+		Delay: 120
+		Count: 3
+		Sound: reload-launcher.ogg
+	Health:
+		HP: 120
+	TgmcMobile:
+		Speed: 45
+	Armament@PRIMARY:
+		Weapon: TGMCSadar
+		MuzzleSequence: flash
+		LocalOffset: -300,0,300
+	WithMuzzleOverlay:
+	Tooltip:
+		Name: actor-rocketeer.name
+	Valued:
+		Cost: 280
+	Buildable:
+		Queue: Infantry
+		BuildAtProductionType: Infantry
+		BuildPaletteOrder: 47
+		Prerequisites: armory
+		Description: actor-rocketeer.description
+
+blademan:
+	Inherits: ^Infantry
+	-StatusLabel@reload:
+	-StatusLabel@lowammo:
+	-AmmoBar:
+	# Sword swings need no magazine.
+	-AmmoPool:
+	-ReloadAmmoPool:
+	Health:
+		HP: 160
+	TgmcMobile:
+		Speed: 60
+	Armament@PRIMARY:
+		Weapon: TGMCVali
+	Tooltip:
+		Name: actor-blademan.name
+	Valued:
+		Cost: 160
+	Buildable:
+		Queue: Infantry
+		BuildAtProductionType: Infantry
+		BuildPaletteOrder: 48
+		Prerequisites: armory
+		Description: actor-blademan.description
+
+mortarman:
+	Inherits: ^Infantry
+	AmmoPool:
+		Ammo: 4
+	ReloadAmmoPool:
+		Delay: 130
+		Count: 4
+		Sound: reload-mortar.ogg
+	Health:
+		HP: 110
+	TgmcMobile:
+		Speed: 40
+	Armament@PRIMARY:
+		Weapon: TGMCMortar
+		MuzzleSequence: flash
+		LocalOffset: 200,0,300
+	WithMuzzleOverlay:
+	Tooltip:
+		Name: actor-mortarman.name
+	Valued:
+		Cost: 300
+	Buildable:
+		Queue: Infantry
+		BuildAtProductionType: Infantry
+		BuildPaletteOrder: 49
+		Prerequisites: ordnance-depot
+		Description: actor-mortarman.description
+
+flamer:
+	Inherits: ^Infantry
+	AmmoPool:
+		Ammo: 20
+	ReloadAmmoPool:
+		Delay: 90
+		Count: 20
+		Sound: reload-flamer.ogg
+	Health:
+		HP: 140
+	TgmcMobile:
+		Speed: 50
+	Armament@PRIMARY:
+		Weapon: TGMCFlamer
+		MuzzleSequence: flash
+		LocalOffset: 300,0,250
+	WithMuzzleOverlay:
+	Tooltip:
+		Name: actor-flamer.name
+	Valued:
+		Cost: 220
+	Buildable:
+		Queue: Infantry
+		BuildAtProductionType: Infantry
+		BuildPaletteOrder: 44
+		Prerequisites: armory
+		Description: actor-flamer.description
+
+machinegunner:
+	Inherits: ^Infantry
+	AmmoPool:
+		Ammo: 120
+	ReloadAmmoPool:
+		Delay: 150
+		Count: 120
+		Sound: reload-mg.ogg
+	# Heavy weapon: this one stops to shoot.
+	AttackWhileMoving:
+		FireWhileMoving: false
+	Health:
+		HP: 150
+	TgmcMobile:
+		Speed: 40
+	Armament@PRIMARY:
+		Weapon: TGMCMG60
+		MuzzleSequence: flash
+		LocalOffset: 256,0,200
+	WithMuzzleOverlay:
+	Tooltip:
+		Name: actor-machinegunner.name
+	Valued:
+		Cost: 230
+	Buildable:
+		Queue: Infantry
+		BuildAtProductionType: Infantry
+		BuildPaletteOrder: 45
+		Prerequisites: armory
+		Description: actor-machinegunner.description
+
 grenadier:
 	Inherits: ^Infantry
+	AmmoPool:
+		Ammo: 6
+	ReloadAmmoPool:
+		Delay: 90
+		Count: 6
+		Sound: reload-launcher.ogg
 	Health:
 		HP: 90
 	Armament@PRIMARY:
@@ -172,15 +711,266 @@ grenadier:
 		Prerequisites: ordnance-depot
 		Description: actor-grenadier.description
 
+# The mech: TGMC's Durand. Slow and very tough, with an autocannon and a rocket pod. Built at a Workshop.
+mech:
+	Inherits: ^Unit
+	StatusLabel@stunned:
+		RequiresCondition: stunned
+		Text: STUNNED
+		Color: FFD040
+		Height: 1400
+	Targetable@HEAL:
+		RequiresCondition: damaged
+		TargetTypes: Repair
+	GrantConditionOnDamageState@DAMAGED:
+		Condition: damaged
+		ValidDamageStates: Light, Medium, Heavy, Critical
+	Voiced:
+		VoiceSet: MarineVoice
+	Health:
+		HP: 900
+	TgmcMobile:
+		Speed: 32
+	Selectable:
+		Bounds: 1792, 2048, -896, -1280
+	SelectionRing:
+		Radius: 1150
+	Armor:
+		Type: Heavy
+	WithInfantryBody:
+		RequiresCondition: mech-assault
+		MoveSequence: run
+		StandSequences: stand
+		DefaultAttackSequence: attack
+	WithInfantryBody@flame:
+		RequiresCondition: mech-flame
+		MoveSequence: stand-flame
+		StandSequences: stand-flame
+		DefaultAttackSequence: stand-flame
+	WithInfantryBody@support:
+		RequiresCondition: mech-support
+		MoveSequence: stand-support
+		StandSequences: stand-support
+		DefaultAttackSequence: stand-support
+	WithInfantryBody@tow:
+		RequiresCondition: mech-tow
+		MoveSequence: stand-tow
+		StandSequences: stand-tow
+		DefaultAttackSequence: stand-tow
+	# The body lies where it fell for 20 seconds, then fades away.
+	WithLingeringCorpse:
+		DeathSequence: die
+		FallbackSequence: die
+		DeathTypes:
+			ExplosionDeath: -gib
+	DeathSounds:
+	# Each mech is built to one of four presets, picked at random: assault (autocannon and rocket pod), flame (shotgun and
+	# flamer), support (SMG and RPG) or tow (autocannon and anti-armour missile). They differ in sprite and in weapons.
+	GrantRandomCondition:
+		Conditions: mech-assault, mech-flame, mech-support, mech-tow
+	Armament@ASSAULTGUN:
+		Name: primary
+		Weapon: TGMCMechGun
+		RequiresCondition: mech-assault
+		MuzzleSequence: flash
+		LocalOffset: 400,-150,300
+	Armament@ASSAULTPOD:
+		Name: secondary
+		Weapon: TGMCMechRocket
+		RequiresCondition: mech-assault
+		LocalOffset: 300,200,400
+	Armament@FLAMEGUN:
+		Name: primary
+		Weapon: TGMCMechShotgun
+		RequiresCondition: mech-flame
+		MuzzleSequence: flash
+		LocalOffset: 400,-150,300
+	Armament@FLAMEPOD:
+		Name: secondary
+		Weapon: TGMCMechFlamer
+		RequiresCondition: mech-flame
+		LocalOffset: 300,200,400
+	Armament@SUPPORTGUN:
+		Name: primary
+		Weapon: TGMCMechSMG
+		RequiresCondition: mech-support
+		MuzzleSequence: flash
+		LocalOffset: 400,-150,300
+	Armament@SUPPORTPOD:
+		Name: secondary
+		Weapon: TGMCMechRPG
+		RequiresCondition: mech-support
+		LocalOffset: 300,200,400
+	Armament@TOWGUN:
+		Name: primary
+		Weapon: TGMCMechGun
+		RequiresCondition: mech-tow
+		MuzzleSequence: flash
+		LocalOffset: 400,-150,300
+	Armament@TOWPOD:
+		Name: secondary
+		Weapon: TGMCMechTow
+		RequiresCondition: mech-tow
+		LocalOffset: 300,200,400
+	WithMuzzleOverlay:
+	AttackWhileMoving:
+		FacingTolerance: 40
+		Voice: Attack
+		PauseOnCondition: stunned
+	ActorLostNotification:
+	Tooltip:
+		Name: actor-mech.name
+	Valued:
+		Cost: 800
+	Buildable:
+		Queue: Infantry
+		BuildAtProductionType: Vehicle
+		BuildPaletteOrder: 70
+		Prerequisites: workshop
+		Description: actor-mech.description
+
+# B18 heavy gunner: juggernaut armour and a minigun. Slow, but fast firing and hard to kill.
+heavygunner:
+	Inherits: ^Infantry
+	AmmoPool:
+		Ammo: 200
+	ReloadAmmoPool:
+		Delay: 190
+		Count: 200
+		Sound: reload-minigun.ogg
+	Health:
+		HP: 320
+	TgmcMobile:
+		Speed: 28
+	Selectable:
+		Bounds: 640, 832, -320, -544
+	Armor:
+		Type: HeavyMarine
+	Armament@PRIMARY:
+		Weapon: TGMCMinigun
+		MuzzleSequence: flash
+		LocalOffset: 256,0,200
+	WithMuzzleOverlay:
+	Tooltip:
+		Name: actor-heavygunner.name
+	Valued:
+		Cost: 450
+	Buildable:
+		Queue: Infantry
+		BuildAtProductionType: Infantry
+		BuildPaletteOrder: 55
+		Prerequisites: ordnance-depot
+		Description: actor-heavygunner.description
+
+# B17 demolitionist: high explosives, and armour that shrugs off blasts, his own included.
+demolitionist:
+	Inherits: ^Infantry
+	AmmoPool:
+		Ammo: 4
+	ReloadAmmoPool:
+		Delay: 110
+		Count: 4
+		Sound: reload-launcher.ogg
+	Health:
+		HP: 260
+	TgmcMobile:
+		Speed: 36
+	Selectable:
+		Bounds: 640, 832, -320, -544
+	Armor:
+		Type: Demolition
+	Armament@PRIMARY:
+		Weapon: TGMCHEGrenade
+		MuzzleSequence: flash
+		LocalOffset: 300,0,260
+	WithMuzzleOverlay:
+	Tooltip:
+		Name: actor-demolitionist.name
+	Valued:
+		Cost: 420
+	Buildable:
+		Queue: Infantry
+		BuildAtProductionType: Infantry
+		BuildPaletteOrder: 56
+		Prerequisites: ordnance-depot
+		Description: actor-demolitionist.description
+
 ^Xeno:
 	Inherits: ^Unit
+	# Xenos bleed green.
+	Bleeds:
+		Image: fx-blood-xeno
 	Targetable@ALIEN:
 		TargetTypes: Alien
+	MuzzleGlow:
+		Sequence: muzzle-green
+	# Right-click one of the hive's tunnels to come out of the other end.
+	UsesHiveTunnels:
+		Sounds: egg-burst.ogg
+	# Hive powers (structures.yaml) grant these for a while: Psychic Cure mends, Rage hits harder and runs faster.
+	ExternalCondition@psycure:
+		Condition: psycure
+	ChangesHealth@psycure:
+		RequiresCondition: psycure
+		Step: 6
+		Delay: 10
+		StartIfBelow: 101
+	WithColoredOverlay@psycure:
+		RequiresCondition: psycure && !rage
+		Color: 60FF6040
+	ExternalCondition@rage:
+		Condition: rage
+	FirepowerMultiplier@rage:
+		RequiresCondition: rage
+		Modifier: 135
+	SpeedMultiplier@rage:
+		RequiresCondition: rage
+		Modifier: 130
+	WithColoredOverlay@rage:
+		RequiresCondition: rage
+		Color: FF303050
+	# A dead xeno leaves a pool of acid that stings marines who walk through it for a few seconds.
+	SpawnActorOnDeath@Acid:
+		Actor: acid-pool
+		OwnerType: Victim
+	StatusLabel@stunned:
+		RequiresCondition: stunned
+		Text: STUNNED
+		Color: FFD040
+		Line: 1
+	StatusLabel@mature:
+		RequiresCondition: mature && !elder
+		Text: MATURE
+		Color: C090F0
+		OnlyWhenSelected: true
+	StatusLabel@elder:
+		RequiresCondition: elder && !ancient
+		Text: ELDER
+		Color: D070F0
+		OnlyWhenSelected: true
+	StatusLabel@ancient:
+		RequiresCondition: ancient
+		Text: ANCIENT
+		Color: F050F0
+		OnlyWhenSelected: true
+	FireWarheadsOnDeath:
+		Weapon: TGMCDeathAcid
+		EmptyWeapon: TGMCDeathAcid
+	# A Recovery Pylon mends a hurt xeno.
+	Targetable@XENOHEAL:
+		RequiresCondition: damaged
+		TargetTypes: XenoHeal
+	GrantConditionOnDamageState@DAMAGED:
+		Condition: damaged
+		ValidDamageStates: Light, Medium, Heavy, Critical
+	Armor:
+		Type: Light
 	WithInfantryBody:
 		MoveSequence: run
 		StandSequences: stand
 		DefaultAttackSequence: attack
-	WithDeathAnimation:
+	# The body lies where it fell for 20 seconds, then fades away.
+	WithLingeringCorpse:
 		DeathSequence: die
 		FallbackSequence: die
 		DeathTypes:
@@ -188,20 +978,76 @@ grenadier:
 	DeathSounds:
 	Armament@PRIMARY:
 		Weapon: TGMCClaws
-	AttackFrontal:
+	AttackWhileMoving:
+		FacingTolerance: 40
 		Voice: Attack
+		PauseOnCondition: stunned
 	ActorLostNotification:
+	# Deploy (F) evolves into Next, Shift + Deploy devolves into Previous. Each caste sets its own Next and Previous.
+	Evolves:
+		EvolveSounds: evolve-ready.ogg, xeno-screech.ogg
+		DevolveSounds: egg-burst.ogg
+	# Xenos grow with age while the hive has a Maturity Tower: mature, elder, then ancient. Each tier takes 10 percent less
+	# damage and deals 8 percent more.
+	Maturity:
+		Sounds: evolve-ready.ogg
+	DamageMultiplier@mature:
+		RequiresCondition: mature
+		Modifier: 90
+	DamageMultiplier@elder:
+		RequiresCondition: elder
+		Modifier: 90
+	DamageMultiplier@ancient:
+		RequiresCondition: ancient
+		Modifier: 90
+	FirepowerMultiplier@mature:
+		RequiresCondition: mature
+		Modifier: 108
+	FirepowerMultiplier@elder:
+		RequiresCondition: elder
+		Modifier: 108
+	FirepowerMultiplier@ancient:
+		RequiresCondition: ancient
+		Modifier: 108
 
 runner:
 	Inherits: ^Xeno
+	StatusLabel@evading:
+		RequiresCondition: evading
+		Text: EVADING
+		Color: 60E0FF
+		Line: 2
+	# Evasion: the first hit it takes darts it aside, taking less damage and running faster for a moment.
+	Reflex:
+		Sounds: xeno-hiss-3.ogg
+		Duration: 40
+		Cooldown: 400
+	DamageMultiplier@evade:
+		RequiresCondition: evading
+		Modifier: 70
+	SpeedMultiplier@evade:
+		RequiresCondition: evading
+		Modifier: 125
+	# Leaps at an enemy it is chasing, then lands a stunning strike (cooldown: see PounceInfo).
+	Pounce:
+		Sounds: xeno-pounce-1.ogg, xeno-pounce-2.ogg
+	SpeedMultiplier@pounce:
+		RequiresCondition: pouncing
+		Modifier: 350
+	Armament@POUNCE:
+		Weapon: TGMCPounce
+		RequiresCondition: pounce-strike
+	Evolves:
+		Next: hunter
+		Previous: larva
 	Voiced:
 		VoiceSet: RunnerVoice
 	Health:
 		HP: 120
 	Selectable:
 		Bounds: 1024, 768, -512, -512
-	Mobile:
-		Speed: 115
+	TgmcMobile:
+		Speed: 144
 	Tooltip:
 		Name: actor-runner.name
 	Valued:
@@ -213,14 +1059,39 @@ runner:
 
 hunter:
 	Inherits: ^Xeno
+	StatusLabel@hidden:
+		RequiresCondition: stealthed
+		Text: HIDDEN
+		Color: A0A0B0
+		Line: 2
+		OnlyWhenSelected: true
+	# Stealth: after standing still a moment it fades from sight, and a marine sees it only from two cells away.
+	Cloak@stealth:
+		InitialDelay: 75
+		CloakDelay: 50
+		UncloakOn: Attack, Damage
+		CloakedCondition: stealthed
+		CloakedAlpha: 0.25
+	# Leaps at an enemy it is chasing, then lands a stunning strike (cooldown: see PounceInfo).
+	Pounce:
+		Sounds: xeno-pounce-1.ogg, xeno-pounce-2.ogg
+	SpeedMultiplier@pounce:
+		RequiresCondition: pouncing
+		Modifier: 350
+	Armament@POUNCE:
+		Weapon: TGMCPounce
+		RequiresCondition: pounce-strike
+	Evolves:
+		Next: warrior
+		Previous: runner
 	Voiced:
 		VoiceSet: HunterVoice
 	Health:
 		HP: 130
 	Selectable:
 		Bounds: 768, 768, -384, -512
-	Mobile:
-		Speed: 70
+	TgmcMobile:
+		Speed: 88
 	Tooltip:
 		Name: actor-hunter.name
 	Valued:
@@ -233,14 +1104,17 @@ hunter:
 
 sentinel:
 	Inherits: ^Xeno
+	Evolves:
+		Next: spitter
+		Previous: drone
 	Voiced:
 		VoiceSet: SentinelVoice
 	Health:
 		HP: 80
 	Selectable:
 		Bounds: 768, 768, -384, -512
-	Mobile:
-		Speed: 55
+	TgmcMobile:
+		Speed: 69
 	Armament@PRIMARY:
 		Weapon: TGMCSpit
 	Tooltip:
@@ -253,22 +1127,85 @@ sentinel:
 		Prerequisites: evolution-tower
 		Description: actor-sentinel.description
 
+facehugger:
+	Inherits: ^Xeno
+	Voiced:
+		VoiceSet: HuggerVoice
+	Health:
+		HP: 25
+	Selectable:
+		Bounds: 512, 512, -256, -256
+	TgmcMobile:
+		Speed: 120
+	# Hunts marines that carry no embryo, leaps at one and is spent planting its own.
+	-Armament@PRIMARY:
+	Armament@HUG:
+		Weapon: TGMCHug
+	# Clinging to a host's face it cannot be shot or ordered about. It dies by itself when the host gets up, and that
+	# is no loss worth announcing. Only marines can be hugged: the host trait is on infantry, not on machines.
+	ExternalCondition@latched:
+		Condition: latched
+	TgmcMobile:
+		PauseOnCondition: latched || stunned
+	AttackWhileMoving:
+		FacingTolerance: 40
+		PauseOnCondition: latched || stunned
+	Targetable:
+		RequiresCondition: !latched
+	-ActorLostNotification:
+	# The leap range is only a cell and a quarter, so scan much wider than that to notice a host.
+	AutoTarget:
+		ScanRadius: 6
+	AutoTargetPriority@DEFAULT:
+		ValidTargets: Infestable
+	Tooltip:
+		Name: actor-facehugger.name
+	Valued:
+		Cost: 40
+	Buildable:
+		Queue: Xeno
+		BuildPaletteOrder: 5
+		Description: actor-facehugger.description
+
+larva:
+	Inherits: ^Xeno
+	Voiced:
+		VoiceSet: LarvaVoice
+	Health:
+		HP: 40
+	Selectable:
+		Bounds: 512, 512, -256, -256
+	TgmcMobile:
+		Speed: 50
+	Armament@PRIMARY:
+		Weapon: TGMCBite
+	Tooltip:
+		Name: actor-larva.name
+	Valued:
+		Cost: 20
+	Evolves:
+		Next: runner
+
 drone:
 	Inherits: ^Xeno
+	Evolves:
+		Next: sentinel
 	Voiced:
 		VoiceSet: DroneVoice
 	Health:
 		HP: 70
 	Selectable:
 		Bounds: 768, 768, -384, -512
-	Mobile:
-		Speed: 50
+	TgmcMobile:
+		Speed: 63
 	Armament@PRIMARY:
 		Weapon: TGMCMend
 		Cursor: repair
 		OutsideRangeCursor: repair-blocked
 		TargetRelationships: Ally
 		ForceTargetRelationships: None
+	AutoTarget:
+		ScanRadius: 5
 	AutoTargetPriority@DEFAULT:
 		ValidTargets: Structure
 	Production:
@@ -286,14 +1223,43 @@ drone:
 
 warrior:
 	Inherits: ^Xeno
+	# Command card ability: seize the nearest marine and fling him away.
+	ActiveAbility@fling:
+		OrderName: AbilityFling
+		Slot: 1
+		Label: Fling
+		Cooldown: 400
+		Weapon: TGMCFling
+		Aim: Nearest
+		Range: 1c768
+		Sounds: xeno-roar-5.ogg
+	# Lunge: leaps at an enemy it is chasing and lands a stunning blow.
+	Pounce:
+		Range: 4c0
+		MinRange: 1c512
+		Duration: 14
+		StrikeWindow: 40
+		Cooldown: 400
+		Sounds: xeno-pounce-1.ogg, xeno-pounce-2.ogg
+	SpeedMultiplier@pounce:
+		RequiresCondition: pouncing
+		Modifier: 300
+	Armament@POUNCE:
+		Weapon: TGMCLunge
+		RequiresCondition: pounce-strike
+	Armor:
+		Type: Heavy
+	Evolves:
+		Next: praetorian
+		Previous: hunter
 	Voiced:
 		VoiceSet: HunterVoice
 	Health:
 		HP: 260
 	Selectable:
 		Bounds: 1024, 1024, -512, -512
-	Mobile:
-		Speed: 32
+	TgmcMobile:
+		Speed: 40
 	Armament@PRIMARY:
 		Weapon: TGMCSlam
 	Tooltip:
@@ -314,10 +1280,16 @@ queen:
 		HP: 300
 	Selectable:
 		Bounds: 1536, 1536, -768, -768
-	Mobile:
-		Speed: 40
+	TgmcMobile:
+		Speed: 50
 	Armament@PRIMARY:
 		Weapon: TGMCSlam
+	# The Deploy key: a screech that stuns marines nearby.
+	Screech:
+		ValidTargets: Infantry
+		Sounds: xeno-screech.ogg
+		EffectImage: fx-slam-big
+		EffectSequence: impact
 	Production:
 		Produces: XenoBuild
 	GivesBuildableArea:
@@ -334,3 +1306,498 @@ queen:
 		BuildLimit: 1
 		Prerequisites: resin-silo
 		Description: actor-queen.description
+
+spitter:
+	Inherits: ^Xeno
+	Evolves:
+		Next: boiler
+		Previous: sentinel
+	Voiced:
+		VoiceSet: HunterVoice
+	Health:
+		HP: 100
+	Selectable:
+		Bounds: 768, 768, -384, -512
+	TgmcMobile:
+		Speed: 60
+	Armament@PRIMARY:
+		Weapon: TGMCSpit
+	Tooltip:
+		Name: actor-spitter.name
+	Valued:
+		Cost: 100
+	Buildable:
+		Queue: Xeno
+		BuildPaletteOrder: 40
+		Prerequisites: evolution-tower
+		Description: actor-spitter.description
+
+praetorian:
+	Inherits: ^Xeno
+	# Command card ability: spray acid on the ground in front of him.
+	ActiveAbility@spray:
+		OrderName: AbilityAcidSpray
+		Slot: 1
+		Label: Acid Spray
+		Cooldown: 350
+		Weapon: TGMCAcidSpray
+		Aim: Forward
+		ForwardDistance: 2c512
+		Sounds: acid-spit-1.ogg, acid-spit-2.ogg
+	Armor:
+		Type: Heavy
+	Evolves:
+		Next: crusher
+		Previous: warrior
+	Voiced:
+		VoiceSet: HunterVoice
+	Health:
+		HP: 180
+	Selectable:
+		Bounds: 768, 768, -384, -512
+	TgmcMobile:
+		Speed: 55
+	Armament@PRIMARY:
+		Weapon: TGMCClaws
+	Tooltip:
+		Name: actor-praetorian.name
+	Valued:
+		Cost: 150
+	Buildable:
+		Queue: Xeno
+		BuildPaletteOrder: 60
+		Prerequisites: evolution-tower
+		Description: actor-praetorian.description
+
+crusher:
+	Inherits: ^Xeno
+	# Charge: a long run-up into a crushing blow that leaves marines senseless.
+	Pounce:
+		Range: 8c0
+		MinRange: 3c0
+		Duration: 30
+		StrikeWindow: 60
+		Cooldown: 500
+		Sounds: xeno-roar-5.ogg, xeno-roar-6.ogg
+	SpeedMultiplier@pounce:
+		RequiresCondition: pouncing
+		Modifier: 260
+	Armament@POUNCE:
+		Weapon: TGMCCharge
+		RequiresCondition: pounce-strike
+	Armor:
+		Type: Heavy
+	Evolves:
+		Next: behemoth
+		Previous: praetorian
+	Voiced:
+		VoiceSet: HunterVoice
+	Health:
+		HP: 280
+	Selectable:
+		Bounds: 768, 768, -384, -512
+	TgmcMobile:
+		Speed: 40
+	Armament@PRIMARY:
+		Weapon: TGMCSlam
+	Tooltip:
+		Name: actor-crusher.name
+	Valued:
+		Cost: 250
+	Buildable:
+		Queue: Xeno
+		BuildPaletteOrder: 70
+		Prerequisites: maturity-tower
+		Description: actor-crusher.description
+
+ravager:
+	Inherits: ^Xeno
+	# Command card abilities. Rage: hits harder and runs faster for a while. Endure: takes half damage and mends.
+	ActiveAbility@rage:
+		OrderName: AbilityRage
+		Slot: 1
+		Label: Rage
+		Cooldown: 500
+		Duration: 150
+		Condition: frenzy
+		Sounds: xeno-roar-8.ogg
+	ActiveAbility@endure:
+		OrderName: AbilityEndure
+		Slot: 2
+		Label: Endure
+		Cooldown: 600
+		Duration: 120
+		Condition: endure
+		Sounds: xeno-roar-3.ogg
+	FirepowerMultiplier@frenzy:
+		RequiresCondition: frenzy
+		Modifier: 145
+	SpeedMultiplier@frenzy:
+		RequiresCondition: frenzy
+		Modifier: 135
+	WithColoredOverlay@frenzy:
+		RequiresCondition: frenzy
+		Color: FF202050
+	DamageMultiplier@endure:
+		RequiresCondition: endure
+		Modifier: 50
+	ChangesHealth@endure:
+		RequiresCondition: endure
+		Step: 4
+		Delay: 8
+		StartIfBelow: 101
+	WithColoredOverlay@endure:
+		RequiresCondition: endure
+		Color: FFD04040
+	Evolves:
+		Next: wraith
+	Voiced:
+		VoiceSet: HunterVoice
+	Health:
+		HP: 150
+	Selectable:
+		Bounds: 768, 768, -384, -512
+	TgmcMobile:
+		Speed: 90
+	Armament@PRIMARY:
+		Weapon: TGMCClaws
+	Tooltip:
+		Name: actor-ravager.name
+	Valued:
+		Cost: 140
+	Buildable:
+		Queue: Xeno
+		BuildPaletteOrder: 80
+		Prerequisites: evolution-tower
+		Description: actor-ravager.description
+
+defiler:
+	Inherits: ^Xeno
+	Evolves:
+		Previous: boiler
+	Voiced:
+		VoiceSet: HunterVoice
+	Health:
+		HP: 200
+	Selectable:
+		Bounds: 768, 768, -384, -512
+	# The canister needs a target in sight.
+	RevealsShroud:
+		Range: 11c0
+	TgmcMobile:
+		Speed: 45
+	Armament@PRIMARY:
+		Weapon: TGMCDefilerGas
+	Tooltip:
+		Name: actor-defiler.name
+	Valued:
+		Cost: 220
+	Buildable:
+		Queue: Xeno
+		BuildPaletteOrder: 90
+		Prerequisites: maturity-tower
+		Description: actor-defiler.description
+
+boiler:
+	Inherits: ^Xeno
+	Evolves:
+		Next: defiler
+		Previous: spitter
+	Voiced:
+		VoiceSet: HunterVoice
+	Health:
+		HP: 160
+	Selectable:
+		Bounds: 768, 768, -384, -512
+	# Artillery needs to see where it shoots.
+	RevealsShroud:
+		Range: 13c0
+	TgmcMobile:
+		Speed: 60
+	Armament@PRIMARY:
+		Weapon: TGMCBoilerGlob
+	Tooltip:
+		Name: actor-boiler.name
+	Valued:
+		Cost: 160
+	Buildable:
+		Queue: Xeno
+		BuildPaletteOrder: 100
+		Prerequisites: evolution-tower
+		Description: actor-boiler.description
+
+carrier:
+	Inherits: ^Xeno
+	# Command card ability: throw a facehugger toward the nearest marine. It holds four and grows a new one every 24 seconds.
+	ActiveAbility@hugger:
+		OrderName: AbilityHugger
+		Slot: 1
+		Label: Hugger
+		Cooldown: 40
+		Charges: 4
+		ChargeRegen: 600
+		Spawn: facehugger
+		SpawnSeek: 9c0
+		Sounds: chestburst-2.ogg
+	Evolves:
+		Next: warlock
+	Voiced:
+		VoiceSet: HunterVoice
+	Health:
+		HP: 200
+	Selectable:
+		Bounds: 768, 768, -384, -512
+	TgmcMobile:
+		Speed: 65
+	Armament@PRIMARY:
+		Weapon: TGMCClaws
+	Tooltip:
+		Name: actor-carrier.name
+	Valued:
+		Cost: 180
+	Buildable:
+		Queue: Xeno
+		BuildPaletteOrder: 110
+		Prerequisites: maturity-tower
+		Description: actor-carrier.description
+
+warlock:
+	Inherits: ^Xeno
+	Evolves:
+		Previous: carrier
+	Voiced:
+		VoiceSet: HunterVoice
+	Health:
+		HP: 170
+	Selectable:
+		Bounds: 768, 768, -384, -512
+	TgmcMobile:
+		Speed: 55
+	Armament@PRIMARY:
+		Weapon: TGMCSpit
+	Tooltip:
+		Name: actor-warlock.name
+	Valued:
+		Cost: 170
+	Buildable:
+		Queue: Xeno
+		BuildPaletteOrder: 120
+		Prerequisites: maturity-tower
+		Description: actor-warlock.description
+
+shrike:
+	Inherits: ^Xeno
+	Evolves:
+		Next: widow
+		Previous: wraith
+	Voiced:
+		VoiceSet: HunterVoice
+	Health:
+		HP: 140
+	Selectable:
+		Bounds: 768, 768, -384, -512
+	TgmcMobile:
+		Speed: 100
+	Armament@PRIMARY:
+		Weapon: TGMCClaws
+	Tooltip:
+		Name: actor-shrike.name
+	Valued:
+		Cost: 130
+	Buildable:
+		Queue: Xeno
+		BuildPaletteOrder: 130
+		Prerequisites: evolution-tower
+		Description: actor-shrike.description
+
+widow:
+	Inherits: ^Xeno
+	Evolves:
+		Next: bull
+		Previous: shrike
+	Voiced:
+		VoiceSet: HunterVoice
+	Health:
+		HP: 150
+	Selectable:
+		Bounds: 768, 768, -384, -512
+	TgmcMobile:
+		Speed: 45
+	Armament@PRIMARY:
+		Weapon: TGMCAcid
+	Tooltip:
+		Name: actor-widow.name
+	Valued:
+		Cost: 150
+	Buildable:
+		Queue: Xeno
+		BuildPaletteOrder: 140
+		Prerequisites: evolution-tower
+		Description: actor-widow.description
+
+wraith:
+	Inherits: ^Xeno
+	Evolves:
+		Next: shrike
+		Previous: ravager
+	Voiced:
+		VoiceSet: HunterVoice
+	Health:
+		HP: 140
+	Selectable:
+		Bounds: 768, 768, -384, -512
+	TgmcMobile:
+		Speed: 95
+	Armament@PRIMARY:
+		Weapon: TGMCClaws
+	Tooltip:
+		Name: actor-wraith.name
+	Valued:
+		Cost: 160
+	Buildable:
+		Queue: Xeno
+		BuildPaletteOrder: 150
+		Prerequisites: maturity-tower
+		Description: actor-wraith.description
+
+bull:
+	Inherits: ^Xeno
+	Armor:
+		Type: Heavy
+	Evolves:
+		Previous: widow
+	Voiced:
+		VoiceSet: HunterVoice
+	Health:
+		HP: 240
+	Selectable:
+		Bounds: 768, 768, -384, -512
+	TgmcMobile:
+		Speed: 70
+	Armament@PRIMARY:
+		Weapon: TGMCSlam
+	Tooltip:
+		Name: actor-bull.name
+	Valued:
+		Cost: 200
+	Buildable:
+		Queue: Xeno
+		BuildPaletteOrder: 160
+		Prerequisites: maturity-tower
+		Description: actor-bull.description
+
+behemoth:
+	Inherits: ^Xeno
+	Armor:
+		Type: Heavy
+	Evolves:
+		Previous: crusher
+	Voiced:
+		VoiceSet: HunterVoice
+	Health:
+		HP: 400
+	Selectable:
+		Bounds: 768, 768, -384, -512
+	TgmcMobile:
+		Speed: 30
+	Armament@PRIMARY:
+		Weapon: TGMCSlam
+	Tooltip:
+		Name: actor-behemoth.name
+	Valued:
+		Cost: 350
+	Buildable:
+		Queue: Xeno
+		BuildPaletteOrder: 170
+		Prerequisites: maturity-tower
+		Description: actor-behemoth.description
+
+# A cloud of gas left by a defiler or boiler. It owns itself for several seconds and chokes enemy units standing in it: damage and a slow.
+gas-cloud:
+	RevealsShroud:
+		Range: 3c0
+		Type: GroundPosition
+	Immobile:
+		OccupiesSpace: false
+	Interactable:
+	BodyOrientation:
+		QuantizedFacings: 1
+	Tooltip:
+		Name: actor-gas-cloud.name
+	RenderSprites:
+		Image: gas-cloud
+		Palette: effect
+	WithSpriteBody:
+	WithIdleOverlay@glow:
+		Image: fx-light
+		Sequence: glow-gas
+		Palette: effect
+	KillsSelf:
+		Delay: 300
+	Armament@PRIMARY:
+		Weapon: TGMCGasCloud
+	AttackOmni:
+	AutoTarget:
+		InitialStance: AttackAnything
+	AutoTargetPriority@DEFAULT:
+		ValidTargets: Ground
+
+# The acid a dead xeno leaves behind. It owns itself for a few seconds and hurts enemy infantry standing in it.
+acid-pool:
+	RevealsShroud:
+		Range: 3c0
+		Type: GroundPosition
+	Immobile:
+		OccupiesSpace: false
+	Interactable:
+	BodyOrientation:
+		QuantizedFacings: 1
+	Tooltip:
+		Name: actor-acid-pool.name
+	RenderSprites:
+		Image: acid-pool
+		Palette: effect
+	WithSpriteBody:
+	WithIdleOverlay@glow:
+		Image: fx-light
+		Sequence: glow-acid
+		Palette: effect
+	KillsSelf:
+		Delay: 150
+	Armament@PRIMARY:
+		Weapon: TGMCAcidPool
+	AttackOmni:
+	AutoTarget:
+		InitialStance: AttackAnything
+	AutoTargetPriority@DEFAULT:
+		ValidTargets: Infantry
+
+# Burning ground left by the flamer: it hurts every unit standing in it (marine or xeno) until it burns out.
+flame-patch:
+	RevealsShroud:
+		Range: 3c0
+		Type: GroundPosition
+	Immobile:
+		OccupiesSpace: false
+	Interactable:
+	BodyOrientation:
+		QuantizedFacings: 1
+	Tooltip:
+		Name: actor-flame-patch.name
+	RenderSprites:
+		Image: flame-patch
+		Palette: effect
+	WithSpriteBody:
+	WithIdleOverlay@glow:
+		Image: fx-light
+		Sequence: glow-fire
+		Palette: effect
+	KillsSelf:
+		Delay: 200
+	Armament@PRIMARY:
+		Weapon: TGMCFlamePatch
+	AttackOmni:
+	AutoTarget:
+		InitialStance: AttackAnything
+	AutoTargetPriority@DEFAULT:
+		ValidTargets: Ground

@@ -4,23 +4,37 @@
 # Maps pre-place the starting base. The skirmish AI has no builder to walk, so its cryo pod and silo give the area too.
 
 ^Structure:
+	FadesInOnBuild:
 	Health:
 		HP: 600
 	Building:
 		Footprint: x
 		Dimensions: 1, 1
 		TerrainTypes: Clear, Road
+	# Ghost of the building under the cursor: green footprint where it fits, red where it does not.
+	ActorPreviewPlaceBuildingPreview:
 	RevealsShroud:
 		Range: 8c0
 	FrozenUnderFog:
 	MustBeDestroyed:
 	AppearsOnRadar:
 	ProvidesPrerequisite@buildingname:
+	# Smoke drifts off a building once it is badly hurt.
+	WithDamageOverlay:
+		Image: fx-smoke
+		LoopSequence: loop
+		Palette: effect
+		Offset: 0, 0, 400
 	Voiced:
 		VoiceSet: MarineStructureVoice
 	DeathSounds:
+	# Any building keeps the minimap running, so the radar panel is never blank while you have a base.
+	ProvidesRadar:
 	Selectable:
 		Bounds: 512, 512, -256, -256
+	SelectionDecorations:
+	SelectionRing:
+		Radius: 720
 	HitShape:
 		UseTargetableCellsOffsets: true
 		Type: Rectangle
@@ -44,10 +58,11 @@
 		Cost: 200
 
 # Where a structure may be placed: within Adjacent cells of an actor with GivesBuildableArea of the same type.
+# Marines build almost anywhere: 24 cells from any marine structure or Engineer.
 ^MarineBuildable:
 	RequiresBuildableArea:
 		AreaTypes: marine-build
-		Adjacent: 5
+		Adjacent: 24
 
 ^XenoMinorBuildable:
 	RequiresBuildableArea:
@@ -212,6 +227,63 @@ weed-node:
 	CashTrickler:
 		Interval: 50
 		Amount: 7
+	# Creeps out on its own, so xenos do not have to place weeds one by one.
+	SpreadWeeds:
+
+weeds:
+	Inherits: weed-node
+	-CashTrickler:
+	-SpreadWeeds:
+	-MustBeDestroyed:
+	-AppearsOnRadar:
+	RevealsShroud:
+		Type: CenterPosition
+	# Walkable carpet: units pass over it but it still marks the cell as taken and extends the build area.
+	Building:
+		Footprint: =
+	Buildable:
+		BuildPaletteOrder: 11
+		BuildLimit: 0
+		Description: actor-weeds.description
+	Health:
+		HP: 80
+	Tooltip:
+		Name: actor-weeds.name
+	Valued:
+		Cost: 15
+	GivesBuildableArea:
+		AreaTypes: xeno-minor
+	# Marines do not shoot the carpet: it dies with the node that grew it. (Not Ground or Structure, so no weapon picks it.)
+	Targetable:
+		TargetTypes: Weeds
+
+# A hugger egg: when a marine comes near it opens and a facehugger hops out; it regrows one in about 25 seconds.
+egg:
+	Inherits: ^Structure
+	Inherits@build: ^XenoMinorBuildable
+	Buildable:
+		Queue: XenoBuild
+		BuildPaletteOrder: 15
+		Prerequisites: evolution-tower
+		Description: actor-egg.description
+	Voiced:
+		VoiceSet: XenoStructureVoice
+	Health:
+		HP: 60
+	Tooltip:
+		Name: actor-egg.name
+	Valued:
+		Cost: 40
+	RevealsShroud:
+		Range: 4c0
+	HuggerEgg:
+		Sounds: egg-burst.ogg
+	StatusLabel@ready:
+		RequiresCondition: hugger-ready
+		Text: READY
+		Color: 70F070
+		Height: 500
+		OnlyWhenSelected: true
 
 resin-wall:
 	Inherits: ^Wall
@@ -245,8 +317,97 @@ evolution-tower:
 		Bounds: 1792, 1792, -896, -896
 	Tooltip:
 		Name: actor-evolution-tower.name
+	GrantExternalConditionPower@cure:
+		OrderName: PsychicCureOrder
+		Name: support-cure.name
+		Description: support-cure.description
+		IconImage: hive-icon
+		BlockedCursor: move-blocked
+		Icon: cure
+		ChargeInterval: 2400
+		Condition: psycure
+		Duration: 250
+		Dimensions: 9, 9
+		Footprint: xxxxxxxxx xxxxxxxxx xxxxxxxxx xxxxxxxxx xxxxxxxxx xxxxxxxxx xxxxxxxxx xxxxxxxxx xxxxxxxxx
+		ValidRelationships: Ally
+		Sequence: idle
+		OnFireSound: xeno-roar-3.ogg
+		BeginChargeSound: ui-ping.ogg
+		EndChargeSound: ui-confirm.ogg
+	CallOfTheBurrowedPower@burrowed:
+		OrderName: BurrowedOrder
+		Name: support-burrowed.name
+		Description: support-burrowed.description
+		IconImage: hive-icon
+		BlockedCursor: move-blocked
+		Icon: burrowed
+		ChargeInterval: 4200
+		Actors: runner, runner, runner, hunter, hunter
+		Radius: 3
+		Sounds: xeno-roar-1.ogg, chestburst-1.ogg
+		BeginChargeSound: ui-ping.ogg
+		EndChargeSound: ui-confirm.ogg
 	Valued:
 		Cost: 300
+
+# Recovery Pylon: mends xenos within four cells.
+recovery-pylon:
+	Inherits: ^Structure
+	Inherits@build: ^XenoMinorBuildable
+	Buildable:
+		Queue: XenoBuild
+		BuildPaletteOrder: 55
+		Prerequisites: evolution-tower
+		Description: actor-recovery-pylon.description
+	Voiced:
+		VoiceSet: XenoStructureVoice
+	Health:
+		HP: 350
+	Building:
+		Footprint: xx xx
+		Dimensions: 2, 2
+	Selectable:
+		Bounds: 1792, 1792, -896, -896
+	Tooltip:
+		Name: actor-recovery-pylon.name
+	Valued:
+		Cost: 220
+	Armament@PRIMARY:
+		Weapon: TGMCPylonHeal
+		Cursor: repair
+		OutsideRangeCursor: repair-blocked
+		TargetRelationships: Ally
+		ForceTargetRelationships: None
+	AttackOmni:
+	AutoTarget:
+		InitialStance: AttackAnything
+	AutoTargetPriority@DEFAULT:
+		ValidTargets: XenoHeal
+
+# Gargoyle: a lookout that sees a long way and shows up marines hidden in the dark.
+gargoyle:
+	Inherits: ^Structure
+	Inherits@build: ^XenoMinorBuildable
+	Buildable:
+		Queue: XenoBuild
+		BuildPaletteOrder: 56
+		Prerequisites: evolution-tower
+		Description: actor-gargoyle.description
+	Voiced:
+		VoiceSet: XenoStructureVoice
+	Health:
+		HP: 250
+	Building:
+		Footprint: xx xx
+		Dimensions: 2, 2
+	Selectable:
+		Bounds: 1792, 1792, -896, -896
+	RevealsShroud:
+		Range: 14c0
+	Tooltip:
+		Name: actor-gargoyle.name
+	Valued:
+		Cost: 150
 
 maturity-tower:
 	Inherits: ^Structure
@@ -268,8 +429,131 @@ maturity-tower:
 		Bounds: 1792, 1792, -896, -896
 	Tooltip:
 		Name: actor-maturity-tower.name
+	GrantExternalConditionPower@rage:
+		OrderName: HiveRageOrder
+		Name: support-rage.name
+		Description: support-rage.description
+		IconImage: hive-icon
+		BlockedCursor: move-blocked
+		Icon: rage
+		ChargeInterval: 3000
+		Condition: rage
+		Duration: 300
+		Dimensions: 9, 9
+		Footprint: xxxxxxxxx xxxxxxxxx xxxxxxxxx xxxxxxxxx xxxxxxxxx xxxxxxxxx xxxxxxxxx xxxxxxxxx xxxxxxxxx
+		ValidRelationships: Ally
+		Sequence: idle
+		OnFireSound: xeno-roar-6.ogg
+		BeginChargeSound: ui-ping.ogg
+		EndChargeSound: ui-confirm.ogg
 	Valued:
 		Cost: 450
+
+# Forward Hive: the way to expand. Built at the edge of your weeds, far from the Queen, it spreads weeds of its own, opens the
+# build area for major structures around it, trains xenos, sees a long way and brings in a little requisition. Marines do not
+# have to destroy it to win.
+forward-hive:
+	Inherits: ^Structure
+	Inherits@build: ^XenoMinorBuildable
+	Buildable:
+		Queue: XenoBuild
+		BuildPaletteOrder: 65
+		BuildLimit: 4
+		Prerequisites: evolution-tower
+		Description: actor-forward-hive.description
+	Voiced:
+		VoiceSet: XenoStructureVoice
+	-MustBeDestroyed:
+	Health:
+		HP: 700
+	Building:
+		Footprint: xx xx
+		Dimensions: 2, 2
+	Selectable:
+		Bounds: 1792, 1792, -896, -896
+	RevealsShroud:
+		Range: 10c0
+	ProvidesRadar:
+	GivesBuildableArea:
+		AreaTypes: xeno-minor, xeno-major
+	SpreadWeeds:
+		Interval: 60
+		MaxRadius: 6
+		Attempts: 8
+	Tooltip:
+		Name: actor-forward-hive.name
+	Valued:
+		Cost: 500
+	WithIdleAnimation:
+		Sequences: idle
+	CashTrickler:
+		Interval: 50
+		Amount: 5
+	StoresPlayerResources:
+		Capacity: 300
+	Exit@1:
+		SpawnOffset: 0,512,0
+		ExitCell: 0,2
+	RallyPoint:
+		Path: 0, 5
+	Production:
+		Produces: Xeno
+	ProductionBar:
+		ProductionType: Xeno
+
+# Resin Trap: sticky resin on the ground. A marine who steps next to it is stuck for a moment and stung; it recovers in ten seconds.
+resin-trap:
+	Inherits: ^Structure
+	Inherits@build: ^XenoMinorBuildable
+	Buildable:
+		Queue: XenoBuild
+		BuildPaletteOrder: 22
+		Prerequisites: evolution-tower
+		Description: actor-resin-trap.description
+	Voiced:
+		VoiceSet: XenoStructureVoice
+	-MustBeDestroyed:
+	-AppearsOnRadar:
+	Health:
+		HP: 90
+	Tooltip:
+		Name: actor-resin-trap.name
+	Valued:
+		Cost: 60
+	RevealsShroud:
+		Range: 3c0
+	Armament@PRIMARY:
+		Weapon: TGMCResinTrap
+	AttackOmni:
+	AutoTarget:
+		InitialStance: AttackAnything
+	AutoTargetPriority@DEFAULT:
+		ValidTargets: Human
+
+# Tunnel: a mouth in the ground. Two of them make a pair (the first two built, then the next two) and a xeno that is ordered into one with a
+# right-click comes out of the other, anywhere on the map. Marines can destroy them.
+tunnel:
+	Inherits: ^Structure
+	Inherits@build: ^XenoMinorBuildable
+	Buildable:
+		Queue: XenoBuild
+		BuildPaletteOrder: 24
+		BuildLimit: 6
+		Prerequisites: evolution-tower
+		Description: actor-tunnel.description
+	Voiced:
+		VoiceSet: XenoStructureVoice
+	-MustBeDestroyed:
+	-AppearsOnRadar:
+	Health:
+		HP: 140
+	Tooltip:
+		Name: actor-tunnel.name
+	Valued:
+		Cost: 100
+	RevealsShroud:
+		Range: 4c0
+	HiveTunnel:
 
 # ---------------------------------------------------------------- marines
 
@@ -298,6 +582,25 @@ miner:
 cade:
 	Inherits: ^Wall
 	Inherits@build: ^MarineBuildable
+	# The cade shows the side that faces away from the base (TGMC draws a barricade from four sides).
+	FacesOutward:
+	-WithSpriteBody:
+	WithSpriteBody@north:
+		Name: body-north
+		RequiresCondition: side-north
+		Sequence: idle-north
+	WithSpriteBody@south:
+		Name: body-south
+		RequiresCondition: side-south
+		Sequence: idle-south
+	WithSpriteBody@east:
+		Name: body-east
+		RequiresCondition: side-east
+		Sequence: idle-east
+	WithSpriteBody@west:
+		Name: body-west
+		RequiresCondition: side-west
+		Sequence: idle-west
 	Buildable:
 		Queue: MarineBuild
 		BuildPaletteOrder: 20
@@ -390,6 +693,87 @@ armory:
 	Valued:
 		Cost: 300
 
+# Medbay: heals marines within four cells on its own, and a heal clears a facehugger's embryo.
+medbay:
+	Inherits: ^Structure
+	Inherits@build: ^MarineBuildable
+	Buildable:
+		Queue: MarineBuild
+		BuildPaletteOrder: 62
+		Prerequisites: armory
+		Description: actor-medbay.description
+	Voiced:
+		VoiceSet: MarineStructureVoice
+	Health:
+		HP: 300
+	Tooltip:
+		Name: actor-medbay.name
+	Valued:
+		Cost: 250
+	Armament@PRIMARY:
+		Weapon: TGMCMedbayHeal
+		Cursor: heal
+		OutsideRangeCursor: heal-blocked
+		TargetRelationships: Ally
+		ForceTargetRelationships: None
+	AttackOmni:
+	AutoTarget:
+		InitialStance: AttackAnything
+	AutoTargetPriority@DEFAULT:
+		ValidTargets: Heal
+	AutoTargetPriority@INFECTED:
+		ValidTargets: Infected
+		Priority: 10
+
+# Ammo Station: marines within four cells reload their magazines much faster.
+ammo-station:
+	Inherits: ^Structure
+	Inherits@build: ^MarineBuildable
+	Buildable:
+		Queue: MarineBuild
+		BuildPaletteOrder: 63
+		Prerequisites: armory
+		Description: actor-ammo-station.description
+	Voiced:
+		VoiceSet: MarineStructureVoice
+	Health:
+		HP: 250
+	Tooltip:
+		Name: actor-ammo-station.name
+	Valued:
+		Cost: 200
+	ProximityExternalCondition:
+		Condition: resupplied
+		Range: 4c0
+
+# Workshop: builds the mech.
+workshop:
+	Inherits: ^Structure
+	Inherits@build: ^MarineBuildable
+	Buildable:
+		Queue: MarineBuild
+		BuildPaletteOrder: 68
+		Prerequisites: ordnance-depot
+		BuildLimit: 2
+		Description: actor-workshop.description
+	Voiced:
+		VoiceSet: MarineStructureVoice
+	AmbientSound:
+		SoundFiles: amb-hum.ogg
+	Health:
+		HP: 450
+	Exit@1:
+		SpawnOffset: 0,512,0
+		ExitCell: 0,1
+	RallyPoint:
+		Path: 0, 4
+	Production:
+		Produces: Vehicle
+	Tooltip:
+		Name: actor-workshop.name
+	Valued:
+		Cost: 400
+
 sentry-turret:
 	Inherits: ^Structure
 	Inherits@build: ^MarineBuildable
@@ -425,6 +809,58 @@ sentry-turret:
 	AutoTargetPriority@DEFAULT:
 		ValidTargets: Ground
 
+# Fixed guns that out-range the mortarman. They need no facing and shoot anything a friendly unit has revealed.
+mortar-emplacement:
+	Inherits: ^Structure
+	Inherits@build: ^MarineBuildable
+	Buildable:
+		Queue: MarineBuild
+		BuildPaletteOrder: 66
+		Prerequisites: armory
+		Description: actor-mortar-emplacement.description
+	Health:
+		HP: 250
+	Tooltip:
+		Name: actor-mortar-emplacement.name
+	Valued:
+		Cost: 300
+	Armament@PRIMARY:
+		Weapon: TGMCMortarEmplacement
+	AttackOmni:
+	WithAttackAnimation:
+		Sequence: fire
+	AutoTarget:
+		InitialStance: AttackAnything
+	AutoTargetPriority@DEFAULT:
+		ValidTargets: Ground
+
+artillery-emplacement:
+	Inherits: ^Structure
+	Inherits@build: ^MarineBuildable
+	Buildable:
+		Queue: MarineBuild
+		BuildPaletteOrder: 68
+		Prerequisites: ordnance-depot
+		Description: actor-artillery-emplacement.description
+	Health:
+		HP: 400
+	Building:
+		Footprint: xx xx
+		Dimensions: 2, 2
+	Tooltip:
+		Name: actor-artillery-emplacement.name
+	Valued:
+		Cost: 550
+	Armament@PRIMARY:
+		Weapon: TGMCHowitzer
+	AttackOmni:
+	WithAttackAnimation:
+		Sequence: fire
+	AutoTarget:
+		InitialStance: AttackAnything
+	AutoTargetPriority@DEFAULT:
+		ValidTargets: Ground
+
 ordnance-depot:
 	Inherits: ^Structure
 	Inherits@build: ^MarineBuildable
@@ -438,6 +874,205 @@ ordnance-depot:
 		SoundFiles: amb-hum.ogg
 	Health:
 		HP: 450
+	# CAS: the Condor jet flies over and strikes the spot you pick. Each power is one TGMC ammo type with its own cooldown and
+	# pattern (see CondorStrikePower in tgmc/code/Condor.cs). The heavy ones need a Workshop. Every blast hurts friendly units too.
+	CondorStrikePower@cas:
+		Variant: cas
+		OrderName: CasCasOrder
+		Name: support-cas.name
+		Description: support-cas.description
+		IconImage: cas-icon
+		Icon: cas
+		BlockedCursor: move-blocked
+		ChargeInterval: 3000
+		Weapon: TGMCCasBomb
+		FlybySounds: condor-flyby.ogg
+		PassSounds: sonic-boom.ogg
+		DropSounds: bomb-fall.ogg
+		IncomingSounds: bomb-fall.ogg
+		BeginChargeSound: ui-ping.ogg
+		EndChargeSound: ui-confirm.ogg
+		LaunchSound: ui-ping.ogg
+		Bombs: 5
+		Spacing: 2c0
+	CondorStrikePower@gun:
+		Variant: gun
+		OrderName: CasGunOrder
+		Name: support-gun.name
+		Description: support-gun.description
+		IconImage: cas-icon
+		Icon: gun
+		BlockedCursor: move-blocked
+		ChargeInterval: 1500
+		Weapon: TGMCCasGun
+		FlybySounds: condor-flyby.ogg
+		PassSounds: sonic-boom.ogg
+		DropSounds: mg60-fire-2.ogg
+		BeginChargeSound: ui-ping.ogg
+		EndChargeSound: ui-confirm.ogg
+		LaunchSound: ui-ping.ogg
+		Bombs: 16
+		Spacing: 0c640
+		FallDelay: 3
+		WarningRadius: 0c768
+	CondorStrikePower@minirocket:
+		Variant: minirocket
+		OrderName: CasMinirocketOrder
+		Name: support-minirocket.name
+		Description: support-minirocket.description
+		IconImage: cas-icon
+		Icon: minirocket
+		BlockedCursor: move-blocked
+		ChargeInterval: 2250
+		Weapon: TGMCCasMini
+		FlybySounds: condor-flyby.ogg
+		PassSounds: sonic-boom.ogg
+		DropSounds: cas-voice-missile.ogg
+		IncomingSounds: rocket-whistle.ogg
+		BeginChargeSound: ui-ping.ogg
+		EndChargeSound: ui-confirm.ogg
+		LaunchSound: ui-ping.ogg
+		Bombs: 6
+		Spacing: 1c512
+		FallDelay: 45
+		WarningRadius: 1c512
+	CondorStrikePower@flare:
+		Variant: flare
+		OrderName: CasFlareOrder
+		Name: support-flare.name
+		Description: support-flare.description
+		IconImage: cas-icon
+		Icon: flare
+		BlockedCursor: move-blocked
+		ChargeInterval: 1000
+		Weapon: TGMCCasFlare
+		FlybySounds: condor-flyby.ogg
+		PassSounds: sonic-boom.ogg
+		DropSounds: cas-voice-flare.ogg
+		BeginChargeSound: ui-ping.ogg
+		EndChargeSound: ui-confirm.ogg
+		LaunchSound: ui-ping.ogg
+		Pattern: Single
+		FallDelay: 40
+		RevealDuration: 1000
+		CameraRange: 14c0
+		WarningRadius: 1c0
+	CondorStrikePower@widowmaker:
+		Variant: widowmaker
+		OrderName: CasWidowmakerOrder
+		Name: support-widowmaker.name
+		Description: support-widowmaker.description
+		IconImage: cas-icon
+		Icon: widowmaker
+		BlockedCursor: move-blocked
+		ChargeInterval: 3000
+		Weapon: TGMCCasWidow
+		FlybySounds: condor-flyby.ogg
+		PassSounds: sonic-boom.ogg
+		DropSounds: cas-voice-missile.ogg
+		IncomingSounds: rocket-whistle.ogg
+		BeginChargeSound: ui-ping.ogg
+		EndChargeSound: ui-confirm.ogg
+		LaunchSound: ui-ping.ogg
+		Prerequisites: workshop
+		Pattern: Single
+		FallDelay: 50
+		WarningRadius: 1c768
+	CondorStrikePower@laser:
+		Variant: laser
+		OrderName: CasLaserOrder
+		Name: support-laser.name
+		Description: support-laser.description
+		IconImage: cas-icon
+		Icon: laser
+		BlockedCursor: move-blocked
+		ChargeInterval: 2250
+		Weapon: TGMCCasLaser
+		FlybySounds: condor-flyby.ogg
+		PassSounds: sonic-boom.ogg
+		DropSounds: laser-zap.ogg
+		BeginChargeSound: ui-ping.ogg
+		EndChargeSound: ui-confirm.ogg
+		LaunchSound: ui-ping.ogg
+		Prerequisites: workshop
+		Bombs: 12
+		Spacing: 1c0
+		FallDelay: 8
+		WarningRadius: 0c768
+		LingerWeapon: TGMCCasFire
+		LingerDuration: 75
+		LingerRadius: 1c512
+		LingerSpots: 2
+	CondorStrikePower@napalm:
+		Variant: napalm
+		OrderName: CasNapalmOrder
+		Name: support-napalm.name
+		Description: support-napalm.description
+		IconImage: cas-icon
+		Icon: napalm
+		BlockedCursor: move-blocked
+		ChargeInterval: 3750
+		Weapon: TGMCCasNapalm
+		FlybySounds: condor-flyby.ogg
+		PassSounds: sonic-boom.ogg
+		DropSounds: cas-voice-missile.ogg
+		IncomingSounds: bomb-fall.ogg
+		BeginChargeSound: ui-ping.ogg
+		EndChargeSound: ui-confirm.ogg
+		LaunchSound: ui-ping.ogg
+		Prerequisites: workshop
+		Pattern: Single
+		FallDelay: 75
+		WarningRadius: 2c256
+		LingerWeapon: TGMCCasFire
+		LingerDuration: 600
+		LingerRadius: 3c0
+	CondorStrikePower@fatty:
+		Variant: fatty
+		OrderName: CasFattyOrder
+		Name: support-fatty.name
+		Description: support-fatty.description
+		IconImage: cas-icon
+		Icon: fatty
+		BlockedCursor: move-blocked
+		ChargeInterval: 4500
+		Weapon: TGMCCasFatty
+		FlybySounds: condor-flyby.ogg
+		PassSounds: sonic-boom.ogg
+		DropSounds: cas-voice-missile.ogg
+		IncomingSounds: bomb-fall.ogg
+		BeginChargeSound: ui-ping.ogg
+		EndChargeSound: ui-confirm.ogg
+		LaunchSound: ui-ping.ogg
+		Prerequisites: workshop
+		Pattern: Cluster
+		FallDelay: 90
+		ClusterWeapon: TGMCCasCluster
+		ClusterCount: 8
+		ClusterRadius: 4c0
+		ClusterDelay: 75
+		WarningRadius: 2c0
+	CondorStrikePower@moab:
+		Variant: moab
+		OrderName: CasMoabOrder
+		Name: support-moab.name
+		Description: support-moab.description
+		IconImage: cas-icon
+		Icon: moab
+		BlockedCursor: move-blocked
+		ChargeInterval: 6000
+		Weapon: TGMCCasMoab
+		FlybySounds: condor-flyby.ogg
+		PassSounds: sonic-boom.ogg
+		DropSounds: cas-voice-bomb.ogg
+		IncomingSounds: ob-incoming.ogg
+		BeginChargeSound: ui-ping.ogg
+		EndChargeSound: ui-confirm.ogg
+		LaunchSound: ui-ping.ogg
+		Prerequisites: workshop
+		Pattern: Single
+		FallDelay: 150
+		WarningRadius: 4c0
 	Tooltip:
 		Name: actor-ordnance-depot.name
 	Valued:

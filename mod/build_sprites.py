@@ -16,9 +16,9 @@ A layer may carry a fourth element, a dict of options, for effect art: "frames" 
 frames, "rotate" turns a 1-dir state by that many degrees clockwise, "facings" then makes that many rotated copies of
 every frame (a muzzle flash or tracer that has to point along the shot), "swap_rg" swaps the red and green channels (the
 green xeno splatter becomes red marine blood), "size" scales the frames to that many pixels
-square, "fit" (w, h) shrinks them into a box of that size keeping the aspect ratio, "side" keeps one side (S, N, E, W) of a
+square, "centre" (w, h) centres them on a transparent canvas of that size, "fit" (w, h) shrinks them into a box of that size keeping the aspect ratio, "side" keeps one side (S, N, E, W) of a
 4-direction state, and "tick" sets the milliseconds per frame. On the first layer of a sequence, "fade" (N) turns the composited still pose
-into N frames that fade out. A unit may also carry "cell": (w, h), which centres every frame of its sheet on a cell that
+into N frames that fade out, "fall" (N) turns it into N frames that topple onto its side. A unit may also carry "cell": (w, h), which centres every frame of its sheet on a cell that
 size (a 32px marine sheet that has to hold TGMC's 64px gib frames).
 
 Animation timing comes from the .dmi `delay` list (deciseconds per frame). OpenRA has one `Tick`
@@ -52,13 +52,31 @@ ACID_TURRET = "icons/Xeno/acid_turret.dmi"
 RESIN_SILO = "icons/Xeno/resin_silo.dmi"
 RESIN_POD = "icons/Xeno/resin_pod.dmi"
 SENTRY = "icons/obj/machines/deployable/sentry/sentry.dmi"
+MORTAR = "icons/obj/machines/deployable/mortar.dmi"
+HOWITZER = "icons/obj/machines/deployable/howitzer.dmi"
 MARINE_ARMOR = "icons/mob/clothing/suits/marine_armor.dmi"
 MARINE_HELMETS = "icons/mob/clothing/headwear/marine_helmets.dmi"
 HUMAN_GIB = "icons/mob/human_gib.dmi"
 FEET = "icons/mob/clothing/feet.dmi"
 RIFLES = "icons/mob/inhands/guns/rifles_right_1.dmi"
+MG60 = "icons/mob/inhands/guns/machineguns_right_64.dmi"
+MARKSMAN = "icons/mob/inhands/guns/marksman_right_64.dmi"
+SADAR = "icons/mob/inhands/guns/special_right_64.dmi"
+VALI = "icons/mob/inhands/weapons/vali_right.dmi"
+FLAMER = "icons/mob/inhands/guns/special_right_1.dmi"
 SMGS = "icons/mob/inhands/guns/submachineguns_right_1.dmi"
+SHOTGUNS = "icons/mob/inhands/guns/shotguns_right_1.dmi"
 PISTOLS = "icons/mob/inhands/guns/pistols_right_1.dmi"
+# The left-hand sheets: TGMC draws a two-handed gun in both hands, the same state on the right and the left sheet.
+TWO_HANDED_LEFT = {
+    RIFLES: "icons/mob/inhands/guns/rifles_left_1.dmi",
+    MG60: "icons/mob/inhands/guns/machineguns_left_64.dmi",
+    MARKSMAN: "icons/mob/inhands/guns/marksman_left_64.dmi",
+    SADAR: "icons/mob/inhands/guns/special_left_64.dmi",
+    FLAMER: "icons/mob/inhands/guns/special_left_1.dmi",
+    SMGS: "icons/mob/inhands/guns/submachineguns_left_1.dmi",
+    SHOTGUNS: "icons/mob/inhands/guns/shotguns_left_1.dmi",
+}
 CRYO = "icons/obj/machines/cryogenics2.dmi"
 VENDING = "icons/obj/machines/vending.dmi"
 WARRIOR = "icons/Xeno/castes/warrior.dmi"
@@ -67,14 +85,34 @@ PROJECTILES = "icons/obj/items/projectiles.dmi"
 FX64 = "icons/effects/64x64.dmi"
 FX96 = "icons/effects/96x96.dmi"
 FX32 = "icons/effects/effects.dmi"
+FIRE = "icons/effects/fire.dmi"
+BLOOD = "icons/effects/blood.dmi"
+CHEMSMOKE = "icons/effects/chemsmoke.dmi"
+CASINGS = "icons/obj/items/casings.dmi"
 HEAVY_IMPACT = "icons/effects/heavyimpact.dmi"
 XENO_FX = "icons/Xeno/Effects.dmi"
 QUEEN = "icons/Xeno/castes/queen.dmi"
+LARVA = "icons/Xeno/castes/larva.dmi"
 WEEDS = "icons/Xeno/weeds.dmi"
 XENO_2X2 = "icons/Xeno/2x2building.dmi"
+SPITTER = "icons/Xeno/castes/spitter.dmi"
+PRAETORIAN = "icons/Xeno/castes/praetorian.dmi"
+CRUSHER = "icons/Xeno/castes/crusher.dmi"
+RAVAGER = "icons/Xeno/castes/ravager.dmi"
+DEFILER = "icons/Xeno/castes/defiler.dmi"
+BOILER = "icons/Xeno/castes/boiler.dmi"
+CARRIER = "icons/Xeno/castes/carrier.dmi"
+WARLOCK = "icons/Xeno/castes/warlock.dmi"
+SHRIKE = "icons/Xeno/castes/shrike.dmi"
+WIDOW = "icons/Xeno/castes/widow.dmi"
+WRAITH = "icons/Xeno/castes/wraith.dmi"
+BULL = "icons/Xeno/castes/bull.dmi"
+BEHEMOTH = "icons/Xeno/castes/behemoth.dmi"
 RESIN_WALL = "icons/obj/smooth_objects/resin-wall.dmi"
 MINING_DRILL = "icons/obj/mining_drill.dmi"
 CADE = "icons/obj/structures/barricades/metal.dmi"
+MECH_MEDIUM = "icons/mecha/mech_medium.dmi"
+MECH_WEAPONS = "icons/mecha/mech_core_weapons.dmi"
 
 # OpenRA facing order (clockwise from north) -> which TGMC side to draw.
 FACING_NAMES = ["N", "NE", "E", "SE", "S", "SW", "W", "NW"]
@@ -91,12 +129,79 @@ FACING_SOURCE = {"N": "N", "NE": "E", "E": "E", "SE": "E", "S": "S", "SW": "W", 
 # (the uniform and the armour) goes blue; the xeno units go red. Skin, helmets, boots and weapons keep their own colours.
 MARINE_TEAM = (120, 150, 255)
 XENO_TEAM = (255, 150, 150)
-GEAR = [(MARINE_ARMOR, "xarmor", MARINE_TEAM), (FEET, "marine"), (MARINE_HELMETS, "helmet")]
+GEAR = [(MARINE_ARMOR, "xarmor", MARINE_TEAM), (FEET, "marine"), (MARINE_HELMETS, "helmet", MARINE_TEAM)]
+
+
+def centred(layer, size=(64, 32)):
+    """The layer with the "centre" option, so it lines up under a gun drawn on a 64px canvas."""
+    parts = list(layer) + [None] * (3 - len(layer))
+    opts = dict(parts[3]) if len(parts) > 3 else {}
+    opts["centre"] = size
+    return tuple(parts[:3]) + (opts,)
+
+
+def guns(weapon):
+    """The layers a gun adds to a marine: a two-handed one is drawn in both hands, the same state on TGMC's left-hand sheet
+    and its right-hand sheet."""
+    left = TWO_HANDED_LEFT.get(weapon[0])
+    return [(left,) + tuple(weapon[1:]), weapon] if left else [weapon]
+
+
+def with_gun(body, weapon):
+    """The marine's body layers plus his gun. A 64px in-hand gun (the sniper rifle, SADAR, machine guns) is drawn full size, as
+    TGMC does, on a 64x32 canvas, so the 32px body is centred on that canvas; shrinking the gun to the marine's size, as before,
+    made it a toy."""
+    if len(weapon) > 3 and weapon[3].get("big"):
+        body = [centred(layer) for layer in body]
+    return body + guns(weapon)
 
 
 def marine(uniform, weapon):
-    """Body, role uniform, armour, boots and helmet, then the weapon held in the right hand."""
-    return [(HUMAN, "body_m"), (MARINE_UNIFORM, uniform, MARINE_TEAM)] + GEAR + [weapon]
+    """Body, role uniform, armour, boots and helmet, then the weapon held in the hands."""
+    return with_gun([(HUMAN, "body_m"), (MARINE_UNIFORM, uniform, MARINE_TEAM)] + GEAR, weapon)
+
+
+JAEGER = "icons/mob/modular/mark_two/{}.dmi"
+
+
+def jaeger(pattern, weapon):
+    """A Jaeger Mk.II marine: body, uniform, the pattern's chest plate and helmet (a greyscale sheet, tinted with the team colour), boots,
+    then the weapon. Patterns: scout, skirmisher, trooper (light); infantry, eva, ranger, helljumper (medium); gugnir, assault, eod (heavy)."""
+    dmi = JAEGER.format(pattern)
+    return with_gun([(HUMAN, "body_m"), (MARINE_UNIFORM, "marine_jumpsuit", MARINE_TEAM), (dmi, "chest", MARINE_TEAM),
+                     (FEET, "marine"), (dmi, "helm", MARINE_TEAM)], weapon)
+
+
+# Presets for the mech: the accent colours painted on TGMC's medium mech, and the two weapons on its arms.
+MECH_PRESETS = {
+    "assault": {"paint": (110, 150, 235), "trim": (205, 205, 215), "right": "assaultrifle_right", "left": "rocketlauncher_left"},
+    "flame": {"paint": (245, 120, 40), "trim": (255, 215, 90), "right": "shotgun_right", "left": "flamer_left"},
+    "support": {"paint": (110, 195, 100), "trim": (205, 235, 175), "right": "smg_right", "left": "rpg_left"},
+    "tow": {"paint": (215, 215, 220), "trim": (90, 95, 115), "right": "assaultrifle_right", "left": "tow_left"},
+}
+
+
+def mech(preset):
+    """TGMC's medium mech in one of the MECH_PRESETS. Each part is a dark frame (the "nocolor" states, which are the mech's
+    skeleton) and two thin paint masks, which get the preset's accent colours. The weapons come from another sheet of the same
+    96x96 size and are laid on top."""
+    spec = MECH_PRESETS[preset]
+    paint, trim = spec["paint"], spec["trim"]
+    opts = {"pad": (96, 96), "scale": 1.0}
+    stack = []
+    for part, frame in (("legs", "legsnocolor"), ("core", "corenocolor"), ("head", "headnocolor"), ("leftarm", "leftarmnocolor"),
+                        ("rightarm", "rightarmnocolor")):
+        stack += [(frame, None), (f"{part}primary", paint), (f"{part}secondary", trim)]
+    stack += [("visor", None)]
+    layers = [(MECH_MEDIUM, state, tint, dict(opts)) for state, tint in stack]
+    layers += [(MECH_WEAPONS, spec["right"], None, dict(opts)), (MECH_WEAPONS, spec["left"], None, dict(opts))]
+    return layers
+
+
+def fallen(layers):
+    """The same stack with its first layer (the body) topping over, for a marine's death: TGMC has no lying-down human."""
+    first = layers[0]
+    return [(first[0], first[1], None, {**(first[3] if len(first) > 3 else {}), "fall": 6, "tick": 90})] + layers[1:]
 
 
 # TGMC's human gib is 64px and the marine is 32px, so the marine sheets hold 64px cells.
@@ -107,7 +212,9 @@ UNITS = {
     "rifleman": {
         "cell": MARINE_CELL,
         "sequences": {
-            "stand": marine("marine_jumpsuit", (RIFLES, "t18_w")),
+            "stand": marine("marine_jumpsuit", (RIFLES, "t12_w")),
+            "stand-carbine": marine("marine_jumpsuit", (RIFLES, "t18_w")),
+            "stand-m412": marine("marine_jumpsuit", (RIFLES, "m412_w")),
             "die-gib": MARINE_GIB,
             "run": "stand",
             "attack": "stand",
@@ -159,6 +266,149 @@ UNITS = {
             "icon": "stand:S",
         },
     },
+    "spitter": {
+        "sequences": {
+            "walk": [(SPITTER, "Spitter Walking")],
+            "run": [(SPITTER, "Spitter Running")],
+            "stand": "walk#1",
+            "die": [(SPITTER, "Spitter Dead")],
+            "die-gib": [(SPITTER, "gibbed-a", None, {"tick": 70})],
+            "attack": "stand",
+            "icon": "stand:S",
+        },
+    },
+    "praetorian": {
+        "sequences": {
+            "walk": [(PRAETORIAN, "Praetorian Walking")],
+            "run": [(PRAETORIAN, "Praetorian Running")],
+            "stand": "walk#1",
+            "die": [(PRAETORIAN, "Praetorian Dead")],
+            "die-gib": [(PRAETORIAN, "gibbed-a", None, {"tick": 70})],
+            "attack": "stand",
+            "icon": "stand:S",
+        },
+    },
+    "crusher": {
+        "sequences": {
+            "walk": [(CRUSHER, "Crusher Walking")],
+            "run": [(CRUSHER, "Crusher Running")],
+            "stand": "walk#1",
+            "die": [(CRUSHER, "Crusher Dead")],
+            "die-gib": [(CRUSHER, "gibbed-a", None, {"tick": 70})],
+            "attack": "stand",
+            "icon": "stand:S",
+        },
+    },
+    "ravager": {
+        "sequences": {
+            "walk": [(RAVAGER, "Ravager Walking")],
+            "run": [(RAVAGER, "Ravager Running")],
+            "stand": "walk#1",
+            "die": [(RAVAGER, "Ravager Dead")],
+            "die-gib": [(RAVAGER, "gibbed-a", None, {"tick": 70})],
+            "attack": "stand",
+            "icon": "stand:S",
+        },
+    },
+    "defiler": {
+        "sequences": {
+            "walk": [(DEFILER, "Defiler Walking")],
+            "run": [(DEFILER, "Defiler Running")],
+            "stand": "walk#1",
+            "die": [(DEFILER, "Defiler Dead")],
+            "die-gib": [(DEFILER, "gibbed-a", None, {"tick": 70})],
+            "attack": "stand",
+            "icon": "stand:S",
+        },
+    },
+    "boiler": {
+        "sequences": {
+            "walk": [(BOILER, "Boiler Walking")],
+            "run": [(BOILER, "Boiler Running")],
+            "stand": "walk#1",
+            "die": [(BOILER, "Boiler Dead")],
+            "die-gib": [(BOILER, "gibbed-a-boiler", None, {"tick": 70})],
+            "attack": "stand",
+            "icon": "stand:S",
+        },
+    },
+    "carrier": {
+        "sequences": {
+            "walk": [(CARRIER, "Carrier Walking")],
+            "run": [(CARRIER, "Carrier Running")],
+            "stand": "walk#1",
+            "die": [(CARRIER, "Carrier Dead")],
+            "die-gib": [(CARRIER, "gibbed-a", None, {"tick": 70})],
+            "attack": "stand",
+            "icon": "stand:S",
+        },
+    },
+    "warlock": {
+        "sequences": {
+            "walk": [(WARLOCK, "Warlock Walking")],
+            "run": [(WARLOCK, "Warlock Running")],
+            "stand": "walk#1",
+            "die": [(WARLOCK, "Warlock Dead")],
+            "die-gib": [(WARLOCK, "gibbed-a", None, {"tick": 70})],
+            "attack": "stand",
+            "icon": "stand:S",
+        },
+    },
+    "shrike": {
+        "sequences": {
+            "walk": [(SHRIKE, "Shrike Walking")],
+            "run": [(SHRIKE, "Shrike Running")],
+            "stand": "walk#1",
+            "die": [(SHRIKE, "Shrike Dead")],
+            "die-gib": [(SHRIKE, "gibbed-a", None, {"tick": 70})],
+            "attack": "stand",
+            "icon": "stand:S",
+        },
+    },
+    "widow": {
+        "sequences": {
+            "walk": [(WIDOW, "Widow Walking")],
+            "run": [(WIDOW, "Widow Running")],
+            "stand": "walk#1",
+            "die": [(WIDOW, "Widow Dead")],
+            "die-gib": [(WIDOW, "gibbed-a", None, {"tick": 70})],
+            "attack": "stand",
+            "icon": "stand:S",
+        },
+    },
+    "wraith": {
+        "sequences": {
+            "walk": [(WRAITH, "Wraith Walking")],
+            "run": [(WRAITH, "Wraith Running")],
+            "stand": "walk#1",
+            "die": [(WRAITH, "Wraith Dead")],
+            "die-gib": [(WRAITH, "gibbed-a", None, {"tick": 70})],
+            "attack": "stand",
+            "icon": "stand:S",
+        },
+    },
+    "bull": {
+        "sequences": {
+            "walk": [(BULL, "Bull Walking")],
+            "run": [(BULL, "Bull Running")],
+            "stand": "walk#1",
+            "die": [(BULL, "Bull Dead")],
+            "die-gib": [(BULL, "gibbed-a", None, {"tick": 70})],
+            "attack": "stand",
+            "icon": "stand:S",
+        },
+    },
+    "behemoth": {
+        "sequences": {
+            "walk": [(BEHEMOTH, "Behemoth Walking")],
+            "run": [(BEHEMOTH, "Behemoth Running")],
+            "stand": "walk#1",
+            "die": [(BEHEMOTH, "Behemoth Dead")],
+            "die-gib": "die",  # too heavy to gib
+            "attack": "stand",
+            "icon": "stand:S",
+        },
+    },
     "warrior": {
         "sequences": {
             "walk": [(WARRIOR, "Warrior Walking")],
@@ -174,7 +424,7 @@ UNITS = {
     "medic": {
         "cell": MARINE_CELL,
         "sequences": {
-            "stand": marine("marine_medic", (PISTOLS, "m44")),
+            "stand": marine("marine_medic", (SMGS, "m25_w")),
             "die-gib": MARINE_GIB,
             "run": "stand",
             "attack": "stand",
@@ -185,7 +435,7 @@ UNITS = {
     "engineer": {
         "cell": MARINE_CELL,
         "sequences": {
-            "stand": marine("marine_engineer", (SMGS, "t19_w")),
+            "stand": marine("marine_engineer", (SHOTGUNS, "m37_w")),
             "die-gib": MARINE_GIB,
             "run": "stand",
             "attack": "stand",
@@ -194,6 +444,66 @@ UNITS = {
         },
     },
     # Marine gunners. Same kit as the other roles with their own uniform state; the weapon art is the rifle's.
+    "scout": {
+        "cell": MARINE_CELL,
+        "sequences": {
+            "stand": jaeger("scout", (SMGS, "m25_w")),
+            "die-gib": MARINE_GIB,
+            "run": "stand",
+            "attack": "stand",
+            "die": [(HUMAN, "husk")],
+            "flash": [(PROJECTILES, "muzzle_bullet", None, {"rotate": 90, "facings": 8, "tick": 40})],
+            "icon": "stand:S",
+        },
+    },
+    "skirmisher": {
+        "cell": MARINE_CELL,
+        "sequences": {
+            "stand": jaeger("skirmisher", (SHOTGUNS, "m37_w")),
+            "die-gib": MARINE_GIB,
+            "run": "stand",
+            "attack": "stand",
+            "die": [(HUMAN, "husk")],
+            "flash": [(PROJECTILES, "muzzle_flash", None, {"rotate": 90, "facings": 8, "tick": 40})],
+            "icon": "stand:S",
+        },
+    },
+    "trooper": {
+        "cell": MARINE_CELL,
+        "sequences": {
+            "stand": jaeger("infantry", (RIFLES, "t12_w")),
+            "die-gib": MARINE_GIB,
+            "run": "stand",
+            "attack": "stand",
+            "die": [(HUMAN, "husk")],
+            "flash": [(PROJECTILES, "muzzle_bullet", None, {"rotate": 90, "facings": 8, "tick": 40})],
+            "icon": "stand:S",
+        },
+    },
+    "ranger": {
+        "cell": MARINE_CELL,
+        "sequences": {
+            "stand": jaeger("ranger", (RIFLES, "m412_w")),
+            "die-gib": MARINE_GIB,
+            "run": "stand",
+            "attack": "stand",
+            "die": [(HUMAN, "husk")],
+            "flash": [(PROJECTILES, "muzzle_bullet", None, {"rotate": 90, "facings": 8, "tick": 40})],
+            "icon": "stand:S",
+        },
+    },
+    "assault": {
+        "cell": MARINE_CELL,
+        "sequences": {
+            "stand": jaeger("assault", (RIFLES, "t18_w")),
+            "die-gib": MARINE_GIB,
+            "run": "stand",
+            "attack": "stand",
+            "die": [(HUMAN, "husk")],
+            "flash": [(PROJECTILES, "muzzle_bullet", None, {"rotate": 90, "facings": 8, "tick": 40})],
+            "icon": "stand:S",
+        },
+    },
     "smartgunner": {
         "cell": MARINE_CELL,
         "sequences": {
@@ -203,6 +513,78 @@ UNITS = {
             "attack": "stand",
             "die": [(HUMAN, "husk")],
             "flash": [(PROJECTILES, "muzzle_bullet", None, {"rotate": 90, "facings": 8, "tick": 35})],
+            "icon": "stand:S",
+        },
+    },
+    "sniper": {
+        "cell": MARINE_CELL,
+        "sequences": {
+            "stand": marine("marine_jumpsuit", (MARKSMAN, "svd", None, {"big": True})),
+            "die-gib": MARINE_GIB,
+            "run": "stand",
+            "attack": "stand",
+            "die": [(HUMAN, "husk")],
+            "flash": [(PROJECTILES, "muzzle_flashold", None, {"rotate": 90, "facings": 8, "tick": 90})],
+            "icon": "stand:S",
+        },
+    },
+    "rocketeer": {
+        "cell": MARINE_CELL,
+        "sequences": {
+            "stand": marine("marine_jumpsuit", (SADAR, "sadar_100", None, {"big": True})),
+            "die-gib": MARINE_GIB,
+            "run": "stand",
+            "attack": "stand",
+            "die": [(HUMAN, "husk")],
+            # The SADAR's back-blast: a puff of smoke behind the launcher
+            "flash": [(PROJECTILES, "recoilless_rifle_smoke", None, {"tick": 60})],
+            "icon": "stand:S",
+        },
+    },
+    "blademan": {
+        "cell": MARINE_CELL,
+        "sequences": {
+            "stand": marine("marine_jumpsuit", (VALI, "vali_sword")),
+            "die-gib": MARINE_GIB,
+            "run": "stand",
+            "attack": "stand",
+            "die": [(HUMAN, "husk")],
+            "icon": "stand:S",
+        },
+    },
+    "mortarman": {
+        "cell": MARINE_CELL,
+        "sequences": {
+            "stand": marine("marine_jumpsuit", (RIFLES, "t18_w")),
+            "die-gib": MARINE_GIB,
+            "run": "stand",
+            "attack": "stand",
+            "die": [(HUMAN, "husk")],
+            "flash": [(PROJECTILES, "smoke_shell", None, {"tick": 70})],
+            "icon": "stand:S",
+        },
+    },
+    "flamer": {
+        "cell": MARINE_CELL,
+        "sequences": {
+            "stand": marine("marine_jumpsuit", (FLAMER, "m240")),
+            "die-gib": MARINE_GIB,
+            "run": "stand",
+            "attack": "stand",
+            "die": [(HUMAN, "husk")],
+            "flash": [(PROJECTILES, "spray_flamer", None, {"rotate": 90, "facings": 8, "tick": 40})],
+            "icon": "stand:S",
+        },
+    },
+    "machinegunner": {
+        "cell": MARINE_CELL,
+        "sequences": {
+            "stand": marine("marine_jumpsuit", (MG60, "t60", None, {"big": True})),
+            "die-gib": MARINE_GIB,
+            "run": "stand",
+            "attack": "stand",
+            "die": [(HUMAN, "husk")],
+            "flash": [(PROJECTILES, "muzzle_flash", None, {"rotate": 90, "facings": 8, "tick": 40})],
             "icon": "stand:S",
         },
     },
@@ -219,12 +601,97 @@ UNITS = {
             "icon": "stand:S",
         },
     },
+    "heavygunner": {
+        "cell": MARINE_CELL,
+        "sequences": {
+            "stand": jaeger("gugnir", (MG60, "v41", None, {"big": True})),
+            "die-gib": MARINE_GIB,
+            "run": "stand",
+            "attack": "stand",
+            "die": [(HUMAN, "husk")],
+            "flash": [(PROJECTILES, "muzzle_flash", None, {"rotate": 90, "facings": 8, "tick": 30})],
+            "icon": "stand:S",
+        },
+    },
+    "demolitionist": {
+        "cell": MARINE_CELL,
+        "sequences": {
+            "stand": jaeger("eod", (RIFLES, "t18_w")),
+            "die-gib": MARINE_GIB,
+            "run": "stand",
+            "attack": "stand",
+            "die": [(HUMAN, "husk")],
+            "flash": [(HEAVY_IMPACT, "heavyimpact", None, {"frames": (0, 9), "size": 32, "tick": 60})],
+            "icon": "stand:S",
+        },
+    },
+    # Marine support buildings and the mech. The mech is TGMC's Durand, a complete 4-direction sprite.
+    "mech": {
+        "cell": (96, 96),
+        "sequences": {
+            "stand": mech("assault"),
+            "stand-flame": mech("flame"),
+            "stand-support": mech("support"),
+            "stand-tow": mech("tow"),
+            "run": "stand",
+            "attack": "stand",
+            "die": [(layer[0], layer[1], layer[2], dict(layer[3], fade=10, tick=70)) for layer in mech("assault")],
+            "die-gib": "die",
+            "flash": [(PROJECTILES, "muzzle_flash", None, {"rotate": 90, "facings": 8, "tick": 30})],
+            "icon": "stand:S",
+        },
+    },
+    "medbay": {
+        "sequences": {
+            "idle": [(VENDING, "marinemed")],
+            "icon": [(VENDING, "marinemed", None, {"fit": (44, 44), "frames": (0, 1)})],
+        },
+    },
+    "ammo-station": {
+        "sequences": {
+            "idle": [(VENDING, "nanoammo", None, {"side": "S"})],
+            "icon": [(VENDING, "nanoammo", None, {"side": "S", "fit": (44, 44), "frames": (0, 1)})],
+        },
+    },
+    "workshop": {
+        "sequences": {
+            "idle": [(VENDING, "engi")],
+            "icon": [(VENDING, "engi", None, {"fit": (44, 44), "frames": (0, 1)})],
+        },
+    },
+    "recovery-pylon": {
+        "sequences": {
+            "idle": [(XENO_2X2, "recovery_pylon")],
+            "icon": [(XENO_2X2, "recovery_pylon", None, {"fit": (44, 44), "frames": (0, 1)})],
+        },
+    },
+    "gargoyle": {
+        "sequences": {
+            "idle": [(XENO_2X2, "gargoyle")],
+            "icon": [(XENO_2X2, "gargoyle", None, {"fit": (44, 44), "frames": (0, 1)})],
+        },
+    },
     # Marine structures. Sentry is 4-dir (8 facings). Cryo pod and vendor are 1-dir and animate in place.
     "sentry-turret": {
         "sequences": {
             "turret": [(SENTRY, "sentry_deployed")],
             "icon": [(SENTRY, "sentry_deployed", None, {"side": "S", "fit": (44, 44), "frames": (0, 1)})],
             "flash": [(PROJECTILES, "muzzle_flash", None, {"facings": 8, "tick": 50})],
+        },
+    },
+    # Emplacements: a mortar (32px) and a howitzer (64px), each drawn from TGMC's deployed art with its own firing frames.
+    "mortar-emplacement": {
+        "sequences": {
+            "idle": [(MORTAR, "mortar_deployed", None, {"side": "S"})],
+            "fire": [(MORTAR, "mortar_deployed_fire", None, {"side": "S", "tick": 60})],
+            "icon": [(MORTAR, "mortar_deployed", None, {"side": "S", "fit": (44, 44), "frames": (0, 1)})],
+        },
+    },
+    "artillery-emplacement": {
+        "sequences": {
+            "idle": [(HOWITZER, "howitzer_deployed", None, {"side": "S"})],
+            "fire": [(HOWITZER, "howitzer_deployed_fire", None, {"side": "S", "tick": 50})],
+            "icon": [(HOWITZER, "howitzer_deployed", None, {"side": "S", "fit": (44, 44), "frames": (0, 1)})],
         },
     },
     "cryo-pod": {
@@ -279,6 +746,10 @@ UNITS = {
     "cade": {
         "sequences": {
             "idle": [(CADE, "metal_0", None, {"side": "S"})],
+            "idle-north": [(CADE, "metal_0", None, {"side": "N"})],
+            "idle-south": [(CADE, "metal_0", None, {"side": "S"})],
+            "idle-east": [(CADE, "metal_0", None, {"side": "E"})],
+            "idle-west": [(CADE, "metal_0", None, {"side": "W"})],
             "icon": [(CADE, "metal_0", None, {"side": "S", "fit": (44, 44), "frames": (0, 1)})],
         },
     },
@@ -300,6 +771,21 @@ UNITS = {
             "icon": [(WEEDS, "weednode3", None, {"fit": (44, 44), "frames": (0, 1)})],
         },
     },
+    "weeds": {
+        "sequences": {
+            "idle": [(WEEDS, "weed15")],
+            "icon": [(WEEDS, "weednode3", None, {"fit": (44, 44), "frames": (0, 1)})],
+        },
+    },
+    # A hugger egg: shut and ready, opening, and open and empty while the next hugger grows.
+    "egg": {
+        "sequences": {
+            "idle": [(XENO_FX, "egg_hugger2")],
+            "open": [(XENO_FX, "egg opening", None, {"tick": 50})],
+            "empty": [(XENO_FX, "egg_hugger3")],
+            "icon": [(XENO_FX, "egg_hugger2", None, {"fit": (44, 44)})],
+        },
+    },
     "resin-wall": {
         "sequences": {
             "idle": [(RESIN_WALL, "resin-wall-255")],
@@ -312,10 +798,60 @@ UNITS = {
             "icon": [(XENO_2X2, "evotower", None, {"fit": (44, 44), "frames": (0, 1)})],
         },
     },
+    "forward-hive": {
+        "sequences": {
+            "idle": [(XENO_2X2, "orb_idle")],
+            "icon": [(XENO_2X2, "orb_idle", None, {"fit": (44, 44), "frames": (0, 1)})],
+        },
+    },
+    # The tunnel mouth: TGMC's hole in the ground.
+    "tunnel": {
+        "sequences": {
+            "idle": [(XENO_FX, "hole")],
+            "icon": [(XENO_FX, "hole", None, {"fit": (44, 44), "frames": (0, 1)})],
+        },
+    },
+    "resin-trap": {
+        "sequences": {
+            "idle": [(WEEDS, "weednode0")],
+            "icon": [(WEEDS, "weednode0", None, {"fit": (44, 44), "frames": (0, 1)})],
+        },
+    },
     "maturity-tower": {
         "sequences": {
             "idle": [(XENO_2X2, "maturitytower")],
             "icon": [(XENO_2X2, "maturitytower", None, {"fit": (44, 44), "frames": (0, 1)})],
+        },
+    },
+    # Facehugger: scuttles on its legs, and shows its leaping pose while it attacks. The embryo's host is a marine.
+    "facehugger": {
+        "sequences": {
+            "stand": [(XENO_FX, "facehugger_inactive")],
+            "run": [(XENO_FX, "facehugger")],
+            "attack": [(XENO_FX, "facehugger_thrown")],
+            "die": [(XENO_FX, "facehugger_dead")],
+            "die-gib": "die",
+            "icon": "stand:S",
+        },
+    },
+    # Larva: TGMC draws it in one still pose per facing, so the crawl is that pose wriggling.
+    "larva": {
+        "sequences": {
+            "stand": [(LARVA, "Larva")],
+            "run": [(LARVA, "Larva Moving", None, {"bob": 4, "tick": 90})],
+            "attack": "stand",
+            "die": [(LARVA, "Larva Dead")],
+            "die-gib": [(LARVA, "larva_gib", None, {"tick": 70})],
+            "icon": "stand:S",
+        },
+    },
+    # Infestation and evolving effects, named by the C# traits (InfestableInfo, EvolvesInfo).
+    "fx-infest": {
+        "sequences": {
+            "burst": [(XENO_FX, "burst_stand", None, {"side": "S", "size": 64, "tick": 80})],
+            "cure": [(FX32, "sparkle", None, {"size": 64, "tick": 60})],
+            "evolve": [(XENO_FX, "egg exploding", None, {"size": 64, "tick": 70})],
+            "devolve": [(XENO_FX, "egg opening", None, {"size": 64, "tick": 70})],
         },
     },
     # Projectile images. Weapons refer to these by name (Bullet Image:), not as actors.
@@ -328,6 +864,17 @@ UNITS = {
         "sequences": {
             "idle": [(PROJECTILES, "bullet", None, {"facings": 16})],
             "large": [(PROJECTILES, "bullet_large", None, {"facings": 16})],
+        },
+    },
+    # Rockets (SADAR, the mech's RPG and anti-armour missile): the art points up, so 16 turned copies fly along the shot.
+    # A spent cartridge case, flung from a rifle (EjectsCasings in tgmc/code/Casings.cs); it spins by turning through the 8 facings.
+    "fx-casing": {
+        "sequences": {"idle": [(CASINGS, "casing", None, {"facings": 8})]},
+    },
+    "fx-rocket": {
+        "sequences": {
+            "idle": [(PROJECTILES, "rpg_he", None, {"facings": 16})],
+            "large": [(PROJECTILES, "missile", None, {"facings": 16})],
         },
     },
     "fx-acid": {
@@ -344,6 +891,8 @@ UNITS = {
             "gore": [(XENO_FX, "splatter", None, {"tick": 70})],
             "heal": [(FX32, "sparkle", None, {"tick": 60})],
             "burst": [(FX32, "explosion", None, {"tick": 40})],
+            "dust": [(FX32, "landslide_dust", None, {"tick": 70})],
+            "ricochet": [(FX32, "sparks", None, {"tick": 40})],
         },
     },
     # The 65-frame TGMC explosions are a fireball that fades into smoke; every third frame at one tick each is about a second
@@ -351,10 +900,79 @@ UNITS = {
         "sequences": {
             "grenade": [(FX64, "explosion", None, {"frames": (0, 65, 3), "tick": 40})],
             "small": [(FX64, "explosion", None, {"frames": (0, 40, 4), "tick": 40})],
+            "fireball": [(FX64, "fireball_explosion", None, {"tick": 55})],
         },
     },
     "fx-blast-big": {
         "sequences": {"big": [(FX96, "explosion", None, {"frames": (0, 65, 3), "tick": 40})]},
+    },
+    # A mortar shell (about 5 tiles across, TGMC's 5 tile outer blast) and a howitzer shell (about 7), each with the dust
+    # that hangs over the ground afterwards. One sheet per size.
+    "fx-blast-mortar": {
+        "sequences": {"boom": [(FX96, "explosion", None, {"frames": (0, 65, 3), "tick": 40, "size": 160})]},
+    },
+    "fx-blast-howi": {
+        "sequences": {"boom": [(FX96, "explosion", None, {"frames": (0, 65, 3), "tick": 40, "size": 224})]},
+    },
+    "fx-dust-mortar": {
+        "sequences": {"dust": [(FX32, "landslide_dust", None, {"tick": 120, "size": 160})]},
+    },
+    "fx-dust-howi": {
+        "sequences": {"dust": [(FX32, "landslide_dust", None, {"tick": 120, "size": 224})]},
+    },
+    # Smoke that drifts off a badly damaged building (WithDamageOverlay in structures.yaml)
+    "fx-smoke": {
+        "sequences": {"loop": [(FX32, "smoke", None, {"side": "S", "tick": 90})]},
+    },
+    # Burning ground left by napalm and lasers (CAS ammo in structures.yaml)
+    "fx-fire": {
+        "sequences": {"burn": [(FIRE, "red_3", None, {"tick": 140})]},
+    },
+    # Flames the flamer leaves on the ground (the flame-patch actor in units.yaml): a looping fire that burns for several seconds.
+    "flame-patch": {
+        "sequences": {"idle": [(FIRE, "red_3", None, {"tick": 100})]},
+    },
+    # A cloud of gas that hangs over the ground (the gas-cloud actor in units.yaml): TGMC's chemical smoke, tinted green.
+    "gas-cloud": {
+        "sequences": {"idle": [(CHEMSMOKE, "", (190, 255, 120), {"side": "S", "size": 128, "tick": 120})]},
+    },
+    # Blood on the floor where a marine is hit and while a badly hurt one walks (xenos leave green blood, fx-blood-xeno) (the Bleeds trait in tgmc/code/Blood.cs): TGMC's floor blood
+    # sprites tinted red, each lying for about half a minute, drawn under the units.
+    "fx-blood": {
+        "zoffset": -1023,
+        "sequences": {
+            "small1": [(BLOOD, "mfloor1", (150, 14, 14), {"tick": 25000})],
+            "small2": [(BLOOD, "mfloor2", (150, 14, 14), {"tick": 25000})],
+            "small3": [(BLOOD, "mfloor3", (150, 14, 14), {"tick": 25000})],
+            "small4": [(BLOOD, "mfloor4", (150, 14, 14), {"tick": 25000})],
+            "small5": [(BLOOD, "mfloor5", (150, 14, 14), {"tick": 25000})],
+            "small6": [(BLOOD, "mfloor6", (150, 14, 14), {"tick": 25000})],
+            "small7": [(BLOOD, "mfloor7", (150, 14, 14), {"tick": 25000})],
+            "big1": [(BLOOD, "splatter1", (150, 14, 14), {"tick": 30000})],
+            "big2": [(BLOOD, "splatter2", (150, 14, 14), {"tick": 30000})],
+            "big3": [(BLOOD, "splatter3", (150, 14, 14), {"tick": 30000})],
+            "big4": [(BLOOD, "splatter4", (150, 14, 14), {"tick": 30000})],
+            "big5": [(BLOOD, "splatter5", (150, 14, 14), {"tick": 30000})],
+            "big6": [(BLOOD, "splatter6", (150, 14, 14), {"tick": 30000})],
+        },
+    },
+    "fx-blood-xeno": {
+        "zoffset": -1023,
+        "sequences": {
+            "small1": [(BLOOD, "mfloor1", (110, 210, 40), {"tick": 25000})],
+            "small2": [(BLOOD, "mfloor2", (110, 210, 40), {"tick": 25000})],
+            "small3": [(BLOOD, "mfloor3", (110, 210, 40), {"tick": 25000})],
+            "small4": [(BLOOD, "mfloor4", (110, 210, 40), {"tick": 25000})],
+            "small5": [(BLOOD, "mfloor5", (110, 210, 40), {"tick": 25000})],
+            "small6": [(BLOOD, "mfloor6", (110, 210, 40), {"tick": 25000})],
+            "small7": [(BLOOD, "mfloor7", (110, 210, 40), {"tick": 25000})],
+            "big1": [(BLOOD, "splatter1", (110, 210, 40), {"tick": 30000})],
+            "big2": [(BLOOD, "splatter2", (110, 210, 40), {"tick": 30000})],
+            "big3": [(BLOOD, "splatter3", (110, 210, 40), {"tick": 30000})],
+            "big4": [(BLOOD, "splatter4", (110, 210, 40), {"tick": 30000})],
+            "big5": [(BLOOD, "splatter5", (110, 210, 40), {"tick": 30000})],
+            "big6": [(BLOOD, "splatter6", (110, 210, 40), {"tick": 30000})],
+        },
     },
     "fx-slam": {
         "sequences": {"slam": [(HEAVY_IMPACT, "heavyimpact", None, {"tick": 60})]},
@@ -379,7 +997,16 @@ def team_layer(layer, rgb):
 
 
 # Xeno units take the xeno team colour on every layer
-XENO_UNITS = ["runner", "hunter", "sentinel", "drone", "warrior", "queen"]
+# A marine that dies topples over rather than becoming a husk: any unit whose stand is the marine stack and die is still the husk.
+for _unit in UNITS.values():
+    _seqs = _unit["sequences"]
+    if _seqs.get("die") == [(HUMAN, "husk")] and isinstance(_seqs.get("stand"), list) and _seqs["stand"][0][1] == "body_m":
+        _seqs["die"] = fallen(_seqs["stand"])
+        # The same pose, held: a marine knocked flat by a facehugger lies on his side until it lets go.
+        _first = _seqs["stand"][0]
+        _seqs["down"] = [(_first[0], _first[1], None, {**(_first[3] if len(_first) > 3 else {}), "fall": 6, "last": True})] + _seqs["stand"][1:]
+
+XENO_UNITS = ["runner", "hunter", "sentinel", "drone", "warrior", "queen", "facehugger", "larva"] + ["spitter", "praetorian", "crusher", "ravager", "defiler", "boiler", "carrier", "warlock", "shrike", "widow", "wraith", "bull", "behemoth"]
 for _unit in XENO_UNITS:
     _seqs = UNITS[_unit]["sequences"]
     for _name, _value in _seqs.items():
@@ -405,7 +1032,7 @@ def _layer_images(dmi, state, tint=None, opts=None):
     if "frames" in opts:
         frames = frames[slice(*opts["frames"])]
     dirs = dmi.state(state)["dirs"]
-    if dirs == 1 and "facings" in opts:
+    if dirs in (1, 8) and "facings" in opts:  # an 8-dir state is turned from its first (south) direction too
         count = opts["facings"]
         base = [tinted(fr[0], tint) for fr in frames]
         return {i: [img.rotate(-(opts.get("rotate", 0) + i * 360 / count), resample=Image.BICUBIC) for img in base]
@@ -433,6 +1060,20 @@ def layer_images(dmi, state, tint=None, opts=None):
     size = (opts or {}).get("size")
     if size:
         sides = {k: [img.resize((size, size), Image.LANCZOS) for img in frames] for k, frames in sides.items()}
+    pad = (opts or {}).get("pad")
+    if pad:  # centre on a transparent canvas of this size, feet at the bottom: layers from different sheets then line up
+        def padded(img):
+            canvas = Image.new("RGBA", tuple(pad), (0, 0, 0, 0))
+            canvas.alpha_composite(img.convert("RGBA"), ((pad[0] - img.width) // 2, pad[1] - img.height))
+            return canvas
+        sides = {k: [padded(img) for img in frames] for k, frames in sides.items()}
+    centre = (opts or {}).get("centre")
+    if centre:  # centre on a transparent canvas of this size, so a 32px body lines up under a 64px in-hand gun
+        sides = {k: [pad_to(img, centre) for img in frames] for k, frames in sides.items()}
+    scale = (opts or {}).get("scale")
+    if scale:
+        sides = {k: [img.resize((round(img.width * scale), round(img.height * scale)), Image.LANCZOS) for img in frames]
+                 for k, frames in sides.items()}
     fit = (opts or {}).get("fit")
     if fit:  # shrink to fit a (w, h) box, keeping the aspect ratio, centred on a transparent cell of that size
         def fitted(img):
@@ -473,6 +1114,23 @@ def fade_frames(img, count):
     for i in range(count):
         r, g, b, a = img.convert("RGBA").split()
         frames.append(Image.merge("RGBA", (r, g, b, a.point(lambda v, i=i: round(v * (count - i) / count)))))
+    return frames
+
+
+def fall_frames(img, count):
+    """`count` copies of img turning clockwise from upright to lying on its side (90 degrees), the last one held."""
+    return [img.rotate(-90 * i / (count - 1), resample=Image.BICUBIC) for i in range(count)]
+
+
+def bob_frames(img, count, height=3, tilt=8):
+    """`count` copies of img hopping and wriggling in a loop: it rises and falls once and tilts both ways."""
+    frames = []
+    for i in range(count):
+        lift = round(height * math.sin(math.pi * i / count))
+        turned = img.rotate(tilt * math.sin(2 * math.pi * i / count), resample=Image.BICUBIC)
+        cell = Image.new("RGBA", img.size, (0, 0, 0, 0))
+        cell.paste(turned, (0, -lift), turned)
+        frames.append(cell)
     return frames
 
 
@@ -520,7 +1178,16 @@ def render_sequences(tgmc, sequences, cell=None):
         first_opts = layer_specs[0][3] if len(layer_specs[0]) > 3 else {}
         if "fade" in first_opts:  # a still pose that fades out over N frames
             sides = {k: fade_frames(frames[0], first_opts["fade"]) for k, frames in sides.items()}
+        if "fall" in first_opts:  # a still pose that topples onto its side over N frames
+            sides = {k: fall_frames(frames[0], first_opts["fall"]) for k, frames in sides.items()}
+        if first_opts.get("last"):  # keep only the final frame, for a pose held after its animation
+            sides = {k: frames[-1:] for k, frames in sides.items()}
+        if "bob" in first_opts:  # a still pose that hops and wriggles over N frames, for a crawl
+            sides = {k: bob_frames(frames[0], first_opts["bob"]) for k, frames in sides.items()}
         size = (dmis[0][0].icon_w, dmis[0][0].icon_h)
+        if "pad" in first_opts:
+            factor = first_opts.get("scale", 1)
+            size = (round(first_opts["pad"][0] * factor), round(first_opts["pad"][1] * factor))
         if "size" in first_opts:
             size = (first_opts["size"], first_opts["size"])
         if "fit" in first_opts:
@@ -607,13 +1274,16 @@ def build_unit(tgmc, unit, spec, out_dir):
 
     lines = ["# Generated by mod/build_sprites.py from TGMC art. Do not edit.",
              f"{unit}:", "\tDefaults:", f"\t\tFilename: sprites/{unit}.png"]
+    if "zoffset" in spec:
+        lines.append(f"\t\tZOffset: {spec['zoffset']}")
     for seq_name, start, length, facings, tick, stride in seq_defs:
         lines.append(f"\t{seq_name}:")
         lines.append(f"\t\tStart: {start}")
         if length != 1:
             lines.append(f"\t\tLength: {length}")
         if facings != 1:
-            lines.append(f"\t\tFacings: {facings}")
+            # OpenRA's facing angle grows counter-clockwise from north; the sheets are laid out clockwise, so reverse them.
+            lines.append(f"\t\tFacings: -{facings}")
         if stride is not None:
             lines.append(f"\t\tStride: {stride}")
         if tick is not None:
@@ -633,16 +1303,128 @@ def build_unit(tgmc, unit, spec, out_dir):
             "sequences": [{"name": n, "start": s, "length": l, "facings": fa, "tick": t} for n, s, l, fa, t, _ in seq_defs]}
 
 
+# The Condor, TGMC's CAS jet. It is no single sprite: the jet is a jigsaw of 32px tiles laid out by _maps/shuttles/casplane.dmm,
+# each tile a turf or structure whose icon state is set in cas_plane_parts.dm. compose_condor reads both and puts the jet
+# back together, nose up. build_condor then turns it into 16 facings and 16 shadow cells for the CAS strike's flyby.
+CONDOR_FILES = ["icons/turf/cas.dmi", "icons/obj/structures/cas_cockpit.dmi", "_maps/shuttles/casplane.dmm",
+                "code/game/objects/structures/cas_plane_parts.dm"]
+
+
+def compose_condor(tgmc):
+    import re
+    read = lambda rel: open(os.path.join(tgmc, rel), encoding="utf-8").read()
+    parts, dmm = read(CONDOR_FILES[3]), read(CONDOR_FILES[2])
+
+    states, overlays, current = {}, {}, None
+    for line in parts.splitlines():
+        m = re.match(r"^(/(?:turf|obj)/[\w/]+)\s*$", line)
+        if m:
+            current = m.group(1)
+            continue
+        m = re.match(r'^\s+icon_state = "([^"]+)"', line)
+        if m and current:
+            states.setdefault(current, m.group(1))
+    current = None
+    for line in parts.splitlines():
+        m = re.match(r"^(/(?:turf|obj)/[\w/]+)/Initialize", line)
+        if m:
+            current = m.group(1)
+            overlays.setdefault(current, [])
+            continue
+        m = re.search(r"image\('icons/turf/cas.dmi', src, \"([^\"]+)\"", line)
+        if m and current:
+            overlays[current].append([m.group(1), 0, 0])
+            continue
+        m = re.search(r"overlay\.pixel_([xy]) = (-?\d+)", line)
+        if m and current and overlays.get(current):
+            overlays[current][-1][1 if m.group(1) == "x" else 2] = int(m.group(2))
+
+    keys, key, buf = {}, None, []
+    for line in dmm.splitlines():
+        m = re.match(r'^"(\w+)" = \($', line)
+        if m:
+            key, buf = m.group(1), []
+            continue
+        if key:
+            buf.append(line)
+            if line.startswith("/area") and line.rstrip().endswith(")"):
+                items = []
+                for typ, attrs in re.findall(r"(/(?:turf|obj)/[\w/]+)(\{[^}]*\})?", "\n".join(buf)):
+                    d = re.search(r"dir = (\d+)", attrs)
+                    items.append((typ, int(d.group(1)) if d else 2))
+                keys[key], key = items, None
+    columns = {int(m.group(1)): m.group(4).split("\n")
+               for m in re.finditer(r'^\((\d+),(\d+),(\d+)\) = \{"\n(.*?)\n"\}', dmm, re.S | re.M)}
+    width, height = max(columns), len(columns[1])
+
+    cas = tgmc_dmi.Dmi(os.path.join(tgmc, CONDOR_FILES[0]))
+    dir_index = {2: 0, 1: 1, 4: 2, 8: 3}   # TGMC's S, N, E, W
+
+    def tile(state, direction):
+        if not cas.has_state(state):
+            return None
+        index = dir_index.get(direction, 0) if cas.state(state)["dirs"] >= 4 else 0
+        return cas.frames(state)[0][index]
+
+    canvas = Image.new("RGBA", (width * 32 + 96, height * 32 + 96), (0, 0, 0, 0))
+
+    def put(img, x, y):
+        if img is not None:
+            canvas.alpha_composite(img.convert("RGBA"), (x + 48, y + 48))
+
+    skip = ("/turf/open", "template_noop", "attach_point", "docking", "telecomms")
+    for x in range(1, width + 1):
+        for row, tile_key in enumerate(columns[x]):
+            for typ, direction in keys.get(tile_key, []):
+                if any(s in typ for s in skip):
+                    continue
+                alt = typ.replace("/obj/structure/caspart", "/turf/closed/shuttle/cas")
+                state = states.get(typ) or states.get(alt)
+                if state is None:
+                    continue   # the pilot's chair: hidden under the canopy anyway
+                px, py = (x - 1) * 32, row * 32
+                put(tile(state, direction), px, py)
+                for name, dx, dy in overlays.get(typ, []) + overlays.get(alt, []):
+                    put(tile(name, 2), px + dx, py - dy)
+    canopy = tgmc_dmi.Dmi(os.path.join(tgmc, CONDOR_FILES[1])).frames("cockpit_closed")[0][0]
+    put(canopy, 5 * 32 - 16, 32)
+    return canvas.crop(canvas.getbbox())
+
+
+def build_condor(tgmc, out_dir, scale=0.5, facings=16):
+    import math
+    jet = compose_condor(tgmc)
+    jet = jet.resize((max(1, round(jet.width * scale)), max(1, round(jet.height * scale))), Image.LANCZOS)
+    cell = int(math.ceil(math.hypot(jet.width, jet.height) / 2) * 2) + 2
+    cells, shadows = [], []
+    for i in range(facings):
+        turned = jet.rotate(-i * 360 / facings, resample=Image.BICUBIC, expand=True)
+        frame = Image.new("RGBA", (cell, cell), (0, 0, 0, 0))
+        frame.paste(turned, ((cell - turned.width) // 2, (cell - turned.height) // 2), turned)
+        cells.append(frame)
+        r, g, b, a = frame.split()
+        shadows.append(Image.merge("RGBA", (r.point(lambda v: 0), g.point(lambda v: 0), b.point(lambda v: 0),
+                                            a.point(lambda v: round(v * 0.35)))))
+    save_sheet(cells + shadows, (cell, cell), os.path.join(out_dir, "sprites", "condor.png"))
+    lines = ["# Generated by mod/build_sprites.py from TGMC art. Do not edit.", "condor:", "\tDefaults:",
+             "\t\tFilename: sprites/condor.png", "\tidle:", "\t\tStart: 0", f"\t\tFacings: -{facings}",
+             "\tshadow:", f"\t\tStart: {facings}", f"\t\tFacings: -{facings}"]
+    os.makedirs(os.path.join(out_dir, "sequences"), exist_ok=True)
+    with open(os.path.join(out_dir, "sequences", "condor.yaml"), "w", encoding="utf-8", newline="\n") as f:
+        f.write("\n".join(lines) + "\n")
+    return {"unit": "condor", "sheet": "sprites/condor.png", "cell": [cell, cell], "cells": len(cells) + len(shadows)}
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--tgmc", required=True, help="path to a terragov-marine-corps checkout")
     ap.add_argument("--out", default=os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "build", "mod", "tgmc"))
-    ap.add_argument("--units", nargs="*", default=sorted(UNITS))
+    ap.add_argument("--units", nargs="*", default=sorted(UNITS) + ["condor"])
     args = ap.parse_args()
 
     report = []
     for unit in args.units:
-        info = build_unit(args.tgmc, unit, UNITS[unit], args.out)
+        info = build_condor(args.tgmc, args.out) if unit == "condor" else build_unit(args.tgmc, unit, UNITS[unit], args.out)
         report.append(info)
         print(f"{unit}: {info['cells']} cells of {info['cell'][0]}x{info['cell'][1]}px -> {info['sheet']}")
     with open(os.path.join(args.out, "sprites.json"), "w") as f:

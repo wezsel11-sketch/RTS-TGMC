@@ -45,6 +45,7 @@ G = "sound/weapons/guns/fire"
 V = "sound/voice"
 A = "sound/voice/alien"
 EF = "sound/effects"
+M = "sound/weapons/guns/misc"
 
 SOUNDS = {
     # Weapons: rifle (three T-18/M41A shots), sentry, claws, acid
@@ -52,6 +53,40 @@ SOUNDS = {
     "rifle-fire-2": (f"{G}/m41a_1.ogg", "fx"),
     "rifle-fire-3": (f"{G}/m41a_2.ogg", "fx"),
     "sentry-fire": (f"{G}/smartgun1.ogg", "fx"),
+    # One firing sound per weapon, from TGMC's own gun sounds
+    "rifle-fire-4": (f"{G}/m41a_3.ogg", "fx"),
+    "rifle-fire-5": (f"{G}/m41a_4.ogg", "fx"),
+    "mg60-fire-1": (f"{G}/gun_mg60.ogg", "fx"),
+    "mg60-fire-2": (f"{G}/gun_mg60_low.ogg", "fx"),
+    "minigun-fire": (f"{G}/minigun.ogg", "fx"),
+    "sniper-fire-1": (f"{G}/svd1.ogg", "fx"),
+    "sniper-fire-2": (f"{G}/svd2.ogg", "fx"),
+    "sniper-fire-3": (f"{G}/svd3.ogg", "fx"),
+    "sadar-fire-1": (f"{G}/rpg_1.ogg", "fx"),
+    "sadar-fire-2": (f"{G}/rpg_2.ogg", "fx"),
+    "sadar-fire-3": (f"{G}/rpg_3.ogg", "fx"),
+    "mortar-fire": (f"{G}/mortar_fire.ogg", "fx"),
+    "flamer-fire-1": (f"{G}/flamethrower1.ogg", "fx"),
+    "flamer-fire-2": (f"{G}/flamethrower2.ogg", "fx"),
+    "flamer-fire-3": (f"{G}/flamethrower3.ogg", "fx"),
+    "smartgun-fire-1": (f"{G}/smartgun1.ogg", "fx"),
+    "smartgun-fire-2": (f"{G}/smartgun2.ogg", "fx"),
+    "smartgun-fire-3": (f"{G}/smartgun3.ogg", "fx"),
+    "rifle-fire-m412": (f"{G}/M412.ogg", "fx"),
+    "shotgun-fire-1": (f"{G}/shotgun.ogg", "fx"),
+    "shotgun-fire-2": (f"{G}/shotgun_heavy.ogg", "fx"),
+    "smg-fire-1": (f"{G}/mp7.ogg", "fx"),
+    "smg-fire-2": (f"{G}/smg_light.ogg", "fx"),
+    # Reloads
+    "reload-rifle": ("sound/weapons/guns/interact/t18_reload.ogg", "fx"),
+    "reload-mg": ("sound/weapons/guns/interact/v41_reload.ogg", "fx"),
+    "reload-minigun": ("sound/weapons/guns/interact/minigun_reload.ogg", "fx"),
+    "reload-sniper": ("sound/weapons/guns/interact/sniper_reload.ogg", "fx"),
+    "reload-launcher": ("sound/weapons/guns/interact/launcher_reload.ogg", "fx"),
+    "reload-mortar": ("sound/weapons/guns/interact/mortar_reload.ogg", "fx"),
+    "reload-shotgun": ("sound/weapons/guns/interact/shotgun_reload.ogg", "fx"),
+    "reload-smg": ("sound/weapons/guns/interact/smg_reload.ogg", "fx"),
+    "reload-flamer": ("sound/weapons/guns/interact/flamethrower_reload.ogg", "fx"),
     "claw-swipe-1": (f"{W}/alien_claw_flesh1.ogg", "fx"),
     "claw-swipe-2": (f"{W}/alien_claw_flesh2.ogg", "fx"),
     "claw-swipe-3": (f"{W}/alien_claw_flesh3.ogg", "fx"),
@@ -117,6 +152,37 @@ SOUNDS = {
     "xeno-death-1": (f"{A}/death.ogg", "voice"),
     "xeno-death-2": (f"{A}/death2.ogg", "voice"),
     "xeno-death-small": (f"{A}/facehugger_dies.ogg", "voice"),
+    # Infestation and evolving
+    "chestburst-1": (f"{A}/chestburst.ogg", "fx"),
+    "chestburst-2": (f"{A}/chestburst2.ogg", "fx"),
+    "preburst-1": ("sound/voice/human/male/preburst1.ogg", "voice"),
+    "preburst-2": ("sound/voice/human/male/preburst2.ogg", "voice"),
+    "preburst-3": ("sound/voice/human/male/preburst3.ogg", "voice"),
+    "egg-burst": (f"{EF}/alien/egg_burst.ogg", "fx"),
+    "evolve-ready": (f"{EF}/alien/evolve_ready.ogg", "fx"),
+    "new-larva": (f"{EF}/alien/new_larva.ogg", "fx"),
+    # The Condor's CAS strike
+    "condor-flyby": (f"{EF}/casplane_flyby.ogg", "fx", 2.0),
+    "bomb-fall": (f"{EF}/bomb_fall.ogg", "fx"),
+    "ob-incoming": (f"{EF}/OB_incoming.ogg", "fx", 4.0),
+    # Shells and rockets in flight, and the big guns that fire them
+    "mortar-whistle": (f"{M}/mortar_whistle.ogg", "fx", 3.0),
+    "mortar-travel": (f"{M}/mortar_travel.ogg", "fx", 3.0),
+    "mortar-long-whistle": (f"{M}/mortar_long_whistle.ogg", "fx", 4.0),
+    "howitzer-whistle": (f"{M}/howitzer_whistle.ogg", "fx", 4.0),
+    "howitzer-fire": (f"{G}/howitzer_fire.ogg", "fx"),
+    "rocket-whistle": (f"{M}/rocket_whistle.ogg", "fx", 3.0),
+    "rocket-incoming": ("sound/weapons/rocket_incoming.ogg", "fx", 3.0),
+    "rocket-arty-fire": (f"{G}/rocket_arty.ogg", "fx"),
+    "sonic-boom": (f"{EF}/dropship_sonic_boom.ogg", "fx"),
+    # CAS ammo types: the Condor pilot's call-outs, a laser zap, a flare pop and a bigger blast for the heavy bombs
+    "cas-voice-missile": (f"{V}/plane_vws/shot_missile.ogg", "fx"),
+    "cas-voice-bomb": (f"{V}/plane_vws/shot_bomb.ogg", "fx"),
+    "cas-voice-flare": (f"{V}/plane_vws/shot_flare.ogg", "fx"),
+    "laser-zap": (f"{EF}/pred_vision.ogg", "fx"),
+    "flare-pop": ("sound/items/flare.ogg", "fx"),
+    "explosion-huge": (f"{EF}/explosion/large2.ogg", "fx", 1.5),
+    "xeno-screech": (f"{EF}/screech.ogg", "fx"),
     # Interface and alerts
     "ui-click": (f"{EF}/menu_click.ogg", "ui"),
     "ui-deny": ("sound/machines/buzz-two.ogg", "ui"),

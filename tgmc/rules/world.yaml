@@ -9,6 +9,50 @@
 	# Faction-aware, fight-aware music (see the script). A map with its own script lists this one last (make_placeholders.py).
 	LuaScript:
 		Scripts: tgmc|scripts/music.lua
+	SmoothScroll:
+	TgmcOptions:
+	# The lobby's Weather option grants "rain" or "dust" (TgmcOptions in tgmc/code/Options.cs).
+	WeatherOverlay@Rain:
+		RequiresCondition: rain
+		# Clear weather starts with no particles at all (the default would show them fading out for the first seconds).
+		InitialParticlePercentage: 0
+		ParticleDensityFactor: 9
+		ChangingWindLevel: false
+		WindLevels: -3
+		UseSquares: false
+		ParticleSize: 1, 2
+		Gravity: 15, 21
+		ScatterDirection: 0, 0
+		SwingOffset: 0, 0
+		SwingSpeed: 0, 0
+		SwingAmplitude: 0, 0
+		ParticleColors: B8CCE8C0, 9DB4D8B0, D0DEF0C0
+		FadeInTicks: 150
+		FadeOutTicks: 150
+	WeatherOverlay@Dust:
+		RequiresCondition: dust
+		InitialParticlePercentage: 0
+		ParticleDensityFactor: 10
+		ChangingWindLevel: false
+		WindLevels: 14
+		UseSquares: true
+		ParticleSize: 1, 3
+		Gravity: 0.6, 1.4
+		ParticleColors: D8B070A0, C89C5890, E6C48CA0
+		FadeInTicks: 150
+		FadeOutTicks: 150
+	SnapPlacement:
+	# Big blasts (mortar, rocket, CAS strike) rattle the screen.
+	ScreenShaker:
+	# A flash across the screen when a big blast goes off near the middle of it (FlashScreen warheads in weapons.yaml).
+	BlastFlash:
+	# Pings on the minimap: attacks on your base, a facehugged marine, a CAS target.
+	RadarPings:
+	TgmcEventLog:
+	OrderEffects:
+		TerrainFlashImage: moveflsh
+		TerrainFlashSequence: idle
+		TerrainFlashPalette: effect
 	LoadWidgetAtGameStart:
 	CreateMapPlayers:
 	MapOptions:
@@ -37,7 +81,7 @@
 	BuildingInfluence:
 	Locomotor@FOOT:
 		Name: foot
-		SharesCell: true
+		SharesCell: false
 		TerrainSpeeds:
 			Clear: 100
 			Road: 120

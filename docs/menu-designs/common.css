@@ -1,0 +1,5 @@
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:1280px;height:720px;overflow:hidden;font-family:'Lato','DejaVu Sans',sans-serif;color:#e8eef5}
+body{background:#0c1016 url(backdrop.png) center/cover;position:relative}
+.abs{position:absolute}
+.vig{position:absolute;inset:0;background:radial-gradient(ellipse at 30% 40%,transparent 35%,rgba(0,0,0,.72) 100%)}

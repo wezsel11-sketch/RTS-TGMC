@@ -2,9 +2,11 @@
 
 An [OpenRA](https://github.com/OpenRA/OpenRA) mod that uses sprites and sounds from
 [Terra Gov Marine Corps (TGMC)](https://github.com/tgstation/terragov-marine-corps), the
-SS13-based game. It has marine infantry (rifleman, corpsman, engineer, smartgunner, grenadier), marine and xeno
+SS13-based game. It has marine infantry (rifleman, corpsman, engineer, smartgunner, grenadier, machine gunner, sniper,
+SADAR rocketeer, Vali blademan, mortarman, flamer, and the armoured Gungnir heavy gunner and EOD demolitionist, and the Jaeger scout, skirmisher, trooper, ranger and assault), marine and xeno
 structures you build from a Build menu (supply generators, walls, tech), and a TGMC-styled HUD. The xenos have a Runner, a Hunter, an acid-spitting Sentinel, a
-structure-mending Drone and a heavy Warrior.
+structure-mending Drone, a heavy Warrior and a long list of further castes, plus facehuggers and larvae. The mod ships a small C# assembly
+(`tgmc/code`, built into `Tgmc.dll` by `mod/build_mod.sh`) for the things OpenRA's YAML cannot do.
 
 **This repo holds scripts, YAML, and docs only.** No TGMC art or sound, no extracted or
 converted sprites or audio, no `.mix`/`.oramap`, and no OpenRA binaries are committed.
@@ -35,13 +37,14 @@ the commits this mod was tested against (see the top of the script), so a later 
 ## How to play
 
 - **Main menu -> Singleplayer -> Skirmish.** Pick a skirmish map (**Landing Zone**, **Canyon Run**, **Jungle Crossing**, **Close Quarters**, **Great Plains**, plus four converted from TGMC's own maps: **LV-624**, **Big Red**, **Whiskey Outpost**, **Desert Dam**) or **Hold the Line** (marines against waves).
-  In Landing Zone choose a faction for yourself and set the other slot to **Skirmish AI**, then Start Game.
+  In Landing Zone choose a faction for yourself and set the other slot to **Skirmish AI** (Easy, Normal or Hard), then Start Game.
 - **Marines** start with a cryo pod, a vendor and a squad. Click the cryo pod and use the sidebar's *Infantry* tab to train riflemen,
   corpsmen (they heal), engineers (they repair), smartgunners (rapid spread fire) and grenadiers (splash). **Xenos** start with a resin silo and mini silos; use the *Xeno* tab for Runner,
   Hunter, Sentinel (spits acid), Drone (mends structures) and Warrior (wide melee slam).
 - **Building.** Both factions have a **Build** tab (the third button beside the production palette). Click a structure to queue
-  it; when its clock finishes, click its icon again and place it on the map. You can only place within 5 cells of a *builder*,
-  so send one to the site first (its build range is shown while you place):
+  it; when its clock finishes, click its icon again and place it on the map. A ghost of the building follows the cursor, green
+  where it fits and red where it does not. Xenos place within 5 cells of a *builder* or of weeds; marines within 24 cells of any marine
+  structure or Engineer, which is nearly anywhere you have been. So send a builder to the site first (its build range is shown while you place):
   - **Marines**: an **Engineer** builds everything.
   - **Xenos**: a **Drone** builds minor structures (Weed Node, Resin Wall, Resin Turret); the **Queen** builds those and the big
     ones too (Evolution and Maturity Towers, Silos). Train the Queen from a Resin Silo (one at a time); a match starts with one.
@@ -59,6 +62,141 @@ the commits this mod was tested against (see the top of the script), so a later 
 - **Controls** are OpenRA's: left-click or drag to select, right-click to move or attack, `A` then click to attack-move,
   `S` to stop, `Ctrl`+number to group, and right-click a production building to set where new units gather (rally point).
   The game speed option "fastest" is the one the balance tests ran at.
+- **Newer mechanics** (all in `tgmc/code` and the YAML; tested by the `scenario-*` maps):
+  - **Weeds spread by themselves.** A Weed Node grows free walkable weeds around it, out to 3 cells. Weeds extend the xeno build area.
+  - **Fire while moving.** Marines and xenos keep shooting as they walk, but a unit on the move has triple the scatter, so shots at range miss.
+    Rifles fire in bursts of three. Each shot does 85 to 115 percent of its weapon's damage.
+  - **Armour.** Big xeno castes (Warrior, Praetorian, Crusher, Bull, Behemoth) are *Heavy*: rifles and the machine gun do 70 percent, snipers and
+    rockets more. The Gungnir heavy gunner (minigun, 320 HP, slow) takes 55 percent from claws and acid. The EOD demolitionist (high-explosive
+    launcher) takes 25 percent from blasts and 85 percent from claws. **Explosives hurt friendly units**: grenades, the mortar and SADAR.
+  - **Facehuggers.** A Facehugger hunts marines. It latches on, the marine drops for four seconds, then the hugger dies. The marine carries
+    an embryo: after a minute it bursts, dies, and a xeno **Larva** for the infector's side stands in its place, unless a corpsman heals the marine first.
+    Only infantry can be hugged, not turrets or machines.
+  - **Evolve and devolve.** Select a xeno and press the Deploy key (default `F`) to evolve it into the next caste, or `Shift` + Deploy to devolve it.
+    Evolving costs the price difference and needs the target caste's tower; devolving refunds half. The lines are set per caste in `units.yaml`
+    (`Evolves: Next / Previous`): Larva, Runner, Hunter, Warrior, Praetorian, Crusher, Behemoth; Drone, Sentinel, Spitter, Boiler, Defiler; Ravager,
+    Wraith, Shrike, Widow, Bull; Carrier, Warlock.
+  - **Pounce and stun.** Runners and Hunters leap at an enemy they are chasing (5 cells, every 12 seconds) and land a stunning hit. The
+    Crusher's slam staggers marines.
+  - **Magazines.** Every marine reloads: a rifleman holds 30 rounds, a machine gunner 120, a heavy gunner 200, a sniper 10, a rocketeer 3.
+    The reload starts a moment after the last shot and plays TGMC's reload sound. An **Ammo Station** speeds the reload of marines near it.
+  - **Weapons and sounds.** Riflemen each carry a random basic rifle (T-12 assault rifle, T-18 carbine or M412). Engineers have a
+    shotgun, corpsmen a submachine gun, and every weapon has its own TGMC firing sound.
+  - **Xeno abilities.** Runner: Evasion (the first hit it takes darts it aside). Hunter: Stealth (it fades when still; a marine sees it only
+    from 2 cells). Warrior: Lunge. Crusher: Charge. Xenos also age through Mature, Elder and Ancient tiers while the hive has a Maturity Tower.
+  - **Hugger Egg.** A xeno structure that opens when a marine comes near and releases a facehugger, then grows another.
+  - **More buildings.** Marines: **Medbay** (heals nearby marines), **Ammo Station**, **Workshop** (builds the **mech**: 900 HP, about two
+    marines tall, TGMC's medium mech built from its layers. Each one is made to a random preset: assault, flame, support or tow, which
+    differ in accent colours and weapons). Xenos: **Recovery Pylon** (mends nearby xenos), **Gargoyle** (sees far).
+  - **CAS ammo.** An Ordnance Depot carries nine support powers, one per ammo type after TGMC's dropship ammo
+    (`code/game/objects/structures/dropship_ammo.dm`). Click an icon (top left), then a spot; a preview shows where the blasts will land
+    and a pulsing ring marks each one before it hits. TGMC's **Condor** jet flies a line through the spot. Bomb Run (200lb), 30mm Gun Run,
+    Mini-Rockets and the Illumination Flare come with the depot. A **Workshop** adds the Widowmaker missile, Laser Battery, Napalm (a
+    24-second fire), the Fatty cluster missile (a blast, then a ring of eight) and the 1000lb MOAB. Each has its own cooldown, and every
+    blast hurts friendly units. `StrikePattern` and the other fields are in `tgmc/code/Condor.cs`; the weapons are `TGMCCas*` in `weapons.yaml`.
+    The jet is no single TGMC sprite: `mod/build_sprites.py` puts it together from `_maps/shuttles/casplane.dmm` and its 32px tiles.
+  - **Production.** Structures build in about half the old time. Each production building trains a unit of its own at the same time
+    (`MultiProductionQueue`): two cryo pods train two marines side by side, three silos hatch three xenos.
+  - **Facing.** Marines and xenos turn to face what they attack before they fire (`FacingTolerance: 40` in `units.yaml`), and turn faster.
+  - **Armour classes.** The marines come in three weights of Jaeger Mk.II exoskeleton. *Light*: Jaeger Scout (SMG, fast, sees 10 cells, 90) and Jaeger
+    Skirmisher (shotgun, 130). *Medium*: Jaeger Trooper (rifle, takes 12 percent less damage, 140) and Jaeger Ranger (M412, sees 9, takes 8 percent less, 170).
+    *Heavy*: Jaeger Assault (carbine, 240 HP, slow, 280), plus the Gungnir heavy gunner and EOD demolitionist. Heavy armour takes 55 percent from claws
+    and acid. The scout needs nothing, the skirmisher, trooper and ranger an Armory, the assault an Ordnance Depot.
+  - **Smarter AI.** The bot comes in three levels, none of which cheat. *Easy* builds its base and units and waits for big squads. *Normal*
+    also reacts to what it has seen the enemy field (it asks for flamers and machine guns against swarms, rocketeers and demolitionists
+    against heavies, snipers against spitters, and the mirror for xenos), evolves its xenos when cash allows, sends medics to the wounded
+    and infected, pulls badly wounded units back to a medbay, medic or the hive, and calls in CAS on clusters of enemies it can see (never
+    on its own units). *Hard* adds a scout that explores the map and sends smaller squads sooner. Defences, emplacements, traps and the
+    Forward Hive are placed toward the nearest enemy, and a Forward Hive becomes a base the bot builds around.
+  - **Xeno AI.** The skirmish bot hatches the Queen early, builds its Evolution Tower sooner and mixes castes, not runners alone.
+  - **Bodies.** Fallen units lie where they fell for 20 seconds and then fade away (`WithLingeringCorpse`).
+  - **Left and right.** OpenRA's facing angle grows counter-clockwise while the sprite sheets are drawn clockwise, so the generator
+    now writes `Facings: -8` and `-16`. Marines face and aim the right way, and the Condor's nose points along its path.
+  - **Rockets.** The SADAR and the mech's RPG and missile fly straight with a smoke trail (`fx-rocket`); the grenadier still lobs grenades.
+  - **Acid pools.** A dead xeno leaves a pool of acid for six seconds that stings marines standing in it (`acid-pool` in
+    `units.yaml`; the puddle art is drawn by `write_acid_pool`, not TGMC's).
+  - **Flame patches.** Where the flamer's fire lands (and three cells back toward the marine) the ground keeps burning for eight seconds and
+    hurts every unit standing in it, friend or foe (`flame-patch` in `units.yaml`, placed by `SpawnActorWarhead` in `Flames.cs`). The CAS fire
+    effect also burns about twice as long.
+  - **Firing on the move.** Marines, corpsmen, engineers and the other light infantry shoot at enemies they pass while walking a move or
+    attack-move order (`AttackWhileMoving`, within about 70 degrees of their heading). Snipers and machine gunners do not: they stop to shoot
+    (`FireWhileMoving: false`).
+  - **Turning.** Infantry turn about five times faster (`TurnSpeed: 160`), so a move order starts almost at once.
+  - **Emplacements.** The Mortar Emplacement (Armory, range 24, minimum 5) and the Artillery Emplacement (a 2x2 howitzer, Ordnance Depot,
+    range 40, minimum 10, 140 damage, slow reload) are fixed guns that outrange the mortarman. They fire at whatever your units have revealed.
+  - **Barricades face outward.** A cade shows the side that faces away from the nearest friendly building (`FacesOutward`; TGMC draws it from four sides).
+  - **Weeds belong to their node.** Weeds cannot be shot (`TargetTypes: Weeds`); marines have to kill the weed node that grew them,
+    and when it dies its weeds wither away over about five seconds. Hand-placed weeds stay.
+  - **Queen's screech.** Select the Queen and press the Deploy key (F): every marine within 7 cells is stunned for three seconds.
+    It recharges over 36 seconds (a purple bar under the Queen shows it; `Screech` in `tgmc/code/Screech.cs`).
+  - **Buildings fade in.** A building you place fades in over about two seconds (`FadesInOnBuild`); the Codex now also lists what a building unlocks.
+  - **Group grid.** With more than one unit selected, a panel above the selection card shows an icon and health bar for each (up to 16).
+    Click one to select only that unit; Shift-click drops it from the selection.
+  - **Shell casings.** Rifles, carbines, SMGs, shotguns, smartguns, the sniper rifle and the MG60 fling a brass case out of the right
+    side that arcs, spins, lies for three seconds and fades (`EjectsCasings`; the sprite is TGMC's `casings.dmi`, built into `fx-casing`).
+  - **End screen.** When you win or lose, a table shows each player's kills, losses, marines facehugged, xenos evolved and CAS strikes
+    (`MatchStatsLogic`); Close dismisses it.
+  - **Repeat build.** Ctrl-click when you place a building: another one is queued, and the ghost opens again when it is ready. Right-click or Esc ends it.
+  - **Keypad stepping.** KP 8, 2, 4, 6 step the selected units one cell north, south, west and east, and KP 7, 9, 1, 3 step diagonally. Rebind them in Settings.
+  - **Floating numbers.** Damage and healing float up from units (yellow on enemies, red on yours, green for heals); a lobby option
+    switches them off.
+  - **Lobby options.** Before a match the host can switch Explosive Friendly Fire, Facehugger Infestation and Xeno Maturity off, or
+    switch on **Tile-by-Tile Movement**, where a move order walks one cell toward where you click, like stepping in SS13.
+  - **Weather.** A lobby dropdown picks Clear, Rain or a Dust storm: falling rain streaks or wind-blown dust over the map. Only a picture
+    (`WeatherOverlay` in `world.yaml`, switched by `TgmcOptions`). Clear weather starts with no particles (`InitialParticlePercentage: 0`).
+  - **Shells.** Blasts follow TGMC's tile counts: a mortar shell (70 damage, about 5 cells across, reload 100; the emplacement reloads in 80)
+    and the howitzer's shell (150 damage, about 8 cells across, reload 240) are far bigger than before, with a bigger fireball and dust
+    that hangs over the ground afterwards. The SADAR rocket reaches 6 cells.
+    Shells and rockets whistle at the spot where they will land just before they hit, and the howitzer has its own gun report. The Condor
+    roars in as the jet closes on the target, booms as it passes overhead, and each bomb or missile whistles on its way down.
+  - **Boiler.** Xeno artillery: lobs globs of acid 6 to 22 cells (55 damage, wide splash, leaves an acid pool), sees 13 cells. The AI builds it. Its globs also leave a gas cloud.
+  - **Hive powers and tunnels.** Like the marines' CAS, the xenos have powers on the support bar: *Psychic Cure* (Evolution Tower: heals xenos in a
+    9 by 9 area), *Call of the Burrowed* (Evolution Tower: three runners and two hunters burst out of the ground where you point) and *Hive
+    Rage* (Maturity Tower: +35 percent damage and +30 percent speed for 12 seconds). The **Hive Tunnel** (100 requisition, Evolution Tower) comes
+    in pairs, the first two built, then the next two: right-click a tunnel with a xeno and it comes out of the other one. The AI uses the powers.
+  - **Throws and shake.** A Crusher's charge hurls a marine five cells away and a Warrior's lunge three: he flies in an arc, takes damage when he lands
+    (more if a wall or unit stops him early) and stays stunned. Big blasts shake the screen harder the closer they are and, for the biggest, flash it.
+  - **Caste abilities and controls.** Selected xenos get two ability buttons on the command card (keys R and T): the Ravager has Rage and Endure, the
+    Praetorian Acid Spray, the Warrior Fling (throws the nearest marine six cells), and the Carrier throws Facehuggers (it holds four and grows a new
+    one every 24 seconds). New selection keys: I selects every idle combat unit, U every wounded or infected one, and Ctrl+W every unit of the
+    selected type anywhere on the map.
+  - **Bleeding.** Marines leave red blood and xenos green blood on the floor where they are hit, bigger for heavy hits, and drip while badly hurt. Blood lies for about half a minute.
+  - **Terminal menus.** The main menu, lobby, settings and dialogs use a green-on-black terminal look with an intel panel; the in-game HUD stays blue glass.
+    `docs/menu-designs/` keeps the three templates it was chosen from.
+  - **Lighting.** Muzzle flashes, blasts, acid splashes, rockets in flight, burning ground, acid pools and gas clouds give off a soft additive glow
+    that brightens the ground around them (`fx-light` in `tgmc/sequences/misc.yaml`, `MuzzleGlow` in `tgmc/code/Lights.cs`).
+  - **Gas clouds.** The Defiler lobs canisters (10 cells) that burst into a green cloud of neurotoxin lasting 12 seconds. Enemies inside take
+    4 damage a few times a second and move at 60 percent speed. Boiler globs leave a cloud too.
+  - **Expanding as xenos.** The **Forward Hive** (Evolution Tower, up to 4, 500 requisition) can go at the edge of your weeds, far from the Queen:
+    it spreads weeds out to 6 cells, opens the build area for major structures, trains xenos, sees 10 cells, shows on the radar and
+    pays a little requisition. Marines need not destroy it to win. The **Resin Trap** (60) holds a marine who comes close for three
+    seconds and stings him, then recovers in ten seconds (`scenario-hive`).
+  - **Evade.** The Runner's evade lasts 1.6 seconds with a 16 second cooldown and takes 30 percent less damage (it was 2.4 s, 10 s and 60 percent).
+  - **Helmets** carry the same blue team tint as the armour.
+  - **Building ghost.** The ghost of a building snaps to the nearest cell within 4 where it fits and is allowed.
+  - **Selection.** Selected units and buildings get brackets, a health bar and a green ring that breathes, plus bars for ammunition, the
+    embryo's growth, ability recharge and xeno age. The sidebar card shows a portrait, health, ammunition, xeno tier and infection.
+  - **HUD.**
+    - A top bar shows income per minute and army size (and waiting larvae).
+    - The `?` button or F1 opens a controls overlay.
+    - An event log on the left lists facehuggings, bursts, evolutions, hatched eggs and CAS strikes; click one to jump there.
+    - The minimap runs whenever you own a building and pings infections and CAS targets.
+    - The selection card has a health bar and Evolve, Devolve, Stop and Scatter buttons.
+    - Words over a unit's head show FACEHUGGED, INFECTED, STUNNED and EVADING, and RELOADING, LOW AMMO, a xeno's tier or a ready egg when selected.
+    - A building ghost that cannot be placed says why.
+  - **Corpsmen and Medbays** go for an infected marine first, even at full health.
+  - **Command card.**
+    - Stance buttons: Attack, Guard, Return and Hold.
+    - **To medic** sends the hurt and infected among the selection to the nearest Medbay or corpsman.
+    - **Infected** selects every infected marine you own.
+    - The status line shows ability cooldowns (Leap, Evade).
+  - **Codex** (top bar button): every unit and building with its portrait, description and stats read live from the rules
+    (health, cost, speed, armour, each weapon's damage, range and damage per second, prerequisites and evolution line).
+  - **Lobby:** a Burst Time dropdown (30 s to 2 min) for facehugged marines.
+  - Units flash white when a bullet or claw hits them.
+  - **Effects.** A shot that misses kicks up dust where it lands. Rockets, mortars and bombs have their own blasts and shake the screen.
+    Every weapon has its own muzzle flash and TGMC firing sound.
+  - Smooth camera scrolling, a click flash on move orders, and marines that topple over when they die.
 - **Win** by destroying every enemy structure and unit that counts (Conquest). In Hold the Line you win by destroying the
   sixth wave and lose when your units are gone.
 
@@ -167,6 +305,10 @@ ground, so they play differently without any new rules (`SKIRMISH_MAPS` in `mod/
 
 ### Maps from TGMC
 
+Each converted map also comes at TGMC's own size (**LV-624 (full size)**, **Big Red (full size)**, **Whiskey Outpost (full size)**, **Desert Dam
+(full size)**, one TGMC tile per cell, up to 245x232). Where TGMC's walls cut the two bases apart at that size, the converter digs the cheapest
+tunnel between them so the match can be won.
+
 `mod/tgmc_dmm.py` reads TGMC's own `.dmm` map files and shrinks each one into an OpenRA skirmish map, so the ground is TGMC's. This only
 happens at build time, from the TGMC checkout (`make_placeholders.py --tgmc`); no converted map is committed. Only the turfs are read: walls,
 cave rock, space and dense jungle become **rock** (impassable), deep water becomes impassable water, shallow river and coast become a ford,
@@ -271,12 +413,25 @@ The effect sprites are TGMC art too (`fx-*` images in `build_sprites.py`) and ar
   `mod/test_effects.py` tests the sprite builder's fade option and padding and the death-type lint; `build_mod.sh` runs it.
   `scenario-gib` kills every unit type, some as an explosion would.
 
+## The HUD
+
+The HUD is a glass dock along the bottom (minimap, selection card with a group grid, command buttons), a Build panel on the left (the
+production tabs and icons), a resource bar on top (requisition, income, army, clock), the CAS bin beside the Build panel, the event log
+top right, and Codex, help and Menu buttons in the corner (`tgmc/chrome/ingame-player.yaml`). The panels are rounded dark-blue glass tiles
+drawn by `mod/make_chrome.py`. The map fills the whole window under it. Evolve and Devolve show only for the xeno side; Medic and Infected
+only for the marines. `docs/hud-designs/` keeps the three mockups the dock was chosen from (A bottom dock, B refined sidebar, C minimal).
+
 ## Known gaps
 
 - A gib leaves no corpse or blood decal and no particles: an OpenRA death animation ends with its sequence. TGMC's human
   gib animation opens on an unclothed body, so a marine in armour pops to a bare body as it bursts.
-- The marine dies to TGMC's `husk` body, which stands upright (TGMC has no lying-down human). Its `run` sequence aliases
-  `stand`, because TGMC's human sheet has only a standing state.
+- TGMC has no lying-down human, so a dying marine, and one a facehugger knocked flat, is TGMC's standing body turned onto its side
+  (`fall` and `last` options in `mod/build_sprites.py`). Its `run` sequence aliases `stand`, because TGMC's human sheet has only a standing state.
+- The mech is TGMC's own medium mech (`icons/mecha/mech_medium.dmi`: a dark skeleton plus two paint masks, tinted here) with weapon
+  overlays from `mech_core_weapons.dmi`. The Jaeger Mk.II exoskeletons (greyscale chest plate and helmet, tinted with the team colour) are the marines' armour: Scout, Skirmisher and Infantry/Trooper patterns for the new light and medium marines, Gungnir for the heavy gunner, EOD for the demolitionist, Assault for the assault marine. SOM armour is not used. The mortarman is a rifleman sprite.
+- The pounce, the stun, the facehugger drop and the egg are only checked by scenarios (`scenario-pounce`, `scenario-infest`,
+  `scenario-infest-cure`, `scenario-egg`) that count health and units. The building ghost snapping, tile-by-tile movement, the lobby
+  options, the CAS icon, the selection card, repeat build and the keypad stepping were built and load without errors, but nobody has used them with a mouse.
 - Units are coloured by team, not by player: marine cloth is blue and xeno units are red, a fixed multiply tint in
   `mod/build_sprites.py` (`MARINE_TEAM`, `XENO_TEAM`). Two players on one side share a colour. Per-player remapping is off:
   the sprites are RGBA, so the `player` palette doesn't recolour them.
@@ -289,7 +444,7 @@ The effect sprites are TGMC art too (`fx-*` images in `build_sprites.py`) and ar
 - Acid is now a projectile, so a fast runner can still outrun a glob. Effects have not been tuned by eye in a long match.
 - Terrain is flat tiles from TGMC's `jungle.dmi`, `ground_map.dmi` and `cave.dmi`: grass (two variants), dirt road, a walkable
   ford, impassable water and impassable rock. There are no edge or transition tiles, so shorelines are hard. The test field is all grass.
-- The HUD is a command sidebar (radar, production palette with an Infantry and a Xeno tab, requisition, menu button); it reads the same for either faction. There is no selection readout, as that would need C#.
+- The HUD is a command sidebar (radar, production palette with an Infantry and a Xeno tab, requisition, menu button); it reads the same for either faction. There is no selection readout.
   Production icons are the units' front-facing sprite. The clock overlay is still a placeholder. The production tab icons are
   pictograms (rifle, claw, hammer) drawn by `mod/make_chrome.py`. The readout card under the palette has a Build-range hint,
   "Builders place within 5 cells", shown on every tab.
@@ -319,8 +474,8 @@ The effect sprites are TGMC art too (`fx-*` images in `build_sprites.py`) and ar
   four runs, finishing the last wave (16 Runners, 10 Hunters, 8 Sentinels) with about 30 units and 2 or 3 of their 5
   buildings. The waves attack-move to the marine base because `Hunt()` cannot see across the map for a scripted player.
 - Tuning so far: the marine queue takes cost x 60% x 350% ticks (a rifleman is about 8 s) and the xeno queue x 250% (a Runner is about 3 s). Marines have
-  120 HP and rifles do 14 every 15 ticks at 6 cells; Runners have 120 HP (raised from 100 so the early push survives rifles), run at speed 115 and claws do 20 every 14 ticks;
-  Hunters 130 HP; sentries do 10; the corpsman heals 20 every 60 ticks.
+  120 HP and rifles fire three 12-damage rounds every 42 ticks at 6 cells; Runners have 120 HP (raised from 100 so the early push survives rifles), run at speed 144 and claws do 20 every 14 ticks;
+  Hunters 130 HP; sentries do 10; the corpsman heals 20 every 36 ticks.
   Base income is 6 cash every 2 s from the vendor and silo and 3 from a mini silo (it was 15 and 5 before the Build tab); a Miner gives 8 and a Weed Node 7.
   None of this has had real play time.
 - `mod/setup.sh` was run from an empty directory on a fresh clone (it installed .NET, built OpenRA, made the sparse TGMC clone, built

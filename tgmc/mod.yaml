@@ -33,22 +33,63 @@ Sequences:
 	tgmc|sequences/medic.yaml
 	tgmc|sequences/engineer.yaml
 	tgmc|sequences/sentry-turret.yaml
+	tgmc|sequences/mortar-emplacement.yaml
+	tgmc|sequences/artillery-emplacement.yaml
 	tgmc|sequences/cryo-pod.yaml
 	tgmc|sequences/vendor.yaml
 	tgmc|sequences/resin-turret.yaml
 	tgmc|sequences/resin-silo.yaml
 	tgmc|sequences/mini-silo.yaml
 	tgmc|sequences/smartgunner.yaml
+	tgmc|sequences/scout.yaml
+	tgmc|sequences/skirmisher.yaml
+	tgmc|sequences/trooper.yaml
+	tgmc|sequences/ranger.yaml
+	tgmc|sequences/assault.yaml
 	tgmc|sequences/grenadier.yaml
+	tgmc|sequences/heavygunner.yaml
+	tgmc|sequences/demolitionist.yaml
+	tgmc|sequences/machinegunner.yaml
+	tgmc|sequences/sniper.yaml
+	tgmc|sequences/flamer.yaml
+	tgmc|sequences/rocketeer.yaml
+	tgmc|sequences/blademan.yaml
+	tgmc|sequences/mortarman.yaml
+	tgmc|sequences/mech.yaml
+	tgmc|sequences/medbay.yaml
+	tgmc|sequences/ammo-station.yaml
+	tgmc|sequences/workshop.yaml
+	tgmc|sequences/recovery-pylon.yaml
+	tgmc|sequences/gargoyle.yaml
 	tgmc|sequences/warrior.yaml
+	tgmc|sequences/spitter.yaml
+	tgmc|sequences/praetorian.yaml
+	tgmc|sequences/crusher.yaml
+	tgmc|sequences/ravager.yaml
+	tgmc|sequences/defiler.yaml
+	tgmc|sequences/boiler.yaml
+	tgmc|sequences/carrier.yaml
+	tgmc|sequences/warlock.yaml
+	tgmc|sequences/shrike.yaml
+	tgmc|sequences/widow.yaml
+	tgmc|sequences/wraith.yaml
+	tgmc|sequences/bull.yaml
+	tgmc|sequences/behemoth.yaml
 	tgmc|sequences/queen.yaml
+	tgmc|sequences/facehugger.yaml
+	tgmc|sequences/larva.yaml
 	tgmc|sequences/miner.yaml
 	tgmc|sequences/cade.yaml
 	tgmc|sequences/armory.yaml
 	tgmc|sequences/ordnance-depot.yaml
 	tgmc|sequences/weed-node.yaml
+	tgmc|sequences/weeds.yaml
 	tgmc|sequences/resin-wall.yaml
+	tgmc|sequences/egg.yaml
 	tgmc|sequences/evolution-tower.yaml
+	tgmc|sequences/forward-hive.yaml
+	tgmc|sequences/resin-trap.yaml
+	tgmc|sequences/tunnel.yaml
 	tgmc|sequences/maturity-tower.yaml
 	tgmc|sequences/grenade.yaml
 	tgmc|sequences/fx-bullet.yaml
@@ -56,9 +97,23 @@ Sequences:
 	tgmc|sequences/fx-impact.yaml
 	tgmc|sequences/fx-blast.yaml
 	tgmc|sequences/fx-blast-big.yaml
+	tgmc|sequences/fx-smoke.yaml
 	tgmc|sequences/fx-slam.yaml
+	tgmc|sequences/fx-blood.yaml
+	tgmc|sequences/fx-blood-xeno.yaml
 	tgmc|sequences/fx-slam-big.yaml
 	tgmc|sequences/fx-claw.yaml
+	tgmc|sequences/fx-blast-mortar.yaml
+	tgmc|sequences/fx-blast-howi.yaml
+	tgmc|sequences/fx-dust-mortar.yaml
+	tgmc|sequences/fx-dust-howi.yaml
+	tgmc|sequences/fx-fire.yaml
+	tgmc|sequences/flame-patch.yaml
+	tgmc|sequences/gas-cloud.yaml
+	tgmc|sequences/fx-rocket.yaml
+	tgmc|sequences/fx-casing.yaml
+	tgmc|sequences/fx-infest.yaml
+	tgmc|sequences/condor.yaml
 
 TileSets:
 	tgmc|tilesets/ground.yaml
@@ -69,7 +124,7 @@ Cursors:
 Chrome:
 	tgmc|chrome.yaml
 
-Assemblies: OpenRA.Mods.Common.dll
+Assemblies: OpenRA.Mods.Common.dll, Tgmc.dll
 
 ChromeLayout:
 	tgmc|chrome/ingame.yaml
@@ -134,6 +189,7 @@ Music:
 	tgmc|audio/music.yaml
 
 Hotkeys:
+	tgmc|hotkeys.yaml
 	common|hotkeys/game.yaml
 	common|hotkeys/observer.yaml
 	common|hotkeys/production-common.yaml

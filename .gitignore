@@ -37,3 +37,5 @@ __pycache__/
 .vscode/
 .idea/
 .DS_Store
+tgmc/code/bin/
+tgmc/code/obj/

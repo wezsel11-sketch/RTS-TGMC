@@ -1,5 +1,5 @@
-# TGMC command sidebar for players. Lives on the right, 240px wide, over the map view.
-# The map viewport is narrowed to match in tgmc/chrome/ingame.yaml.
+# TGMC command HUD for players: a glass dock along the bottom (minimap, selection, commands), a build panel on the left, a
+# resource bar on top. It floats over a full-window map view (tgmc/chrome/ingame.yaml).
 
 Container@PLAYER_WIDGETS:
 	Logic: LoadIngameChatLogic
@@ -8,6 +8,8 @@ Container@PLAYER_WIDGETS:
 		LogicKeyListener@PLAYER_KEYHANDLER:
 			Logic: RemoveFromControlGroupHotkeyLogic
 				RemoveFromControlGroupKey: RemoveFromControlGroup
+		StepKeys@STEP_KEYS:
+		SmartSelect@SMART_SELECT:
 		ControlGroups@CONTROLGROUPS:
 			SelectGroupKeyPrefix: ControlGroupSelect
 			CreateGroupKeyPrefix: ControlGroupCreate
@@ -15,158 +17,1093 @@ Container@PLAYER_WIDGETS:
 			CombineWithGroupKeyPrefix: ControlGroupCombineWith
 			JumpToGroupKeyPrefix: ControlGroupJumpTo
 		LogicTicker@SIDEBAR_TICKER:
-		Background@TGMC_SIDEBAR:
-			Logic: MenuButtonsChromeLogic
-			X: WINDOW_WIDTH - 240
-			Y: 0
-			Width: 240
-			Height: WINDOW_HEIGHT
-			Background: tgui-window
+		Container@SUPPORT_POWERS:
+			Logic: SupportPowerBinLogic
+			X: 274
+			Y: 44
 			Children:
-				Background@TITLE_BAR:
+				SupportPowers@SUPPORT_PALETTE:
+					IconSize: 62, 46
+					IconSpriteOffset: 0, 0
+					TooltipContainer: TOOLTIP_CONTAINER
+					ReadyText: supportpowers-support-powers-palette.ready
+					HoldText: supportpowers-support-powers-palette.hold
+					HotkeyPrefix: SupportPower
+					HotkeyCount: 6
+		SupportPowerTimer@SUPPORT_POWER_TIMER:
+			X: 346
+			Y: 48
+			Order: Descending
+		Container@EVENT_LOG:
+			Logic: EventLogLogic
+			X: WINDOW_WIDTH - 316
+			Y: 48
+			Width: 300
+			Height: 140
+			Children:
+				Button@EVENT_1:
 					X: 0
 					Y: 0
 					Width: PARENT_WIDTH
-					Height: 36
-					Background: tgui-titlebar
-				Label@HEADER:
-					X: 8
-					Y: 6
-					Width: PARENT_WIDTH - 16
+					Height: 20
+					Background: sidebar-button
+					Font: TinyBold
+					Align: Left
+				Button@EVENT_2:
+					X: 0
+					Y: 22
+					Width: PARENT_WIDTH
+					Height: 20
+					Background: sidebar-button
+					Font: TinyBold
+					Align: Left
+				Button@EVENT_3:
+					X: 0
+					Y: 44
+					Width: PARENT_WIDTH
+					Height: 20
+					Background: sidebar-button
+					Font: TinyBold
+					Align: Left
+				Button@EVENT_4:
+					X: 0
+					Y: 66
+					Width: PARENT_WIDTH
+					Height: 20
+					Background: sidebar-button
+					Font: TinyBold
+					Align: Left
+				Button@EVENT_5:
+					X: 0
+					Y: 88
+					Width: PARENT_WIDTH
+					Height: 20
+					Background: sidebar-button
+					Font: TinyBold
+					Align: Left
+				Button@EVENT_6:
+					X: 0
+					Y: 110
+					Width: PARENT_WIDTH
+					Height: 20
+					Background: sidebar-button
+					Font: TinyBold
+					Align: Left
+		Background@TOP_BAR:
+			Logic: TopBarLogic
+			X: WINDOW_WIDTH / 2 - 270
+			Y: 8
+			Width: 540
+			Height: 30
+			Background: tgui-window
+			Children:
+				Label@CASH_LABEL:
+					X: 14
+					Y: 4
+					Width: 90
 					Height: 22
-					Text: hud-header
+					Text: hud-cash
+					Font: Tiny
+				LabelWithTooltip@CASH:
+					Logic: IngameCashCounterLogic
+					X: 100
+					Y: 4
+					Width: 70
+					Height: 22
+					Align: Left
+					Font: Bold
+					TooltipContainer: TOOLTIP_CONTAINER
+					TooltipTemplate: SIMPLE_TOOLTIP
+				Label@TOP_INCOME:
+					X: 190
+					Y: 4
+					Width: 150
+					Height: 22
+					Font: TinyBold
+				Label@TOP_ARMY:
+					X: 350
+					Y: 4
+					Width: 90
+					Height: 22
+					Font: TinyBold
+				Label@GAME_TIMER:
+					Logic: GameTimerLogic
+					X: 450
+					Y: 4
+					Width: 80
+					Height: 22
+					Align: Center
+					Font: TinyBold
+		Background@STATS_PANEL:
+			Logic: MatchStatsLogic
+			X: WINDOW_WIDTH / 2 - 300
+			Y: 120
+			Width: 600
+			Height: 230
+			Background: tgui-window
+			Children:
+				Label@STATS_TITLE:
+					X: 0
+					Y: 10
+					Width: PARENT_WIDTH
+					Height: 28
 					Font: Bold
 					Align: Center
-				Label@FACTION:
-					X: 8
-					Y: 26
-					Width: PARENT_WIDTH - 16
-					Height: 16
-					Text: hud-faction
-					Font: Tiny
-					Align: Center
-				Background@RADAR_FRAME:
-					X: 8
+				Label@STATS_HEAD_NAME:
+					X: 16
 					Y: 48
-					Width: 224
-					Height: 160
-					Background: tgmc-radar-frame
-					Logic: IngameRadarDisplayLogic
+					Width: 150
+					Height: 20
+					Text: Player
+					Font: TinyBold
+					Align: Left
+				Label@STATS_HEAD_KILLS:
+					X: 180
+					Y: 48
+					Width: 60
+					Height: 20
+					Text: Kills
+					Font: TinyBold
+					Align: Center
+				Label@STATS_HEAD_LOST:
+					X: 250
+					Y: 48
+					Width: 60
+					Height: 20
+					Text: Lost
+					Font: TinyBold
+					Align: Center
+				Label@STATS_HEAD_HOSTS:
+					X: 320
+					Y: 48
+					Width: 70
+					Height: 20
+					Text: Hosts
+					Font: TinyBold
+					Align: Center
+				Label@STATS_HEAD_EVOLVED:
+					X: 400
+					Y: 48
+					Width: 70
+					Height: 20
+					Text: Evolved
+					Font: TinyBold
+					Align: Center
+				Label@STATS_HEAD_CAS:
+					X: 480
+					Y: 48
+					Width: 60
+					Height: 20
+					Text: CAS
+					Font: TinyBold
+					Align: Center
+				Label@STATS_NAME_0:
+					X: 16
+					Y: 74
+					Width: 150
+					Height: 22
+					Font: Regular
+					Align: Left
+				Label@STATS_KILLS_0:
+					X: 180
+					Y: 74
+					Width: 60
+					Height: 22
+					Font: Regular
+					Align: Center
+				Label@STATS_LOST_0:
+					X: 250
+					Y: 74
+					Width: 60
+					Height: 22
+					Font: Regular
+					Align: Center
+				Label@STATS_HOSTS_0:
+					X: 320
+					Y: 74
+					Width: 70
+					Height: 22
+					Font: Regular
+					Align: Center
+				Label@STATS_EVOLVED_0:
+					X: 400
+					Y: 74
+					Width: 70
+					Height: 22
+					Font: Regular
+					Align: Center
+				Label@STATS_CAS_0:
+					X: 480
+					Y: 74
+					Width: 60
+					Height: 22
+					Font: Regular
+					Align: Center
+				Label@STATS_NAME_1:
+					X: 16
+					Y: 100
+					Width: 150
+					Height: 22
+					Font: Regular
+					Align: Left
+				Label@STATS_KILLS_1:
+					X: 180
+					Y: 100
+					Width: 60
+					Height: 22
+					Font: Regular
+					Align: Center
+				Label@STATS_LOST_1:
+					X: 250
+					Y: 100
+					Width: 60
+					Height: 22
+					Font: Regular
+					Align: Center
+				Label@STATS_HOSTS_1:
+					X: 320
+					Y: 100
+					Width: 70
+					Height: 22
+					Font: Regular
+					Align: Center
+				Label@STATS_EVOLVED_1:
+					X: 400
+					Y: 100
+					Width: 70
+					Height: 22
+					Font: Regular
+					Align: Center
+				Label@STATS_CAS_1:
+					X: 480
+					Y: 100
+					Width: 60
+					Height: 22
+					Font: Regular
+					Align: Center
+				Label@STATS_NAME_2:
+					X: 16
+					Y: 126
+					Width: 150
+					Height: 22
+					Font: Regular
+					Align: Left
+				Label@STATS_KILLS_2:
+					X: 180
+					Y: 126
+					Width: 60
+					Height: 22
+					Font: Regular
+					Align: Center
+				Label@STATS_LOST_2:
+					X: 250
+					Y: 126
+					Width: 60
+					Height: 22
+					Font: Regular
+					Align: Center
+				Label@STATS_HOSTS_2:
+					X: 320
+					Y: 126
+					Width: 70
+					Height: 22
+					Font: Regular
+					Align: Center
+				Label@STATS_EVOLVED_2:
+					X: 400
+					Y: 126
+					Width: 70
+					Height: 22
+					Font: Regular
+					Align: Center
+				Label@STATS_CAS_2:
+					X: 480
+					Y: 126
+					Width: 60
+					Height: 22
+					Font: Regular
+					Align: Center
+				Label@STATS_NAME_3:
+					X: 16
+					Y: 152
+					Width: 150
+					Height: 22
+					Font: Regular
+					Align: Left
+				Label@STATS_KILLS_3:
+					X: 180
+					Y: 152
+					Width: 60
+					Height: 22
+					Font: Regular
+					Align: Center
+				Label@STATS_LOST_3:
+					X: 250
+					Y: 152
+					Width: 60
+					Height: 22
+					Font: Regular
+					Align: Center
+				Label@STATS_HOSTS_3:
+					X: 320
+					Y: 152
+					Width: 70
+					Height: 22
+					Font: Regular
+					Align: Center
+				Label@STATS_EVOLVED_3:
+					X: 400
+					Y: 152
+					Width: 70
+					Height: 22
+					Font: Regular
+					Align: Center
+				Label@STATS_CAS_3:
+					X: 480
+					Y: 152
+					Width: 60
+					Height: 22
+					Font: Regular
+					Align: Center
+				Button@STATS_CLOSE:
+					X: PARENT_WIDTH / 2 - 60
+					Y: PARENT_HEIGHT - 44
+					Width: 120
+					Height: 30
+					Text: Close
+					Font: Bold
+		Background@HELP_PANEL:
+			X: WINDOW_WIDTH / 2 - 300
+			Y: 60
+			Width: 600
+			Height: 280
+			Background: tgui-window
+			Children:
+				Label@HELP_TITLE:
+					X: 0
+					Y: 8
+					Width: PARENT_WIDTH
+					Height: 24
+					Text: help-title
+					Font: Bold
+					Align: Center
+				Label@HELP_1:
+					X: 16
+					Y: 40
+					Width: PARENT_WIDTH - 32
+					Height: 20
+					Text: help-1
+					Font: Regular
+				Label@HELP_2:
+					X: 16
+					Y: 62
+					Width: PARENT_WIDTH - 32
+					Height: 20
+					Text: help-2
+					Font: Regular
+				Label@HELP_3:
+					X: 16
+					Y: 84
+					Width: PARENT_WIDTH - 32
+					Height: 20
+					Text: help-3
+					Font: Regular
+				Label@HELP_4:
+					X: 16
+					Y: 106
+					Width: PARENT_WIDTH - 32
+					Height: 20
+					Text: help-4
+					Font: Regular
+				Label@HELP_5:
+					X: 16
+					Y: 128
+					Width: PARENT_WIDTH - 32
+					Height: 20
+					Text: help-5
+					Font: Regular
+				Label@HELP_6:
+					X: 16
+					Y: 150
+					Width: PARENT_WIDTH - 32
+					Height: 20
+					Text: help-6
+					Font: Regular
+				Label@HELP_7:
+					X: 16
+					Y: 172
+					Width: PARENT_WIDTH - 32
+					Height: 20
+					Text: help-7
+					Font: Regular
+				Label@HELP_8:
+					X: 16
+					Y: 194
+					Width: PARENT_WIDTH - 32
+					Height: 20
+					Text: help-8
+					Font: Regular
+				Label@HELP_9:
+					X: 16
+					Y: 216
+					Width: PARENT_WIDTH - 32
+					Height: 20
+					Text: help-9
+					Font: Regular
+				Label@HELP_10:
+					X: 16
+					Y: 238
+					Width: PARENT_WIDTH - 32
+					Height: 20
+					Text: help-10
+					Font: Regular
+		Background@CODEX_PANEL:
+			X: WINDOW_WIDTH / 2 - 340
+			Y: 40
+			Width: 680
+			Height: 440
+			Background: tgui-window
+			Children:
+				Label@CODEX_HEADER:
+					X: 0
+					Y: 8
+					Width: PARENT_WIDTH
+					Height: 24
+					Text: codex-title
+					Font: Bold
+					Align: Center
+				ScrollPanel@CODEX_LIST:
+					X: 12
+					Y: 40
+					Width: 220
+					Height: PARENT_HEIGHT - 52
 					Children:
-						LogicTicker@RADAR_TICKER:
-						Radar@RADAR_MINIMAP:
-							WorldInteractionController: INTERACTION_CONTROLLER
+						ScrollItem@CODEX_ITEM:
+							Width: PARENT_WIDTH - 27
+							Height: 22
 							X: 2
-							Y: 2
-							Width: 220
-							Height: 156
-				Container@SIDEBAR_PRODUCTION:
-					Logic: ClassicProductionLogic
-					X: 4
-					Y: 214
-					Width: 232
-					Height: PARENT_HEIGHT - 342
-					Children:
-						LogicTicker@PRODUCTION_TICKER:
-						ProductionPalette@PRODUCTION_PALETTE:
-							X: 34
-							Columns: 3
-							IconSize: 62, 46
-							IconMargin: 1, 1
-							TooltipContainer: TOOLTIP_CONTAINER
-							ReadyText: productionpalette-sidebar-production-palette.ready
-							HoldText: productionpalette-sidebar-production-palette.hold
-							HotkeyPrefix: Production
-							HotkeyCount: 24
-							SelectProductionBuildingHotkey: SelectProductionBuilding
-						Container@PRODUCTION_TYPES:
-							X: 2
-							Width: 28
-							Height: 93
+							Visible: false
 							Children:
-								ProductionTypeButton@INFANTRY:
-									Width: 28
-									Height: 28
-									VisualHeight: 0
-									Background: sidebar-button
-									ProductionGroup: Infantry
-									Children:
-										Image@ICON:
-											X: 6
-											Y: 6
-											ImageCollection: production-icons
-								ProductionTypeButton@XENO:
-									Y: 31
-									Width: 28
-									Height: 28
-									VisualHeight: 0
-									Background: sidebar-button
-									ProductionGroup: Xeno
-									Children:
-										Image@ICON:
-											X: 6
-											Y: 6
-											ImageCollection: production-icons
-								ProductionTypeButton@BUILD:
-									Y: 62
-									Width: 28
-									Height: 28
-									VisualHeight: 0
-									Background: sidebar-button
-									ProductionGroup: Build
-									Children:
-										Image@ICON:
-											X: 6
-											Y: 6
-											ImageCollection: production-icons
-				Background@READOUT_PANEL:
-					X: 8
-					Y: PARENT_HEIGHT - 118
-					Width: 224
-					Height: 76
-					Background: tgui-card
+								Label@NAME:
+									X: 6
+									Width: PARENT_WIDTH - 12
+									Height: 22
+									Font: Regular
+				Sprite@CODEX_PORTRAIT:
+					X: 248
+					Y: 44
+					Width: 96
+					Height: 96
+				Label@CODEX_TITLE:
+					X: 356
+					Y: 48
+					Width: PARENT_WIDTH - 368
+					Height: 24
+					Font: Bold
+				Label@CODEX_DESC:
+					X: 356
+					Y: 76
+					Width: PARENT_WIDTH - 368
+					Height: 60
+					Font: Regular
+					WordWrap: true
+					VAlign: Top
+				Label@CODEX_STATS:
+					X: 248
+					Y: 150
+					Width: PARENT_WIDTH - 260
+					Height: PARENT_HEIGHT - 162
+					Font: Regular
+					WordWrap: true
+					VAlign: Top
+		Button@CODEX_BUTTON:
+			Logic: CodexLogic
+			X: WINDOW_WIDTH - 214
+			Y: 8
+			Width: 66
+			Height: 28
+			Background: sidebar-button
+			Text: codex-button
+			Font: Bold
+		Button@HELP_BUTTON:
+			Logic: HelpOverlayLogic
+			X: WINDOW_WIDTH - 144
+			Y: 8
+			Width: 28
+			Height: 28
+			Background: sidebar-button
+			Text: help-button
+			Font: Bold
+			Key: TgmcHelp
+		Container@TGMC_SIDEBAR:
+			Logic: MenuButtonsChromeLogic
+			X: 0
+			Y: 0
+			Width: WINDOW_WIDTH
+			Height: WINDOW_HEIGHT
+			Children:
+				Background@BUILD_PANEL:
+					X: 10
+					Y: 44
+					Width: 252
+					Height: WINDOW_HEIGHT - 250
+					Background: tgui-window
 					Children:
-						Label@GAME_TIMER:
-							Logic: GameTimerLogic
-							X: 8
-							Y: 6
-							Width: PARENT_WIDTH - 16
-							Height: 20
-							Align: Center
-							Font: TinyBold
-						Label@CASH_LABEL:
+						Label@HEADER:
 							X: 10
-							Y: 28
-							Width: 100
-							Height: 20
-							Text: hud-cash
+							Y: 6
+							Width: PARENT_WIDTH - 20
+							Height: 18
+							Text: hud-header
+							Font: TinyBold
+							Align: Left
+						Label@FACTION:
+							X: 10
+							Y: 22
+							Width: PARENT_WIDTH - 20
+							Height: 14
+							Text: hud-faction
 							Font: Tiny
-						LabelWithTooltip@CASH:
-							Logic: IngameCashCounterLogic
-							X: 8
-							Y: 28
-							Width: PARENT_WIDTH - 16
-							Height: 20
-							Align: Right
-							Font: Bold
-							TooltipContainer: TOOLTIP_CONTAINER
-							TooltipTemplate: SIMPLE_TOOLTIP
+							Align: Left
+						Container@SIDEBAR_PRODUCTION:
+							Logic: ClassicProductionLogic
+							X: 4
+							Y: 44
+							Width: 244
+							Height: PARENT_HEIGHT - 72
+							Children:
+								LogicTicker@PRODUCTION_TICKER:
+								ProductionPalette@PRODUCTION_PALETTE:
+									X: 34
+									Columns: 3
+									IconSize: 62, 46
+									IconMargin: 1, 1
+									TooltipContainer: TOOLTIP_CONTAINER
+									ReadyText: productionpalette-sidebar-production-palette.ready
+									HoldText: productionpalette-sidebar-production-palette.hold
+									HotkeyPrefix: Production
+									HotkeyCount: 24
+									SelectProductionBuildingHotkey: SelectProductionBuilding
+								Container@PRODUCTION_TYPES:
+									X: 2
+									Width: 28
+									Height: 93
+									Children:
+										ProductionTypeButton@INFANTRY:
+											Width: 28
+											Height: 28
+											VisualHeight: 0
+											Background: sidebar-button
+											ProductionGroup: Infantry
+											Children:
+												Image@ICON:
+													X: 6
+													Y: 6
+													ImageCollection: production-icons
+										ProductionTypeButton@XENO:
+											Y: 31
+											Width: 28
+											Height: 28
+											VisualHeight: 0
+											Background: sidebar-button
+											ProductionGroup: Xeno
+											Children:
+												Image@ICON:
+													X: 6
+													Y: 6
+													ImageCollection: production-icons
+										ProductionTypeButton@BUILD:
+											Y: 62
+											Width: 28
+											Height: 28
+											VisualHeight: 0
+											Background: sidebar-button
+											ProductionGroup: Build
+											Children:
+												Image@ICON:
+													X: 6
+													Y: 6
+													ImageCollection: production-icons
 						Label@BUILD_HINT:
 							X: 8
-							Y: 50
+							Y: PARENT_HEIGHT - 24
 							Width: PARENT_WIDTH - 16
 							Height: 18
 							Text: hud-build-hint
 							Font: Tiny
 							Align: Center
 				MenuButton@OPTIONS_BUTTON:
-					X: 8
-					Y: PARENT_HEIGHT - 34
-					Width: 224
-					Height: 26
+					X: WINDOW_WIDTH - 70
+					Y: 8
+					Width: 60
+					Height: 28
 					Background: sidebar-button
 					Key: escape
 					Text: hud-menu
 					Font: Bold
 					DisableWorldSounds: true
 					VisualHeight: 0
+				Background@DOCK:
+					X: 10
+					Y: WINDOW_HEIGHT - 196
+					Width: WINDOW_WIDTH - 20
+					Height: 186
+					Background: tgui-window
+					Children:
+						Background@RADAR_FRAME:
+							X: 12
+							Y: 12
+							Width: 224
+							Height: 162
+							Background: tgmc-radar-frame
+							Logic: IngameRadarDisplayLogic
+							Children:
+								LogicTicker@RADAR_TICKER:
+								Radar@RADAR_MINIMAP:
+									WorldInteractionController: INTERACTION_CONTROLLER
+									X: 2
+									Y: 2
+									Width: 220
+									Height: 158
+						Background@SELECTION_PANEL:
+							Logic: SelectionReadoutLogic
+							X: 250
+							Y: 12
+							Width: PARENT_WIDTH - 250 - 324
+							Height: 162
+							Background: tgui-card
+							Children:
+								Sprite@SEL_PORTRAIT:
+									X: 10
+									Y: 10
+									Width: 62
+									Height: 46
+								Label@SEL_NAME:
+									X: 84
+									Y: 6
+									Width: PARENT_WIDTH - 100
+									Height: 22
+									Font: Bold
+								Label@SEL_HEALTH:
+									X: 84
+									Y: 28
+									Width: PARENT_WIDTH - 100
+									Height: 16
+									Font: Tiny
+								ProgressBar@SEL_HPBAR:
+									X: 84
+									Y: 46
+									Width: PARENT_WIDTH - 100
+									Height: 10
+								Label@SEL_AMMO:
+									X: 84
+									Y: 60
+									Width: PARENT_WIDTH - 100
+									Height: 16
+									Font: Tiny
+								Label@SEL_STATUS:
+									X: 10
+									Y: 62
+									Width: 70
+									Height: 16
+									Font: TinyBold
+									Align: Left
+						Background@GROUP_PANEL:
+							Logic: GroupGridLogic
+							X: 250 + 84
+							Y: 12 + 82
+							Width: 224
+							Height: 64
+							Background: tgui-card
+							Children:
+								Button@GRP_0:
+									X: 6
+									Y: 6
+									Width: 24
+									Height: 24
+									VisualHeight: 0
+									Background: sidebar-button
+									Children:
+										Sprite@GRP_ICON_0:
+											X: 1
+											Y: 1
+											Width: 22
+											Height: 16
+										ProgressBar@GRP_HP_0:
+											X: 2
+											Y: 19
+											Width: 20
+											Height: 3
+								Button@GRP_1:
+									X: 32
+									Y: 6
+									Width: 24
+									Height: 24
+									VisualHeight: 0
+									Background: sidebar-button
+									Children:
+										Sprite@GRP_ICON_1:
+											X: 1
+											Y: 1
+											Width: 22
+											Height: 16
+										ProgressBar@GRP_HP_1:
+											X: 2
+											Y: 19
+											Width: 20
+											Height: 3
+								Button@GRP_2:
+									X: 58
+									Y: 6
+									Width: 24
+									Height: 24
+									VisualHeight: 0
+									Background: sidebar-button
+									Children:
+										Sprite@GRP_ICON_2:
+											X: 1
+											Y: 1
+											Width: 22
+											Height: 16
+										ProgressBar@GRP_HP_2:
+											X: 2
+											Y: 19
+											Width: 20
+											Height: 3
+								Button@GRP_3:
+									X: 84
+									Y: 6
+									Width: 24
+									Height: 24
+									VisualHeight: 0
+									Background: sidebar-button
+									Children:
+										Sprite@GRP_ICON_3:
+											X: 1
+											Y: 1
+											Width: 22
+											Height: 16
+										ProgressBar@GRP_HP_3:
+											X: 2
+											Y: 19
+											Width: 20
+											Height: 3
+								Button@GRP_4:
+									X: 110
+									Y: 6
+									Width: 24
+									Height: 24
+									VisualHeight: 0
+									Background: sidebar-button
+									Children:
+										Sprite@GRP_ICON_4:
+											X: 1
+											Y: 1
+											Width: 22
+											Height: 16
+										ProgressBar@GRP_HP_4:
+											X: 2
+											Y: 19
+											Width: 20
+											Height: 3
+								Button@GRP_5:
+									X: 136
+									Y: 6
+									Width: 24
+									Height: 24
+									VisualHeight: 0
+									Background: sidebar-button
+									Children:
+										Sprite@GRP_ICON_5:
+											X: 1
+											Y: 1
+											Width: 22
+											Height: 16
+										ProgressBar@GRP_HP_5:
+											X: 2
+											Y: 19
+											Width: 20
+											Height: 3
+								Button@GRP_6:
+									X: 162
+									Y: 6
+									Width: 24
+									Height: 24
+									VisualHeight: 0
+									Background: sidebar-button
+									Children:
+										Sprite@GRP_ICON_6:
+											X: 1
+											Y: 1
+											Width: 22
+											Height: 16
+										ProgressBar@GRP_HP_6:
+											X: 2
+											Y: 19
+											Width: 20
+											Height: 3
+								Button@GRP_7:
+									X: 188
+									Y: 6
+									Width: 24
+									Height: 24
+									VisualHeight: 0
+									Background: sidebar-button
+									Children:
+										Sprite@GRP_ICON_7:
+											X: 1
+											Y: 1
+											Width: 22
+											Height: 16
+										ProgressBar@GRP_HP_7:
+											X: 2
+											Y: 19
+											Width: 20
+											Height: 3
+								Button@GRP_8:
+									X: 6
+									Y: 34
+									Width: 24
+									Height: 24
+									VisualHeight: 0
+									Background: sidebar-button
+									Children:
+										Sprite@GRP_ICON_8:
+											X: 1
+											Y: 1
+											Width: 22
+											Height: 16
+										ProgressBar@GRP_HP_8:
+											X: 2
+											Y: 19
+											Width: 20
+											Height: 3
+								Button@GRP_9:
+									X: 32
+									Y: 34
+									Width: 24
+									Height: 24
+									VisualHeight: 0
+									Background: sidebar-button
+									Children:
+										Sprite@GRP_ICON_9:
+											X: 1
+											Y: 1
+											Width: 22
+											Height: 16
+										ProgressBar@GRP_HP_9:
+											X: 2
+											Y: 19
+											Width: 20
+											Height: 3
+								Button@GRP_10:
+									X: 58
+									Y: 34
+									Width: 24
+									Height: 24
+									VisualHeight: 0
+									Background: sidebar-button
+									Children:
+										Sprite@GRP_ICON_10:
+											X: 1
+											Y: 1
+											Width: 22
+											Height: 16
+										ProgressBar@GRP_HP_10:
+											X: 2
+											Y: 19
+											Width: 20
+											Height: 3
+								Button@GRP_11:
+									X: 84
+									Y: 34
+									Width: 24
+									Height: 24
+									VisualHeight: 0
+									Background: sidebar-button
+									Children:
+										Sprite@GRP_ICON_11:
+											X: 1
+											Y: 1
+											Width: 22
+											Height: 16
+										ProgressBar@GRP_HP_11:
+											X: 2
+											Y: 19
+											Width: 20
+											Height: 3
+								Button@GRP_12:
+									X: 110
+									Y: 34
+									Width: 24
+									Height: 24
+									VisualHeight: 0
+									Background: sidebar-button
+									Children:
+										Sprite@GRP_ICON_12:
+											X: 1
+											Y: 1
+											Width: 22
+											Height: 16
+										ProgressBar@GRP_HP_12:
+											X: 2
+											Y: 19
+											Width: 20
+											Height: 3
+								Button@GRP_13:
+									X: 136
+									Y: 34
+									Width: 24
+									Height: 24
+									VisualHeight: 0
+									Background: sidebar-button
+									Children:
+										Sprite@GRP_ICON_13:
+											X: 1
+											Y: 1
+											Width: 22
+											Height: 16
+										ProgressBar@GRP_HP_13:
+											X: 2
+											Y: 19
+											Width: 20
+											Height: 3
+								Button@GRP_14:
+									X: 162
+									Y: 34
+									Width: 24
+									Height: 24
+									VisualHeight: 0
+									Background: sidebar-button
+									Children:
+										Sprite@GRP_ICON_14:
+											X: 1
+											Y: 1
+											Width: 22
+											Height: 16
+										ProgressBar@GRP_HP_14:
+											X: 2
+											Y: 19
+											Width: 20
+											Height: 3
+								Button@GRP_15:
+									X: 188
+									Y: 34
+									Width: 24
+									Height: 24
+									VisualHeight: 0
+									Background: sidebar-button
+									Children:
+										Sprite@GRP_ICON_15:
+											X: 1
+											Y: 1
+											Width: 22
+											Height: 16
+										ProgressBar@GRP_HP_15:
+											X: 2
+											Y: 19
+											Width: 20
+											Height: 3
+						Container@COMMAND_CARD:
+							Logic: CommandCardLogic
+							X: PARENT_WIDTH - 312
+							Y: 14
+							Width: 300
+							Height: 160
+							Children:
+								Button@CMD_EVOLVE:
+									X: 0
+									Y: 0
+									Width: 72
+									Height: 30
+									Background: sidebar-button
+									Text: cmd-evolve
+									Font: TinyBold
+								Button@CMD_DEVOLVE:
+									X: 76
+									Y: 0
+									Width: 72
+									Height: 30
+									Background: sidebar-button
+									Text: cmd-devolve
+									Font: TinyBold
+								Button@CMD_STOP:
+									X: 152
+									Y: 0
+									Width: 72
+									Height: 30
+									Background: sidebar-button
+									Text: cmd-stop
+									Font: TinyBold
+								Button@CMD_SCATTER:
+									X: 228
+									Y: 0
+									Width: 72
+									Height: 30
+									Background: sidebar-button
+									Text: cmd-scatter
+									Font: TinyBold
+								Button@CMD_AGGRESSIVE:
+									X: 0
+									Y: 36
+									Width: 72
+									Height: 30
+									Background: sidebar-button
+									Text: cmd-aggressive
+									Font: TinyBold
+								Button@CMD_GUARD:
+									X: 76
+									Y: 36
+									Width: 72
+									Height: 30
+									Background: sidebar-button
+									Text: cmd-guard
+									Font: TinyBold
+								Button@CMD_RETURN:
+									X: 152
+									Y: 36
+									Width: 72
+									Height: 30
+									Background: sidebar-button
+									Text: cmd-return
+									Font: TinyBold
+								Button@CMD_HOLD:
+									X: 228
+									Y: 36
+									Width: 72
+									Height: 30
+									Background: sidebar-button
+									Text: cmd-hold
+									Font: TinyBold
+								Button@CMD_ABILITY1:
+									X: 0
+									Y: 72
+									Width: 148
+									Height: 30
+									Background: sidebar-button
+									Key: TgmcAbility1
+									Font: TinyBold
+								Button@CMD_ABILITY2:
+									X: 152
+									Y: 72
+									Width: 148
+									Height: 30
+									Background: sidebar-button
+									Key: TgmcAbility2
+									Font: TinyBold
+								Button@CMD_MEDIC:
+									X: 0
+									Y: 72
+									Width: 148
+									Height: 30
+									Background: sidebar-button
+									Text: cmd-medic
+									Font: TinyBold
+								Button@CMD_INFECTED:
+									X: 152
+									Y: 72
+									Width: 148
+									Height: 30
+									Background: sidebar-button
+									Text: cmd-infected
+									Font: TinyBold

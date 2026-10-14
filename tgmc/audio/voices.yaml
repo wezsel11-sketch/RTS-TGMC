@@ -60,6 +60,23 @@ DroneVoice:
 		Attack: xeno-hiss-1, xeno-hiss-2
 		Die: xeno-help-1, xeno-help-2
 
+# Facehuggers hiss and skitter; larvae squeal.
+HuggerVoice:
+	DefaultVariant: .ogg
+	Voices:
+		Select: xeno-hiss-1, xeno-hiss-2
+		Action: xeno-hiss-3, xeno-pounce-2
+		Attack: xeno-pounce-1, xeno-pounce-2
+		Die: xeno-death-small
+
+LarvaVoice:
+	DefaultVariant: .ogg
+	Voices:
+		Select: xeno-larva-1, xeno-larva-3
+		Action: xeno-larva-2, xeno-larva-4
+		Attack: xeno-larva-1, xeno-larva-4
+		Die: xeno-death-small
+
 # Structures: a click when selected or ordered, and their own noise when destroyed.
 MarineStructureVoice:
 	DefaultVariant: .ogg

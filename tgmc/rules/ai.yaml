@@ -3,12 +3,26 @@
 # then builds generators, tech and turrets, trains units and sends them out in squads. Pattern: OpenRA mods/ra/rules/ai.yaml.
 # Xenos are cheap and fast, so the xeno bot gathers a bigger group before it attacks.
 Player:
+	# Three levels, none of which cheat. Easy has only the basic modules and waits for bigger squads; Normal adds the smart modules (counter-picking,
+	# evolving, medics, retreat, CAS); Hard adds scouting and sends smaller squads sooner.
+	ModularBot@EasyAI:
+		Name: bot-easy-ai.name
+		Type: easy
 	ModularBot@SkirmishAI:
 		Name: bot-skirmish-ai.name
 		Type: skirmish
+	ModularBot@HardAI:
+		Name: bot-hard-ai.name
+		Type: hard
 	GrantConditionOnBotOwner@skirmish:
 		Condition: enable-skirmish-ai
-		Bots: skirmish
+		Bots: easy, skirmish, hard
+	GrantConditionOnBotOwner@easy:
+		Condition: enable-easy-ai
+		Bots: easy
+	GrantConditionOnBotOwner@hard:
+		Condition: enable-hard-ai
+		Bots: hard
 	GrantConditionOnFaction@xenos:
 		Condition: faction-xenos
 		Factions: xenos
@@ -22,18 +36,50 @@ Player:
 			engineer: 15
 			smartgunner: 25
 			grenadier: 20
-			runner: 60
-			hunter: 30
-			sentinel: 30
-			warrior: 15
-			queen: 10
+			scout: 10
+			skirmisher: 12
+			trooper: 25
+			ranger: 15
+			assault: 10
+			sniper: 15
+			rocketeer: 12
+			blademan: 12
+			mortarman: 10
+			flamer: 18
+			machinegunner: 15
+			heavygunner: 10
+			demolitionist: 8
+			mech: 6
+			runner: 30
+			hunter: 40
+			sentinel: 25
+			warrior: 25
+			spitter: 25
+			praetorian: 15
+			crusher: 12
+			ravager: 10
+			defiler: 8
+			boiler: 10
+			carrier: 10
+			warlock: 8
+			shrike: 8
+			widow: 8
+			wraith: 8
+			bull: 8
+			behemoth: 4
+			queen: 30
+		UnitLimits:
+			queen: 1
 	# The bot has no builder to walk around, so its cryo pod and silo give it the build area (structures.yaml) and it
 	# places each finished structure in a ring around them. It never builds walls. The refinery counts are zeroed
 	# because the module otherwise holds back all unit production until it owns a refinery.
 	BaseBuilderBotModule@skirmish:
 		RequiresCondition: enable-skirmish-ai
 		BuildingQueues: MarineBuild, XenoBuild
-		ConstructionYardTypes: cryo-pod, resin-silo
+		ConstructionYardTypes: cryo-pod, resin-silo, forward-hive
+		# Defences go toward the nearest enemy, around the base closest to the fighting: the Forward Hive too, so the hive grows toward the enemy.
+		DefenseTypes: sentry-turret, resin-turret, mortar-emplacement, artillery-emplacement, resin-trap, cade, forward-hive
+		PlaceDefenseTowardsEnemyChance: 100
 		InititalMinimumRefineryCount: 0
 		AdditionalMinimumRefineryCount: 0
 		NewProductionCashThreshold: 0
@@ -52,6 +98,12 @@ Player:
 			maturity-tower: 8
 			sentry-turret: 12
 			resin-turret: 12
+			workshop: 5
+			mortar-emplacement: 10
+			artillery-emplacement: 6
+			forward-hive: 10
+			resin-trap: 12
+			cade: 10
 		BuildingLimits:
 			miner: 6
 			weed-node: 6
@@ -64,22 +116,309 @@ Player:
 			maturity-tower: 1
 			sentry-turret: 4
 			resin-turret: 4
+			workshop: 1
+			mortar-emplacement: 3
+			artillery-emplacement: 2
+			forward-hive: 2
+			resin-trap: 6
+			cade: 8
 		BuildingDelays:
 			armory: 3000
 			ordnance-depot: 6000
-			evolution-tower: 3000
-			maturity-tower: 6000
-	SquadManagerBotModule@marines:
-		RequiresCondition: enable-skirmish-ai && !faction-xenos
+			evolution-tower: 800
+			maturity-tower: 2400
+			workshop: 5000
+			mortar-emplacement: 3500
+			artillery-emplacement: 8000
+			forward-hive: 2500
+			resin-trap: 1500
+			cade: 1200
+	SquadManagerBotModule@marines-easy:
+		RequiresCondition: enable-skirmish-ai && !faction-xenos && enable-easy-ai
+		SquadSize: 12
+		SquadSizeRandomBonus: 20
+		ExcludeFromSquadsTypes: medic, engineer, drone, queen
+		ConstructionYardTypes: cryo-pod, resin-silo, forward-hive
+		ProtectionTypes: cryo-pod, vendor, resin-silo, mini-silo, sentry-turret, resin-turret, miner, weed-node, armory, ordnance-depot, evolution-tower, maturity-tower, workshop, mortar-emplacement, artillery-emplacement, forward-hive, cade
+	SquadManagerBotModule@xenos-easy:
+		RequiresCondition: enable-skirmish-ai && faction-xenos && enable-easy-ai
+		SquadSize: 20
+		SquadSizeRandomBonus: 20
+		ExcludeFromSquadsTypes: medic, engineer, drone, queen
+		ConstructionYardTypes: cryo-pod, resin-silo, forward-hive
+		ProtectionTypes: cryo-pod, vendor, resin-silo, mini-silo, sentry-turret, resin-turret, miner, weed-node, armory, ordnance-depot, evolution-tower, maturity-tower, workshop, mortar-emplacement, artillery-emplacement, forward-hive, cade
+	SquadManagerBotModule@marines-normal:
+		RequiresCondition: enable-skirmish-ai && !faction-xenos && !enable-easy-ai && !enable-hard-ai
 		SquadSize: 8
 		SquadSizeRandomBonus: 20
 		ExcludeFromSquadsTypes: medic, engineer, drone, queen
-		ConstructionYardTypes: cryo-pod, resin-silo
-		ProtectionTypes: cryo-pod, vendor, resin-silo, mini-silo, sentry-turret, resin-turret, miner, weed-node, armory, ordnance-depot, evolution-tower, maturity-tower
-	SquadManagerBotModule@xenos:
-		RequiresCondition: enable-skirmish-ai && faction-xenos
+		ConstructionYardTypes: cryo-pod, resin-silo, forward-hive
+		ProtectionTypes: cryo-pod, vendor, resin-silo, mini-silo, sentry-turret, resin-turret, miner, weed-node, armory, ordnance-depot, evolution-tower, maturity-tower, workshop, mortar-emplacement, artillery-emplacement, forward-hive, cade
+	SquadManagerBotModule@xenos-normal:
+		RequiresCondition: enable-skirmish-ai && faction-xenos && !enable-easy-ai && !enable-hard-ai
 		SquadSize: 14
 		SquadSizeRandomBonus: 20
 		ExcludeFromSquadsTypes: medic, engineer, drone, queen
-		ConstructionYardTypes: cryo-pod, resin-silo
-		ProtectionTypes: cryo-pod, vendor, resin-silo, mini-silo, sentry-turret, resin-turret, miner, weed-node, armory, ordnance-depot, evolution-tower, maturity-tower
+		ConstructionYardTypes: cryo-pod, resin-silo, forward-hive
+		ProtectionTypes: cryo-pod, vendor, resin-silo, mini-silo, sentry-turret, resin-turret, miner, weed-node, armory, ordnance-depot, evolution-tower, maturity-tower, workshop, mortar-emplacement, artillery-emplacement, forward-hive, cade
+	SquadManagerBotModule@marines-hard:
+		RequiresCondition: enable-skirmish-ai && !faction-xenos && enable-hard-ai
+		SquadSize: 6
+		SquadSizeRandomBonus: 20
+		ExcludeFromSquadsTypes: medic, engineer, drone, queen
+		ConstructionYardTypes: cryo-pod, resin-silo, forward-hive
+		ProtectionTypes: cryo-pod, vendor, resin-silo, mini-silo, sentry-turret, resin-turret, miner, weed-node, armory, ordnance-depot, evolution-tower, maturity-tower, workshop, mortar-emplacement, artillery-emplacement, forward-hive, cade
+	SquadManagerBotModule@xenos-hard:
+		RequiresCondition: enable-skirmish-ai && faction-xenos && enable-hard-ai
+		SquadSize: 10
+		SquadSizeRandomBonus: 20
+		ExcludeFromSquadsTypes: medic, engineer, drone, queen
+		ConstructionYardTypes: cryo-pod, resin-silo, forward-hive
+		ProtectionTypes: cryo-pod, vendor, resin-silo, mini-silo, sentry-turret, resin-turret, miner, weed-node, armory, ordnance-depot, evolution-tower, maturity-tower, workshop, mortar-emplacement, artillery-emplacement, forward-hive, cade
+	# Calls in CAS (marines) or the hive powers (xenos) when the strike is ready and a cluster of enemies is in sight. A friendly unit in the blast counts against the spot.
+	SupportPowerBotModule:
+		RequiresCondition: enable-skirmish-ai && !enable-easy-ai
+		Decisions:
+			bombrun:
+				OrderName: CasCasOrder
+				CoarseScanRadius: 10
+				MinimumAttractiveness: 4
+				Consideration@1:
+					Against: Enemy
+					Types: Infantry
+					Attractiveness: 1
+					TargetMetric: None
+					CheckRadius: 6c0
+				Consideration@2:
+					Against: Enemy
+					Types: Structure
+					Attractiveness: 1
+					TargetMetric: None
+					CheckRadius: 6c0
+				Consideration@3:
+					Against: Ally
+					Types: Infantry, Structure
+					Attractiveness: -6
+					TargetMetric: None
+					CheckRadius: 6c0
+			gun:
+				OrderName: CasGunOrder
+				CoarseScanRadius: 10
+				MinimumAttractiveness: 3
+				Consideration@1:
+					Against: Enemy
+					Types: Infantry
+					Attractiveness: 1
+					TargetMetric: None
+					CheckRadius: 4c0
+				Consideration@2:
+					Against: Ally
+					Types: Infantry, Structure
+					Attractiveness: -6
+					TargetMetric: None
+					CheckRadius: 4c0
+			minirockets:
+				OrderName: CasMinirocketOrder
+				CoarseScanRadius: 10
+				MinimumAttractiveness: 4
+				Consideration@1:
+					Against: Enemy
+					Types: Infantry
+					Attractiveness: 1
+					TargetMetric: None
+					CheckRadius: 5c0
+				Consideration@2:
+					Against: Ally
+					Types: Infantry, Structure
+					Attractiveness: -6
+					TargetMetric: None
+					CheckRadius: 5c0
+			widowmaker:
+				OrderName: CasWidowmakerOrder
+				CoarseScanRadius: 10
+				MinimumAttractiveness: 4
+				Consideration@1:
+					Against: Enemy
+					Types: Structure
+					Attractiveness: 2
+					TargetMetric: None
+					CheckRadius: 4c0
+				Consideration@2:
+					Against: Enemy
+					Types: Infantry
+					Attractiveness: 1
+					TargetMetric: None
+					CheckRadius: 4c0
+				Consideration@3:
+					Against: Ally
+					Types: Infantry, Structure
+					Attractiveness: -6
+					TargetMetric: None
+					CheckRadius: 4c0
+			napalm:
+				OrderName: CasNapalmOrder
+				CoarseScanRadius: 10
+				MinimumAttractiveness: 5
+				Consideration@1:
+					Against: Enemy
+					Types: Infantry
+					Attractiveness: 1
+					TargetMetric: None
+					CheckRadius: 4c0
+				Consideration@2:
+					Against: Ally
+					Types: Infantry, Structure
+					Attractiveness: -6
+					TargetMetric: None
+					CheckRadius: 4c0
+			fatty:
+				OrderName: CasFattyOrder
+				CoarseScanRadius: 10
+				MinimumAttractiveness: 8
+				Consideration@1:
+					Against: Enemy
+					Types: Structure
+					Attractiveness: 2
+					TargetMetric: None
+					CheckRadius: 6c0
+				Consideration@2:
+					Against: Enemy
+					Types: Infantry
+					Attractiveness: 1
+					TargetMetric: None
+					CheckRadius: 6c0
+				Consideration@3:
+					Against: Ally
+					Types: Infantry, Structure
+					Attractiveness: -6
+					TargetMetric: None
+					CheckRadius: 6c0
+			moab:
+				OrderName: CasMoabOrder
+				CoarseScanRadius: 10
+				MinimumAttractiveness: 14
+				Consideration@1:
+					Against: Enemy
+					Types: Structure
+					Attractiveness: 2
+					TargetMetric: None
+					CheckRadius: 8c0
+				Consideration@2:
+					Against: Enemy
+					Types: Infantry
+					Attractiveness: 1
+					TargetMetric: None
+					CheckRadius: 8c0
+				Consideration@3:
+					Against: Ally
+					Types: Infantry, Structure
+					Attractiveness: -6
+					TargetMetric: None
+					CheckRadius: 8c0
+			laser:
+				OrderName: CasLaserOrder
+				CoarseScanRadius: 10
+				MinimumAttractiveness: 5
+				Consideration@1:
+					Against: Enemy
+					Types: Structure
+					Attractiveness: 3
+					TargetMetric: None
+					CheckRadius: 3c0
+				Consideration@2:
+					Against: Ally
+					Types: Infantry, Structure
+					Attractiveness: -6
+					TargetMetric: None
+					CheckRadius: 3c0
+			psychic-cure:
+				OrderName: PsychicCureOrder
+				CoarseScanRadius: 10
+				MinimumAttractiveness: 6
+				Consideration@1:
+					Against: Ally
+					Types: XenoHeal
+					Attractiveness: 2
+					TargetMetric: None
+					CheckRadius: 4c0
+			hive-rage:
+				OrderName: HiveRageOrder
+				CoarseScanRadius: 10
+				MinimumAttractiveness: 8
+				Consideration@1:
+					Against: Ally
+					Types: Alien
+					Attractiveness: 1
+					TargetMetric: None
+					CheckRadius: 5c0
+				Consideration@2:
+					Against: Enemy
+					Types: Human
+					Attractiveness: 2
+					TargetMetric: None
+					CheckRadius: 8c0
+			call-of-the-burrowed:
+				OrderName: BurrowedOrder
+				CoarseScanRadius: 10
+				MinimumAttractiveness: 2
+				Consideration@1:
+					Against: Enemy
+					Types: Human, Structure
+					Attractiveness: 1
+					TargetMetric: None
+					CheckRadius: 5c0
+	# What the enemy is seen to field decides which units the bot asks for on top of its basic mix (it remembers a sighting for a while).
+	CounterPickBotModule@marines:
+		RequiresCondition: enable-skirmish-ai && !enable-easy-ai && !faction-xenos
+		Counters:
+			swarm:
+				Enemies: runner, hunter, facehugger, larva, sentinel, warrior
+				Units: flamer, machinegunner, grenadier, smartgunner, skirmisher
+				Bonus: 150
+			heavy:
+				Enemies: crusher, praetorian, behemoth, bull, ravager
+				Units: rocketeer, demolitionist, heavygunner, mortarman, assault
+				Bonus: 150
+			ranged:
+				Enemies: spitter, boiler, defiler, widow, warlock, shrike, wraith, carrier
+				Units: sniper, rifleman, blademan, mech, ranger, scout
+				Bonus: 120
+	CounterPickBotModule@xenos:
+		RequiresCondition: enable-skirmish-ai && !enable-easy-ai && faction-xenos
+		Counters:
+			infantry:
+				Enemies: rifleman, smartgunner, medic, engineer, blademan, flamer
+				Units: runner, hunter, warrior, ravager
+				Bonus: 150
+			heavy:
+				Enemies: mech, heavygunner, demolitionist, rocketeer, grenadier
+				Units: crusher, behemoth, bull, boiler, defiler
+				Bonus: 150
+			guns:
+				Enemies: sniper, machinegunner, mortarman, sentry-turret, mortar-emplacement, artillery-emplacement
+				Units: runner, hunter, shrike, widow, wraith
+				Bonus: 120
+	# Xeno units evolve when there is cash to spare. The workers, larvae and the queen stay as they are.
+	EvolveBotModule@xenos:
+		RequiresCondition: enable-skirmish-ai && !enable-easy-ai && faction-xenos
+		Keep: drone, larva, facehugger, queen
+	# Medics go to the wounded and infected, and otherwise stay with the fighting units.
+	MedicBotModule@marines:
+		RequiresCondition: enable-skirmish-ai && !enable-easy-ai && !faction-xenos
+		Medics: medic
+	# Badly wounded units fall back to a refuge and come back when mended.
+	RetreatBotModule@marines:
+		RequiresCondition: enable-skirmish-ai && !enable-easy-ai && !faction-xenos
+		Refuges: medbay, medic, cryo-pod
+		Exclude: medic, engineer
+	RetreatBotModule@xenos:
+		RequiresCondition: enable-skirmish-ai && !enable-easy-ai && faction-xenos
+		Refuges: weed-node, resin-silo, forward-hive
+		Exclude: drone, queen, facehugger, larva
+	# On Hard, one cheap fast unit explores the map.
+	ScoutBotModule@marines:
+		RequiresCondition: enable-hard-ai && !faction-xenos
+		Scouts: scout, rifleman
+	ScoutBotModule@xenos:
+		RequiresCondition: enable-hard-ai && faction-xenos
+		Scouts: runner, hunter

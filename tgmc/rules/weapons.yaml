@@ -2,20 +2,47 @@
 # and acid-green gore on xenos, spit is a visible acid glob, the grenade explodes, and melee hits get their own flash.
 TGMCRifle:
 	Range: 6c0
-	ReloadDelay: 15
-	Report: rifle-fire-1.ogg, rifle-fire-2.ogg, rifle-fire-3.ogg
+	# Fires in bursts of three, then the trigger rests (TGMC rifles have burst_amount 3 and a longer delay between bursts).
+	Burst: 3
+	BurstDelays: 3
+	ReloadDelay: 18
+	Report: rifle-fire-1.ogg, rifle-fire-2.ogg, rifle-fire-3.ogg, rifle-fire-4.ogg, rifle-fire-5.ogg
+	# Shots scatter a little at full range. Units that fire on the move multiply this (see ^Unit), and a shot that lands
+	# more than about a cell off its mark misses.
 	Projectile: Bullet
 		Speed: 600
 		Image: fx-bullet
+		Inaccuracy: 384
+	Warhead@8Flash: GrantExternalCondition
+		Condition: hitflash
+		Duration: 3
+		Range: 0c256
+		ValidRelationships: Enemy
+		ValidTargets: Infantry
 	Warhead@1Dam: SpreadDamage
-		Damage: 14
+		Damage: 8
 		Spread: 128
+		# Armoured xenos shrug off ordinary rounds (armour classes are set on the xeno castes; see units.yaml).
+		Versus:
+			Heavy: 70
 		ValidRelationships: Enemy
 	Warhead@2Hit: CreateEffect
 		ImpactSounds: hit-bullet-1.ogg, hit-bullet-2.ogg, hit-bullet-3.ogg, hit-bullet-4.ogg
 		ImpactSoundChance: 55
 		ValidRelationships: Enemy
 		ValidTargets: Alien, Structure
+	# A shot that finds no one is a puff of dust where it lands. (Impacts on an actor are ignored by this warhead.)
+	Warhead@6Dust: CreateEffect
+		Image: fx-impact
+		Explosions: dust
+		ValidTargets: Ground
+		InvalidTargets: Infantry, Structure
+		ForceDisplayAtGroundLevel: true
+	Warhead@9Light1: CreateEffect
+		Image: fx-light
+		Explosions: impact
+		ForceDisplayAtGroundLevel: true
+		ValidTargets: Ground
 	Warhead@3Cry: CreateEffect
 		ImpactSounds: xeno-larva-1.ogg, xeno-larva-2.ogg, xeno-larva-3.ogg, xeno-larva-4.ogg, xeno-growl-1.ogg
 		ImpactSoundChance: 18
@@ -26,36 +53,310 @@ TGMCRifle:
 		Explosions: gore
 		ValidRelationships: Enemy
 		ValidTargets: Alien
+	Warhead@9Light2: CreateEffect
+		Image: fx-light
+		Explosions: impact
+		ForceDisplayAtGroundLevel: true
+		ValidTargets: Alien
 	Warhead@5Spark: CreateEffect
 		Image: fx-impact
 		Explosions: spark
 		ValidRelationships: Enemy
 		ValidTargets: Structure
+	Warhead@9Light3: CreateEffect
+		Image: fx-light
+		Explosions: impact
+		ForceDisplayAtGroundLevel: true
+		ValidTargets: Structure
+
+TGMCSadar:
+	Inherits: TGMCGrenade
+	Range: 9c0
+	ReloadDelay: 90
+	Report: sadar-fire-1.ogg, sadar-fire-2.ogg, sadar-fire-3.ogg
+	# A rocket, not a lobbed grenade: it flies straight and fast, pointing along its path, and leaves a trail of smoke.
+	Projectile: Shell
+		WhistleSounds: rocket-whistle.ogg
+		WhistleLead: 25
+		Speed: 330
+		Image: fx-rocket
+		Sequences: idle
+		Shadow: false
+		LaunchAngle: 0
+		Blockable: false
+		ContrailLength: 14
+		ContrailStartColor: ffffffcc
+		ContrailEndColor: 9a9a9a00
+		ContrailZOffset: 2047
+		TrailImage: fx-light
+		TrailSequences: rocket
+		TrailInterval: 3
+	# A rocket bursts in a fireball, and the ground shudders.
+	Warhead@2Boom: CreateEffect
+		Image: fx-blast
+		Explosions: fireball
+		ImpactSounds: explosion-1.ogg, explosion-2.ogg, explosion-3.ogg
+		ForceDisplayAtGroundLevel: true
+		ValidTargets: Ground, Water, Structure
+	Warhead@9Light4: CreateEffect
+		Image: fx-light
+		Explosions: blast
+		ForceDisplayAtGroundLevel: true
+		ValidTargets: Ground, Water, Structure
+	Warhead@7Shake: ShakeScreen
+		Duration: 10
+		Intensity: 3
+		Multiplier: 1, 1
+	Warhead@7Flash: FlashScreen
+		Duration: 5
+		Strength: 40
+	Warhead@1Dam: ExplosiveDamage
+		Damage: 80
+		# TGMC's SADAR rocket: devastation 0, heavy 4, light 6.
+		Range: 0c0, 1c0, 4c0, 6c0
+		Falloff: 100, 85, 40, 0
+		Versus:
+			Heavy: 120
+
+TGMCMortar:
+	Inherits: TGMCGrenade
+	Range: 14c0
+	MinRange: 3c0
+	ReloadDelay: 100
+	Report: mortar-fire.ogg
+	# The shell whistles at the spot where it will land, shortly before it does.
+	Projectile: Shell
+		WhistleSounds: mortar-whistle.ogg, mortar-long-whistle.ogg
+		WhistleLead: 50
+	# A mortar shell: a blast about five cells across like TGMC's (devastation 1, heavy 2, light 5), a shake, and dust that hangs over the ground.
+	Warhead@2Boom: CreateEffect
+		Image: fx-blast-mortar
+		Explosions: boom
+		ImpactSounds: explosion-big.ogg
+		ForceDisplayAtGroundLevel: true
+		ValidTargets: Ground, Water, Structure
+	Warhead@9Light5: CreateEffect
+		Image: fx-light
+		Explosions: blast
+		ForceDisplayAtGroundLevel: true
+		ValidTargets: Ground, Water, Structure
+	Warhead@3Dust: CreateEffect
+		Delay: 14
+		Image: fx-dust-mortar
+		Explosions: dust
+		ForceDisplayAtGroundLevel: true
+		ValidTargets: Ground, Water, Structure
+	Warhead@7Shake: ShakeScreen
+		Duration: 14
+		Intensity: 5
+		Multiplier: 1, 1
+	Warhead@7Flash: FlashScreen
+		Duration: 6
+		Strength: 45
+	Warhead@1Dam: ExplosiveDamage
+		Damage: 70
+		Range: 0c0, 1c0, 2c0, 5c0
+		Falloff: 100, 80, 50, 0
+
+# The mortar emplacement: the mortarman's shell from further away and a little quicker.
+TGMCMortarEmplacement:
+	Inherits: TGMCMortar
+	Range: 24c0
+	MinRange: 5c0
+	ReloadDelay: 80
+
+# The artillery emplacement (a howitzer): the longest reach in the game and a bigger shell than a mortar's (TGMC: heavy 6, light 7), but
+# slow to reload.
+TGMCHowitzer:
+	Inherits: TGMCMortar
+	Range: 40c0
+	MinRange: 10c0
+	ReloadDelay: 240
+	Report: howitzer-fire.ogg
+	Projectile: Shell
+		WhistleSounds: howitzer-whistle.ogg
+		WhistleLead: 90
+	Warhead@2Boom: CreateEffect
+		Image: fx-blast-howi
+		Explosions: boom
+	Warhead@9Light6: CreateEffect
+		Image: fx-light
+		Explosions: blast-big
+		ForceDisplayAtGroundLevel: true
+		ValidTargets: Ground, Water, Structure
+	Warhead@3Dust: CreateEffect
+		Image: fx-dust-howi
+		Explosions: dust
+	Warhead@7Shake: ShakeScreen
+		Duration: 26
+		Intensity: 11
+		Multiplier: 1, 1
+	Warhead@7Flash: FlashScreen
+		Duration: 12
+		Strength: 100
+	Warhead@1Dam: ExplosiveDamage
+		Damage: 150
+		Range: 0c0, 1c0, 6c0, 8c0
+		Falloff: 100, 90, 40, 0
+
+# What a resin trap does to a marine who comes close: holds him in place for a few seconds and stings.
+TGMCResinTrap:
+	Range: 1c256
+	ReloadDelay: 250
+	Projectile: InstantHit
+	Warhead@9Stun: GrantExternalCondition
+		Condition: stunned
+		Duration: 75
+		Range: 1c256
+		ValidRelationships: Enemy
+		ValidTargets: Human
+	Warhead@1Dam: SpreadDamage
+		Damage: 12
+		Spread: 1c256
+		Falloff: 100, 0
+		ValidRelationships: Enemy
+		ValidTargets: Human
+
+TGMCVali:
+	Inherits: TGMCClaws
+	ReloadDelay: 18
+	Report: hit-armor-1.ogg, hit-armor-2.ogg, hit-armor-3.ogg
+	Warhead@1Dam: TargetDamage
+		Damage: 35
+
+TGMCFlamer:
+	Range: 4c0
+	ReloadDelay: 30
+	Report: flamer-fire-1.ogg, flamer-fire-2.ogg, flamer-fire-3.ogg
+	TargetActorCenter: true
+	Projectile: InstantHit
+	Warhead@1Cone: ConeDamage
+		Damage: 25
+		ConeRange: 4c0
+		HalfAngle: 64
+		FarEndPercent: 40
+		ValidRelationships: Enemy
+	Warhead@2Fx: CreateEffect
+		Image: fx-blast
+		Explosions: grenade
+		ValidRelationships: Enemy
+		ValidTargets: Ground, Structure
+	Warhead@9Light7: CreateEffect
+		Image: fx-light
+		Explosions: blast
+		ForceDisplayAtGroundLevel: true
+		ValidTargets: Ground, Structure
+	# The ground where the flames land keeps burning (see flame-patch in units.yaml).
+	Warhead@3Patch: SpawnActor
+		Actor: flame-patch
+		TrailCells: 3
+
+# What a gas cloud does to enemy units standing in it, a few times a second: a little damage and a slow.
+TGMCGasCloud:
+	Range: 1c768
+	ReloadDelay: 15
+	Projectile: InstantHit
+	Warhead@1Slow: GrantExternalCondition
+		Condition: gassed
+		Duration: 30
+		Range: 1c768
+		ValidRelationships: Enemy, Neutral
+		ValidTargets: Ground
+	Warhead@2Dam: SpreadDamage
+		Damage: 4
+		Spread: 1c768
+		Falloff: 100, 100, 0
+		ValidRelationships: Enemy, Neutral
+		ValidTargets: Ground
+
+# The defiler's canister: a short lob that bursts into a lingering cloud of neurotoxin, little damage of its own.
+TGMCDefilerGas:
+	Inherits: TGMCAcid
+	Range: 10c0
+	MinRange: 2c0
+	ReloadDelay: 140
+	Projectile: Shell
+		Speed: 300
+		LaunchAngle: 120
+		Inaccuracy: 384
+		InaccuracyType: Maximum
+		WhistleSounds: mortar-whistle.ogg
+		WhistleLead: 30
+	Warhead@1Dam: SpreadDamage
+		Damage: 12
+		Spread: 1c0
+		Falloff: 100, 50, 0
+		ValidRelationships: Enemy
+	Warhead@3Gas: SpawnActor
+		Actor: gas-cloud
+		TrailCells: 0
+
+# What the flame patch does to anyone standing in it, friend or foe, a few times a second.
+TGMCFlamePatch:
+	Range: 1c256
+	ReloadDelay: 12
+	Projectile: InstantHit
+	Warhead@1Dam: SpreadDamage
+		Damage: 5
+		Spread: 1c0
+		Falloff: 100, 0
+		ValidRelationships: Enemy, Neutral, Ally
+		ValidTargets: Ground
+
+TGMCSniper:
+	Inherits: TGMCRifle
+	Range: 12c0
+	Burst: 1
+	ReloadDelay: 40
+	Report: sniper-fire-1.ogg, sniper-fire-2.ogg, sniper-fire-3.ogg
+	Projectile: Bullet
+		Inaccuracy: 128
+	Warhead@1Dam: SpreadDamage
+		Damage: 60
+		Spread: 0
+		# Armour-piercing: a sniper round goes through heavy hide.
+		Versus:
+			Heavy: 120
+
+TGMCMG60:
+	Inherits: TGMCRifle
+	Range: 7c0
+	Burst: 1
+	ReloadDelay: 4
+	Report: mg60-fire-1.ogg, mg60-fire-2.ogg
+	Projectile: Bullet
+		Inaccuracy: 512
+	Warhead@1Dam: SpreadDamage
+		Damage: 11
+		Spread: 192
 
 TGMCSentry:
 	Inherits: TGMCRifle
+	Burst: 1
+	ReloadDelay: 15
 	Report: sentry-fire.ogg
 	Projectile: Bullet
 		Sequences: large
+		Inaccuracy: 256
 	Warhead@1Dam: SpreadDamage
 		Damage: 10
 
 TGMCHeal:
 	Range: 3c0
-	ReloadDelay: 60
+	ReloadDelay: 36
 	Report: heal.ogg
-	ValidTargets: Heal
+	ValidTargets: Heal, Infected
 	TargetActorCenter: true
 	Projectile: InstantHit
 	Warhead@1Dam: TargetDamage
 		Damage: -20
 		ValidRelationships: Ally
-		ValidTargets: Heal
+		ValidTargets: Heal, Infected
 	Warhead@2Fx: CreateEffect
 		Image: heal-plus
 		Explosions: idle
 		ValidRelationships: Ally
-		ValidTargets: Heal
+		ValidTargets: Heal, Infected
 
 TGMCRepair:
 	Range: 2c0
@@ -83,8 +384,18 @@ TGMCClaws:
 	Report: claw-swipe-1.ogg, claw-swipe-2.ogg, claw-swipe-3.ogg
 	TargetActorCenter: true
 	Projectile: InstantHit
+	Warhead@8Flash: GrantExternalCondition
+		Condition: hitflash
+		Duration: 3
+		Range: 0c256
+		ValidRelationships: Enemy
+		ValidTargets: Infantry
 	Warhead@1Dam: TargetDamage
 		Damage: 20
+		# B18 heavy armour turns a good share of a claw or acid hit aside; B17 demolition armour a little.
+		Versus:
+			HeavyMarine: 55
+			Demolition: 85
 	Warhead@2Hit: CreateEffect
 		ImpactSounds: hit-armor-1.ogg, hit-armor-2.ogg, hit-armor-3.ogg
 		ImpactSoundChance: 50
@@ -102,10 +413,20 @@ TGMCClaws:
 		ImpactSoundChance: 40
 		ValidRelationships: Enemy
 		ValidTargets: Human
+	Warhead@9Light8: CreateEffect
+		Image: fx-light
+		Explosions: impact
+		ForceDisplayAtGroundLevel: true
+		ValidTargets: Human
 	Warhead@5Spark: CreateEffect
 		Image: fx-impact
 		Explosions: spark
 		ValidRelationships: Enemy
+		ValidTargets: Structure
+	Warhead@9Light9: CreateEffect
+		Image: fx-light
+		Explosions: impact
+		ForceDisplayAtGroundLevel: true
 		ValidTargets: Structure
 	Warhead@6Slash: CreateEffect
 		Image: fx-claw
@@ -124,12 +445,23 @@ TGMCSpit:
 		Image: fx-acid
 		Shadow: true
 		LaunchAngle: 60
+		Inaccuracy: 384
 		Blockable: false
+	Warhead@8Flash: GrantExternalCondition
+		Condition: hitflash
+		Duration: 3
+		Range: 0c256
+		ValidRelationships: Enemy
+		ValidTargets: Infantry
 	Warhead@1Dam: SpreadDamage
 		Damage: 16
 		Spread: 256
 		Falloff: 100, 100, 60, 0
 		ValidRelationships: Enemy
+		# B18 heavy armour turns a good share of a claw or acid hit aside; B17 demolition armour a little.
+		Versus:
+			HeavyMarine: 55
+			Demolition: 85
 	Warhead@2Hit: CreateEffect
 		Image: fx-acid
 		Explosions: splash
@@ -137,6 +469,11 @@ TGMCSpit:
 		ImpactSoundChance: 70
 		ForceDisplayAtGroundLevel: true
 		ValidRelationships: Enemy
+		ValidTargets: Ground, Water, Structure
+	Warhead@9Light10: CreateEffect
+		Image: fx-light
+		Explosions: acid
+		ForceDisplayAtGroundLevel: true
 		ValidTargets: Ground, Water, Structure
 
 TGMCMend:
@@ -155,6 +492,11 @@ TGMCMend:
 		Explosions: heal
 		ValidRelationships: Ally
 		ValidTargets: Repair
+	Warhead@9Light11: CreateEffect
+		Image: fx-light
+		Explosions: impact
+		ForceDisplayAtGroundLevel: true
+		ValidTargets: Repair
 
 # Resin turret: the same acid glob as the Sentinel, with more punch.
 TGMCAcid:
@@ -166,13 +508,24 @@ TGMCAcid:
 		Speed: 450
 		Image: fx-acid
 		Shadow: true
+		Inaccuracy: 384
 		LaunchAngle: 60
 		Blockable: false
+	Warhead@8Flash: GrantExternalCondition
+		Condition: hitflash
+		Duration: 3
+		Range: 0c256
+		ValidRelationships: Enemy
+		ValidTargets: Infantry
 	Warhead@1Dam: SpreadDamage
 		Damage: 30
 		Spread: 256
 		Falloff: 100, 100, 60, 0
 		ValidRelationships: Enemy
+		# B18 heavy armour turns a good share of a claw or acid hit aside; B17 demolition armour a little.
+		Versus:
+			HeavyMarine: 55
+			Demolition: 85
 	Warhead@2Hit: CreateEffect
 		Image: fx-acid
 		Explosions: splash
@@ -181,17 +534,58 @@ TGMCAcid:
 		ForceDisplayAtGroundLevel: true
 		ValidRelationships: Enemy
 		ValidTargets: Ground, Water, Structure
+	Warhead@9Light12: CreateEffect
+		Image: fx-light
+		Explosions: acid
+		ForceDisplayAtGroundLevel: true
+		ValidTargets: Ground, Water, Structure
+
+# The boiler's glob: xeno artillery. A big lobbed ball of acid from far away that splashes wide and leaves a pool on the ground.
+TGMCBoilerGlob:
+	Inherits: TGMCAcid
+	Range: 22c0
+	MinRange: 6c0
+	ReloadDelay: 160
+	Report: acid-spit-1.ogg, acid-spit-2.ogg
+	Projectile: Shell
+		Speed: 260
+		Image: fx-acid
+		LaunchAngle: 165
+		Inaccuracy: 512
+		InaccuracyType: Maximum
+		WhistleSounds: mortar-long-whistle.ogg
+		WhistleLead: 60
+	Warhead@1Dam: SpreadDamage
+		Damage: 55
+		Spread: 1c512
+		Falloff: 100, 70, 35, 0
+		ValidRelationships: Enemy
+		Versus:
+			HeavyMarine: 55
+			Demolition: 85
+	Warhead@3Pool: SpawnActor
+		Actor: acid-pool
+		TrailCells: 0
+	Warhead@4Gas: SpawnActor
+		Actor: gas-cloud
+		TrailCells: 0
 
 # Marine gunners. Smartgunner: fast, spread bullets. Grenadier: a grenade launcher, lobbed and explosive.
 TGMCSmartgun:
 	Range: 7c0
 	ReloadDelay: 5
-	Report: rifle-fire-1.ogg, rifle-fire-2.ogg, rifle-fire-3.ogg
+	Report: smartgun-fire-1.ogg, smartgun-fire-2.ogg, smartgun-fire-3.ogg
 	Projectile: Bullet
 		Speed: 900
 		Image: fx-bullet
 		Inaccuracy: 256
 		InaccuracyType: Maximum
+	Warhead@8Flash: GrantExternalCondition
+		Condition: hitflash
+		Duration: 3
+		Range: 0c256
+		ValidRelationships: Enemy
+		ValidTargets: Infantry
 	Warhead@1Dam: SpreadDamage
 		Damage: 7
 		Spread: 1c0
@@ -206,10 +600,20 @@ TGMCSmartgun:
 		Explosions: gore
 		ValidRelationships: Enemy
 		ValidTargets: Alien
+	Warhead@9Light13: CreateEffect
+		Image: fx-light
+		Explosions: impact
+		ForceDisplayAtGroundLevel: true
+		ValidTargets: Alien
 	Warhead@4Spark: CreateEffect
 		Image: fx-impact
 		Explosions: spark
 		ValidRelationships: Enemy
+		ValidTargets: Structure
+	Warhead@9Light14: CreateEffect
+		Image: fx-light
+		Explosions: impact
+		ForceDisplayAtGroundLevel: true
 		ValidTargets: Structure
 
 TGMCGrenade:
@@ -222,16 +626,25 @@ TGMCGrenade:
 		Shadow: true
 		LaunchAngle: 165
 		Blockable: false
-	Warhead@1Dam: SpreadDamage
+	Warhead@1Dam: ExplosiveDamage
 		Damage: 45
 		Spread: 2c0
 		Falloff: 100, 50, 20, 0
 		DamageTypes: ExplosionDeath
-		ValidRelationships: Enemy
+		# Blasts hurt friend and foe alike, so lobbing one at point-blank range is a mistake. B17 armour is made for it.
+		ValidRelationships: Ally, Neutral, Enemy
+		Versus:
+			Demolition: 25
+			HeavyMarine: 90
 	Warhead@2Boom: CreateEffect
 		Image: fx-blast
 		Explosions: grenade
 		ImpactSounds: explosion-1.ogg, explosion-2.ogg, explosion-3.ogg
+		ForceDisplayAtGroundLevel: true
+		ValidTargets: Ground, Water, Structure
+	Warhead@9Light15: CreateEffect
+		Image: fx-light
+		Explosions: blast
 		ForceDisplayAtGroundLevel: true
 		ValidTargets: Ground, Water, Structure
 
@@ -241,11 +654,27 @@ TGMCSlam:
 	ReloadDelay: 35
 	Report: claw-swipe-1.ogg, claw-swipe-2.ogg, claw-swipe-3.ogg
 	Projectile: InstantHit
+	Warhead@8Flash: GrantExternalCondition
+		Condition: hitflash
+		Duration: 3
+		Range: 0c256
+		ValidRelationships: Enemy
+		ValidTargets: Infantry
 	Warhead@1Dam: SpreadDamage
 		Damage: 30
 		Spread: 1c256
 		Falloff: 100, 60, 25
 		ValidRelationships: Enemy
+		# B18 heavy armour turns a good share of a claw or acid hit aside; B17 demolition armour a little.
+		Versus:
+			HeavyMarine: 55
+			Demolition: 85
+	Warhead@9Stagger: GrantExternalCondition
+		Condition: stunned
+		Duration: 25
+		Range: 1c0
+		ValidRelationships: Enemy
+		ValidTargets: Human
 	Warhead@2Slam: CreateEffect
 		Image: fx-slam
 		Explosions: slam
@@ -259,8 +688,551 @@ TGMCSlam:
 		ImpactSoundChance: 50
 		ValidRelationships: Enemy
 		ValidTargets: Human
+	Warhead@9Light16: CreateEffect
+		Image: fx-light
+		Explosions: impact
+		ForceDisplayAtGroundLevel: true
+		ValidTargets: Human
 	Warhead@4Impact: CreateEffect
 		Image: fx-slam-big
 		Explosions: impact
 		ForceDisplayAtGroundLevel: true
 		ValidTargets: Ground, Water, Structure
+
+# Facehugger: leaps at a marine without an embryo and plants one, which spends the facehugger. Healing the marine in time
+# clears the embryo; otherwise the marine bursts into a larva for the xenos.
+TGMCHug:
+	Range: 1c256
+	ReloadDelay: 30
+	Report: xeno-pounce-1.ogg, xeno-pounce-2.ogg, xeno-hiss-1.ogg
+	TargetActorCenter: true
+	ValidTargets: Infestable
+	Projectile: InstantHit
+	Warhead@1Infest: Infest
+		ValidRelationships: Enemy
+		ValidTargets: Infestable
+	Warhead@2Latch: CreateEffect
+		Image: fx-impact
+		Explosions: blood
+		ImpactSounds: splat.ogg
+		ValidRelationships: Enemy
+		ValidTargets: Infestable
+	Warhead@9Light17: CreateEffect
+		Image: fx-light
+		Explosions: impact
+		ForceDisplayAtGroundLevel: true
+		ValidTargets: Infestable
+
+# A larva's nibble.
+TGMCBite:
+	Inherits: TGMCClaws
+	ReloadDelay: 22
+	Warhead@1Dam: TargetDamage
+		Damage: 5
+
+# Pounce strike: the first hit after a leap hits hard and knocks the marine senseless for a moment.
+TGMCPounce:
+	Inherits: TGMCClaws
+	ReloadDelay: 60
+	Warhead@1Dam: TargetDamage
+		Damage: 30
+	Warhead@9Stun: GrantExternalCondition
+		Condition: stunned
+		Duration: 40
+		ValidRelationships: Enemy
+		ValidTargets: Human
+
+# B18 heavy gunner's minigun: a long, wild burst of light rounds, then a pause for the barrels to spin down.
+TGMCMinigun:
+	Inherits: TGMCMG60
+	Range: 6c0
+	Burst: 8
+	BurstDelays: 1
+	ReloadDelay: 12
+	Report: minigun-fire.ogg
+	Projectile: Bullet
+		Inaccuracy: 640
+	Warhead@1Dam: SpreadDamage
+		Damage: 6
+		Spread: 192
+
+# B17 demolitionist's launcher: a heavier shell than the grenadier's, with the same friendly fire.
+TGMCHEGrenade:
+	Inherits: TGMCGrenade
+	Range: 7c0
+	ReloadDelay: 60
+	Warhead@1Dam: ExplosiveDamage
+		Damage: 90
+		Spread: 2c512
+
+# The other basic rifles a rifleman may carry (one is picked at random for each marine): the T-18 carbine fires quicker and
+# lighter, the M412 heavier and slower. The T-12 assault rifle is TGMCRifle above.
+TGMCCarbine:
+	Inherits: TGMCRifle
+	Range: 5c256
+	BurstDelays: 2
+	ReloadDelay: 15
+	Projectile: Bullet
+		Inaccuracy: 448
+	Warhead@1Dam: SpreadDamage
+		Damage: 7
+
+TGMCM412:
+	Inherits: TGMCRifle
+	Range: 6c512
+	BurstDelays: 4
+	ReloadDelay: 24
+	Report: rifle-fire-m412.ogg
+	Projectile: Bullet
+		Inaccuracy: 320
+	Warhead@1Dam: SpreadDamage
+		Damage: 11
+
+# Engineer's shotgun: six pellets that scatter, deadly up close.
+TGMCShotgun:
+	Inherits: TGMCRifle
+	Range: 4c0
+	Burst: 6
+	BurstDelays: 1
+	ReloadDelay: 45
+	Report: shotgun-fire-1.ogg, shotgun-fire-2.ogg
+	Projectile: Bullet
+		Inaccuracy: 768
+	Warhead@1Dam: SpreadDamage
+		Damage: 6
+
+# Corpsman's submachine gun: a stream of light rounds at short range.
+TGMCSMG:
+	Inherits: TGMCRifle
+	Range: 4c512
+	Burst: 1
+	ReloadDelay: 5
+	Report: smg-fire-1.ogg, smg-fire-2.ogg
+	Projectile: Bullet
+		Inaccuracy: 512
+	Warhead@1Dam: SpreadDamage
+		Damage: 5
+
+# Warrior lunge and Crusher charge: the landing blow of a leap. Heavy, and it stuns.
+TGMCLunge:
+	Inherits: TGMCClaws
+	ReloadDelay: 60
+	# The warrior hurls the marine away.
+	Warhead@6Throw: Knockback
+		Distance: 3c0
+		Duration: 14
+		Height: 0c768
+		LandDamage: 6
+		BlockedDamage: 12
+		ValidRelationships: Enemy
+		ValidTargets: Human
+	Warhead@1Dam: TargetDamage
+		Damage: 35
+	Warhead@9Stun: GrantExternalCondition
+		Condition: stunned
+		Duration: 35
+		ValidRelationships: Enemy
+		ValidTargets: Human
+
+TGMCCharge:
+	Inherits: TGMCClaws
+	Range: 1c512
+	ReloadDelay: 80
+	# The crusher's charge sends the marine flying; he lands hard and harder still against a wall.
+	Warhead@6Throw: Knockback
+		Distance: 5c0
+		Duration: 18
+		Height: 1c256
+		LandDamage: 14
+		BlockedDamage: 28
+		ValidRelationships: Enemy
+		ValidTargets: Human
+	Warhead@1Dam: TargetDamage
+		Damage: 55
+	Warhead@9Stun: GrantExternalCondition
+		Condition: stunned
+		Duration: 60
+		ValidRelationships: Enemy
+		ValidTargets: Human
+
+# Medbay: heals marines nearby, and clears an embryo from a marine it heals.
+TGMCMedbayHeal:
+	Inherits: TGMCHeal
+	Range: 4c0
+	ReloadDelay: 45
+
+# Recovery Pylon: mends xenos nearby.
+TGMCPylonHeal:
+	Range: 4c0
+	ReloadDelay: 50
+	Report: resin-build.ogg
+	ValidTargets: XenoHeal
+	TargetActorCenter: true
+	Projectile: InstantHit
+	Warhead@1Dam: TargetDamage
+		Damage: -25
+		ValidRelationships: Ally
+		ValidTargets: XenoHeal
+	Warhead@2Fx: CreateEffect
+		Image: heal-plus
+		Explosions: idle
+		ValidRelationships: Ally
+		ValidTargets: XenoHeal
+
+# The mech's autocannon and its rocket pod.
+TGMCMechGun:
+	Inherits: TGMCMG60
+	Range: 7c0
+	Burst: 6
+	BurstDelays: 1
+	ReloadDelay: 10
+	Report: mg60-fire-1.ogg, mg60-fire-2.ogg
+	Projectile: Bullet
+		Inaccuracy: 512
+	Warhead@1Dam: SpreadDamage
+		Damage: 10
+		Spread: 192
+
+TGMCMechRocket:
+	Inherits: TGMCSadar
+	Range: 9c0
+	ReloadDelay: 150
+	Warhead@1Dam: ExplosiveDamage
+		Damage: 70
+
+# One bomb of the Condor's CAS run: a big fireball and a shake, and it hurts friend and foe alike.
+TGMCCasBomb:
+	Inherits: TGMCGrenade
+	Range: 90c0
+	Warhead@1Dam: ExplosiveDamage
+		Damage: 150
+		Spread: 1c0
+		Falloff: 100, 70, 40, 15, 0
+	Warhead@2Boom: CreateEffect
+		Image: fx-blast-big
+		Explosions: big
+		ImpactSounds: explosion-big.ogg
+		ForceDisplayAtGroundLevel: true
+		ValidTargets: Ground, Water, Structure
+	Warhead@9Light18: CreateEffect
+		Image: fx-light
+		Explosions: blast-big
+		ForceDisplayAtGroundLevel: true
+		ValidTargets: Ground, Water, Structure
+	Warhead@7Shake: ShakeScreen
+		Duration: 16
+		Intensity: 5
+		Multiplier: 1, 1
+	Warhead@7Flash: FlashScreen
+		Duration: 8
+		Strength: 70
+
+# CAS ammo types, after TGMC's dropship ammo (code/game/objects/structures/dropship_ammo.dm). Each is one blast of a strike set up in
+# structures.yaml (CondorStrikePower). All hurt friend and foe alike.
+TGMCCasGun:
+	Inherits: TGMCGrenade
+	Warhead@1Dam: ExplosiveDamage
+		Damage: 35
+		Spread: 1c0
+		Falloff: 100, 50, 0
+	Warhead@2Boom: CreateEffect
+		Image: fx-impact
+		Explosions: burst
+		ImpactSounds: explosion-1.ogg, explosion-2.ogg
+		ImpactSoundChance: 25
+		ForceDisplayAtGroundLevel: true
+		ValidTargets: Ground, Water, Structure
+	Warhead@9Light19: CreateEffect
+		Image: fx-light
+		Explosions: impact
+		ForceDisplayAtGroundLevel: true
+		ValidTargets: Ground, Water, Structure
+
+TGMCCasMini:
+	Inherits: TGMCGrenade
+	Warhead@1Dam: ExplosiveDamage
+		Damage: 90
+		Spread: 1c0
+		Falloff: 100, 60, 25, 0
+	Warhead@2Boom: CreateEffect
+		Image: fx-blast
+		Explosions: fireball
+		ImpactSounds: explosion-1.ogg, explosion-2.ogg, explosion-3.ogg
+		ForceDisplayAtGroundLevel: true
+		ValidTargets: Ground, Water, Structure
+	Warhead@9Light20: CreateEffect
+		Image: fx-light
+		Explosions: blast
+		ForceDisplayAtGroundLevel: true
+		ValidTargets: Ground, Water, Structure
+	Warhead@7Shake: ShakeScreen
+		Duration: 6
+		Intensity: 1
+		Multiplier: 1, 1
+
+TGMCCasWidow:
+	Inherits: TGMCCasMini
+	Warhead@1Dam: ExplosiveDamage
+		Damage: 350
+		Spread: 1c0
+		Falloff: 100, 70, 30, 0
+		Versus:
+			Heavy: 130
+			Demolition: 25
+			HeavyMarine: 90
+	Warhead@7Shake: ShakeScreen
+		Duration: 12
+		Intensity: 3
+		Multiplier: 1, 1
+	Warhead@7Flash: FlashScreen
+		Duration: 6
+		Strength: 50
+
+TGMCCasNapalm:
+	Inherits: TGMCCasMini
+	Warhead@1Dam: ExplosiveDamage
+		Damage: 90
+		Spread: 1c128
+		Falloff: 100, 60, 30, 10, 0
+	Warhead@2Boom: CreateEffect
+		Image: fx-blast-big
+		Explosions: big
+		ImpactSounds: explosion-big.ogg
+		ForceDisplayAtGroundLevel: true
+		ValidTargets: Ground, Water, Structure
+	Warhead@9Light21: CreateEffect
+		Image: fx-light
+		Explosions: blast-big
+		ForceDisplayAtGroundLevel: true
+		ValidTargets: Ground, Water, Structure
+	Warhead@7Shake: ShakeScreen
+		Duration: 12
+		Intensity: 3
+		Multiplier: 1, 1
+	Warhead@7Flash: FlashScreen
+		Duration: 10
+		Strength: 80
+
+# The fire napalm and lasers leave behind, hit every few ticks at random spots (LingerWeapon).
+TGMCCasFire:
+	Inherits: TGMCGrenade
+	-Warhead@2Boom:
+	Warhead@1Dam: ExplosiveDamage
+		Damage: 7
+		Spread: 1c0
+		Falloff: 100, 0
+	Warhead@3Fire: CreateEffect
+		Image: fx-fire
+		Explosions: burn
+		ForceDisplayAtGroundLevel: true
+		ValidTargets: Ground, Structure
+
+# The Fatty: a first, smaller blast, then a ring of eight more.
+TGMCCasFatty:
+	Inherits: TGMCCasMini
+	Warhead@1Dam: ExplosiveDamage
+		Damage: 120
+		Spread: 1c256
+		Falloff: 100, 60, 30, 0
+	Warhead@7Shake: ShakeScreen
+		Duration: 14
+		Intensity: 4
+		Multiplier: 1, 1
+	Warhead@7Flash: FlashScreen
+		Duration: 8
+		Strength: 70
+
+TGMCCasCluster:
+	Inherits: TGMCCasMini
+	Warhead@1Dam: ExplosiveDamage
+		Damage: 140
+		Spread: 0c896
+		Falloff: 100, 70, 35, 10, 0
+
+TGMCCasLaser:
+	Inherits: TGMCGrenade
+	Warhead@1Dam: ExplosiveDamage
+		Damage: 100
+		Spread: 0c768
+		Falloff: 100, 40, 0
+	Warhead@2Boom: CreateEffect
+		Image: fx-blast
+		Explosions: small
+		ImpactSounds: laser-zap.ogg
+		ImpactSoundChance: 35
+		ForceDisplayAtGroundLevel: true
+		ValidTargets: Ground, Water, Structure
+	Warhead@9Light22: CreateEffect
+		Image: fx-light
+		Explosions: blast
+		ForceDisplayAtGroundLevel: true
+		ValidTargets: Ground, Water, Structure
+
+# Illumination flare: harmless, it only lights the spot (the strike keeps it revealed).
+TGMCCasFlare:
+	Inherits: TGMCGrenade
+	-Warhead@1Dam:
+	Warhead@2Boom: CreateEffect
+		Image: fx-impact
+		Explosions: burst
+		ImpactSounds: flare-pop.ogg
+		ForceDisplayAtGroundLevel: true
+		ValidTargets: Ground, Water, Structure
+	Warhead@9Light23: CreateEffect
+		Image: fx-light
+		Explosions: impact
+		ForceDisplayAtGroundLevel: true
+		ValidTargets: Ground, Water, Structure
+
+TGMCCasMoab:
+	Inherits: TGMCCasNapalm
+	Warhead@1Dam: ExplosiveDamage
+		Damage: 700
+		Spread: 1c512
+		Falloff: 100, 90, 65, 40, 15, 0
+	Warhead@2Boom: CreateEffect
+		Image: fx-blast-big
+		Explosions: big
+		ImpactSounds: explosion-huge.ogg
+		ForceDisplayAtGroundLevel: true
+		ValidTargets: Ground, Water, Structure
+	Warhead@9Light24: CreateEffect
+		Image: fx-light
+		Explosions: blast-big
+		ForceDisplayAtGroundLevel: true
+		ValidTargets: Ground, Water, Structure
+	Warhead@7Shake: ShakeScreen
+		Duration: 46
+		Intensity: 13
+		Multiplier: 1, 1
+	Warhead@7Flash: FlashScreen
+		Duration: 22
+		Strength: 210
+
+# What a unit leaves where it dies: a splash of blood (marines) or acid-green gore (xenos). Fired by FireWarheadsOnDeath.
+TGMCDeathBlood:
+	Warhead@1Fx: CreateEffect
+		Image: fx-impact
+		Explosions: blood
+		ImpactSounds: splat.ogg
+		ImpactSoundChance: 60
+		ForceDisplayAtGroundLevel: true
+		ImpactActors: false
+	Warhead@9Light25: CreateEffect
+		Image: fx-light
+		Explosions: impact
+		ForceDisplayAtGroundLevel: true
+		ValidTargets: Ground, Water, Structure
+
+TGMCDeathAcid:
+	Warhead@1Fx: CreateEffect
+		Image: fx-impact
+		Explosions: gore
+		ImpactSounds: acid-impact.ogg
+		ImpactSoundChance: 60
+		ForceDisplayAtGroundLevel: true
+		ImpactActors: false
+	Warhead@9Light26: CreateEffect
+		Image: fx-light
+		Explosions: impact
+		ForceDisplayAtGroundLevel: true
+		ValidTargets: Ground, Water, Structure
+
+# The mech's other arms (see the presets in mod/build_sprites.py): flamer, shotgun, SMG, RPG and anti-armour missile.
+TGMCMechFlamer:
+	Inherits: TGMCFlamer
+	Range: 5c0
+
+TGMCMechShotgun:
+	Inherits: TGMCShotgun
+	Range: 5c0
+	Burst: 8
+	ReloadDelay: 38
+	Warhead@1Dam: SpreadDamage
+		Damage: 9
+
+TGMCMechSMG:
+	Inherits: TGMCSMG
+	Range: 6c0
+	ReloadDelay: 3
+	Warhead@1Dam: SpreadDamage
+		Damage: 6
+
+TGMCMechRPG:
+	Inherits: TGMCMechRocket
+	Range: 10c0
+	ReloadDelay: 170
+	Warhead@1Dam: ExplosiveDamage
+		Damage: 90
+
+TGMCMechTow:
+	Inherits: TGMCSadar
+	Projectile: Bullet
+		Sequences: large
+	Range: 12c0
+	ReloadDelay: 230
+	Warhead@1Dam: ExplosiveDamage
+		Damage: 150
+		Versus:
+			Heavy: 140
+
+# The sting of a pool of acid, once a second to marines standing in it.
+TGMCAcidPool:
+	Range: 1c256
+	ReloadDelay: 20
+	Projectile: InstantHit
+	Warhead@1Dam: SpreadDamage
+		Damage: 4
+		Spread: 1c0
+		Falloff: 100, 0
+		ValidRelationships: Enemy
+		ValidTargets: Infantry
+
+# The praetorian's acid spray: a splash of acid on the ground in front of him, thicker than a spit.
+TGMCAcidSpray:
+	Range: 3c0
+	Projectile: InstantHit
+	Warhead@1Dam: SpreadDamage
+		Damage: 32
+		Spread: 1c768
+		Falloff: 100, 100, 50, 0
+		ValidRelationships: Enemy
+		ValidTargets: Ground
+		Versus:
+			HeavyMarine: 55
+			Demolition: 85
+	Warhead@2Hit: CreateEffect
+		Image: fx-acid
+		Explosions: splash
+		ImpactSounds: acid-impact.ogg
+		ForceDisplayAtGroundLevel: true
+		ValidTargets: Ground, Water, Structure
+	Warhead@9Light1: CreateEffect
+		Image: fx-light
+		Explosions: acid
+		ForceDisplayAtGroundLevel: true
+		ValidTargets: Ground, Water, Structure
+	Warhead@3Pool: SpawnActor
+		Actor: acid-pool
+		TrailCells: 0
+
+# The warrior's fling: he throws the marine he holds, hurting him and leaving him stunned.
+TGMCFling:
+	Range: 1c768
+	Projectile: InstantHit
+	Warhead@1Dam: TargetDamage
+		Damage: 18
+		ValidRelationships: Enemy
+	Warhead@6Throw: Knockback
+		Distance: 6c0
+		Duration: 20
+		Height: 1c512
+		LandDamage: 16
+		BlockedDamage: 30
+		ValidRelationships: Enemy
+		ValidTargets: Human
+	Warhead@9Stun: GrantExternalCondition
+		Condition: stunned
+		Duration: 45
+		ValidRelationships: Enemy
+		ValidTargets: Human

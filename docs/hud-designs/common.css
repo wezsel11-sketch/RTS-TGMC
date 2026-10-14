@@ -1,0 +1,8 @@
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:1280px;height:720px;overflow:hidden;font-family:'Lato','DejaVu Sans',sans-serif;color:#e8eef5}
+body{background:#10141a url(backdrop.png) center/cover;position:relative}
+.vig{position:absolute;inset:0;background:radial-gradient(ellipse at center,transparent 45%,rgba(0,0,0,.55) 100%)}
+.abs{position:absolute}
+.bar{height:8px;border-radius:4px;background:rgba(255,255,255,.12);overflow:hidden}
+.bar>i{display:block;height:100%;border-radius:4px}
+.ico{display:inline-block;border-radius:4px;background:linear-gradient(135deg,#3b4a5e,#222c3a);border:1px solid rgba(255,255,255,.18)}

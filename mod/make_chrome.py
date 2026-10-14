@@ -20,21 +20,23 @@ CORNER = 6    # corner and edge width of the nine-slice
 CENTRE = 12   # centre width and height: CORNER + CENTRE + CORNER == TILE
 COLS = 8
 
-SLATE = (30, 35, 40, 255)
-OLIVE = (76, 92, 64, 255)
-OLIVE_HI = (116, 136, 92, 255)
-OLIVE_DARK = (42, 52, 38, 255)
-AMBER = (209, 154, 43, 255)
-AMBER_DIM = (140, 100, 30, 255)
+# A glass look: dark navy panels with a thin blue edge and rounded corners (the names keep their old olive-drab meaning so the
+# style table below still reads the same). Fills are a little see-through, so the map shows faintly through a panel.
+SLATE = (20, 30, 44, 215)
+OLIVE = (30, 46, 68, 235)
+OLIVE_HI = (52, 86, 128, 245)
+OLIVE_DARK = (14, 22, 34, 235)
+AMBER = (79, 179, 255, 255)
+AMBER_DIM = (60, 110, 170, 255)
 RED = (150, 44, 44, 255)
 GREY = (70, 72, 74, 255)
 GREY_DIM = (48, 49, 50, 255)
 # TGUI-style window tones: a darker body than SLATE, so cards and rails read as raised panels.
-TGUI_BODY = (24, 27, 30, 255)
-TGUI_RAIL = (18, 21, 23, 255)
-TGUI_TAB = (34, 40, 32, 255)
-TGUI_EDGE = (60, 70, 52, 255)
-TGUI_TRACK = (16, 18, 20, 255)
+TGUI_BODY = (12, 18, 28, 222)
+TGUI_RAIL = (10, 15, 24, 230)
+TGUI_TAB = (24, 36, 54, 240)
+TGUI_EDGE = (92, 150, 220, 150)
+TGUI_TRACK = (8, 12, 18, 240)
 
 # Collection name -> (fill, border). Names decide the state: hover, pressed, disabled, highlighted.
 PANEL_COLLECTIONS = [
@@ -44,6 +46,8 @@ PANEL_COLLECTIONS = [
     "observer-scrollitem", "scrollpanel-bg", "slider-track",
     "tgui-window", "tgui-titlebar", "tgui-rail", "tgui-card", "tgui-card-header", "tgui-bar-track",
     "tgui-bar-fill",
+    # The terminal main menu's own window and tab (the tgui-* ones above belong to the in-game HUD).
+    "term-window", "term-titlebar",
     # States and panels the stock settings, music, lobby and observer widgets look up by name.
     "scrollitem", "scrollitem-nohover", "scrollitem-nohover-highlighted", "progressbar-bg", "progressbar-thumb",
     "panel-bg", "panel-header", "panel-rule", "panel-thinborder", "panel-thinborder-light",
@@ -54,11 +58,14 @@ BUTTON_COLLECTIONS = [
     "button-highlighted", "button-highlighted-hover", "button-highlighted-pressed",
     "button-highlighted-disabled",
     "sidebar-button", "sidebar-button-hover", "sidebar-button-pressed", "sidebar-button-disabled",
+    "sidebar-button-highlighted", "sidebar-button-highlighted-hover", "sidebar-button-highlighted-pressed",
+    "sidebar-button-highlighted-disabled",
     "scrollpanel-button", "scrollpanel-button-hover", "scrollpanel-button-pressed",
     "observer-scrollpanel-button-pressed", "slider-thumb",
     "checkbox-toggle", "checkbox-toggle-hover", "checkbox-toggle-pressed",
     "checkbox-toggle-highlighted", "checkbox-pressed", "checkbox-disabled",
     "tgui-tab", "tgui-tab-hover", "tgui-tab-pressed", "tgui-tab-disabled", "tgui-tab-active",
+    "term-tab", "term-tab-hover", "term-tab-pressed", "term-tab-disabled", "term-tab-active",
     "scrollitem-hover", "scrollitem-pressed", "scrollitem-highlighted", "scrollheader-highlighted",
     "observer-scrollitem-hover", "observer-scrollitem-pressed", "observer-scrollitem-highlighted",
     "observer-scrollheader-highlighted", "observer-scrollpanel-button", "observer-scrollpanel-button-hover",
@@ -72,7 +79,47 @@ BUTTON_COLLECTIONS = [
 ]
 
 
+# The menus, lobby, settings and dialogs wear a green terminal look: near-black panels with square corners and a thin green edge. The in-game HUD
+# (sidebar, tgmc-*, bars) keeps the blue glass above.
+T_BODY = (5, 14, 8, 238)
+T_BODY_HI = (14, 44, 24, 245)
+T_BODY_DARK = (3, 9, 5, 240)
+T_EDGE = (45, 138, 69, 255)
+T_EDGE_HI = (125, 255, 154, 255)
+T_EDGE_DIM = (30, 84, 46, 255)
+T_OFF = (10, 18, 12, 235)
+T_OFF_EDGE = (36, 56, 42, 255)
+HUD_PREFIXES = ("sidebar", "tgmc-", "tgui-", "progressbar", "tooltip-separator", "separator")
+
+
+def is_hud(name):
+    return name.startswith(HUD_PREFIXES)
+
+
+def term_style(name):
+    """Fill and edge for a menu or dialog collection."""
+    if "disabled" in name:
+        return T_OFF, T_OFF_EDGE
+    if name in ("term-window", "dialog", "dialog2", "dialog3", "dialog4", "dialog5", "panel-bg", "scrollpanel-bg", "mainmenu-border"):
+        return T_BODY, T_EDGE
+    if name in ("term-titlebar", "tgui-rail", "panel-header", "scrollheader", "tgui-card-header"):
+        return T_BODY_DARK, T_EDGE_DIM
+    if "highlighted" in name or name.endswith("active"):
+        return T_BODY_HI, T_EDGE_HI
+    if "pressed" in name:
+        return T_BODY_DARK, T_EDGE
+    if "hover" in name:
+        return T_BODY_HI, T_EDGE_HI
+    if name.startswith("textfield"):
+        return T_BODY_DARK, T_EDGE
+    return T_BODY, T_EDGE
+
+
 def style_for(name):
+    if name == "progressbar-thumb":
+        return (64, 196, 104, 255), (140, 235, 165, 255)
+    if name == "progressbar-bg":
+        return TGUI_TRACK, TGUI_EDGE
     if name == "tgui-window":
         return TGUI_BODY, TGUI_EDGE
     if name == "tgui-titlebar":
@@ -119,15 +166,21 @@ def style_for(name):
     return SLATE, OLIVE
 
 
-def draw_tile(fill, border):
-    img = Image.new("RGBA", (TILE, TILE), fill)
+def flat_tile(fill):
+    """A bar's track or fill: a plain block, so a bar only a few pixels high still reads as a bar."""
+    return Image.new("RGBA", (TILE, TILE), fill)
+
+
+def draw_tile(fill, border, square=False):
+    """A rounded glass tile: a one pixel edge, a faint lighter line along the top, no heavy bevel. Terminal tiles (square) have sharp corners and no sheen."""
+    img = Image.new("RGBA", (TILE, TILE), (0, 0, 0, 0))
     d = ImageDraw.Draw(img)
-    # Two-pixel outer border, a one-pixel bevel highlight on top and left, and a shadow on bottom and right.
-    d.rectangle([0, 0, TILE - 1, TILE - 1], outline=border, width=2)
-    d.line([(2, 2), (TILE - 3, 2)], fill=tuple(min(255, c + 25) for c in fill[:3]) + (255,))
-    d.line([(2, 2), (2, TILE - 3)], fill=tuple(min(255, c + 25) for c in fill[:3]) + (255,))
-    d.line([(2, TILE - 3), (TILE - 3, TILE - 3)], fill=tuple(max(0, c - 20) for c in fill[:3]) + (255,))
-    d.line([(TILE - 3, 2), (TILE - 3, TILE - 3)], fill=tuple(max(0, c - 20) for c in fill[:3]) + (255,))
+    if square:
+        d.rectangle([0, 0, TILE - 1, TILE - 1], fill=fill, outline=border, width=1)
+        return img
+    d.rounded_rectangle([0, 0, TILE - 1, TILE - 1], radius=CORNER - 1, fill=fill, outline=border, width=1)
+    sheen = tuple(min(255, c + 22) for c in fill[:3]) + (min(255, fill[3] + 10),)
+    d.line([(CORNER, 1), (TILE - CORNER - 1, 1)], fill=sheen)
     return img
 
 
@@ -414,8 +467,9 @@ def main():
     lines = ["# Generated by mod/make_chrome.py. Do not edit."]
     for i, name in enumerate(names):
         x, y = (i % COLS) * TILE, (i // COLS) * TILE
-        fill, border = style_for(name)
-        atlas.paste(draw_tile(fill, border), (x, y))
+        square = not is_hud(name)
+        fill, border = term_style(name) if square else style_for(name)
+        atlas.paste(flat_tile(fill) if name.startswith('progressbar') else draw_tile(fill, border, square), (x, y))
         lines.append(f"{name}:")
         lines.append("\tImage: chrome.png")
         lines.append(f"\tPanelRegion: {x}, {y}, {CORNER}, {CORNER}, {CENTRE}, {CENTRE}, {CORNER}, {CORNER}")

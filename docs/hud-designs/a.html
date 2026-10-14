@@ -1,0 +1,47 @@
+<!doctype html><meta charset=utf-8><link rel=stylesheet href=common.css>
+<style>
+:root{--acc:#4fb3ff;--amb:#ffb43c;--glass:rgba(14,20,30,.78);--line:rgba(120,180,255,.35)}
+.panel{position:absolute;background:var(--glass);backdrop-filter:blur(6px);border:1px solid var(--line);border-radius:10px;box-shadow:0 6px 24px rgba(0,0,0,.5)}
+.top{left:50%;transform:translateX(-50%);top:12px;height:38px;padding:0 22px;display:flex;gap:28px;align-items:center;font-size:14px;letter-spacing:.04em}
+.top b{color:var(--amb);font-size:17px}
+.top span small{opacity:.6;margin-right:6px;font-size:11px;letter-spacing:.12em}
+.dock{left:14px;right:14px;bottom:12px;height:178px;display:grid;grid-template-columns:230px 1fr 300px;gap:14px;padding:12px}
+.mini{border-radius:8px;border:1px solid var(--line);background:#0b1118 radial-gradient(circle at 40% 45%,#244a2a 0 46%,#0b1118 47%);position:relative}
+.mini i{position:absolute;width:6px;height:6px;background:#ff5a4f;border-radius:50%}
+.mini u{position:absolute;width:6px;height:6px;background:#6fd0ff;border-radius:50%}
+.card{display:flex;gap:14px}
+.portrait{width:96px;height:120px;border-radius:8px;background:linear-gradient(#2a3a52,#141c28);border:1px solid var(--line);display:flex;align-items:flex-end;justify-content:center;font-size:11px;padding-bottom:6px;opacity:.9}
+.group{display:grid;grid-template-columns:repeat(8,34px);gap:6px;margin-top:8px}
+.group .ico{width:34px;height:34px;position:relative}
+.group .ico:after{content:'';position:absolute;left:3px;right:3px;bottom:3px;height:3px;background:#46d36b;border-radius:2px}
+.name{font-size:20px;font-weight:700;letter-spacing:.03em}
+.sub{opacity:.65;font-size:12px;margin:2px 0 8px}
+.cmd{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.cmd div{height:38px;border-radius:6px;border:1px solid var(--line);background:linear-gradient(#1c2a3e,#121b29);display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:11px;position:relative}
+.cmd div em{position:absolute;top:2px;left:5px;font-size:9px;color:var(--amb);font-style:normal}
+.cmd .on{border-color:var(--acc);box-shadow:inset 0 0 12px rgba(79,179,255,.35)}
+.build{left:14px;top:62px;width:210px;padding:10px}
+.build h4{font-size:11px;letter-spacing:.16em;opacity:.65;margin-bottom:8px}
+.row{display:flex;align-items:center;gap:10px;padding:6px;border-radius:6px}
+.row:hover,.row.sel{background:rgba(79,179,255,.15)}
+.row .ico{width:34px;height:34px}
+.row p{font-size:13px}.row small{font-size:11px;color:var(--amb)}
+.alerts{right:14px;top:62px;width:250px;padding:10px;font-size:12px;line-height:1.6}
+.alerts div{opacity:.9}.alerts .w{color:#ff7a6e}.alerts .g{color:#7be39a}
+.cas{left:240px;top:62px;padding:8px 12px;display:flex;gap:10px;align-items:center;font-size:12px}
+.cas .ico{width:36px;height:36px;background:linear-gradient(135deg,#6a4a1a,#3a2a10)}
+</style>
+<div class=vig></div>
+<div class="panel top"><span><small>REQUISITION</small><b>1000</b></span><span><small>INCOME</small>+0/min</span><span><small>ARMY</small>4</span><span><small>TIME</small>00:02</span></div>
+<div class="panel build"><h4>BUILD · MARINE</h4>
+<div class="row sel"><span class=ico></span><p>Rifleman<br><small>◆ 100</small></p></div>
+<div class=row><span class=ico></span><p>Corpsman<br><small>◆ 140</small></p></div>
+<div class=row><span class=ico></span><p>Engineer<br><small>◆ 120</small></p></div>
+<div class=row><span class=ico></span><p>Smartgunner<br><small>◆ 230</small></p></div></div>
+<div class="panel cas"><span class=ico></span><div><b>CAS · Bomb run</b><br><span style="opacity:.65">Ready · [C]</span></div></div>
+<div class="panel alerts"><div class=w>▲ Marine facehugged</div><div class=g>✚ Barracks complete</div><div>● Hunter spotted — NE</div><div class=w>▲ Under attack</div></div>
+<div class="panel dock">
+ <div class=mini><i style="left:150px;top:60px"></i><i style="left:160px;top:70px"></i><u style="left:90px;top:80px"></u><u style="left:96px;top:90px"></u></div>
+ <div><div class=card><div class=portrait>Rifleman</div><div style="flex:1"><div class=name>6 units selected</div><div class=sub>Squad · 582 / 710 HP</div><div class=bar style="width:360px;height:10px"><i style="width:82%;background:linear-gradient(90deg,#d9b13a,#46d36b)"></i></div><div class=group><span class=ico></span><span class=ico></span><span class=ico></span><span class=ico></span><span class=ico></span><span class=ico></span></div></div></div></div>
+ <div class=cmd><div><em>E</em>Evolve</div><div><em>⇧E</em>Devolve</div><div><em>S</em>Stop</div><div><em>X</em>Scatter</div><div class=on>Attack</div><div>Guard</div><div>Return</div><div>Hold</div><div style="grid-column:span 2">To medic</div><div style="grid-column:span 2">Infected</div></div>
+</div>

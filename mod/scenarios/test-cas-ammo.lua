@@ -8,8 +8,10 @@ WorldLoaded = function()
 	local depot = marines.GetActorsByType("ordnance-depot")[1]
 	local hunters = xenos.GetActorsByType("hunter")
 	table.sort(hunters, function(a, b) return a.Location.X < b.Location.X end)
-	for _, h in ipairs(hunters) do
+	local spots = {}
+	for i, h in ipairs(hunters) do
 		h.Stance = "HoldFire"
+		spots[i] = h.Location
 	end
 
 	local failures = {}
@@ -22,7 +24,7 @@ WorldLoaded = function()
 			local alive = {}
 			for _, h in ipairs(hunters) do alive[#alive + 1] = h.IsDead and "x" or "o" end
 			print("STAT " .. variant .. " alive " .. table.concat(alive))
-			local ok, err = pcall(function() depot.ActivateCondorStrike(hunter.Location, variant) end)
+			local ok, err = pcall(function() depot.ActivateCondorStrike(spots[i], variant) end)
 			if not ok then
 				table.insert(failures, variant .. " (" .. tostring(err) .. ")")
 			end

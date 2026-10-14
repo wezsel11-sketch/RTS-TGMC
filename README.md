@@ -146,6 +146,7 @@ the commits this mod was tested against (see the top of `mod/bootstrap.py`), so 
   - **Firing on the move.** Marines, corpsmen, engineers and the other light infantry shoot at enemies they pass while walking a move or
     attack-move order (`AttackWhileMoving`, within about 70 degrees of their heading). Snipers and machine gunners do not: they stop to shoot
     (`FireWhileMoving: false`).
+  - **Speed.** Every unit moves twice as fast as before (a rifleman's `Speed` is 108, a runner's 288).
   - **Turning.** Infantry turn about five times faster (`TurnSpeed: 160`), so a move order starts almost at once.
   - **Emplacements.** The Mortar Emplacement (Armory, range 24, minimum 5) and the Artillery Emplacement (a 2x2 howitzer, Ordnance Depot,
     range 40, minimum 10, 140 damage, slow reload) are fixed guns that outrange the mortarman. They fire at whatever your units have revealed.
@@ -283,7 +284,7 @@ tgmc/                       the OpenRA mod (YAML and Fluent only)
   mod.yaml                  manifest
   rules/                    world, player, palettes, units, structures, weapons
   audio/notifications.yaml  UI sound mapping
-  audio/music.yaml          the playlist: themes, tense tracks, lobby theme, ambience loops
+  audio/music.yaml          the playlist: the Kevin MacLeod songs and the ambience loops
   scripts/music.lua         faction-aware, fight-aware music (the world's LuaScript)
   tilesets/ground.yaml      one flat ground template
   cursors.yaml, fluent/     cursor names, display strings
@@ -398,18 +399,13 @@ On a headless machine, run OpenRA under Xvfb with Mesa software GL
   The cryo pod and vendor hum, and a cave ambience plays across the map with long gaps.
 - **Announcer** (the ship's AI, ARES): game start, unit ready, queue and refusal pings, a siren when a building is attacked,
   an alert when a unit is lost, code red and a distress beacon for Hold the Line waves, and win and lose stings.
-- **Music** is every music track TGMC has, plus its ambience loops as a calm backdrop. TGMC's real music is short: the
-  four neutral themes (10 to 20 s), two tense themes (`nuclear_detonation`), the dread theme (`zombies_loss`), the elevator
-  track and the lobby theme (the only long one, about three minutes). Win and loss stings are not in the playlist. The 40
-  ambience loops (`ambigen`, `ambicha`, `ambisin`, `ambilava`, `ambicave` and others, capped at 75 s) are stereo music
-  at -12 dB. All of it is in `tgmc/audio/music.yaml`.
-  `tgmc/scripts/music.lua` plays it, because OpenRA's playlist cannot filter by faction. **Marines** get the hopeful themes,
-  elevator, lobby and station ambience; **xenos** get the melancholy and dread themes and the cave, lava and jungle
-  ambience; an observer gets a bit of both. A theme and an ambience track alternate. When an enemy comes within 8 cells of
-  one of your units or structures the tense tracks take over, and the calm ones return about 30 s after the fight.
-  The script is the world's `LuaScript`; a map with its own script (Hold the Line) lists it last. After the in-game
-  next/previous keys, OpenRA's own shuffled playlist (all tracks) continues. `mod/lint_static.py` checks every track
-  named in the script and playlist.
+- **Music** is 23 full-length songs by Kevin MacLeod (incompetech.com, Creative Commons: By Attribution 4.0), plus TGMC's ambience loops as a calm
+  backdrop. TGMC's own themes are only 10 to 20 seconds long, so they are no longer played (the win and loss stings stay). The songs are not in git:
+  `mod/build_sounds.py` downloads them into `build/open-music/` when the mod is built and checks each against the sha256 pinned in
+  `mod/open-music.sha256` (`python mod/build_sounds.py --pin-music` pins them again). Re-encoded as stereo 44.1 kHz at a -9 dB peak, 55 MB in all.
+  `tgmc/scripts/music.lua` plays them, because OpenRA's playlist cannot filter by faction: **marines** get six songs, **xenos** eight darker ones, an
+  observer a mix; every third pick is an ambience loop. When an enemy comes within 8 cells of one of your units or structures the shorter combat songs
+  take over. The artist is in every title, which the in-game music player shows.
 - `mod/lint_static.py` checks every sound name against `build_sounds.py`, including each clip of each prefixed voice set.
   `scenario-sounds` plays every sound, announcer line and track, and `test_scenarios.sh` fails any scenario whose
   `sound.log` says a file did not load. None of it has been heard: this machine has no audio device.
@@ -526,3 +522,11 @@ only for the marines. `docs/hud-designs/` keeps the three mockups the dock was c
 - **Non-commercial.** Because the TGMC art and sounds are NonCommercial, the built mod is
   for personal use only. Don't redistribute `build/`, its `.oramap` or `.zip` files, or any
   converted sprite or sound.
+
+## Music credits
+
+The music is by Kevin MacLeod (incompetech.com), licensed under Creative Commons: By Attribution 4.0, https://creativecommons.org/licenses/by/4.0/.
+Titles: "Intrepid", "Rynos Theme", "Decisions", "Prelude and Action", "Ossuary 7 - Resolve", "Heart of Nowhere", "Dark Times", "Unseen Horrors",
+"Anguish", "The Descent", "Deep Haze", "Ether Vox", "Frozen Star", "Crypto", "Aggressor", "Faceoff", "Dangerous", "Failing Defense",
+"Space Fighter Loop", "Volatile Reaction", "Hot Pursuit", "Killing Time" and "Hitman". This music is CC BY 4.0; the rest of `build/` stays under TGMC's
+non-commercial licences.

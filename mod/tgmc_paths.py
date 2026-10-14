@@ -23,8 +23,11 @@ def paths():
                 continue  # alias of another sequence, no new art
             for layer in layers:
                 found.add(layer[0])
+                if len(layer) > 3 and isinstance(layer[3].get("or_sheet"), str):
+                    found.add(layer[3]["or_sheet"])  # the left-hand sheet of a two-handed gun
     for entry in build_sounds.SOUNDS.values():
-        found.add(entry[0])
+        if not entry[0].startswith(build_sounds.OPEN_PREFIX):  # the open music is downloaded, not read from TGMC
+            found.add(entry[0])
     for entry in build_tileset.TILES.values():
         found.add(entry[0])
     found.update(tgmc_dmm.paths())

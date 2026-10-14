@@ -346,6 +346,23 @@ def write_lights(out):
         img.save(os.path.join(out, f"light-{name}.png"), pnginfo=meta)
 
 
+def write_shockwave(out):
+    """A ring that grows and fades, 256x256, ten frames: the shockwave of a big blast, drawn over the ground with additive blending. No TGMC art."""
+    size, frames = 256, 10
+    img = Image.new("RGBA", (size * frames, size), (0, 0, 0, 0))
+    d = ImageDraw.Draw(img)
+    for f in range(frames):
+        radius = 20 + (size / 2 - 24) * f / (frames - 1)
+        alpha = int(190 * (1 - f / frames) ** 1.4)
+        width = 3 + int(5 * (1 - f / frames))
+        cx = size * f + size // 2
+        d.ellipse([cx - radius, size // 2 - radius, cx + radius, size // 2 + radius], outline=(255, 215, 150, alpha), width=width)
+    meta = PngImagePlugin.PngInfo()
+    meta.add_text("FrameSize", f"{size},{size}")
+    meta.add_text("FrameAmount", str(frames))
+    img.save(os.path.join(out, "shockwave.png"), pnginfo=meta)
+
+
 def write_overlay(out):
     """The building ghost's cell tiles: frame 0 is a green translucent tile for a cell the building may use, frame 1 a red one for a
     blocked cell. The engine's placement preview asks for the image `overlay`, sequences build-valid and build-invalid."""
@@ -929,6 +946,18 @@ SCENARIOS = {
         ("rifleman", "Marines", 30, 22, 512), ("rifleman", "Marines", 31, 24, 512),
         ("resin-silo", "Xenos", 3, 3, 0),
     ]},
+    # The xeno AI creeps its weeds out with drones (see scenarios/test-ai-weeds.lua): no squads, a silo and two drones, plenty of cash.
+    "scenario-ai-weeds": {"scripts": ("test-ai-weeds",), "xeno_bot": "skirmish", "fast": True, "drop_conquest": True, "size": (72, 40),
+                          "extra_rules": "Player:\n\t-SquadManagerBotModule@xenos-easy:\n\t-SquadManagerBotModule@xenos-normal:\n\t-SquadManagerBotModule@xenos-hard:\n", "actors": [
+        ("resin-silo", "Xenos", 12, 20, 0), ("drone", "Xenos", 14, 22, 0), ("drone", "Xenos", 14, 18, 0),
+        ("rifleman", "Marines", 64, 20, 512),
+    ]},
+    # The xeno AI uses a caste ability by itself (see scenarios/test-ai-abilities.lua): a crusher that holds fire, with marines close by.
+    "scenario-ai-abilities": {"scripts": ("test-ai-abilities",), "xeno_bot": "skirmish", "drop_conquest": True, "size": (40, 24),
+                              "extra_rules": "Player:\n\t-SquadManagerBotModule@xenos-easy:\n\t-SquadManagerBotModule@xenos-normal:\n\t-SquadManagerBotModule@xenos-hard:\n^Infantry:\n\tAutoTarget:\n\t\tInitialStance: HoldFire\ncrusher:\n\tAutoTarget:\n\t\tInitialStance: HoldFire\nrifleman:\n\tHealth:\n\t\tHP: 3000\n", "actors": [
+        ("crusher", "Xenos", 14, 12, 0), ("rifleman", "Marines", 16, 12, 512), ("rifleman", "Marines", 16, 13, 512), ("rifleman", "Marines", 15, 14, 512),
+        ("resin-silo", "Xenos", 30, 20, 0),
+    ]},
     "scenario-boiler": {"scripts": ("test-boiler",), "size": (48, 24), "drop_conquest": True, "extra_rules": "^Infantry:\n\tAutoTarget:\n\t\tInitialStance: HoldFire\n", "actors": [
         ("boiler", "Xenos", 6, 10, 0), ("rifleman", "Marines", 17, 10, 0),
     ]},
@@ -1141,6 +1170,7 @@ def main():
     write_cas_icon(args.out)
     write_hive_icon(args.out)
     write_lights(args.out)
+    write_shockwave(args.out)
     write_overlay(args.out)
     write_acid_pool(args.out)
     write_repair_fx(args.out)

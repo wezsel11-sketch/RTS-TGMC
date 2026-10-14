@@ -198,3 +198,20 @@ fx-light:
 		Scale: 1.8
 		BlendMode: Additive
 		ZOffset: 2047
+
+# The ring of a big blast's shockwave (drawn by mod/make_placeholders.py, no TGMC art): additive, growing and fading.
+fx-shockwave:
+	ring:
+		Filename: shockwave.png
+		Length: 10
+		Tick: 50
+		Scale: 2.4
+		BlendMode: Additive
+		ZOffset: 2047
+	ring-big:
+		Filename: shockwave.png
+		Length: 10
+		Tick: 70
+		Scale: 4.2
+		BlendMode: Additive
+		ZOffset: 2047

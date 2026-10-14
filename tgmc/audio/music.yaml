@@ -1,40 +1,97 @@
-# Background music: every TGMC track that is music, plus its ambience loops as a calm backdrop. The themes are short
-# (10 to 20 s, the lobby theme runs close to three minutes). tgmc/scripts/music.lua plays them in a faction-aware order
-# and switches to the tense tracks in a fight; the playlist below is also what the in-game next/previous keys walk.
-theme-hopeful-1: Hopeful I
-	Filename: theme-hopeful-1
+# Background music: 23 full-length songs by Kevin MacLeod (incompetech.com, Creative Commons: By Attribution 4.0; the artist is in every title,
+# which the in-game music player shows, and the README lists the credits), plus TGMC's ambience loops as a calm backdrop. The songs are downloaded
+# when the mod is built (mod/build_sounds.py, pinned in mod/open-music.sha256). tgmc/scripts/music.lua plays them in a faction-aware order and
+# switches to the shorter combat songs in a fight; the playlist below is also what the in-game next/previous keys walk.
+score-intrepid: Intrepid - Kevin MacLeod
+	Filename: score-intrepid
 	Extension: ogg
 	VolumeModifier: 0.8
-theme-melancholy-1: Melancholy I
-	Filename: theme-melancholy-1
+score-rynos-theme: Rynos Theme - Kevin MacLeod
+	Filename: score-rynos-theme
 	Extension: ogg
 	VolumeModifier: 0.8
-theme-hopeful-2: Hopeful II
-	Filename: theme-hopeful-2
+score-decisions: Decisions - Kevin MacLeod
+	Filename: score-decisions
 	Extension: ogg
 	VolumeModifier: 0.8
-theme-melancholy-2: Melancholy II
-	Filename: theme-melancholy-2
+score-prelude-and-action: Prelude and Action - Kevin MacLeod
+	Filename: score-prelude-and-action
 	Extension: ogg
 	VolumeModifier: 0.8
-theme-tense-1: Tense I
-	Filename: theme-tense-1
+score-ossuary-resolve: Ossuary 7 - Resolve - Kevin MacLeod
+	Filename: score-ossuary-resolve
 	Extension: ogg
 	VolumeModifier: 0.8
-theme-tense-2: Tense II
-	Filename: theme-tense-2
+score-heart-of-nowhere: Heart of Nowhere - Kevin MacLeod
+	Filename: score-heart-of-nowhere
 	Extension: ogg
 	VolumeModifier: 0.8
-theme-dread: Dread
-	Filename: theme-dread
+score-dark-times: Dark Times - Kevin MacLeod
+	Filename: score-dark-times
 	Extension: ogg
 	VolumeModifier: 0.8
-theme-elevator: Elevator
-	Filename: theme-elevator
+score-unseen-horrors: Unseen Horrors - Kevin MacLeod
+	Filename: score-unseen-horrors
 	Extension: ogg
 	VolumeModifier: 0.8
-theme-lobby: Lobby Theme
-	Filename: theme-lobby
+score-anguish: Anguish - Kevin MacLeod
+	Filename: score-anguish
+	Extension: ogg
+	VolumeModifier: 0.8
+score-the-descent: The Descent - Kevin MacLeod
+	Filename: score-the-descent
+	Extension: ogg
+	VolumeModifier: 0.8
+score-deep-haze: Deep Haze - Kevin MacLeod
+	Filename: score-deep-haze
+	Extension: ogg
+	VolumeModifier: 0.8
+score-ether-vox: Ether Vox - Kevin MacLeod
+	Filename: score-ether-vox
+	Extension: ogg
+	VolumeModifier: 0.8
+score-frozen-star: Frozen Star - Kevin MacLeod
+	Filename: score-frozen-star
+	Extension: ogg
+	VolumeModifier: 0.8
+score-crypto: Crypto - Kevin MacLeod
+	Filename: score-crypto
+	Extension: ogg
+	VolumeModifier: 0.8
+score-aggressor: Aggressor - Kevin MacLeod
+	Filename: score-aggressor
+	Extension: ogg
+	VolumeModifier: 0.8
+score-faceoff: Faceoff - Kevin MacLeod
+	Filename: score-faceoff
+	Extension: ogg
+	VolumeModifier: 0.8
+score-dangerous: Dangerous - Kevin MacLeod
+	Filename: score-dangerous
+	Extension: ogg
+	VolumeModifier: 0.8
+score-failing-defense: Failing Defense - Kevin MacLeod
+	Filename: score-failing-defense
+	Extension: ogg
+	VolumeModifier: 0.8
+score-space-fighter-loop: Space Fighter Loop - Kevin MacLeod
+	Filename: score-space-fighter-loop
+	Extension: ogg
+	VolumeModifier: 0.8
+score-volatile-reaction: Volatile Reaction - Kevin MacLeod
+	Filename: score-volatile-reaction
+	Extension: ogg
+	VolumeModifier: 0.8
+score-hot-pursuit: Hot Pursuit - Kevin MacLeod
+	Filename: score-hot-pursuit
+	Extension: ogg
+	VolumeModifier: 0.8
+score-killing-time: Killing Time - Kevin MacLeod
+	Filename: score-killing-time
+	Extension: ogg
+	VolumeModifier: 0.8
+score-hitman: Hitman - Kevin MacLeod
+	Filename: score-hitman
 	Extension: ogg
 	VolumeModifier: 0.8
 ambient-station-1: Ambience: Station 1

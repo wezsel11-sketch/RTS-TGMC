@@ -212,7 +212,7 @@ weed-node:
 	Buildable:
 		Queue: XenoBuild
 		BuildPaletteOrder: 10
-		BuildLimit: 6
+		BuildLimit: 14
 		Description: actor-weed-node.description
 	Voiced:
 		VoiceSet: XenoStructureVoice
@@ -238,7 +238,12 @@ weeds:
 	-AppearsOnRadar:
 	RevealsShroud:
 		Type: CenterPosition
-	# Walkable carpet: units pass over it but it still marks the cell as taken and extends the build area.
+	# Walkable carpet: units pass over it but it still marks the cell as taken and extends the build area. It cannot be clicked, so a click on a
+	# xeno standing on it selects the xeno, not the carpet.
+	-Selectable:
+	-SelectionDecorations:
+	-SelectionRing:
+	Interactable:
 	Building:
 		Footprint: =
 	Buildable:
@@ -886,7 +891,6 @@ ordnance-depot:
 		BlockedCursor: move-blocked
 		ChargeInterval: 3000
 		Weapon: TGMCCasBomb
-		FlybySounds: condor-flyby.ogg
 		PassSounds: sonic-boom.ogg
 		DropSounds: bomb-fall.ogg
 		IncomingSounds: bomb-fall.ogg
@@ -925,7 +929,6 @@ ordnance-depot:
 		BlockedCursor: move-blocked
 		ChargeInterval: 2250
 		Weapon: TGMCCasMini
-		FlybySounds: condor-flyby.ogg
 		PassSounds: sonic-boom.ogg
 		DropSounds: cas-voice-missile.ogg
 		IncomingSounds: rocket-whistle.ogg
@@ -946,7 +949,6 @@ ordnance-depot:
 		BlockedCursor: move-blocked
 		ChargeInterval: 1000
 		Weapon: TGMCCasFlare
-		FlybySounds: condor-flyby.ogg
 		PassSounds: sonic-boom.ogg
 		DropSounds: cas-voice-flare.ogg
 		BeginChargeSound: ui-ping.ogg
@@ -967,7 +969,6 @@ ordnance-depot:
 		BlockedCursor: move-blocked
 		ChargeInterval: 3000
 		Weapon: TGMCCasWidow
-		FlybySounds: condor-flyby.ogg
 		PassSounds: sonic-boom.ogg
 		DropSounds: cas-voice-missile.ogg
 		IncomingSounds: rocket-whistle.ogg
@@ -988,7 +989,6 @@ ordnance-depot:
 		BlockedCursor: move-blocked
 		ChargeInterval: 2250
 		Weapon: TGMCCasLaser
-		FlybySounds: condor-flyby.ogg
 		PassSounds: sonic-boom.ogg
 		DropSounds: laser-zap.ogg
 		BeginChargeSound: ui-ping.ogg
@@ -1013,7 +1013,6 @@ ordnance-depot:
 		BlockedCursor: move-blocked
 		ChargeInterval: 3750
 		Weapon: TGMCCasNapalm
-		FlybySounds: condor-flyby.ogg
 		PassSounds: sonic-boom.ogg
 		DropSounds: cas-voice-missile.ogg
 		IncomingSounds: bomb-fall.ogg
@@ -1021,12 +1020,16 @@ ordnance-depot:
 		EndChargeSound: ui-confirm.ogg
 		LaunchSound: ui-ping.ogg
 		Prerequisites: workshop
-		Pattern: Single
+		# A wide swath: six canisters along the jet's track, and the ground keeps burning for 36 seconds.
+		Pattern: Line
+		Bombs: 6
+		Spacing: 2c768
 		FallDelay: 75
-		WarningRadius: 2c256
+		WarningRadius: 3c0
 		LingerWeapon: TGMCCasFire
-		LingerDuration: 600
-		LingerRadius: 3c0
+		LingerDuration: 900
+		LingerRadius: 4c0
+		LingerSpots: 5
 	CondorStrikePower@fatty:
 		Variant: fatty
 		OrderName: CasFattyOrder
@@ -1037,7 +1040,6 @@ ordnance-depot:
 		BlockedCursor: move-blocked
 		ChargeInterval: 4500
 		Weapon: TGMCCasFatty
-		FlybySounds: condor-flyby.ogg
 		PassSounds: sonic-boom.ogg
 		DropSounds: cas-voice-missile.ogg
 		IncomingSounds: bomb-fall.ogg
@@ -1062,7 +1064,6 @@ ordnance-depot:
 		BlockedCursor: move-blocked
 		ChargeInterval: 6000
 		Weapon: TGMCCasMoab
-		FlybySounds: condor-flyby.ogg
 		PassSounds: sonic-boom.ogg
 		DropSounds: cas-voice-bomb.ogg
 		IncomingSounds: ob-incoming.ogg

@@ -143,8 +143,8 @@ def centred(layer, size=(64, 32)):
 
 def guns(weapon):
     """The layers a gun adds to a marine. A two-handed gun is TGMC's wielded state, which both its right-hand and its left-hand sheet
-    draw; drawing both made the marine look like he carried two guns, so each facing uses the one that shows the gun better, plus the
-    other hand's glove (see _with_hand)."""
+    draw; drawing both made the marine look like he carried two guns, so each facing uses the one that shows the gun better. TGMC's gun
+    sheets hold no hands, only the gun, so the marine's arms stay at his sides."""
     left = TWO_HANDED_LEFT.get(weapon[0])
     if not left:
         return [weapon]
@@ -781,6 +781,7 @@ UNITS = {
         },
     },
     "weeds": {
+        "zoffset": -1023,  # the carpet lies under everything that walks on it
         "sequences": {
             "idle": [(WEEDS, "weed15")],
             "icon": [(WEEDS, "weednode3", None, {"fit": (44, 44), "frames": (0, 1)})],
@@ -919,6 +920,23 @@ UNITS = {
             "fireball": [(FX64, "fireball_explosion", None, {"tick": 55})],
         },
     },
+    # CAS blasts: a bomb about 8 tiles across, the MOAB about 18, with a dust cloud and a shockwave ring (fx-shockwave in sequences/misc.yaml).
+    "fx-blast-cas": {
+        "sequences": {"boom": [(FX96, "explosion", None, {"frames": (0, 65, 3), "tick": 40, "size": 256})]},
+    },
+    # A puff of dust for one tile of a spreading blast (Shockwave warhead).
+    "fx-dust-tile": {
+        "sequences": {"dust": [(FX32, "landslide_dust", None, {"tick": 110, "size": 96})]},
+    },
+    "fx-blast-moab": {
+        "sequences": {"boom": [(FX96, "explosion", None, {"frames": (0, 65, 3), "tick": 45, "size": 576})]},
+    },
+    "fx-blast-moab2": {
+        "sequences": {"boom": [(FX96, "explosion", None, {"frames": (0, 65, 3), "tick": 45, "size": 384})]},
+    },
+    "fx-dust-moab": {
+        "sequences": {"dust": [(FX32, "landslide_dust", None, {"tick": 160, "size": 576})]},
+    },
     "fx-blast-big": {
         "sequences": {"big": [(FX96, "explosion", None, {"frames": (0, 65, 3), "tick": 40})]},
     },
@@ -1044,35 +1062,6 @@ def _opaque(frames):
     return sum(1 for img in frames for a in img.getchannel("A").getdata() if a)
 
 
-def _with_hand(gun, other, limit=14):
-    """The gun image with the other hand's glove added. Each hand's sheet shows the whole gun and only its own glove; the small blobs
-    (the glove) that the other sheet has outside the gun are laid on, but not its larger slivers, which would double the gun."""
-    gun = gun.convert("RGBA").copy()
-    other = other.convert("RGBA")
-    have, got = gun.load(), other.load()
-    width, height = other.size
-    free = {(x, y) for x in range(width) for y in range(height) if got[x, y][3] > 0 and have[x, y][3] == 0}
-    seen = set()
-    for start in sorted(free):
-        if start in seen:
-            continue
-        blob, stack = [start], [start]
-        seen.add(start)
-        while stack:
-            x, y = stack.pop()
-            for dx in (-1, 0, 1):
-                for dy in (-1, 0, 1):
-                    q = (x + dx, y + dy)
-                    if q in free and q not in seen:
-                        seen.add(q)
-                        stack.append(q)
-                        blob.append(q)
-        if len(blob) <= limit:
-            for x, y in blob:
-                have[x, y] = got[x, y]
-    return gun
-
-
 def _layer_images(dmi, state, tint=None, opts=None):
     """Return {side: [frame images]} for S/N/E/W, {"*": [frame images]} for a 1-dir state, or, with the "facings"
     option, {0..facings-1: [frame images]} for a 1-dir state turned to each facing (facing 0 points north).
@@ -1085,8 +1074,8 @@ def _layer_images(dmi, state, tint=None, opts=None):
         second = _layer_images(opts["or_sheet"], state, tint, rest)
         merged = {}
         for k in first:
-            better, other = (second[k], first[k]) if _opaque(second[k]) > _opaque(first[k]) else (first[k], second[k])
-            merged[k] = [_with_hand(a, b) for a, b in zip(better, other)]
+            better = second[k] if _opaque(second[k]) > _opaque(first[k]) else first[k]
+            merged[k] = better
         return merged
     frames = dmi.frames(state)
     if "frames" in opts:

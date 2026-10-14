@@ -90,11 +90,15 @@ def main():
 
     # The music script names tracks by their music.yaml key, and every track in the playlist should be in one of its pools
     keys = top_level_keys(read("audio", "music.yaml"))
-    scripted = set(re.findall(r'"((?:theme|ambient)-[a-z0-9-]+)"', read("scripts", "music.lua")))
+    scripted = set(re.findall(r'"((?:theme|ambient|score)-[a-z0-9-]+)"', read("scripts", "music.lua")))
     for track in sorted(scripted - keys):
         errors.append(f"scripts/music.lua plays {track}, which is not in audio/music.yaml")
     for track in sorted(keys - scripted):
         errors.append(f"music track {track} is in audio/music.yaml but no pool in scripts/music.lua plays it")
+    # Kevin MacLeod's music is CC BY 4.0: the artist has to be named, and the title is what the in-game player shows
+    for key, title in re.findall(r"^(score-[a-z0-9-]+): (.*)$", read("audio", "music.yaml"), re.M):
+        if not title.endswith(" - Kevin MacLeod"):
+            errors.append(f"music track {key} has no artist credit in its title (CC BY)")
 
     # Voice clips that sit behind a Prefixes list: <prefix><clip> must exist for every prefix of the set
     current, section, prefixes, clips = None, None, [], {}

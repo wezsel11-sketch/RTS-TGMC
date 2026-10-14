@@ -154,10 +154,16 @@ TGMCMortar:
 	Warhead@7Flash: FlashScreen
 		Duration: 6
 		Strength: 24
-	Warhead@1Dam: ExplosiveDamage
+	-Warhead@1Dam:
+	Warhead@1Wave: Shockwave
 		Damage: 70
-		Range: 0c0, 1c0, 2c0, 5c0
-		Falloff: 100, 80, 50, 0
+		Radius: 5
+		RingDelay: 2
+		EdgePercent: 6
+		DustImage: fx-dust-tile
+		DustChance: 20
+		DamageTypes: ExplosionDeath
+		ValidRelationships: Ally, Neutral, Enemy
 
 # The mortar emplacement: the mortarman's shell from further away and a little quicker.
 TGMCMortarEmplacement:
@@ -196,10 +202,13 @@ TGMCHowitzer:
 	Warhead@7Flash: FlashScreen
 		Duration: 12
 		Strength: 55
-	Warhead@1Dam: ExplosiveDamage
+	Warhead@1Wave: Shockwave
 		Damage: 150
-		Range: 0c0, 1c0, 6c0, 8c0
-		Falloff: 100, 90, 40, 0
+		Radius: 8
+		RingDelay: 2
+		EdgePercent: 8
+		DustImage: fx-dust-tile
+		DustChance: 25
 
 # What a resin trap does to a marine who comes close: holds him in place for a few seconds and stings.
 TGMCResinTrap:
@@ -906,19 +915,28 @@ TGMCMechRocket:
 TGMCCasBomb:
 	Inherits: TGMCGrenade
 	Range: 90c0
-	Warhead@1Dam: ExplosiveDamage
+	-Warhead@1Dam:
+	Warhead@1Wave: Shockwave
 		Damage: 150
-		Spread: 1c0
-		Falloff: 100, 70, 40, 15, 0
+		Radius: 7
+		RingDelay: 2
+		EdgePercent: 8
+		DustImage: fx-dust-tile
+		DustChance: 25
 	Warhead@2Boom: CreateEffect
-		Image: fx-blast-big
-		Explosions: big
+		Image: fx-blast-cas
+		Explosions: boom
 		ImpactSounds: explosion-big.ogg
 		ForceDisplayAtGroundLevel: true
 		ValidTargets: Ground, Water, Structure
 	Warhead@9Light18: CreateEffect
 		Image: fx-light
 		Explosions: blast-big
+		ForceDisplayAtGroundLevel: true
+		ValidTargets: Ground, Water, Structure
+	Warhead@3Ring: CreateEffect
+		Image: fx-shockwave
+		Explosions: ring
 		ForceDisplayAtGroundLevel: true
 		ValidTargets: Ground, Water, Structure
 	Warhead@7Shake: ShakeScreen
@@ -992,13 +1010,17 @@ TGMCCasWidow:
 
 TGMCCasNapalm:
 	Inherits: TGMCCasMini
-	Warhead@1Dam: ExplosiveDamage
-		Damage: 90
-		Spread: 1c128
-		Falloff: 100, 60, 30, 10, 0
+	-Warhead@1Dam:
+	Warhead@1Wave: Shockwave
+		Damage: 70
+		Radius: 6
+		RingDelay: 2
+		EdgePercent: 8
+		DustImage: fx-dust-tile
+		DustChance: 20
 	Warhead@2Boom: CreateEffect
-		Image: fx-blast-big
-		Explosions: big
+		Image: fx-blast-cas
+		Explosions: boom
 		ImpactSounds: explosion-big.ogg
 		ForceDisplayAtGroundLevel: true
 		ValidTargets: Ground, Water, Structure
@@ -1028,14 +1050,22 @@ TGMCCasFire:
 		Explosions: burn
 		ForceDisplayAtGroundLevel: true
 		ValidTargets: Ground, Structure
+	# The ground keeps burning for a while where the fire lands (see flame-patch in units.yaml).
+	Warhead@3Patch: SpawnActor
+		Actor: flame-patch
+		TrailCells: 0
 
 # The Fatty: a first, smaller blast, then a ring of eight more.
 TGMCCasFatty:
 	Inherits: TGMCCasMini
-	Warhead@1Dam: ExplosiveDamage
+	-Warhead@1Dam:
+	Warhead@1Wave: Shockwave
 		Damage: 120
-		Spread: 1c256
-		Falloff: 100, 60, 30, 0
+		Radius: 6
+		RingDelay: 2
+		EdgePercent: 8
+		DustImage: fx-dust-tile
+		DustChance: 25
 	Warhead@7Shake: ShakeScreen
 		Duration: 14
 		Intensity: 4
@@ -1088,19 +1118,46 @@ TGMCCasFlare:
 
 TGMCCasMoab:
 	Inherits: TGMCCasNapalm
-	Warhead@1Dam: ExplosiveDamage
+	Warhead@1Wave: Shockwave
 		Damage: 700
-		Spread: 1c512
-		Falloff: 100, 90, 65, 40, 15, 0
+		Radius: 14
+		RingDelay: 2
+		EdgePercent: 10
+		DustImage: fx-dust-tile
+		DustChance: 45
 	Warhead@2Boom: CreateEffect
-		Image: fx-blast-big
-		Explosions: big
+		Image: fx-blast-moab
+		Explosions: boom
 		ImpactSounds: explosion-huge.ogg
 		ForceDisplayAtGroundLevel: true
 		ValidTargets: Ground, Water, Structure
 	Warhead@9Light24: CreateEffect
 		Image: fx-light
 		Explosions: blast-big
+		ForceDisplayAtGroundLevel: true
+		ValidTargets: Ground, Water, Structure
+	# A second, smaller fireball a moment later, the dust that hangs after, and a shockwave that rolls out over the ground.
+	Warhead@3Boom2: CreateEffect
+		Delay: 7
+		Image: fx-blast-moab2
+		Explosions: boom
+		ForceDisplayAtGroundLevel: true
+		ValidTargets: Ground, Water, Structure
+	Warhead@3Dust: CreateEffect
+		Delay: 18
+		Image: fx-dust-moab
+		Explosions: dust
+		ForceDisplayAtGroundLevel: true
+		ValidTargets: Ground, Water, Structure
+	Warhead@3Ring: CreateEffect
+		Image: fx-shockwave
+		Explosions: ring-big
+		ForceDisplayAtGroundLevel: true
+		ValidTargets: Ground, Water, Structure
+	Warhead@3Ring2: CreateEffect
+		Delay: 10
+		Image: fx-shockwave
+		Explosions: ring
 		ForceDisplayAtGroundLevel: true
 		ValidTargets: Ground, Water, Structure
 	Warhead@7Shake: ShakeScreen
@@ -1236,5 +1293,175 @@ TGMCFling:
 	Warhead@9Stun: GrantExternalCondition
 		Condition: stunned
 		Duration: 45
+		ValidRelationships: Enemy
+		ValidTargets: Human
+
+# Caste abilities (ActiveAbility in units.yaml). The crusher's stomp: a blast around him that hurts and stuns every marine close by.
+TGMCStomp:
+	Range: 3c0
+	Projectile: InstantHit
+	Warhead@1Dam: SpreadDamage
+		Damage: 28
+		Spread: 2c512
+		Falloff: 100, 100, 60, 0
+		ValidRelationships: Enemy
+		ValidTargets: Ground
+		Versus:
+			HeavyMarine: 55
+			Demolition: 85
+	Warhead@9Stun: GrantExternalCondition
+		Condition: stunned
+		Duration: 45
+		Range: 2c512
+		ValidRelationships: Enemy
+		ValidTargets: Human
+	Warhead@2Hit: CreateEffect
+		Image: fx-slam-big
+		Explosions: impact
+		ImpactSounds: slam-1.ogg, slam-2.ogg
+		ForceDisplayAtGroundLevel: true
+		ValidTargets: Ground, Water, Structure
+	Warhead@7Shake: ShakeScreen
+		Duration: 12
+		Intensity: 3
+		Multiplier: 1, 1
+
+# The behemoth's stomp: wider, heavier and a longer stun.
+TGMCStompBig:
+	Inherits: TGMCStomp
+	Warhead@1Dam: SpreadDamage
+		Damage: 50
+		Spread: 3c768
+	Warhead@9Stun: GrantExternalCondition
+		Duration: 70
+		Range: 3c768
+	Warhead@7Shake: ShakeScreen
+		Duration: 18
+		Intensity: 6
+
+# The defiler breathes out a cloud of neurotoxin on the spot.
+TGMCDefilerEmit:
+	Range: 1c0
+	Projectile: InstantHit
+	Warhead@3Gas: SpawnActor
+		Actor: gas-cloud
+		TrailCells: 0
+
+# The shrike's psychic fling: the nearest marine is thrown away.
+TGMCPsychicFling:
+	Range: 5c0
+	Projectile: InstantHit
+	Warhead@1Dam: TargetDamage
+		Damage: 12
+		ValidRelationships: Enemy
+	Warhead@6Throw: Knockback
+		Distance: 5c0
+		Duration: 18
+		Height: 1c256
+		LandDamage: 14
+		BlockedDamage: 24
+		ValidRelationships: Enemy
+		ValidTargets: Human
+	Warhead@9Stun: GrantExternalCondition
+		Condition: stunned
+		Duration: 35
+		ValidRelationships: Enemy
+		ValidTargets: Human
+
+# The shrike's psychic cure and the queen's cry reach the xenos around them.
+TGMCPsychicCure:
+	Range: 4c0
+	Projectile: InstantHit
+	Warhead@1Cure: GrantExternalCondition
+		Condition: psycure
+		Duration: 200
+		Range: 4c0
+		ValidRelationships: Ally
+		ValidTargets: Ground
+
+TGMCQueenCry:
+	Range: 8c0
+	Projectile: InstantHit
+	Warhead@1Rage: GrantExternalCondition
+		Condition: rage
+		Duration: 200
+		Range: 8c0
+		ValidRelationships: Ally
+		ValidTargets: Ground
+
+# The widow's web: the nearest marine is stuck fast for a moment.
+TGMCWebSpit:
+	Range: 6c0
+	Projectile: InstantHit
+	Warhead@1Dam: TargetDamage
+		Damage: 6
+		ValidRelationships: Enemy
+	Warhead@9Stun: GrantExternalCondition
+		Condition: stunned
+		Duration: 60
+		ValidRelationships: Enemy
+		ValidTargets: Human
+
+# The sentinel's neurotoxin: the nearest marine is hurt and slowed.
+TGMCNeurotoxin:
+	Range: 6c0
+	Projectile: InstantHit
+	Warhead@1Dam: TargetDamage
+		Damage: 12
+		ValidRelationships: Enemy
+	Warhead@9Slow: GrantExternalCondition
+		Condition: gassed
+		Duration: 150
+		ValidRelationships: Enemy
+		ValidTargets: Human
+
+# The warlock's psychic blast.
+TGMCPsychicBlast:
+	Range: 6c0
+	Projectile: InstantHit
+	Warhead@1Dam: TargetDamage
+		Damage: 38
+		ValidRelationships: Enemy
+	Warhead@6Throw: Knockback
+		Distance: 2c0
+		Duration: 12
+		Height: 0c512
+		LandDamage: 6
+		BlockedDamage: 10
+		ValidRelationships: Enemy
+		ValidTargets: Human
+
+# The warrior's punch: a heavy blow to the nearest marine that leaves him reeling.
+TGMCPunch:
+	Range: 1c768
+	Projectile: InstantHit
+	Warhead@1Dam: TargetDamage
+		Damage: 42
+		ValidRelationships: Enemy
+		Versus:
+			HeavyMarine: 60
+			Demolition: 85
+	Warhead@6Throw: Knockback
+		Distance: 2c0
+		Duration: 10
+		Height: 0c512
+		LandDamage: 4
+		BlockedDamage: 14
+		ValidRelationships: Enemy
+		ValidTargets: Human
+	Warhead@9Stun: GrantExternalCondition
+		Condition: stunned
+		Duration: 40
+		ValidRelationships: Enemy
+		ValidTargets: Human
+
+# The wraith's time stop: every marine close by freezes for a moment.
+TGMCTimestop:
+	Range: 5c0
+	Projectile: InstantHit
+	Warhead@1Freeze: GrantExternalCondition
+		Condition: stunned
+		Duration: 75
+		Range: 5c0
 		ValidRelationships: Enemy
 		ValidTargets: Human

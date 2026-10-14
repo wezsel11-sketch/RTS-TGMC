@@ -5,7 +5,7 @@
 	Selection:
 	ControlGroups:
 	MusicPlaylist:
-		StartingMusic: theme-hopeful-1
+		StartingMusic: score-intrepid
 	# Faction-aware, fight-aware music (see the script). A map with its own script lists this one last (make_placeholders.py).
 	LuaScript:
 		Scripts: tgmc|scripts/music.lua

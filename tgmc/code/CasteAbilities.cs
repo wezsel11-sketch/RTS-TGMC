@@ -67,6 +67,12 @@ namespace OpenRA.Mods.TGMC.Traits
 		[Desc("Spawned units appear toward the nearest enemy within this range if there is one.")]
 		public readonly WDist SpawnSeek = new(8 * 1024);
 
+		[Desc("For the AI: it uses the ability when at least AiMinTargets enemy units are within AiRange. If AiWoundedPercent is above 0 it counts hurt " +
+			"allies (below that share of their health) within AiRange instead, which is how it uses a heal.")]
+		public readonly WDist AiRange = new(6 * 1024);
+		public readonly int AiMinTargets = 1;
+		public readonly int AiWoundedPercent = 0;
+
 		public readonly string[] Sounds = [];
 		public readonly string EffectImage = null;
 		public readonly string EffectSequence = null;

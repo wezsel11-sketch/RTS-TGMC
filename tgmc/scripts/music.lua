@@ -1,10 +1,10 @@
 -- Faction-aware music for every map. OpenRA's own playlist cannot filter by faction, so this script plays the tracks in
 -- audio/music.yaml itself with Media.PlayMusic and chains one to the next. It only changes what the local player hears.
 --
---  * Marines get the hopeful themes, the elevator and lobby tracks and the station ambience; xenos get the melancholy
---    themes, the dread theme and the cave, lava and jungle ambience. An observer gets a bit of both.
---  * A theme and an ambience track alternate, so the many ambience loops do not bury the themes.
---  * When an enemy comes near one of your units or structures the tense tracks take over, and they stay for a while
+--  * Marines get six full-length songs by Kevin MacLeod and the station ambience; xenos get eight darker ones and the cave, lava and
+--    jungle ambience. An observer gets a bit of both.
+--  * Every third pick is an ambience track, so the many ambience loops do not bury the songs.
+--  * When an enemy comes near one of your units or structures the shorter combat songs take over, and they stay for a while
 --    after the fight. The in-game next/previous keys still work; after one, the engine's own shuffled playlist continues.
 --
 -- A map that has its own script lists this one last, and it wraps that script's WorldLoaded (see the end of the file).
@@ -15,7 +15,7 @@ TGMCMusic.Pools =
 {
 	marines =
 	{
-		themes = { "theme-hopeful-1", "theme-hopeful-2", "theme-lobby", "theme-elevator" },
+		themes = { "score-intrepid", "score-rynos-theme", "score-decisions", "score-prelude-and-action", "score-ossuary-resolve", "score-heart-of-nowhere" },
 		calm =
 		{
 			"ambient-station-1", "ambient-station-2", "ambient-station-3", "ambient-station-4", "ambient-station-5",
@@ -25,18 +25,18 @@ TGMCMusic.Pools =
 			"ambient-signal-3", "ambient-signal-4", "ambient-chapel-1", "ambient-chapel-2", "ambient-chapel-3",
 			"ambient-chapel-4"
 		},
-		combat = { "theme-tense-1", "theme-tense-2" },
+		combat = { "score-aggressor", "score-faceoff", "score-dangerous", "score-failing-defense", "score-space-fighter-loop" },
 	},
 	xenos =
 	{
-		themes = { "theme-melancholy-1", "theme-melancholy-2", "theme-dread" },
+		themes = { "score-dark-times", "score-unseen-horrors", "score-anguish", "score-the-descent", "score-deep-haze", "score-ether-vox", "score-frozen-star", "score-crypto" },
 		calm =
 		{
 			"ambient-cave", "ambient-lava-1", "ambient-lava-2", "ambient-lava-3", "ambient-mine", "ambient-malf",
 			"ambient-jungle", "ambient-wind", "ambient-moon-1", "ambient-moon-2", "ambient-space", "ambient-atmos-1",
 			"ambient-atmos-2", "ambient-atmos-3"
 		},
-		combat = { "theme-tense-1", "theme-tense-2", "theme-dread" },
+		combat = { "score-volatile-reaction", "score-hot-pursuit", "score-killing-time", "score-hitman" },
 	},
 }
 
@@ -52,6 +52,8 @@ TGMCMusic.Config =
 	minSwitch = 500,
 	-- Ticks to wait before the first track, so that it replaces the one the engine starts when the world finishes loading.
 	startDelay = 10,
+	-- One pick in this many is a calm ambience track; the rest are full songs.
+	calmEvery = 3,
 }
 
 TGMCMusic.State = { pool = nil, inCombat = false, lastThreat = -100000, lastSwitch = -100000, generation = 0, turn = 0, queues = {} }
@@ -89,10 +91,10 @@ TGMCMusic.NextTrack = function()
 		return TGMCMusic.Draw("combat", pool.combat)
 	end
 	TGMCMusic.State.turn = TGMCMusic.State.turn + 1
-	if TGMCMusic.State.turn % 2 == 1 then
-		return TGMCMusic.Draw("themes", pool.themes)
+	if TGMCMusic.State.turn % TGMCMusic.Config.calmEvery == 0 then
+		return TGMCMusic.Draw("calm", pool.calm)
 	end
-	return TGMCMusic.Draw("calm", pool.calm)
+	return TGMCMusic.Draw("themes", pool.themes)
 end
 
 TGMCMusic.PlayNext = function()
@@ -163,9 +165,9 @@ TGMCMusic.StartMusic = function()
 		-- An observer, or a faction without its own pool: a bit of both
 		TGMCMusic.State.pool =
 		{
-			themes = { "theme-hopeful-1", "theme-melancholy-1", "theme-hopeful-2", "theme-melancholy-2", "theme-lobby" },
+			themes = { "score-intrepid", "score-rynos-theme", "score-decisions", "score-dark-times", "score-unseen-horrors", "score-anguish" },
 			calm = TGMCMusic.Pools.marines.calm,
-			combat = { "theme-tense-1", "theme-tense-2", "theme-dread" },
+			combat = { "score-aggressor", "score-faceoff", "score-dangerous", "score-failing-defense", "score-space-fighter-loop", "score-volatile-reaction", "score-hot-pursuit", "score-killing-time", "score-hitman" },
 		}
 		me = nil
 	end

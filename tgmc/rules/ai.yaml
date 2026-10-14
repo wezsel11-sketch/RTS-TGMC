@@ -51,6 +51,7 @@ Player:
 			demolitionist: 8
 			mech: 6
 			runner: 30
+			drone: 14
 			hunter: 40
 			sentinel: 25
 			warrior: 25
@@ -70,13 +71,15 @@ Player:
 			queen: 30
 		UnitLimits:
 			queen: 1
+			drone: 4
 	# The bot has no builder to walk around, so its cryo pod and silo give it the build area (structures.yaml) and it
 	# places each finished structure in a ring around them. It never builds walls. The refinery counts are zeroed
 	# because the module otherwise holds back all unit production until it owns a refinery.
 	BaseBuilderBotModule@skirmish:
 		RequiresCondition: enable-skirmish-ai
 		BuildingQueues: MarineBuild, XenoBuild
-		ConstructionYardTypes: cryo-pod, resin-silo, forward-hive
+		# A drone gives the build area too, so weed nodes go up around wherever the weed drones stand (see WeedDroneBotModule).
+		ConstructionYardTypes: cryo-pod, resin-silo, forward-hive, drone
 		# Defences go toward the nearest enemy, around the base closest to the fighting: the Forward Hive too, so the hive grows toward the enemy.
 		DefenseTypes: sentry-turret, resin-turret, mortar-emplacement, artillery-emplacement, resin-trap, cade, forward-hive
 		PlaceDefenseTowardsEnemyChance: 100
@@ -106,7 +109,7 @@ Player:
 			cade: 10
 		BuildingLimits:
 			miner: 6
-			weed-node: 6
+			weed-node: 14
 			vendor: 2
 			cryo-pod: 2
 			mini-silo: 3
@@ -422,3 +425,11 @@ Player:
 	ScoutBotModule@xenos:
 		RequiresCondition: enable-hard-ai && faction-xenos
 		Scouts: runner, hunter
+	# Drones creep the weeds out across the map: they walk to the edge of the weeds, toward the enemy, and the builder plants nodes around them.
+	WeedDroneBotModule@xenos:
+		RequiresCondition: enable-skirmish-ai && faction-xenos
+		Drones: drone
+		Weeds: weeds, weed-node, forward-hive, resin-silo
+	# The xeno AI uses its caste abilities: attacks when marines are close, heals and cries when its xenos are hurt or gathered.
+	AbilityBotModule@xenos:
+		RequiresCondition: enable-skirmish-ai && !enable-easy-ai && faction-xenos

@@ -11,6 +11,7 @@ loudness, so each one is re-encoded and level-matched:
   amb     mono 22050 Hz         -16 dB                   8 s
   music   stereo 44100 Hz       -6 dB                    whole file
   ambient stereo 44100 Hz       -12 dB                   75 s   (TGMC's ambience loops, played as calm music)
+  score   stereo 44100 Hz       -9 dB                    whole file  (Kevin MacLeod's full-length songs, CC BY 4.0, downloaded at build time)
 
 A sound is (source path under the TGMC checkout, kind) or (source, kind, max seconds). Each file is scaled so its
 loudest sample sits at the kind's peak, which keeps weapons, voices and the interface at sensible levels relative to
@@ -21,13 +22,17 @@ the voice sets in tgmc/audio/voices.yaml pick one per marine through Prefixes.
 
 Output (default build/mod/tgmc/audio): <name>.ogg, plus sounds.json listing sources, kinds, lengths and peaks.
 
-Usage: build_sounds.py --tgmc CHECKOUT [--out DIR]
+Usage: build_sounds.py --tgmc CHECKOUT [--out DIR] [--only PREFIX]
+       build_sounds.py --pin-music        (download the open music once and record its hashes in mod/open-music.sha256)
 """
 import argparse
 import json
 import os
+import hashlib
 import re
 import subprocess
+import urllib.parse
+import urllib.request
 
 KINDS = {
     #          channels, rate,  peak dB, default max seconds, vorbis quality
@@ -38,7 +43,68 @@ KINDS = {
     "amb": (1, 22050, -16.0, 8.0, 4),
     "music": (2, 44100, -6.0, None, 5),
     "ambient": (2, 44100, -12.0, 75.0, 4),
+    "score": (2, 44100, -9.0, None, 4),
 }
+
+# Kevin MacLeod's music (incompetech.com), Creative Commons: By Attribution 4.0. It is downloaded at build time into build/open-music,
+# checked against the hashes pinned in mod/open-music.sha256, and credited in the music titles and the README. Never committed.
+OPEN_MUSIC_BASE = "https://incompetech.com/music/royalty-free/mp3-royaltyfree/"
+OPEN_PREFIX = "open-music/"
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+CACHE = os.path.join(ROOT, "build", "open-music")
+HASHES = os.path.join(ROOT, "mod", "open-music.sha256")
+
+
+def read_hashes(path=HASHES):
+    """File name -> sha256, from lines of `<sha256>  <file name>`. A missing file gives {}."""
+    if not os.path.isfile(path):
+        return {}
+    found = {}
+    with open(path, encoding="utf-8") as f:
+        for line in f:
+            digest, _, name = line.rstrip("\n").partition("  ")
+            if digest and name:
+                found[name] = digest
+    return found
+
+
+def _download(filename, base, cache):
+    """Download base + filename into the cache as <filename>.part and return that path and its sha256."""
+    os.makedirs(cache, exist_ok=True)
+    part = os.path.join(cache, filename + ".part")
+    digest = hashlib.sha256()
+    with urllib.request.urlopen(base + urllib.parse.quote(filename)) as response, open(part, "wb") as out:
+        while True:
+            chunk = response.read(1 << 16)
+            if not chunk:
+                break
+            digest.update(chunk)
+            out.write(chunk)
+    return part, digest.hexdigest()
+
+
+def _file_sha(path):
+    digest = hashlib.sha256()
+    with open(path, "rb") as f:
+        for chunk in iter(lambda: f.read(1 << 16), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def fetch_open(filename, hashes, base=OPEN_MUSIC_BASE, cache=CACHE):
+    """The verified local copy of an open-music file, downloading it if the cache has no matching one."""
+    want = hashes.get(filename)
+    if want is None:
+        raise RuntimeError(f"{filename} is not pinned in mod/open-music.sha256; run build_sounds.py --pin-music")
+    final = os.path.join(cache, filename)
+    if os.path.isfile(final) and _file_sha(final) == want:
+        return final
+    part, got = _download(filename, base, cache)
+    if got != want:
+        os.remove(part)
+        raise RuntimeError(f"{filename}: sha256 {got} does not match the pinned {want}")
+    os.replace(part, final)
+    return final
 
 W = "sound/weapons"
 G = "sound/weapons/guns/fire"
@@ -200,20 +266,11 @@ SOUNDS = {
     "amb-generator": ("sound/machines/generator/generator_mid1.ogg", "amb"),
     "amb-hive": ("sound/ambience/ambicave.ogg", "amb"),
     # Music: TGMC's theme tracks, and the stings played when a game is won or lost
-    "theme-hopeful-1": ("sound/theme/neutral_hopeful1.ogg", "music"),
-    "theme-hopeful-2": ("sound/theme/neutral_hopeful2.ogg", "music"),
-    "theme-melancholy-1": ("sound/theme/neutral_melancholy1.ogg", "music"),
-    "theme-melancholy-2": ("sound/theme/neutral_melancholy2.ogg", "music"),
     "sting-win-1": ("sound/theme/winning_triumph1.ogg", "music"),
     "sting-win-2": ("sound/theme/winning_triumph2.ogg", "music"),
     "sting-loss-1": ("sound/theme/sad_loss1.ogg", "music"),
     "sting-loss-2": ("sound/theme/sad_loss2.ogg", "music"),
     # The rest of TGMC's music: two tense nuclear-alarm themes, a zombie-loss theme, the elevator track and the lobby theme
-    "theme-tense-1": ("sound/theme/nuclear_detonation1.ogg", "music"),
-    "theme-tense-2": ("sound/theme/nuclear_detonation2.ogg", "music"),
-    "theme-dread": ("sound/theme/zombies_loss.ogg", "music"),
-    "theme-elevator": ("sound/music/elevator/robocop-short.ogg", "music"),
-    "theme-lobby": ("config/lobby_themes/DawsonChristian.ogg", "music"),
 }
 
 # TGMC's ambience loops, played as a calm backdrop in the playlist. Name -> source file under sound/ambience.
@@ -257,6 +314,35 @@ for _clip, _numbers in MARINE_CLIPS.items():
             SOUNDS[f"marine-{_tag}-{_clip}-{_n}"] = (f"{V}/human/{_dir}/{_clip}_{_n}.ogg", "voice")
 for _tag, _dir in (("m", "male"), ("f", "female")):
     SOUNDS[f"marine-{_tag}-medic-1"] = (f"{V}/human/{_dir}/medic.ogg", "voice")
+
+
+OPEN_MUSIC = {
+    "score-intrepid": "Intrepid",
+    "score-rynos-theme": "Rynos Theme",
+    "score-decisions": "Decisions",
+    "score-prelude-and-action": "Prelude and Action",
+    "score-ossuary-resolve": "Ossuary 7 - Resolve",
+    "score-heart-of-nowhere": "Heart of Nowhere",
+    "score-dark-times": "Dark Times",
+    "score-unseen-horrors": "Unseen Horrors",
+    "score-anguish": "Anguish",
+    "score-the-descent": "The Descent",
+    "score-deep-haze": "Deep Haze",
+    "score-ether-vox": "Ether Vox",
+    "score-frozen-star": "Frozen Star",
+    "score-crypto": "Crypto",
+    "score-aggressor": "Aggressor",
+    "score-faceoff": "Faceoff",
+    "score-dangerous": "Dangerous",
+    "score-failing-defense": "Failing Defense",
+    "score-space-fighter-loop": "Space Fighter Loop",
+    "score-volatile-reaction": "Volatile Reaction",
+    "score-hot-pursuit": "Hot Pursuit",
+    "score-killing-time": "Killing Time",
+    "score-hitman": "Hitman",
+}
+for _key, _title in OPEN_MUSIC.items():
+    SOUNDS[_key] = (f"{OPEN_PREFIX}{_title}.mp3", "score")
 
 
 def spec(name):
@@ -303,15 +389,38 @@ def reencode(src, dst, kind, limit):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--tgmc", required=True, help="path to a terragov-marine-corps checkout")
+    ap.add_argument("--tgmc", help="path to a terragov-marine-corps checkout (not needed for the open music alone)")
     ap.add_argument("--out", default=os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "build", "mod", "tgmc", "audio"))
+    ap.add_argument("--only", default="", help="build only the sounds whose name starts with this")
+    ap.add_argument("--pin-music", action="store_true", help="download the open music once and write mod/open-music.sha256")
     args = ap.parse_args()
 
+    if args.pin_music:
+        pinned = {}
+        for title in sorted(OPEN_MUSIC.values()):
+            filename = title + ".mp3"
+            part, digest = _download(filename, OPEN_MUSIC_BASE, CACHE)
+            os.replace(part, os.path.join(CACHE, filename))
+            pinned[filename] = digest
+            print(f"pinned {filename}")
+        with open(HASHES, "w", encoding="utf-8", newline="\n") as f:
+            for filename in sorted(pinned):
+                f.write(f"{pinned[filename]}  {filename}\n")
+        print(f"pinned {len(pinned)} tracks")
+        return
+
+    names = [n for n in sorted(SOUNDS) if n.startswith(args.only)]
+    if not args.tgmc and any(not SOUNDS[n][0].startswith(OPEN_PREFIX) for n in names):
+        ap.error("--tgmc is required unless only the open music is built (--only score-)")
+    hashes = read_hashes()
     os.makedirs(args.out, exist_ok=True)
     report = []
-    for name in sorted(SOUNDS):
+    for name in names:
         source, kind, limit = spec(name)
-        src = os.path.join(args.tgmc, source)
+        if source.startswith(OPEN_PREFIX):
+            src = fetch_open(source[len(OPEN_PREFIX):], hashes)
+        else:
+            src = os.path.join(args.tgmc, source)
         dst = os.path.join(args.out, f"{name}.ogg")
         seconds, gain = reencode(src, dst, kind, limit)
         report.append({"name": name, "source": source, "kind": kind, "seconds": round(seconds, 2),

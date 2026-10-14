@@ -6,11 +6,13 @@
 		HP: 120
 	TgmcMobile:
 		Locomotor: foot
-		Speed: 54
+		Speed: 108
 		TurnSpeed: 160
 		PauseOnCondition: stunned
+	# A click picks a unit before a building under it, and the click area is a little roomier than the sprite.
 	Selectable:
-		Bounds: 512, 768, -256, -512
+		Bounds: 640, 896, -320, -576
+		Priority: 20
 	HitShape:
 		UseTargetableCellsOffsets: true
 		Type: Rectangle
@@ -345,7 +347,7 @@ scout:
 	Health:
 		HP: 85
 	TgmcMobile:
-		Speed: 68
+		Speed: 136
 	# Scouts see further than other marines.
 	RevealsShroud:
 		Range: 10c0
@@ -375,7 +377,7 @@ skirmisher:
 	Health:
 		HP: 95
 	TgmcMobile:
-		Speed: 62
+		Speed: 124
 	Armament@PRIMARY:
 		Weapon: TGMCShotgun
 		MuzzleSequence: flash
@@ -403,7 +405,7 @@ trooper:
 	Health:
 		HP: 140
 	TgmcMobile:
-		Speed: 52
+		Speed: 104
 	DamageMultiplier@armor:
 		Modifier: 88
 	Armament@PRIMARY:
@@ -433,7 +435,7 @@ ranger:
 	Health:
 		HP: 110
 	TgmcMobile:
-		Speed: 54
+		Speed: 108
 	DamageMultiplier@armor:
 		Modifier: 92
 	RevealsShroud:
@@ -465,7 +467,7 @@ assault:
 	Health:
 		HP: 240
 	TgmcMobile:
-		Speed: 34
+		Speed: 68
 	Selectable:
 		Bounds: 640, 832, -320, -544
 	Armor:
@@ -497,7 +499,7 @@ smartgunner:
 	Health:
 		HP: 130
 	TgmcMobile:
-		Speed: 45
+		Speed: 90
 	Armament@PRIMARY:
 		Weapon: TGMCSmartgun
 		MuzzleSequence: flash
@@ -528,7 +530,7 @@ sniper:
 	Health:
 		HP: 110
 	TgmcMobile:
-		Speed: 40
+		Speed: 80
 	Armament@PRIMARY:
 		Weapon: TGMCSniper
 		MuzzleSequence: flash
@@ -556,7 +558,7 @@ rocketeer:
 	Health:
 		HP: 120
 	TgmcMobile:
-		Speed: 45
+		Speed: 90
 	Armament@PRIMARY:
 		Weapon: TGMCSadar
 		MuzzleSequence: flash
@@ -584,7 +586,7 @@ blademan:
 	Health:
 		HP: 160
 	TgmcMobile:
-		Speed: 60
+		Speed: 120
 	Armament@PRIMARY:
 		Weapon: TGMCVali
 	Tooltip:
@@ -609,7 +611,7 @@ mortarman:
 	Health:
 		HP: 110
 	TgmcMobile:
-		Speed: 40
+		Speed: 80
 	Armament@PRIMARY:
 		Weapon: TGMCMortar
 		MuzzleSequence: flash
@@ -637,7 +639,7 @@ flamer:
 	Health:
 		HP: 140
 	TgmcMobile:
-		Speed: 50
+		Speed: 100
 	Armament@PRIMARY:
 		Weapon: TGMCFlamer
 		MuzzleSequence: flash
@@ -668,7 +670,7 @@ machinegunner:
 	Health:
 		HP: 150
 	TgmcMobile:
-		Speed: 40
+		Speed: 80
 	Armament@PRIMARY:
 		Weapon: TGMCMG60
 		MuzzleSequence: flash
@@ -730,7 +732,7 @@ mech:
 	Health:
 		HP: 900
 	TgmcMobile:
-		Speed: 32
+		Speed: 64
 	Selectable:
 		Bounds: 1792, 2048, -896, -1280
 	SelectionRing:
@@ -841,7 +843,7 @@ heavygunner:
 	Health:
 		HP: 320
 	TgmcMobile:
-		Speed: 28
+		Speed: 56
 	Selectable:
 		Bounds: 640, 832, -320, -544
 	Armor:
@@ -874,7 +876,7 @@ demolitionist:
 	Health:
 		HP: 260
 	TgmcMobile:
-		Speed: 36
+		Speed: 72
 	Selectable:
 		Bounds: 640, 832, -320, -544
 	Armor:
@@ -1047,7 +1049,7 @@ runner:
 	Selectable:
 		Bounds: 1024, 768, -512, -512
 	TgmcMobile:
-		Speed: 144
+		Speed: 288
 	Tooltip:
 		Name: actor-runner.name
 	Valued:
@@ -1091,7 +1093,7 @@ hunter:
 	Selectable:
 		Bounds: 768, 768, -384, -512
 	TgmcMobile:
-		Speed: 88
+		Speed: 176
 	Tooltip:
 		Name: actor-hunter.name
 	Valued:
@@ -1104,6 +1106,17 @@ hunter:
 
 sentinel:
 	Inherits: ^Xeno
+	# Command card ability: neurotoxin that hurts and slows the nearest marine.
+	ActiveAbility@abilityneurotoxin:
+		OrderName: AbilityNeurotoxin
+		Slot: 1
+		Label: Neurotoxin
+		Cooldown: 350
+		Weapon: TGMCNeurotoxin
+		Aim: Nearest
+		Range: 6c0
+		AiRange: 6c0
+		Sounds: acid-spit-1.ogg
 	Evolves:
 		Next: spitter
 		Previous: drone
@@ -1114,7 +1127,7 @@ sentinel:
 	Selectable:
 		Bounds: 768, 768, -384, -512
 	TgmcMobile:
-		Speed: 69
+		Speed: 138
 	Armament@PRIMARY:
 		Weapon: TGMCSpit
 	Tooltip:
@@ -1136,7 +1149,7 @@ facehugger:
 	Selectable:
 		Bounds: 512, 512, -256, -256
 	TgmcMobile:
-		Speed: 120
+		Speed: 240
 	# Hunts marines that carry no embryo, leaps at one and is spent planting its own.
 	-Armament@PRIMARY:
 	Armament@HUG:
@@ -1176,7 +1189,7 @@ larva:
 	Selectable:
 		Bounds: 512, 512, -256, -256
 	TgmcMobile:
-		Speed: 50
+		Speed: 100
 	Armament@PRIMARY:
 		Weapon: TGMCBite
 	Tooltip:
@@ -1197,7 +1210,7 @@ drone:
 	Selectable:
 		Bounds: 768, 768, -384, -512
 	TgmcMobile:
-		Speed: 63
+		Speed: 126
 	Armament@PRIMARY:
 		Weapon: TGMCMend
 		Cursor: repair
@@ -1223,6 +1236,17 @@ drone:
 
 warrior:
 	Inherits: ^Xeno
+	# Command card ability: punch the nearest marine.
+	ActiveAbility@abilitypunch:
+		OrderName: AbilityPunch
+		Slot: 2
+		Label: Punch
+		Cooldown: 300
+		Weapon: TGMCPunch
+		Aim: Nearest
+		Range: 1c768
+		AiRange: 2c0
+		Sounds: xeno-roar-7.ogg
 	# Command card ability: seize the nearest marine and fling him away.
 	ActiveAbility@fling:
 		OrderName: AbilityFling
@@ -1232,6 +1256,7 @@ warrior:
 		Weapon: TGMCFling
 		Aim: Nearest
 		Range: 1c768
+		AiRange: 2c0
 		Sounds: xeno-roar-5.ogg
 	# Lunge: leaps at an enemy it is chasing and lands a stunning blow.
 	Pounce:
@@ -1259,7 +1284,7 @@ warrior:
 	Selectable:
 		Bounds: 1024, 1024, -512, -512
 	TgmcMobile:
-		Speed: 40
+		Speed: 80
 	Armament@PRIMARY:
 		Weapon: TGMCSlam
 	Tooltip:
@@ -1274,6 +1299,17 @@ warrior:
 
 queen:
 	Inherits: ^Xeno
+	# Command card ability: a cry that sends the xenos around her into a rage.
+	ActiveAbility@abilitycry:
+		OrderName: AbilityCry
+		Slot: 1
+		Label: Rally Cry
+		Cooldown: 900
+		Weapon: TGMCQueenCry
+		Aim: Self
+		AiRange: 8c0
+		AiMinTargets: 3
+		Sounds: xeno-roar-1.ogg
 	Voiced:
 		VoiceSet: HunterVoice
 	Health:
@@ -1281,7 +1317,7 @@ queen:
 	Selectable:
 		Bounds: 1536, 1536, -768, -768
 	TgmcMobile:
-		Speed: 50
+		Speed: 100
 	Armament@PRIMARY:
 		Weapon: TGMCSlam
 	# The Deploy key: a screech that stuns marines nearby.
@@ -1309,6 +1345,17 @@ queen:
 
 spitter:
 	Inherits: ^Xeno
+	# Command card ability: a burst of acid on the ground ahead.
+	ActiveAbility@abilityacidburst:
+		OrderName: AbilityAcidBurst
+		Slot: 1
+		Label: Acid Burst
+		Cooldown: 400
+		Weapon: TGMCAcidSpray
+		Aim: Nearest
+		Range: 4c0
+		AiRange: 4c0
+		Sounds: acid-spit-1.ogg
 	Evolves:
 		Next: boiler
 		Previous: sentinel
@@ -1319,7 +1366,7 @@ spitter:
 	Selectable:
 		Bounds: 768, 768, -384, -512
 	TgmcMobile:
-		Speed: 60
+		Speed: 120
 	Armament@PRIMARY:
 		Weapon: TGMCSpit
 	Tooltip:
@@ -1334,6 +1381,22 @@ spitter:
 
 praetorian:
 	Inherits: ^Xeno
+	# Command card ability: Dodge, quicker and harder to hit for a moment.
+	ActiveAbility@abilitydodge:
+		OrderName: AbilityDodge
+		Slot: 2
+		Label: Dodge
+		Cooldown: 450
+		Duration: 90
+		Condition: dodging
+		AiRange: 5c0
+		Sounds: xeno-hiss-3.ogg
+	SpeedMultiplier@dodge:
+		RequiresCondition: dodging
+		Modifier: 145
+	DamageMultiplier@dodge:
+		RequiresCondition: dodging
+		Modifier: 55
 	# Command card ability: spray acid on the ground in front of him.
 	ActiveAbility@spray:
 		OrderName: AbilityAcidSpray
@@ -1343,6 +1406,7 @@ praetorian:
 		Weapon: TGMCAcidSpray
 		Aim: Forward
 		ForwardDistance: 2c512
+		AiRange: 3c0
 		Sounds: acid-spit-1.ogg, acid-spit-2.ogg
 	Armor:
 		Type: Heavy
@@ -1356,7 +1420,7 @@ praetorian:
 	Selectable:
 		Bounds: 768, 768, -384, -512
 	TgmcMobile:
-		Speed: 55
+		Speed: 110
 	Armament@PRIMARY:
 		Weapon: TGMCClaws
 	Tooltip:
@@ -1371,6 +1435,17 @@ praetorian:
 
 crusher:
 	Inherits: ^Xeno
+	# Command card ability: stomp, stunning the marines around him.
+	ActiveAbility@abilitystomp:
+		OrderName: AbilityStomp
+		Slot: 1
+		Label: Stomp
+		Cooldown: 500
+		Weapon: TGMCStomp
+		Aim: Self
+		AiRange: 2c768
+		AiMinTargets: 2
+		Sounds: xeno-roar-6.ogg
 	# Charge: a long run-up into a crushing blow that leaves marines senseless.
 	Pounce:
 		Range: 8c0
@@ -1397,7 +1472,7 @@ crusher:
 	Selectable:
 		Bounds: 768, 768, -384, -512
 	TgmcMobile:
-		Speed: 40
+		Speed: 80
 	Armament@PRIMARY:
 		Weapon: TGMCSlam
 	Tooltip:
@@ -1420,6 +1495,7 @@ ravager:
 		Cooldown: 500
 		Duration: 150
 		Condition: frenzy
+		AiRange: 5c0
 		Sounds: xeno-roar-8.ogg
 	ActiveAbility@endure:
 		OrderName: AbilityEndure
@@ -1428,6 +1504,7 @@ ravager:
 		Cooldown: 600
 		Duration: 120
 		Condition: endure
+		AiRange: 4c0
 		Sounds: xeno-roar-3.ogg
 	FirepowerMultiplier@frenzy:
 		RequiresCondition: frenzy
@@ -1458,7 +1535,7 @@ ravager:
 	Selectable:
 		Bounds: 768, 768, -384, -512
 	TgmcMobile:
-		Speed: 90
+		Speed: 180
 	Armament@PRIMARY:
 		Weapon: TGMCClaws
 	Tooltip:
@@ -1473,6 +1550,16 @@ ravager:
 
 defiler:
 	Inherits: ^Xeno
+	# Command card ability: breathe out a cloud of neurotoxin.
+	ActiveAbility@abilityemitgas:
+		OrderName: AbilityEmitGas
+		Slot: 1
+		Label: Emit Gas
+		Cooldown: 450
+		Weapon: TGMCDefilerEmit
+		Aim: Self
+		AiRange: 3c0
+		Sounds: acid-spit-1.ogg
 	Evolves:
 		Previous: boiler
 	Voiced:
@@ -1485,7 +1572,7 @@ defiler:
 	RevealsShroud:
 		Range: 11c0
 	TgmcMobile:
-		Speed: 45
+		Speed: 90
 	Armament@PRIMARY:
 		Weapon: TGMCDefilerGas
 	Tooltip:
@@ -1513,7 +1600,7 @@ boiler:
 	RevealsShroud:
 		Range: 13c0
 	TgmcMobile:
-		Speed: 60
+		Speed: 120
 	Armament@PRIMARY:
 		Weapon: TGMCBoilerGlob
 	Tooltip:
@@ -1538,6 +1625,7 @@ carrier:
 		ChargeRegen: 600
 		Spawn: facehugger
 		SpawnSeek: 9c0
+		AiRange: 8c0
 		Sounds: chestburst-2.ogg
 	Evolves:
 		Next: warlock
@@ -1548,7 +1636,7 @@ carrier:
 	Selectable:
 		Bounds: 768, 768, -384, -512
 	TgmcMobile:
-		Speed: 65
+		Speed: 130
 	Armament@PRIMARY:
 		Weapon: TGMCClaws
 	Tooltip:
@@ -1563,6 +1651,17 @@ carrier:
 
 warlock:
 	Inherits: ^Xeno
+	# Command card ability: a psychic blast at the nearest marine.
+	ActiveAbility@abilityblast:
+		OrderName: AbilityBlast
+		Slot: 1
+		Label: Blast
+		Cooldown: 400
+		Weapon: TGMCPsychicBlast
+		Aim: Nearest
+		Range: 6c0
+		AiRange: 6c0
+		Sounds: xeno-roar-2.ogg
 	Evolves:
 		Previous: carrier
 	Voiced:
@@ -1572,7 +1671,7 @@ warlock:
 	Selectable:
 		Bounds: 768, 768, -384, -512
 	TgmcMobile:
-		Speed: 55
+		Speed: 110
 	Armament@PRIMARY:
 		Weapon: TGMCSpit
 	Tooltip:
@@ -1587,6 +1686,28 @@ warlock:
 
 shrike:
 	Inherits: ^Xeno
+	# Command card abilities: Fling throws the nearest marine, Cure heals the xenos around her.
+	ActiveAbility@abilityfling:
+		OrderName: AbilityFling
+		Slot: 1
+		Label: Fling
+		Cooldown: 500
+		Weapon: TGMCPsychicFling
+		Aim: Nearest
+		Range: 5c0
+		AiRange: 5c0
+		Sounds: xeno-roar-4.ogg
+	ActiveAbility@abilitycure:
+		OrderName: AbilityCure
+		Slot: 2
+		Label: Cure
+		Cooldown: 700
+		Weapon: TGMCPsychicCure
+		Aim: Self
+		AiRange: 4c0
+		AiMinTargets: 2
+		AiWoundedPercent: 60
+		Sounds: xeno-larva-2.ogg
 	Evolves:
 		Next: widow
 		Previous: wraith
@@ -1597,7 +1718,7 @@ shrike:
 	Selectable:
 		Bounds: 768, 768, -384, -512
 	TgmcMobile:
-		Speed: 100
+		Speed: 200
 	Armament@PRIMARY:
 		Weapon: TGMCClaws
 	Tooltip:
@@ -1612,6 +1733,17 @@ shrike:
 
 widow:
 	Inherits: ^Xeno
+	# Command card ability: web the nearest marine.
+	ActiveAbility@abilityweb:
+		OrderName: AbilityWeb
+		Slot: 1
+		Label: Web
+		Cooldown: 450
+		Weapon: TGMCWebSpit
+		Aim: Nearest
+		Range: 6c0
+		AiRange: 6c0
+		Sounds: acid-spit-2.ogg
 	Evolves:
 		Next: bull
 		Previous: shrike
@@ -1622,7 +1754,7 @@ widow:
 	Selectable:
 		Bounds: 768, 768, -384, -512
 	TgmcMobile:
-		Speed: 45
+		Speed: 90
 	Armament@PRIMARY:
 		Weapon: TGMCAcid
 	Tooltip:
@@ -1637,6 +1769,17 @@ widow:
 
 wraith:
 	Inherits: ^Xeno
+	# Command card ability: freeze every marine around her for a moment.
+	ActiveAbility@abilitytimestop:
+		OrderName: AbilityTimestop
+		Slot: 1
+		Label: Time Stop
+		Cooldown: 700
+		Weapon: TGMCTimestop
+		Aim: Self
+		AiRange: 4c0
+		AiMinTargets: 2
+		Sounds: xeno-roar-2.ogg
 	Evolves:
 		Next: shrike
 		Previous: ravager
@@ -1647,7 +1790,7 @@ wraith:
 	Selectable:
 		Bounds: 768, 768, -384, -512
 	TgmcMobile:
-		Speed: 95
+		Speed: 190
 	Armament@PRIMARY:
 		Weapon: TGMCClaws
 	Tooltip:
@@ -1673,7 +1816,7 @@ bull:
 	Selectable:
 		Bounds: 768, 768, -384, -512
 	TgmcMobile:
-		Speed: 70
+		Speed: 140
 	Armament@PRIMARY:
 		Weapon: TGMCSlam
 	Tooltip:
@@ -1688,6 +1831,17 @@ bull:
 
 behemoth:
 	Inherits: ^Xeno
+	# Command card ability: a heavy stomp.
+	ActiveAbility@abilitystomp:
+		OrderName: AbilityStomp
+		Slot: 1
+		Label: Stomp
+		Cooldown: 600
+		Weapon: TGMCStompBig
+		Aim: Self
+		AiRange: 3c768
+		AiMinTargets: 2
+		Sounds: xeno-roar-5.ogg
 	Armor:
 		Type: Heavy
 	Evolves:
@@ -1699,7 +1853,7 @@ behemoth:
 	Selectable:
 		Bounds: 768, 768, -384, -512
 	TgmcMobile:
-		Speed: 30
+		Speed: 60
 	Armament@PRIMARY:
 		Weapon: TGMCSlam
 	Tooltip:

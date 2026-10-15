@@ -1054,6 +1054,11 @@ SCENARIOS = {
         ("rifleman", "Marines", 12, 4, 256), ("cade-w", "Neutral", 14, 4, 0), ("hunter", "Xenos", 17, 4, 0),
         ("rifleman", "Marines", 12, 12, 256), ("cade-e", "Neutral", 14, 12, 0), ("hunter", "Xenos", 17, 12, 0), ("resin-silo", "Xenos", 28, 20, 0),
     ]},
+    # The orbital strike (see scenarios/test-orbital.lua): hunters and a wall at the target.
+    "scenario-orbital": {"scripts": ("test-orbital",), "drop_conquest": True, "size": (32, 24), "ground": "walls", "actors": [
+        ("workshop", "Marines", 6, 6, 0), ("hunter", "Xenos", 12, 11, 0), ("hunter", "Xenos", 18, 12, 0), ("hunter", "Xenos", 15, 9, 0),
+        ("resin-silo", "Xenos", 28, 20, 0),
+    ]},
     # The marine AI uses its support powers (see scenarios/test-ai-support.lua).
     "scenario-ai-support": {"scripts": ("test-ai-support",), "marine_bot": "skirmish", "drop_conquest": True, "size": (48, 32),
                             "extra_rules": "Player:\n\t-SquadManagerBotModule@marines-easy:\n\t-SquadManagerBotModule@marines-normal:\n\t-SquadManagerBotModule@marines-hard:\n^Infantry:\n\tAutoTarget:\n\t\tInitialStance: HoldFire\ncryo-pod:\n\tDropPodPower@sentrydrop:\n\t\tChargeInterval: 60\n\tDropPodPower@mortardrop:\n\t\tChargeInterval: 60\narmory:\n\tDropPodPower@supplydrop:\n\t\tChargeInterval: 60\n\tSpawnActorPower@smoke:\n\t\tChargeInterval: 60\n", "actors": [

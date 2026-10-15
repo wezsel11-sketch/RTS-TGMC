@@ -27,7 +27,7 @@ def _parse(path):
         line = raw.rstrip("\n")
         if not line.strip() or line.lstrip().startswith("//"):
             continue
-        m = re.match(r"^(/[\w/]+)\s*$", line)
+        m = re.match(r"^(/[\w/]+)\s*(//.*)?$", line)
         if m:
             cur = m.group(1)
             DEFS.setdefault(cur, {})
@@ -153,3 +153,25 @@ def destroyable(path):
         if path.startswith(prefix):
             return hp, blocks, cover
     return None
+
+
+def door_states(names, state):
+    """For a door picture, its animation states: (closed, open, opening, closing, starts_open), or None when it is not a door TGMC animates this way.
+    Airlocks use door_closed / door_open / door_opening / door_closing; blast doors and shutters use pdoor1 / pdoor0 / pdoorc0 / pdoorc1."""
+    if state.endswith("_closed") or state.endswith("_open"):
+        base = state.rsplit("_", 1)[0]
+        found = (base + "_closed", base + "_open", base + "_opening", base + "_closing", state.endswith("_open"))
+    else:
+        m = re.match(r"^(pdoor|shutter)([01]?)$", state)
+        if not m:
+            return None
+        base = m.group(1)
+        found = (base + "1" if base + "1" in names else base, base + "0", base + "c0", base + "c1", m.group(2) == "0")
+    if found[0] not in names or found[1] not in names or found[2] not in names or found[3] not in names:
+        return None
+    return found
+
+
+def is_door(path):
+    """Doors that open for units on their own: airlocks and blast doors, not the timed landing-zone containment doors."""
+    return (path.startswith("/obj/machinery/door/airlock") or path.startswith("/obj/machinery/door/poddoor")) and "/timed_late" not in path

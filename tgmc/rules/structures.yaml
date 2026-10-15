@@ -31,7 +31,7 @@
 	# Any building keeps the minimap running, so the radar panel is never blank while you have a base.
 	ProvidesRadar:
 	Selectable:
-		Bounds: 512, 512, -256, -256
+		Bounds: 512, 512, 0, 0
 	SelectionDecorations:
 	SelectionRing:
 		Radius: 720
@@ -146,7 +146,7 @@ resin-silo:
 		Footprint: xxx xxx xxx
 		Dimensions: 3, 3
 	Selectable:
-		Bounds: 2560, 2560, -1280, -1280
+		Bounds: 2560, 2560, 0, 0
 	HitShape:
 		Type: Rectangle
 			TopLeft: -1536, -1536
@@ -319,7 +319,7 @@ evolution-tower:
 		Footprint: xx xx
 		Dimensions: 2, 2
 	Selectable:
-		Bounds: 1792, 1792, -896, -896
+		Bounds: 1792, 1792, 0, 0
 	Tooltip:
 		Name: actor-evolution-tower.name
 	GrantExternalConditionPower@cure:
@@ -372,7 +372,7 @@ recovery-pylon:
 		Footprint: xx xx
 		Dimensions: 2, 2
 	Selectable:
-		Bounds: 1792, 1792, -896, -896
+		Bounds: 1792, 1792, 0, 0
 	Tooltip:
 		Name: actor-recovery-pylon.name
 	Valued:
@@ -406,7 +406,7 @@ gargoyle:
 		Footprint: xx xx
 		Dimensions: 2, 2
 	Selectable:
-		Bounds: 1792, 1792, -896, -896
+		Bounds: 1792, 1792, 0, 0
 	RevealsShroud:
 		Range: 14c0
 	Tooltip:
@@ -431,7 +431,7 @@ maturity-tower:
 		Footprint: xx xx
 		Dimensions: 2, 2
 	Selectable:
-		Bounds: 1792, 1792, -896, -896
+		Bounds: 1792, 1792, 0, 0
 	Tooltip:
 		Name: actor-maturity-tower.name
 	GrantExternalConditionPower@rage:
@@ -475,7 +475,7 @@ forward-hive:
 		Footprint: xx xx
 		Dimensions: 2, 2
 	Selectable:
-		Bounds: 1792, 1792, -896, -896
+		Bounds: 1792, 1792, 0, 0
 	RevealsShroud:
 		Range: 10c0
 	ProvidesRadar:
@@ -691,6 +691,7 @@ cryo-pod:
 		EndChargeSound: ui-confirm.ogg
 		Actors: sentry-turret
 		Radius: 1
+		MarkerRadius: 1c512
 		Image: droppod
 		FallSounds: bomb-fall.ogg
 		LandSounds: slam-1.ogg, explosion-1.ogg
@@ -706,6 +707,7 @@ cryo-pod:
 		EndChargeSound: ui-confirm.ogg
 		Actors: mortar-emplacement
 		Radius: 1
+		MarkerRadius: 1c512
 		Image: droppod
 		FallSounds: bomb-fall.ogg
 		LandSounds: slam-1.ogg, explosion-1.ogg
@@ -749,12 +751,14 @@ armory:
 		BeginChargeSound: ui-ping.ogg
 		EndChargeSound: ui-confirm.ogg
 		Actors: supply-crate
+		MarkerRadius: 4c768
 		Radius: 1
 		Image: supplypod
 		OpenDelay: 5
 		FallSounds: bomb-fall.ogg
 		LandSounds: slam-2.ogg
-	SpawnActorPower@smoke:
+	TgmcSpawnActorPower@smoke:
+		MarkerRadius: 3c768
 		OrderName: SmokeScreenOrder
 		Name: support-smokescreen.name
 		Description: support-smokescreen.description
@@ -770,7 +774,8 @@ armory:
 		EffectImage: fx-light
 		EffectSequence: blast
 		EffectPalette: effect
-	SpawnActorPower@sensor:
+	TgmcSpawnActorPower@sensor:
+		MarkerRadius: 20c0
 		OrderName: SensorSweepOrder
 		Name: support-sensorsweep.name
 		Description: support-sensorsweep.description
@@ -861,6 +866,24 @@ workshop:
 	AmbientSound:
 		SoundFiles: amb-hum.ogg
 	# Orbital bombardment: a long warning, then a huge blast.
+	# A mech dropped from orbit: the workshop's own drop pod, one mech in it.
+	DropPodPower@mechdrop:
+		OrderName: MechDropOrder
+		Name: support-mechdrop.name
+		Description: support-mechdrop.description
+		IconImage: support-icon
+		BlockedCursor: move-blocked
+		Icon: mech
+		ChargeInterval: 6000
+		BeginChargeSound: ui-ping.ogg
+		EndChargeSound: ui-confirm.ogg
+		Actors: mech
+		Radius: 2
+		MarkerRadius: 2c0
+		Image: droppod
+		FallTicks: 40
+		FallSounds: bomb-fall.ogg
+		LandSounds: slam-1.ogg, explosion-1.ogg
 	CondorStrikePower@orbital:
 		Variant: orbital
 		OrderName: OrbitalOrder

@@ -230,6 +230,8 @@ SOUNDS = {
     # The Condor's CAS strike
     "condor-flyby": (f"{EF}/casplane_flyby.ogg", "fx", 2.0),
     "bomb-fall": (f"{EF}/bomb_fall.ogg", "fx"),
+    "door-open": ("sound/machines/airlock.ogg", "fx", 1.5),
+    "door-close": ("sound/machines/door_close.ogg", "fx", 1.5),
     "smoke-bomb": (f"{EF}/smoke_bomb.ogg", "fx", 3.0),
     "ob-incoming": (f"{EF}/OB_incoming.ogg", "fx", 4.0),
     # Shells and rockets in flight, and the big guns that fire them

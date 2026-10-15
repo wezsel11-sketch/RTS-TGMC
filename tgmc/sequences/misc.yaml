@@ -249,3 +249,7 @@ support-icon:
 		Filename: support-icon.png
 		Start: 5
 		Length: 1
+	mech:
+		Filename: support-icon.png
+		Start: 6
+		Length: 1

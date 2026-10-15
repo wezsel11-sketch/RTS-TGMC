@@ -40,6 +40,11 @@ def walls_ground(x, y):
     """Grass with a wall of three cells thick at x 14 to 16, y 8 to 15."""
     return (WALL if 14 <= x <= 16 and 8 <= y <= 15 else GRASS), 0
 
+def doorline_ground(x, y):
+    """Grass with an uncrossable line of rock at x 14, except a gap at y 11 (the door)."""
+    return (WALL if x == 14 and y != 11 else GRASS), 0
+
+
 # (actor, owner, x, y, facing). Facing is in OpenRA angle units: 0 = north, 512 = south.
 TEST_FIELD = [
     ("rifleman", "Marines", 9, 11, 0),
@@ -387,7 +392,7 @@ def write_pod_icon(out):
     img.save(os.path.join(out, "pod-icon.png"), pnginfo=meta)
 
 
-SUPPORT_ICONS = ["supply", "sensor", "smoke", "orbital", "sentry", "mortar"]
+SUPPORT_ICONS = ["supply", "sensor", "smoke", "orbital", "sentry", "mortar", "mech"]
 
 
 def write_support_icons(out):
@@ -397,7 +402,7 @@ def write_support_icons(out):
     img = Image.new("RGBA", (w * len(SUPPORT_ICONS), h), (0, 0, 0, 0))
     d = ImageDraw.Draw(img)
     white, blue, amber, red, grey = (240, 240, 230, 255), (110, 150, 255, 255), (255, 170, 40, 255), (240, 80, 60, 255), (170, 176, 186, 255)
-    labels = ["SUPPLY", "SENSOR", "SMOKE", "ORBIT", "SENTRY", "MORTAR"]
+    labels = ["SUPPLY", "SENSOR", "SMOKE", "ORBIT", "SENTRY", "MORTAR", "MECH"]
     for i, name in enumerate(SUPPORT_ICONS):
         ox = w * i
         d.rectangle([ox, 0, ox + w - 1, h - 1], fill=(24, 28, 36, 255), outline=(90, 110, 140, 255))
@@ -425,6 +430,14 @@ def write_support_icons(out):
             d.polygon([(cx - 9, cy + 9), (cx + 9, cy + 9), (cx + 3, cy - 2), (cx - 3, cy - 2)], fill=grey)
             d.line([cx, cy - 2, cx + 8, cy - 14], fill=white, width=4)
             d.ellipse([cx + 8, cy - 18, cx + 14, cy - 12], fill=amber)
+        elif name == "mech":
+            d.rectangle([cx - 6, cy - 4, cx + 6, cy + 6], fill=grey)
+            d.rectangle([cx - 4, cy - 9, cx + 4, cy - 4], fill=grey)
+            d.rectangle([cx - 11, cy - 3, cx - 7, cy + 5], fill=white)
+            d.rectangle([cx + 7, cy - 3, cx + 11, cy + 5], fill=white)
+            d.rectangle([cx - 4, cy + 6, cx - 1, cy + 11], fill=grey)
+            d.rectangle([cx + 1, cy + 6, cx + 4, cy + 11], fill=grey)
+            d.rectangle([cx + 6, cy - 12, cx + 12, cy - 9], fill=red)
         d.text((ox + 31 - 3 * len(labels[i]), 33), labels[i], fill=white)
     meta = PngImagePlugin.PngInfo()
     meta.add_text("FrameSize", f"{w},{h}")
@@ -580,6 +593,7 @@ SCENARIOS = {
         ("resin-turret", "Xenos", 10, 12, 512),
         ("rifleman", "Marines", 20, 20, 0),
     ]},
+    "scenario-raid": {"scripts": ("wave-survival", "mission-raid", "test-raid"), "drop_conquest": True, "size": (40, 28), "ground": "landing_zone", "actors": HOLD_THE_LINE},
     "scenario-waves": {"scripts": ("wave-survival", "test-waves"), "drop_conquest": True, "actors": [
         ("rifleman", "Marines", 9, 10, 512),
         ("rifleman", "Marines", 10, 10, 512),
@@ -1026,6 +1040,15 @@ SCENARIOS = {
         ("resin-silo", "Xenos", 12, 20, 0), ("drone", "Xenos", 14, 22, 0), ("drone", "Xenos", 14, 18, 0),
         ("rifleman", "Marines", 64, 20, 512),
     ]},
+    # The xeno AI builds its own drone and sends it out (see scenarios/test-ai-drone-build.lua): no drones at the start.
+    "scenario-ai-drone-build": {"scripts": ("test-ai-drone-build",), "xeno_bot": "skirmish", "fast": True, "drop_conquest": True, "size": (72, 40),
+                                "extra_rules": "Player:\n\t-SquadManagerBotModule@xenos-easy:\n\t-SquadManagerBotModule@xenos-normal:\n\t-SquadManagerBotModule@xenos-hard:\n", "actors": [
+        ("resin-silo", "Xenos", 12, 20, 0), ("rifleman", "Marines", 64, 20, 512),
+    ]},
+    # The workshop's mech drop (see scenarios/test-mechdrop.lua).
+    "scenario-mechdrop": {"scripts": ("test-mechdrop",), "drop_conquest": True, "size": (32, 24), "actors": [
+        ("workshop", "Marines", 6, 6, 0), ("resin-silo", "Xenos", 28, 20, 0),
+    ]},
     # The xeno AI uses a caste ability by itself (see scenarios/test-ai-abilities.lua): a crusher that holds fire, with marines close by.
     "scenario-ai-abilities": {"scripts": ("test-ai-abilities",), "xeno_bot": "skirmish", "drop_conquest": True, "size": (40, 24),
                               "extra_rules": "Player:\n\t-SquadManagerBotModule@xenos-easy:\n\t-SquadManagerBotModule@xenos-normal:\n\t-SquadManagerBotModule@xenos-hard:\n^Infantry:\n\tAutoTarget:\n\t\tInitialStance: HoldFire\ncrusher:\n\tAutoTarget:\n\t\tInitialStance: HoldFire\nrifleman:\n\tHealth:\n\t\tHP: 3000\n", "actors": [
@@ -1059,9 +1082,22 @@ SCENARIOS = {
         ("workshop", "Marines", 6, 6, 0), ("hunter", "Xenos", 12, 11, 0), ("hunter", "Xenos", 18, 12, 0), ("hunter", "Xenos", 15, 9, 0),
         ("resin-silo", "Xenos", 28, 20, 0),
     ]},
+    # Pods carrying a mortar and a sentry on awkward spots (see scenarios/test-podcarry.lua).
+    "scenario-podcarry": {"scripts": ("test-podcarry",), "drop_conquest": True, "size": (32, 24), "ground": "walls", "actors": [
+        ("cryo-pod", "Marines", 6, 6, 0), ("rifleman", "Marines", 10, 12, 0), ("rifleman", "Marines", 20, 12, 0),
+        ("hunter", "Xenos", 17, 10, 0), ("hunter", "Xenos", 17, 13, 0), ("resin-silo", "Xenos", 28, 20, 0),
+    ]},
+    # A unit walks through a door in a wall (see scenarios/test-door.lua): mapdoor-0 is any generated door.
+    "scenario-door": {"scripts": ("test-door",), "drop_conquest": True, "size": (32, 24), "ground": "doorline", "actors": [
+        ("rifleman", "Marines", 10, 11, 0), ("mapdoor-0", "Neutral", 14, 11, 0), ("resin-silo", "Xenos", 28, 20, 0),
+    ]},
+    # Not a test: a door opening for a marine, to see the animation.
+    "shot-door": {"scripts": ("shot-door",), "drop_conquest": True, "size": (32, 24), "ground": "doorline", "extra_rules": "World:\n\tScreenshotAt:\n\t\tTick: 75\n", "actors": [
+        ("rifleman", "Marines", 12, 11, 0), ("mapdoor-0", "Neutral", 14, 11, 0), ("resin-silo", "Xenos", 28, 20, 0),
+    ]},
     # The marine AI uses its support powers (see scenarios/test-ai-support.lua).
     "scenario-ai-support": {"scripts": ("test-ai-support",), "marine_bot": "skirmish", "drop_conquest": True, "size": (48, 32),
-                            "extra_rules": "Player:\n\t-SquadManagerBotModule@marines-easy:\n\t-SquadManagerBotModule@marines-normal:\n\t-SquadManagerBotModule@marines-hard:\n^Infantry:\n\tAutoTarget:\n\t\tInitialStance: HoldFire\ncryo-pod:\n\tDropPodPower@sentrydrop:\n\t\tChargeInterval: 60\n\tDropPodPower@mortardrop:\n\t\tChargeInterval: 60\narmory:\n\tDropPodPower@supplydrop:\n\t\tChargeInterval: 60\n\tSpawnActorPower@smoke:\n\t\tChargeInterval: 60\n", "actors": [
+                            "extra_rules": "Player:\n\t-SquadManagerBotModule@marines-easy:\n\t-SquadManagerBotModule@marines-normal:\n\t-SquadManagerBotModule@marines-hard:\n^Infantry:\n\tAutoTarget:\n\t\tInitialStance: HoldFire\ncryo-pod:\n\tDropPodPower@sentrydrop:\n\t\tChargeInterval: 60\n\tDropPodPower@mortardrop:\n\t\tChargeInterval: 60\narmory:\n\tDropPodPower@supplydrop:\n\t\tChargeInterval: 60\n\tTgmcSpawnActorPower@smoke:\n\t\tChargeInterval: 60\n", "actors": [
         ("cryo-pod", "Marines", 6, 6, 0), ("armory", "Marines", 10, 6, 0), ("rifleman", "Marines", 17, 22, 512),
         ("rifleman", "Marines", 17, 23, 512), ("rifleman", "Marines", 17, 24, 512), ("medic", "Marines", 16, 23, 512),
         ("hunter", "Xenos", 22, 22, 0), ("hunter", "Xenos", 23, 23, 0), ("hunter", "Xenos", 22, 24, 0), ("hunter", "Xenos", 23, 21, 0),
@@ -1289,7 +1325,16 @@ def write_tgmc_map(folder, title, rows, marines, xenos, art=None, objects=None, 
             placed = [(open_variant(n), x, y) for n, x, y in placed]
         extra = [(n, "Neutral", x, y, 0) for n, x, y in placed]
     original = rows
-    ground = (lambda x, y: (art(x, y) if land[y][x] == original[y][x] else codes[land[y][x]], 0)) if art else (lambda x, y: (codes[land[y][x]], 0))
+    def dug_art(x, y):
+        """A tunnel cell dug through rock wears the picture of the nearest ordinary ground cell, not the repo's flat dirt tile."""
+        for r in range(1, 8):
+            for dx in range(-r, r + 1):
+                for dy in (-r, r) if abs(dx) != r else range(-r, r + 1):
+                    nx, ny = x + dx, y + dy
+                    if 0 <= nx < w and 0 <= ny < h and land[ny][nx] == original[ny][nx] and land[ny][nx] in "GD":
+                        return art(nx, ny)
+        return codes[land[y][x]]
+    ground = (lambda x, y: (art(x, y) if land[y][x] == original[y][x] else dug_art(x, y), 0)) if art else (lambda x, y: (codes[land[y][x]], 0))
     write_map(folder, title, w, h, actors + xeno_actors + extra, "Lobby", [spawn_m, spawn_x], ground=ground, category="Conquest")
 
 
@@ -1339,9 +1384,15 @@ def main():
                   drop_conquest=sc.get("drop_conquest", False), xeno_bot=sc.get("xeno_bot"),
                   marine_bot=sc.get("marine_bot"), fast=sc.get("fast", True),
                   extra_rules=sc.get("extra_rules", ""),
-                  ground={"landing_zone": landing_zone_ground, "walls": walls_ground}.get(sc.get("ground"), flat_ground))
+                  ground={"landing_zone": landing_zone_ground, "walls": walls_ground, "doorline": doorline_ground}.get(sc.get("ground"), flat_ground))
     write_map(os.path.join(args.out, "maps", "hold-the-line"), "Hold the Line", 40, 28, HOLD_THE_LINE, "Lobby",
               [(6, 14), (33, 13)], scripts=("wave-survival",), ground=landing_zone_ground, category="Survival",
+              drop_conquest=True, music=True)
+    write_map(os.path.join(args.out, "maps", "night-raid"), "Night Raid", 40, 28, HOLD_THE_LINE, "Lobby",
+              [(6, 14), (33, 13)], scripts=("wave-survival", "mission-raid"), ground=landing_zone_ground, category="Survival",
+              drop_conquest=True, music=True)
+    write_map(os.path.join(args.out, "maps", "last-stand"), "Last Stand", 40, 28, HOLD_THE_LINE, "Lobby",
+              [(6, 14), (33, 13)], scripts=("wave-survival", "mission-last-stand"), ground=landing_zone_ground, category="Survival",
               drop_conquest=True, music=True)
     print(f"placeholders written to {args.out}")
 

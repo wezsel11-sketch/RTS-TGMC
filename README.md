@@ -61,7 +61,7 @@ the commits this mod was tested against (see the top of `mod/bootstrap.py`), so 
 
 ## How to play
 
-- **Main menu -> Singleplayer -> Skirmish.** Pick a skirmish map (**Landing Zone**, **Canyon Run**, **Jungle Crossing**, **Close Quarters**, **Great Plains**, plus four converted from TGMC's own maps: **LV-624**, **Big Red**, **Whiskey Outpost**, **Desert Dam**) or **Hold the Line** (marines against waves).
+- **Main menu -> Singleplayer -> Skirmish.** Pick a skirmish map (**Landing Zone**, **Canyon Run**, **Jungle Crossing**, **Close Quarters**, **Great Plains**, plus four converted from TGMC's own maps: **LV-624**, **Big Red**, **Whiskey Outpost**, **Desert Dam**) or one of the wave missions: **Hold the Line** (marines against waves), **Night Raid** (waves from two sides, spitters and a drone) or **Last Stand** (eight growing waves, a Behemoth in the last).
   In Landing Zone choose a faction for yourself and set the other slot to **Skirmish AI** (Easy, Normal or Hard), then Start Game.
 - **Marines** start with a cryo pod, a vendor and a squad. Click the cryo pod and use the sidebar's *Infantry* tab to train riflemen,
   corpsmen (they heal), engineers (they repair), smartgunners (rapid spread fire) and grenadiers (splash). **Xenos** start with a resin silo and mini silos; use the *Xeno* tab for Runner,
@@ -202,8 +202,13 @@ the commits this mod was tested against (see the top of `mod/bootstrap.py`), so 
     (barricades, closets, crates, windows) and hit them instead of what is behind. A barricade has a front: shots coming from the side it faces are
     mostly caught (70%), shots from behind or the flanks go over it, so face barricades toward the enemy and shoot over them from behind.
     Shells, rockets, grenades and acid fly over.
-  - **Drop pod.** The Cryo Pod gives the marines a power on the support bar, like CAS: pick a spot and a pod falls from orbit, shakes the ground and
-    opens on four riflemen, an engineer and a medic. Recharges in 2.5 minutes; the marine AI calls it on clusters of xenos.
+  - **Doors.** Airlocks and blast doors of the four full-size maps open by themselves with TGMC's own animation when a unit comes near, and close
+    again a moment after it has left. Closed they block movement and bullets; units path through them. Two-wide doors are two halves that open together.
+  - **Aiming support powers.** Every marine support power (drop pods, supply, smoke, sensor, CAS, orbital) shows a circle of the area it affects
+    under the cursor while you aim.
+  - **Drop pod.** The Cryo Pod gives the marines a power on the support bar, like CAS: pick a spot and six pods, one marine each (four riflemen, an
+    engineer, a medic), slam down around it one after the other. Each pod hits hard: a shockwave crushes whatever is under it and the screen shakes.
+    Empty pods are gone after a minute. Recharges in 2.5 minutes; the marine AI calls it on clusters of xenos.
   - **Gibs and bodies.** A marine or xeno killed by an explosion throws five to eight body parts (TGMC's gib sprites) a few cells around with a splash of blood
     where each lands. Parts, blood and bodies lie for over three minutes.
   - **Real TGMC map art.** The full-size maps (`big-red-full`, `lv-624-full`, `whiskey-outpost-full`, `desert-dam-full`) are drawn with TGMC's own floor and wall

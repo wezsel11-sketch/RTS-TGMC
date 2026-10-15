@@ -20,7 +20,7 @@ def _parse(path):
         line = raw.rstrip("\n")
         if not line.strip() or line.lstrip().startswith("//"):
             continue
-        m = re.match(r"^(/[\w/]+)\s*$", line)
+        m = re.match(r"^(/[\w/]+)\s*(//.*)?$", line)
         if m:
             cur = m.group(1)
             DEFS.setdefault(cur, {})

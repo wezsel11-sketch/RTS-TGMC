@@ -7,6 +7,7 @@ using OpenRA.Effects;
 using OpenRA.GameRules;
 using OpenRA.Graphics;
 using OpenRA.Mods.Common.Projectiles;
+using OpenRA.Mods.TGMC.Traits;
 using OpenRA.Traits;
 
 namespace OpenRA.Mods.TGMC.Projectiles
@@ -109,6 +110,9 @@ namespace OpenRA.Mods.TGMC.Projectiles
 
 		public bool Stops(World world, Actor self, WPos shooter)
 		{
+			if (self.TraitOrDefault<MapDoor>() is { IsOpen: true })
+				return false;
+
 			if (FaceX == 0 && FaceY == 0)
 				return true;
 

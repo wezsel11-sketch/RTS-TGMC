@@ -36,6 +36,11 @@
 	Inherits: ^MapObjectBlocking
 	BlocksBullets:
 
+# A door: opens by itself with TGMC's animation when a unit comes near (MapDoor, see tgmc/code/MapDoor.cs). The sequences come from build_maptiles.py.
+^MapDoor:
+	Inherits: ^MapObjectCover
+	WithSpriteBody:
+
 ^MapObjectOpen:
 	Inherits: ^MapObject
 	# Units walk over it, as over weeds.

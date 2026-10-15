@@ -180,6 +180,17 @@ TGMCMortar:
 		Damage: 120
 		Radius: 2c0
 
+# A drop pod hitting the ground: a hard impact that shakes the screen and crushes what is under it.
+TGMCPodImpact:
+	Inherits: TGMCMortar
+	Warhead@7Shake: ShakeScreen
+		Duration: 22
+		Intensity: 9
+		Multiplier: 1, 1
+	Warhead@1Wave: Shockwave
+		Damage: 150
+		Radius: 3
+
 # The mortar emplacement: the mortarman's shell from further away and a little quicker.
 TGMCMortarEmplacement:
 	Inherits: TGMCMortar

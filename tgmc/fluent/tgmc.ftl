@@ -361,7 +361,7 @@ menu-intel-4 = > Recommend: scout before engaging.
 
 support-droppod =
     .name = Drop Pod
-    .description = A pod falls from orbit onto the spot you pick: four riflemen, an engineer and a medic step out. Granted by the Cryo Pod. Recharges in two and a half minutes.
+    .description = Six pods fall from orbit around the spot you pick, one marine in each (four riflemen, an engineer and a medic). The pods hit hard and crush what is under them, and are gone after a minute. Granted by the Cryo Pod. Recharges in two and a half minutes.
 
 actor-mapobject =
     .name = Furniture
@@ -381,6 +381,9 @@ support-smokescreen =
 support-sensorsweep =
     .name = Sensor Sweep
     .description = Reveals the area around the spot you pick, cloaked xenos included, for thirty-six seconds. Granted by the Armory. Recharges in two minutes.
+support-mechdrop =
+    .name = Mech Drop
+    .description = A pod drops a mech on the spot you pick: the heavy walker, with its autocannon and rockets. Granted by the Workshop. Recharges in four minutes.
 support-orbital =
     .name = Orbital Bombardment
     .description = Ten seconds after you call it a huge blast lands, bigger than the MOAB, and flattens walls twelve cells around. Hurts your own units too. Granted by the Workshop. Recharges in six minutes.

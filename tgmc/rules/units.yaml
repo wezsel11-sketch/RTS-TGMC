@@ -11,7 +11,7 @@
 		PauseOnCondition: stunned
 	# A click picks a unit before a building under it, and the click area is a little roomier than the sprite.
 	Selectable:
-		Bounds: 640, 896, -320, -576
+		Bounds: 640, 896, 0, -128
 		Priority: 20
 	HitShape:
 		UseTargetableCellsOffsets: true
@@ -483,7 +483,7 @@ assault:
 	TgmcMobile:
 		Speed: 68
 	Selectable:
-		Bounds: 640, 832, -320, -544
+		Bounds: 640, 832, 0, -128
 	Armor:
 		Type: HeavyMarine
 	Armament@PRIMARY:
@@ -748,7 +748,7 @@ mech:
 	TgmcMobile:
 		Speed: 64
 	Selectable:
-		Bounds: 1792, 2048, -896, -1280
+		Bounds: 1792, 2048, 0, -256
 	SelectionRing:
 		Radius: 1150
 	Armor:
@@ -861,7 +861,7 @@ heavygunner:
 	TgmcMobile:
 		Speed: 56
 	Selectable:
-		Bounds: 640, 832, -320, -544
+		Bounds: 640, 832, 0, -128
 	Armor:
 		Type: HeavyMarine
 	Armament@PRIMARY:
@@ -894,7 +894,7 @@ demolitionist:
 	TgmcMobile:
 		Speed: 72
 	Selectable:
-		Bounds: 640, 832, -320, -544
+		Bounds: 640, 832, 0, -128
 	Armor:
 		Type: Demolition
 	Armament@PRIMARY:
@@ -1073,7 +1073,7 @@ runner:
 	Health:
 		HP: 120
 	Selectable:
-		Bounds: 1024, 768, -512, -512
+		Bounds: 1024, 768, 0, -128
 	TgmcMobile:
 		Speed: 300
 	Tooltip:
@@ -1117,7 +1117,7 @@ hunter:
 	Health:
 		HP: 130
 	Selectable:
-		Bounds: 768, 768, -384, -512
+		Bounds: 768, 768, 0, -128
 	TgmcMobile:
 		Speed: 200
 	Tooltip:
@@ -1152,7 +1152,7 @@ sentinel:
 	Health:
 		HP: 80
 	Selectable:
-		Bounds: 768, 768, -384, -512
+		Bounds: 768, 768, 0, -128
 	TgmcMobile:
 		Speed: 160
 	Armament@PRIMARY:
@@ -1174,7 +1174,7 @@ facehugger:
 	Health:
 		HP: 25
 	Selectable:
-		Bounds: 512, 512, -256, -256
+		Bounds: 512, 512, 0, 0
 	TgmcMobile:
 		Speed: 260
 	# Hunts marines that carry no embryo, leaps at one and is spent planting its own.
@@ -1214,7 +1214,7 @@ larva:
 	Health:
 		HP: 40
 	Selectable:
-		Bounds: 512, 512, -256, -256
+		Bounds: 512, 512, 0, 0
 	TgmcMobile:
 		Speed: 120
 	Armament@PRIMARY:
@@ -1235,7 +1235,7 @@ drone:
 	Health:
 		HP: 70
 	Selectable:
-		Bounds: 768, 768, -384, -512
+		Bounds: 768, 768, 0, -128
 	TgmcMobile:
 		Speed: 140
 	Armament@PRIMARY:
@@ -1311,7 +1311,7 @@ warrior:
 	Health:
 		HP: 260
 	Selectable:
-		Bounds: 1024, 1024, -512, -512
+		Bounds: 1024, 1024, 0, 0
 	TgmcMobile:
 		Speed: 140
 	Armament@PRIMARY:
@@ -1345,7 +1345,7 @@ queen:
 	Health:
 		HP: 300
 	Selectable:
-		Bounds: 1536, 1536, -768, -768
+		Bounds: 1536, 1536, 0, 0
 	TgmcMobile:
 		Speed: 120
 	Armament@PRIMARY:
@@ -1395,7 +1395,7 @@ spitter:
 	Health:
 		HP: 100
 	Selectable:
-		Bounds: 768, 768, -384, -512
+		Bounds: 768, 768, 0, -128
 	TgmcMobile:
 		Speed: 140
 	Armament@PRIMARY:
@@ -1451,7 +1451,7 @@ praetorian:
 	Health:
 		HP: 180
 	Selectable:
-		Bounds: 768, 768, -384, -512
+		Bounds: 768, 768, 0, -128
 	TgmcMobile:
 		Speed: 130
 	Armament@PRIMARY:
@@ -1504,7 +1504,7 @@ crusher:
 	Health:
 		HP: 280
 	Selectable:
-		Bounds: 768, 768, -384, -512
+		Bounds: 768, 768, 0, -128
 	TgmcMobile:
 		Speed: 125
 	Armament@PRIMARY:
@@ -1569,7 +1569,7 @@ ravager:
 	Health:
 		HP: 150
 	Selectable:
-		Bounds: 768, 768, -384, -512
+		Bounds: 768, 768, 0, -128
 	TgmcMobile:
 		Speed: 200
 	Armament@PRIMARY:
@@ -1604,7 +1604,7 @@ defiler:
 	Health:
 		HP: 200
 	Selectable:
-		Bounds: 768, 768, -384, -512
+		Bounds: 768, 768, 0, -128
 	# The canister needs a target in sight.
 	RevealsShroud:
 		Range: 11c0
@@ -1632,7 +1632,7 @@ boiler:
 	Health:
 		HP: 160
 	Selectable:
-		Bounds: 768, 768, -384, -512
+		Bounds: 768, 768, 0, -128
 	# Artillery needs to see where it shoots.
 	RevealsShroud:
 		Range: 13c0
@@ -1671,7 +1671,7 @@ carrier:
 	Health:
 		HP: 200
 	Selectable:
-		Bounds: 768, 768, -384, -512
+		Bounds: 768, 768, 0, -128
 	TgmcMobile:
 		Speed: 145
 	Armament@PRIMARY:
@@ -1707,7 +1707,7 @@ warlock:
 	Health:
 		HP: 170
 	Selectable:
-		Bounds: 768, 768, -384, -512
+		Bounds: 768, 768, 0, -128
 	TgmcMobile:
 		Speed: 125
 	Armament@PRIMARY:
@@ -1756,7 +1756,7 @@ shrike:
 	Health:
 		HP: 140
 	Selectable:
-		Bounds: 768, 768, -384, -512
+		Bounds: 768, 768, 0, -128
 	TgmcMobile:
 		Speed: 220
 	Armament@PRIMARY:
@@ -1793,7 +1793,7 @@ widow:
 	Health:
 		HP: 150
 	Selectable:
-		Bounds: 768, 768, -384, -512
+		Bounds: 768, 768, 0, -128
 	TgmcMobile:
 		Speed: 140
 	Armament@PRIMARY:
@@ -1830,7 +1830,7 @@ wraith:
 	Health:
 		HP: 140
 	Selectable:
-		Bounds: 768, 768, -384, -512
+		Bounds: 768, 768, 0, -128
 	TgmcMobile:
 		Speed: 210
 	Armament@PRIMARY:
@@ -1856,7 +1856,7 @@ bull:
 	Health:
 		HP: 240
 	Selectable:
-		Bounds: 768, 768, -384, -512
+		Bounds: 768, 768, 0, -128
 	TgmcMobile:
 		Speed: 155
 	Armament@PRIMARY:
@@ -1894,7 +1894,7 @@ behemoth:
 	Health:
 		HP: 400
 	Selectable:
-		Bounds: 768, 768, -384, -512
+		Bounds: 768, 768, 0, -128
 	TgmcMobile:
 		Speed: 115
 	Armament@PRIMARY:

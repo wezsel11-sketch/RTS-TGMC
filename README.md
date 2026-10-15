@@ -61,7 +61,7 @@ the commits this mod was tested against (see the top of `mod/bootstrap.py`), so 
 
 ## How to play
 
-- **Main menu -> Singleplayer -> Skirmish.** Pick a skirmish map (**Landing Zone**, **Canyon Run**, **Jungle Crossing**, **Close Quarters**, **Great Plains**, plus four converted from TGMC's own maps: **LV-624**, **Big Red**, **Whiskey Outpost**, **Desert Dam**) or one of the wave missions: **Hold the Line** (marines against waves), **Night Raid** (waves from two sides, spitters and a drone) or **Last Stand** (eight growing waves, a Behemoth in the last).
+- **Main menu -> Singleplayer -> Skirmish.** Pick a skirmish map (**Landing Zone**, **Canyon Run**, **Jungle Crossing**, **Close Quarters**, **Great Plains**, plus four converted from TGMC's own maps: **LV-624**, **Big Red**, **Whiskey Outpost**, **Desert Dam**) or one of the wave missions: **Hold the Line** (marines against waves), **Night Raid** (waves from two sides, spitters and a drone) or **Last Stand** (eight growing waves, a Behemoth in the last) or **The Hundred** (a hundred waves, from runners up to behemoths).
   In Landing Zone choose a faction for yourself and set the other slot to **Skirmish AI** (Easy, Normal or Hard), then Start Game.
 - **Marines** start with a cryo pod, a vendor and a squad. Click the cryo pod and use the sidebar's *Infantry* tab to train riflemen,
   corpsmen (they heal), engineers (they repair), smartgunners (rapid spread fire) and grenadiers (splash). **Xenos** start with a resin silo and mini silos; use the *Xeno* tab for Runner,

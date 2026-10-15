@@ -1394,6 +1394,9 @@ def main():
     write_map(os.path.join(args.out, "maps", "last-stand"), "Last Stand", 40, 28, HOLD_THE_LINE, "Lobby",
               [(6, 14), (33, 13)], scripts=("wave-survival", "mission-last-stand"), ground=landing_zone_ground, category="Survival",
               drop_conquest=True, music=True)
+    write_map(os.path.join(args.out, "maps", "the-hundred"), "The Hundred", 40, 28, HOLD_THE_LINE, "Lobby",
+              [(6, 14), (33, 13)], scripts=("wave-survival", "mission-hundred"), ground=landing_zone_ground, category="Survival",
+              drop_conquest=True, music=True)
     print(f"placeholders written to {args.out}")
 
 

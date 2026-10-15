@@ -99,16 +99,64 @@ def paths():
     return sorted(m["file"] for m in MAPS.values())
 
 
+def crop_box(grid, width, height, f):
+    """The crop load() uses: (x0, y0, x1, y1) in TGMC tiles, the open ground plus a margin, a whole number of f-tile blocks."""
+    open_x = [x for x in range(width) if any(terrain(t) != "R" for t in grid[x])]
+    open_y = [y for y in range(height) if any(terrain(grid[x][y]) != "R" for x in range(width))]
+    x0, y0 = max(0, min(open_x) - 2 * f), max(0, min(open_y) - 2 * f)
+    x1, y1 = min(width, max(open_x) + 1 + 2 * f), min(height, max(open_y) + 1 + 2 * f)
+    return x0, y0, x0 + (x1 - x0) // f * f, y0 + (y1 - y0) // f * f
+
+
 def load(tgmc, spec):
     """Convert one map: (rows, marines, xenos). rows is a list of terrain-letter strings, marines and xenos are the base
     centres in cells. The map is cropped to its open ground with a margin and shrunk by the spec's factor."""
     import os
     width, height, grid = parse(os.path.join(tgmc, spec["file"]))
     f = spec["factor"]
-    open_x = [x for x in range(width) if any(terrain(t) != "R" for t in grid[x])]
-    open_y = [y for y in range(height) if any(terrain(grid[x][y]) != "R" for x in range(width))]
-    x0, y0 = max(0, min(open_x) - 2 * f), max(0, min(open_y) - 2 * f)
-    x1, y1 = min(width, max(open_x) + 1 + 2 * f), min(height, max(open_y) + 1 + 2 * f)
-    rows = convert(grid, width, height, f, (x0, y0, x0 + (x1 - x0) // f * f, y0 + (y1 - y0) // f * f))
+    x0, y0, x1, y1 = crop_box(grid, width, height, f)
+    rows = convert(grid, width, height, f, (x0, y0, x1, y1))
     cell = lambda p: ((p[0] - x0) // f, (p[1] - y0) // f)  # noqa: E731
     return rows, cell(spec["marines"]), cell(spec["xenos"])
+
+
+def parse_objects(path):
+    """Every object on the first z level of a .dmm: (width, height, cells) where cells[x][y] is a list of (object path, {var: value}) for the
+    /obj/ and /mob/ atoms of the cell, in the map's order (bottom first). Values are the raw DM text (`"name"` keeps its quotes)."""
+    import re
+    text = open(path, encoding="utf-8").read()
+    defs = {}
+    for m in re.finditer(r'^"([A-Za-z]+)" = \(\n(.*?)\)\n(?=")', text + '"', re.S | re.M):
+        body = m.group(2)
+        entries = []
+        for e in re.finditer(r"(?m)^(/[\w/]+)(\{.*?\n\t\}|\{[^\n]*\})?,?", body, re.S):
+            if not e.group(1).startswith(("/obj/", "/mob/")):
+                continue
+            vars_ = {}
+            if e.group(2):
+                for item in re.split(r";\n?|\n", e.group(2).strip("{}")):
+                    item = item.strip()
+                    if "=" in item:
+                        k, v = item.split("=", 1)
+                        vars_[k.strip()] = v.strip().rstrip(",")
+            entries.append((e.group(1), vars_))
+        defs[m.group(1)] = entries
+    width, height, columns = 0, 0, {}
+    block = None
+    for line in text.split("\n"):
+        if block is not None:
+            if line == '"}':
+                block = None
+            else:
+                block.append(line)
+            continue
+        m = _BLOCK.match(line)
+        if m:
+            block = []
+            if m.group(3) == "1" and m.group(2) == "1":
+                columns[int(m.group(1))] = block
+            else:
+                block = []
+    width = max(columns)
+    height = len(columns[1])
+    return width, height, [[defs.get(k, []) for k in columns[x + 1]] for x in range(width)]

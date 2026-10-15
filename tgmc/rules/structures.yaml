@@ -659,6 +659,21 @@ cryo-pod:
 		AreaTypes: marine-build
 	AmbientSound:
 		SoundFiles: amb-generator.ogg
+	# Drop pod: marines fall from orbit in a pod onto the spot you pick.
+	DropPodPower@droppod:
+		OrderName: DropPodOrder
+		Name: support-droppod.name
+		Description: support-droppod.description
+		IconImage: pod-icon
+		Icon: pod
+		BlockedCursor: move-blocked
+		ChargeInterval: 3600
+		Actors: rifleman, rifleman, rifleman, rifleman, engineer, medic
+		Radius: 2
+		FallSounds: bomb-fall.ogg
+		LandSounds: slam-1.ogg, explosion-1.ogg
+		BeginChargeSound: ui-ping.ogg
+		EndChargeSound: ui-confirm.ogg
 	ProvidesRadar:
 	Building:
 		Footprint: x x

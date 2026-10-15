@@ -114,7 +114,7 @@ def tgmc():
     else:
         b.git(b.TGMC, "checkout", "-q", "--force", "HEAD")  # picks up files added to the path list since last time
     wanted = [p for p in paths.splitlines() if p.strip()]
-    absent = [p for p in wanted if not os.path.isfile(os.path.join(b.TGMC, p))]
+    absent = [p for p in wanted if not (os.path.isdir if p.endswith('/') else os.path.isfile)(os.path.join(b.TGMC, p))]
     for p in absent:
         print("missing in TGMC checkout:", p)
     if absent:

@@ -87,6 +87,7 @@ FX96 = "icons/effects/96x96.dmi"
 FX32 = "icons/effects/effects.dmi"
 FIRE = "icons/effects/fire.dmi"
 BLOOD = "icons/effects/blood.dmi"
+DROPPOD = "icons/obj/structures/droppod.dmi"
 ARTILLERY = "icons/obj/items/ammo/artillery.dmi"
 CHEMSMOKE = "icons/effects/chemsmoke.dmi"
 CASINGS = "icons/obj/items/casings.dmi"
@@ -975,37 +976,68 @@ UNITS = {
     "fx-blood": {
         "zoffset": -1023,
         "sequences": {
-            "small1": [(BLOOD, "mfloor1", (150, 14, 14), {"tick": 25000})],
-            "small2": [(BLOOD, "mfloor2", (150, 14, 14), {"tick": 25000})],
-            "small3": [(BLOOD, "mfloor3", (150, 14, 14), {"tick": 25000})],
-            "small4": [(BLOOD, "mfloor4", (150, 14, 14), {"tick": 25000})],
-            "small5": [(BLOOD, "mfloor5", (150, 14, 14), {"tick": 25000})],
-            "small6": [(BLOOD, "mfloor6", (150, 14, 14), {"tick": 25000})],
-            "small7": [(BLOOD, "mfloor7", (150, 14, 14), {"tick": 25000})],
-            "big1": [(BLOOD, "splatter1", (150, 14, 14), {"tick": 30000})],
-            "big2": [(BLOOD, "splatter2", (150, 14, 14), {"tick": 30000})],
-            "big3": [(BLOOD, "splatter3", (150, 14, 14), {"tick": 30000})],
-            "big4": [(BLOOD, "splatter4", (150, 14, 14), {"tick": 30000})],
-            "big5": [(BLOOD, "splatter5", (150, 14, 14), {"tick": 30000})],
-            "big6": [(BLOOD, "splatter6", (150, 14, 14), {"tick": 30000})],
+            "small1": [(BLOOD, "mfloor1", (150, 14, 14), {"tick": 200000})],
+            "small2": [(BLOOD, "mfloor2", (150, 14, 14), {"tick": 200000})],
+            "small3": [(BLOOD, "mfloor3", (150, 14, 14), {"tick": 200000})],
+            "small4": [(BLOOD, "mfloor4", (150, 14, 14), {"tick": 200000})],
+            "small5": [(BLOOD, "mfloor5", (150, 14, 14), {"tick": 200000})],
+            "small6": [(BLOOD, "mfloor6", (150, 14, 14), {"tick": 200000})],
+            "small7": [(BLOOD, "mfloor7", (150, 14, 14), {"tick": 200000})],
+            "big1": [(BLOOD, "splatter1", (150, 14, 14), {"tick": 220000})],
+            "big2": [(BLOOD, "splatter2", (150, 14, 14), {"tick": 220000})],
+            "big3": [(BLOOD, "splatter3", (150, 14, 14), {"tick": 220000})],
+            "big4": [(BLOOD, "splatter4", (150, 14, 14), {"tick": 220000})],
+            "big5": [(BLOOD, "splatter5", (150, 14, 14), {"tick": 220000})],
+            "big6": [(BLOOD, "splatter6", (150, 14, 14), {"tick": 220000})],
+        },
+    },
+    # Body parts thrown out of a gibbed marine (h-*, tinted red) or xeno (x-*) by the ThrowsGibs trait; each lies for over three minutes.
+    "fx-gibs": {
+        "zoffset": -1000,
+        "sequences": {
+            "h-head": [(BLOOD, "gibhead", (170, 30, 30), {"tick": 200000})],
+            "h-arm": [(BLOOD, "gibarm", (170, 30, 30), {"tick": 200000})],
+            "h-leg": [(BLOOD, "gibleg", (170, 30, 30), {"tick": 200000})],
+            "h-torso": [(BLOOD, "gibtorso", (170, 30, 30), {"tick": 200000})],
+            "h-mid1": [(BLOOD, "gibmid1", (170, 30, 30), {"tick": 200000})],
+            "h-mid2": [(BLOOD, "gibmid2", (170, 30, 30), {"tick": 200000})],
+            "h-mid3": [(BLOOD, "gibmid3", (170, 30, 30), {"tick": 200000})],
+            "h-up": [(BLOOD, "gibup1", (170, 30, 30), {"tick": 200000})],
+            "h-down": [(BLOOD, "gibdown1", (170, 30, 30), {"tick": 200000})],
+            "x-head": [(BLOOD, "xgibhead", None, {"tick": 200000})],
+            "x-torso": [(BLOOD, "xgibtorso", None, {"tick": 200000})],
+            "x-arm": [(BLOOD, "xgibarm", None, {"tick": 200000})],
+            "x-leg": [(BLOOD, "xgibleg", None, {"tick": 200000})],
+            "x-up": [(BLOOD, "xgibup1", None, {"tick": 200000})],
+            "x-down": [(BLOOD, "xgibdown1", None, {"tick": 200000})],
+            "x-mid1": [(BLOOD, "xgibmid1", None, {"tick": 200000})],
+            "x-mid2": [(BLOOD, "xgibmid2", None, {"tick": 200000})],
+            "x-mid3": [(BLOOD, "xgibmid3", None, {"tick": 200000})],
+        },
+    },
+    # The marines' drop pod: falling with its thrusters lit, then shut on the ground (DropPodPower in tgmc/code/DropPod.cs).
+    "droppod": {
+        "sequences": {
+            "fall": [(DROPPOD, "singlepod_green_active", None, {"tick": 100000})],
+            "landed": [(DROPPOD, "singlepod_green_inactive", None, {"tick": 400000})],
         },
     },
     "fx-blood-xeno": {
         "zoffset": -1023,
         "sequences": {
-            "small1": [(BLOOD, "mfloor1", (110, 210, 40), {"tick": 25000})],
-            "small2": [(BLOOD, "mfloor2", (110, 210, 40), {"tick": 25000})],
-            "small3": [(BLOOD, "mfloor3", (110, 210, 40), {"tick": 25000})],
-            "small4": [(BLOOD, "mfloor4", (110, 210, 40), {"tick": 25000})],
-            "small5": [(BLOOD, "mfloor5", (110, 210, 40), {"tick": 25000})],
-            "small6": [(BLOOD, "mfloor6", (110, 210, 40), {"tick": 25000})],
-            "small7": [(BLOOD, "mfloor7", (110, 210, 40), {"tick": 25000})],
-            "big1": [(BLOOD, "splatter1", (110, 210, 40), {"tick": 30000})],
-            "big2": [(BLOOD, "splatter2", (110, 210, 40), {"tick": 30000})],
-            "big3": [(BLOOD, "splatter3", (110, 210, 40), {"tick": 30000})],
-            "big4": [(BLOOD, "splatter4", (110, 210, 40), {"tick": 30000})],
-            "big5": [(BLOOD, "splatter5", (110, 210, 40), {"tick": 30000})],
-            "big6": [(BLOOD, "splatter6", (110, 210, 40), {"tick": 30000})],
+            "small1": [(BLOOD, "mfloor1", (110, 210, 40), {"tick": 200000})],
+            "small2": [(BLOOD, "mfloor2", (110, 210, 40), {"tick": 200000})],
+            "small3": [(BLOOD, "mfloor3", (110, 210, 40), {"tick": 200000})],
+            "small4": [(BLOOD, "mfloor4", (110, 210, 40), {"tick": 200000})],
+            "small5": [(BLOOD, "mfloor5", (110, 210, 40), {"tick": 200000})],
+            "small6": [(BLOOD, "mfloor6", (110, 210, 40), {"tick": 200000})],
+            "small7": [(BLOOD, "mfloor7", (110, 210, 40), {"tick": 200000})],
+            "big1": [(BLOOD, "splatter1", (110, 210, 40), {"tick": 220000})],
+            "big2": [(BLOOD, "splatter2", (110, 210, 40), {"tick": 220000})],
+            "big3": [(BLOOD, "splatter3", (110, 210, 40), {"tick": 220000})],
+            "big4": [(BLOOD, "splatter4", (110, 210, 40), {"tick": 220000})],
+            "big5": [(BLOOD, "splatter5", (110, 210, 40), {"tick": 220000})],
+            "big6": [(BLOOD, "splatter6", (110, 210, 40), {"tick": 220000})],
         },
     },
     "fx-slam": {

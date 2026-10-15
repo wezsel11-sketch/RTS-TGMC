@@ -215,3 +215,10 @@ fx-shockwave:
 		Scale: 4.2
 		BlendMode: Additive
 		ZOffset: 2047
+
+# The drop pod power's palette icon (drawn by mod/make_placeholders.py, no TGMC art).
+pod-icon:
+	pod:
+		Filename: pod-icon.png
+		Start: 0
+		Length: 1

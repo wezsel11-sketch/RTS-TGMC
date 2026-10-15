@@ -102,6 +102,8 @@ Sequences:
 	tgmc|sequences/howitzer-shell.yaml
 	tgmc|sequences/fx-slam.yaml
 	tgmc|sequences/fx-blood.yaml
+	tgmc|sequences/droppod.yaml
+	tgmc|sequences/fx-gibs.yaml
 	tgmc|sequences/fx-blast-cas.yaml
 	tgmc|sequences/fx-dust-tile.yaml
 	tgmc|sequences/fx-blast-moab.yaml

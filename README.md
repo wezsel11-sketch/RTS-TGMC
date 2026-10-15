@@ -186,6 +186,13 @@ the commits this mod was tested against (see the top of `mod/bootstrap.py`), so 
     Praetorian Acid Spray, the Warrior Fling (throws the nearest marine six cells), and the Carrier throws Facehuggers (it holds four and grows a new
     one every 24 seconds). New selection keys: I selects every idle combat unit, U every wounded or infected one, and Ctrl+W every unit of the
     selected type anywhere on the map.
+  - **Drop pod.** The Cryo Pod gives the marines a power on the support bar, like CAS: pick a spot and a pod falls from orbit, shakes the ground and
+    opens on four riflemen, an engineer and a medic. Recharges in 2.5 minutes; the marine AI calls it on clusters of xenos.
+  - **Gibs and bodies.** A marine or xeno killed by an explosion throws five to eight body parts (TGMC's gib sprites) a few cells around with a splash of blood
+    where each lands. Parts, blood and bodies lie for over three minutes.
+  - **Real TGMC map art.** The full-size maps (`big-red-full`, `lv-624-full`, `whiskey-outpost-full`, `desert-dam-full`) are drawn with TGMC's own floor and wall
+    pictures instead of flat ground: `mod/tgmc_turfs.py` reads which picture each turf shows from TGMC's DM code (walls pick their picture from their neighbours),
+    `mod/build_maptiles.py` cuts the pictures out as tiles. Void is black. The objects on the map (tables, beds, vending machines, computers, barricades, plants, doors, decals; `mod/tgmc_objects.py`) are baked into the floor tile under them, so the maps show their furniture too. They do not block movement yet, and objects wider than one tile (big trees) are left out. The smaller maps keep the plain ground.
   - **Bleeding.** Marines leave red blood and xenos green blood on the floor where they are hit, bigger for heavy hits, and drip while badly hurt. Blood lies for about half a minute.
   - **Terminal menus.** The main menu, lobby, settings and dialogs use a green-on-black terminal look with an intel panel; the in-game HUD stays blue glass.
     `docs/menu-designs/` keeps the three templates it was chosen from.

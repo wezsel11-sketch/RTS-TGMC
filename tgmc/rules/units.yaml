@@ -78,6 +78,9 @@
 	Inherits: ^Unit
 	# Marines bleed where they are hit, and drip when badly hurt (the blood lies on the floor for about half a minute).
 	Bleeds:
+	# A gibbed marine throws his body parts about; they lie there for a long time.
+	ThrowsGibs:
+		Parts: h-head, h-arm, h-leg, h-torso, h-mid1, h-mid2, h-mid3, h-up, h-down
 	# Rifles and the like fling brass out of the right side (the casing sprite is TGMC's casings.dmi).
 	EjectsCasings:
 		Weapons: TGMCRifle, TGMCCarbine, TGMCM412, TGMCSMG, TGMCShotgun, TGMCSmartgun, TGMCSniper, TGMCMG60
@@ -119,10 +122,12 @@
 	Voiced:
 		VoiceSet: MarineVoice
 	DeathSounds:
-	# The body lies where it fell for 20 seconds, then fades away.
+	# The body lies where it fell for three minutes, then fades away.
 	WithLingeringCorpse:
 		DeathSequence: die
 		FallbackSequence: die
+		Linger: 4500
+		Fade: 300
 		DeathTypes:
 			ExplosionDeath: -gib
 	# A marine that is down does not walk.
@@ -759,10 +764,12 @@ mech:
 		MoveSequence: stand-tow
 		StandSequences: stand-tow
 		DefaultAttackSequence: stand-tow
-	# The body lies where it fell for 20 seconds, then fades away.
+	# The body lies where it fell for three minutes, then fades away.
 	WithLingeringCorpse:
 		DeathSequence: die
 		FallbackSequence: die
+		Linger: 4500
+		Fade: 300
 		DeathTypes:
 			ExplosionDeath: -gib
 	DeathSounds:
@@ -902,6 +909,9 @@ demolitionist:
 	# Xenos bleed green.
 	Bleeds:
 		Image: fx-blood-xeno
+	ThrowsGibs:
+		Parts: x-head, x-torso, x-arm, x-leg, x-up, x-down, x-mid1, x-mid2, x-mid3
+		BloodImage: fx-blood-xeno
 	Targetable@ALIEN:
 		TargetTypes: Alien
 	MuzzleGlow:
@@ -971,10 +981,12 @@ demolitionist:
 		MoveSequence: run
 		StandSequences: stand
 		DefaultAttackSequence: attack
-	# The body lies where it fell for 20 seconds, then fades away.
+	# The body lies where it fell for three minutes, then fades away.
 	WithLingeringCorpse:
 		DeathSequence: die
 		FallbackSequence: die
+		Linger: 4500
+		Fade: 300
 		DeathTypes:
 			ExplosionDeath: -gib
 	DeathSounds:

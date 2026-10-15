@@ -26,6 +26,7 @@ from PIL import Image, ImageDraw, PngImagePlugin
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import build_sounds  # noqa: E402
+import build_maptiles  # noqa: E402
 import tgmc_dmm  # noqa: E402
 
 CLOCK_W, CLOCK_H, CLOCK_FRAMES, CLOCK_COLS = 62, 46, 30, 6  # matches the sidebar palette's IconSize
@@ -361,6 +362,23 @@ def write_shockwave(out):
     meta.add_text("FrameSize", f"{size},{size}")
     meta.add_text("FrameAmount", str(frames))
     img.save(os.path.join(out, "shockwave.png"), pnginfo=meta)
+
+
+def write_pod_icon(out):
+    """The palette icon of the drop pod power (62x46): a card with a pod falling in flames. No TGMC art."""
+    w, h = 62, 46
+    img = Image.new("RGBA", (w, h), (24, 28, 36, 255))
+    d = ImageDraw.Draw(img)
+    d.rectangle([0, 0, w - 1, h - 1], outline=(90, 110, 140, 255))
+    cx = 31
+    d.polygon([(cx, 6), (cx - 8, 24), (cx + 8, 24)], fill=(120, 150, 255, 255))
+    d.rectangle([cx - 6, 20, cx + 6, 28], fill=(200, 210, 230, 255))
+    d.polygon([(cx - 5, 28), (cx + 5, 28), (cx, 36)], fill=(255, 150, 40, 255))
+    d.text((cx - 3 * 3, 35), "POD", fill=(240, 240, 230, 255))
+    meta = PngImagePlugin.PngInfo()
+    meta.add_text("FrameSize", f"{w},{h}")
+    meta.add_text("FrameAmount", "1")
+    img.save(os.path.join(out, "pod-icon.png"), pnginfo=meta)
 
 
 def write_overlay(out):
@@ -714,6 +732,11 @@ SCENARIOS = {
         ("rifleman", "Marines", 16, 12, 0), ("rifleman", "Marines", 17, 14, 0),
         ("crusher", "Xenos", 12, 12, 0), ("resin-silo", "Xenos", 28, 20, 0),
     ]},
+    # Not a test: marines and a xeno killed by an explosion, to see the body parts and the blood (see ThrowsGibs in tgmc/code/Gibs.cs).
+    "shot-gibs": {"scripts": ("shot-gibs",), "size": (32, 24), "drop_conquest": True, "extra_rules": "World:\n\tScreenshotAt:\n\t\tTick: 70\n", "actors": [
+        ("rifleman", "Marines", 14, 11, 0), ("rifleman", "Marines", 18, 13, 0), ("hunter", "Xenos", 16, 15, 0), ("resin-silo", "Xenos", 28, 20, 0),
+        ("medic", "Marines", 16, 9, 0),
+    ]},
     "shot-shells": {"scripts": ("shot-shells",), "size": (48, 32), "drop_conquest": True, "extra_rules": "World:\n\tScreenshotAt:\n\t\tTick: 320\n", "actors": [
         ("mortar-emplacement", "Marines", 6, 12, 0), ("artillery-emplacement", "Marines", 6, 18, 0),
         ("rifleman", "Marines", 20, 12, 0), ("rifleman", "Marines", 20, 18, 0),
@@ -958,6 +981,12 @@ SCENARIOS = {
         ("crusher", "Xenos", 14, 12, 0), ("rifleman", "Marines", 16, 12, 512), ("rifleman", "Marines", 16, 13, 512), ("rifleman", "Marines", 15, 14, 512),
         ("resin-silo", "Xenos", 30, 20, 0),
     ]},
+    # The marine AI calls a drop pod by itself (see scenarios/test-ai-pod.lua): squads removed, units hold fire, the pod ready at once.
+    "scenario-ai-pod": {"scripts": ("test-ai-pod",), "marine_bot": "skirmish", "drop_conquest": True, "size": (48, 32),
+                        "extra_rules": "Player:\n\t-SquadManagerBotModule@marines-easy:\n\t-SquadManagerBotModule@marines-normal:\n\t-SquadManagerBotModule@marines-hard:\n^Infantry:\n\tAutoTarget:\n\t\tInitialStance: HoldFire\ncryo-pod:\n\tDropPodPower@droppod:\n\t\tChargeInterval: 60\n", "actors": [
+        ("cryo-pod", "Marines", 6, 6, 0), ("rifleman", "Marines", 17, 22, 512),
+        ("hunter", "Xenos", 22, 22, 0), ("hunter", "Xenos", 23, 23, 0), ("hunter", "Xenos", 22, 24, 0), ("resin-silo", "Xenos", 44, 28, 0),
+    ]},
     "scenario-boiler": {"scripts": ("test-boiler",), "size": (48, 24), "drop_conquest": True, "extra_rules": "^Infantry:\n\tAutoTarget:\n\t\tInitialStance: HoldFire\n", "actors": [
         ("boiler", "Xenos", 6, 10, 0), ("rifleman", "Marines", 17, 10, 0),
     ]},
@@ -1098,12 +1127,13 @@ Actors:
 
     colours = {ROCK: (0x3A, 0x3A, 0x3A, 255), GRASS: (0x2E, 0x52, 0x30, 255), WATER: (0x1C, 0x3A, 0x5E, 255), FORD: (0x4A, 0x72, 0x86, 255), DIRT: (0x7A, 0x62, 0x40, 255)}
     preview = Image.new("RGBA", (size_w, size_h))
-    preview.putdata([colours[ground(x, y)[0]] for y in range(size_h) for x in range(size_w)])
+    preview.putdata([colours.get(ground(x, y)[0]) or build_maptiles.COLOURS[ground(x, y)[0]] for y in range(size_h) for x in range(size_w)])
     preview.save(os.path.join(folder, "map.png"))
 
 
-def write_tgmc_map(folder, title, rows, marines, xenos):
-    """A skirmish map from a converted TGMC map. Landing Zone's two bases go at the given centres, on open ground."""
+def write_tgmc_map(folder, title, rows, marines, xenos, art=None):
+    """A skirmish map from a converted TGMC map. Landing Zone's two bases go at the given centres, on open ground. With `art`, a function
+    (x, y) -> template id (build_maptiles), a cell that was not changed shows its real TGMC picture; a carved or cleared cell shows plain dirt."""
     h, w = len(rows), len(rows[0])
     land = [list(r) for r in rows]
     centres = {"Marines": (marines, (6, 14)), "Xenos": (xenos, (33, 13))}
@@ -1150,8 +1180,9 @@ def write_tgmc_map(folder, title, rows, marines, xenos):
             land[cell[1]][cell[0]] = "D"
         cell = prev[cell]
     codes = {"G": GRASS, "D": DIRT, "F": FORD, "W": WATER, "R": ROCK}
-    write_map(folder, title, w, h, actors + xeno_actors, "Lobby", [spawn_m, spawn_x],
-              ground=lambda x, y: (codes[land[y][x]], 0), category="Conquest")
+    original = rows
+    ground = (lambda x, y: (art(x, y) if land[y][x] == original[y][x] else codes[land[y][x]], 0)) if art else (lambda x, y: (codes[land[y][x]], 0))
+    write_map(folder, title, w, h, actors + xeno_actors, "Lobby", [spawn_m, spawn_x], ground=ground, category="Conquest")
 
 
 def main():
@@ -1169,6 +1200,7 @@ def main():
     write_move_flash(args.out)
     write_cas_icon(args.out)
     write_hive_icon(args.out)
+    write_pod_icon(args.out)
     write_lights(args.out)
     write_shockwave(args.out)
     write_overlay(args.out)
@@ -1184,8 +1216,12 @@ def main():
         write_map(os.path.join(args.out, "maps", name), title, w, h, actors, "Lobby", [(6, 14 + dy), (33 + xeno_dx, 13 + dy)],
                   ground=ground, category="Conquest")
     if args.tgmc:
+        # The full-size maps wear TGMC's own floor and wall pictures; the shrunk ones cannot, a cell there is several TGMC tiles.
+        full = [n for n, spec in tgmc_dmm.MAPS.items() if spec["factor"] == 1]
+        tiles = build_maptiles.prepare(args.tgmc, args.out, full)
         for name, spec in tgmc_dmm.MAPS.items():
-            write_tgmc_map(os.path.join(args.out, "maps", name), spec["title"], *tgmc_dmm.load(args.tgmc, spec))
+            write_tgmc_map(os.path.join(args.out, "maps", name), spec["title"], *tgmc_dmm.load(args.tgmc, spec),
+                           art=tiles.art(name) if name in full else None)
     for name, sc in SCENARIOS.items():
         width, height = sc.get("size", (24, 24))
         write_map(os.path.join(args.out, "maps", name), name, width, height, sc["actors"], "MissionSelector",

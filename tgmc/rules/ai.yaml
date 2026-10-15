@@ -360,6 +360,22 @@ Player:
 					Attractiveness: 2
 					TargetMetric: None
 					CheckRadius: 8c0
+			drop-pod:
+				OrderName: DropPodOrder
+				CoarseScanRadius: 10
+				MinimumAttractiveness: 3
+				Consideration@1:
+					Against: Enemy
+					Types: Alien, Structure
+					Attractiveness: 1
+					TargetMetric: None
+					CheckRadius: 6c0
+				Consideration@2:
+					Against: Ally
+					Types: Infantry
+					Attractiveness: -1
+					TargetMetric: None
+					CheckRadius: 6c0
 			call-of-the-burrowed:
 				OrderName: BurrowedOrder
 				CoarseScanRadius: 10

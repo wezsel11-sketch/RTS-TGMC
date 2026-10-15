@@ -106,6 +106,7 @@ else
 fi
 absent=0
 while IFS= read -r path; do
+	case $path in */) [ -d "$TGMC/$path" ] || { echo "missing in TGMC checkout: $path"; absent=1; }; continue ;; esac
 	[ -f "$TGMC/$path" ] || { echo "missing in TGMC checkout: $path"; absent=1; }
 done < "$BUILD/tgmc-paths.txt"
 [ "$absent" = 0 ] || die "TGMC no longer has the files above at $TGMC_REF. Set TGMC_REF to an older commit."

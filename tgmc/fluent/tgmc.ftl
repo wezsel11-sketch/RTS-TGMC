@@ -358,3 +358,7 @@ menu-intel-1 = > Hive activity detected on LV-624.
 menu-intel-2 = > Jaeger exoskeleton stock: 5 patterns.
 menu-intel-3 = > Xeno hive powers: CURE, BURROWED, RAGE.
 menu-intel-4 = > Recommend: scout before engaging.
+
+support-droppod =
+    .name = Drop Pod
+    .description = A pod falls from orbit onto the spot you pick: four riflemen, an engineer and a medic step out. Granted by the Cryo Pod. Recharges in two and a half minutes.

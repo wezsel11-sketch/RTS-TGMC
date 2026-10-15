@@ -76,6 +76,9 @@
 
 ^Infantry:
 	Inherits: ^Unit
+	# Marines see further than xenos do (the rest of the army sees 7 cells).
+	RevealsShroud:
+		Range: 10c0
 	# Marines bleed where they are hit, and drip when badly hurt (the blood lies on the floor for about half a minute).
 	Bleeds:
 	# A gibbed marine throws his body parts about; they lie there for a long time.
@@ -355,7 +358,7 @@ scout:
 		Speed: 136
 	# Scouts see further than other marines.
 	RevealsShroud:
-		Range: 10c0
+		Range: 13c0
 	Armament@PRIMARY:
 		Weapon: TGMCSMG
 		MuzzleSequence: flash
@@ -444,7 +447,7 @@ ranger:
 	DamageMultiplier@armor:
 		Modifier: 92
 	RevealsShroud:
-		Range: 9c0
+		Range: 12c0
 	Armament@PRIMARY:
 		Weapon: TGMCM412
 		MuzzleSequence: flash
@@ -906,6 +909,9 @@ demolitionist:
 
 ^Xeno:
 	Inherits: ^Unit
+	# Xenos see 9 cells through the fog (the marines on foot 10).
+	RevealsShroud:
+		Range: 9c0
 	# Xenos bleed green.
 	Bleeds:
 		Image: fx-blood-xeno

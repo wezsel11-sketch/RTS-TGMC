@@ -19,13 +19,20 @@ TGMCRifle:
 		Range: 0c256
 		ValidRelationships: Enemy
 		ValidTargets: Infantry
+	# A bullet that misses still chips what is around where it lands: furniture, barricades, windows.
+	Warhead@4Stray: SpreadDamage
+		Damage: 6
+		Spread: 1c0
+		Falloff: 100, 40, 0
+		ValidRelationships: Neutral
+		ValidTargets: MapObject
 	Warhead@1Dam: SpreadDamage
 		Damage: 8
 		Spread: 128
 		# Armoured xenos shrug off ordinary rounds (armour classes are set on the xeno castes; see units.yaml).
 		Versus:
 			Heavy: 70
-		ValidRelationships: Enemy
+		ValidRelationships: Neutral, Enemy
 	Warhead@2Hit: CreateEffect
 		ImpactSounds: hit-bullet-1.ogg, hit-bullet-2.ogg, hit-bullet-3.ogg, hit-bullet-4.ogg
 		ImpactSoundChance: 55
@@ -225,7 +232,7 @@ TGMCResinTrap:
 		Damage: 12
 		Spread: 1c256
 		Falloff: 100, 0
-		ValidRelationships: Enemy
+		ValidRelationships: Neutral, Enemy
 		ValidTargets: Human
 
 TGMCVali:
@@ -246,7 +253,7 @@ TGMCFlamer:
 		ConeRange: 4c0
 		HalfAngle: 64
 		FarEndPercent: 40
-		ValidRelationships: Enemy
+		ValidRelationships: Neutral, Enemy
 	Warhead@2Fx: CreateEffect
 		Image: fx-blast
 		Explosions: grenade
@@ -273,12 +280,14 @@ TGMCGasCloud:
 		Range: 1c768
 		ValidRelationships: Enemy, Neutral
 		ValidTargets: Ground
+		InvalidTargets: MapObject
 	Warhead@2Dam: SpreadDamage
 		Damage: 4
 		Spread: 1c768
 		Falloff: 100, 100, 0
 		ValidRelationships: Enemy, Neutral
 		ValidTargets: Ground
+		InvalidTargets: MapObject
 
 # The defiler's canister: a short lob that bursts into a lingering cloud of neurotoxin, little damage of its own.
 TGMCDefilerGas:
@@ -297,7 +306,7 @@ TGMCDefilerGas:
 		Damage: 12
 		Spread: 1c0
 		Falloff: 100, 50, 0
-		ValidRelationships: Enemy
+		ValidRelationships: Neutral, Enemy
 	Warhead@3Gas: SpawnActor
 		Actor: gas-cloud
 		TrailCells: 0
@@ -468,7 +477,7 @@ TGMCSpit:
 		Damage: 16
 		Spread: 256
 		Falloff: 100, 100, 60, 0
-		ValidRelationships: Enemy
+		ValidRelationships: Neutral, Enemy
 		# B18 heavy armour turns a good share of a claw or acid hit aside; B17 demolition armour a little.
 		Versus:
 			HeavyMarine: 55
@@ -532,7 +541,7 @@ TGMCAcid:
 		Damage: 30
 		Spread: 256
 		Falloff: 100, 100, 60, 0
-		ValidRelationships: Enemy
+		ValidRelationships: Neutral, Enemy
 		# B18 heavy armour turns a good share of a claw or acid hit aside; B17 demolition armour a little.
 		Versus:
 			HeavyMarine: 55
@@ -570,7 +579,7 @@ TGMCBoilerGlob:
 		Damage: 55
 		Spread: 1c512
 		Falloff: 100, 70, 35, 0
-		ValidRelationships: Enemy
+		ValidRelationships: Neutral, Enemy
 		Versus:
 			HeavyMarine: 55
 			Demolition: 85
@@ -597,10 +606,17 @@ TGMCSmartgun:
 		Range: 0c256
 		ValidRelationships: Enemy
 		ValidTargets: Infantry
+	# A bullet that misses still chips what is around where it lands: furniture, barricades, windows.
+	Warhead@4Stray: SpreadDamage
+		Damage: 6
+		Spread: 1c0
+		Falloff: 100, 40, 0
+		ValidRelationships: Neutral
+		ValidTargets: MapObject
 	Warhead@1Dam: SpreadDamage
 		Damage: 7
 		Spread: 1c0
-		ValidRelationships: Enemy
+		ValidRelationships: Neutral, Enemy
 	Warhead@2Hit: CreateEffect
 		ImpactSounds: hit-bullet-1.ogg, hit-bullet-2.ogg, hit-bullet-3.ogg, hit-bullet-4.ogg
 		ImpactSoundChance: 40
@@ -675,7 +691,7 @@ TGMCSlam:
 		Damage: 30
 		Spread: 1c256
 		Falloff: 100, 60, 25
-		ValidRelationships: Enemy
+		ValidRelationships: Neutral, Enemy
 		# B18 heavy armour turns a good share of a claw or acid hit aside; B17 demolition armour a little.
 		Versus:
 			HeavyMarine: 55
@@ -1244,7 +1260,7 @@ TGMCAcidPool:
 		Damage: 4
 		Spread: 1c0
 		Falloff: 100, 0
-		ValidRelationships: Enemy
+		ValidRelationships: Neutral, Enemy
 		ValidTargets: Infantry
 
 # The praetorian's acid spray: a splash of acid on the ground in front of him, thicker than a spit.
@@ -1255,7 +1271,7 @@ TGMCAcidSpray:
 		Damage: 32
 		Spread: 1c768
 		Falloff: 100, 100, 50, 0
-		ValidRelationships: Enemy
+		ValidRelationships: Neutral, Enemy
 		ValidTargets: Ground
 		Versus:
 			HeavyMarine: 55
@@ -1281,7 +1297,7 @@ TGMCFling:
 	Projectile: InstantHit
 	Warhead@1Dam: TargetDamage
 		Damage: 18
-		ValidRelationships: Enemy
+		ValidRelationships: Neutral, Enemy
 	Warhead@6Throw: Knockback
 		Distance: 6c0
 		Duration: 20
@@ -1304,7 +1320,7 @@ TGMCStomp:
 		Damage: 28
 		Spread: 2c512
 		Falloff: 100, 100, 60, 0
-		ValidRelationships: Enemy
+		ValidRelationships: Neutral, Enemy
 		ValidTargets: Ground
 		Versus:
 			HeavyMarine: 55
@@ -1353,7 +1369,7 @@ TGMCPsychicFling:
 	Projectile: InstantHit
 	Warhead@1Dam: TargetDamage
 		Damage: 12
-		ValidRelationships: Enemy
+		ValidRelationships: Neutral, Enemy
 	Warhead@6Throw: Knockback
 		Distance: 5c0
 		Duration: 18
@@ -1395,7 +1411,7 @@ TGMCWebSpit:
 	Projectile: InstantHit
 	Warhead@1Dam: TargetDamage
 		Damage: 6
-		ValidRelationships: Enemy
+		ValidRelationships: Neutral, Enemy
 	Warhead@9Stun: GrantExternalCondition
 		Condition: stunned
 		Duration: 60
@@ -1408,7 +1424,7 @@ TGMCNeurotoxin:
 	Projectile: InstantHit
 	Warhead@1Dam: TargetDamage
 		Damage: 12
-		ValidRelationships: Enemy
+		ValidRelationships: Neutral, Enemy
 	Warhead@9Slow: GrantExternalCondition
 		Condition: gassed
 		Duration: 150
@@ -1421,7 +1437,7 @@ TGMCPsychicBlast:
 	Projectile: InstantHit
 	Warhead@1Dam: TargetDamage
 		Damage: 38
-		ValidRelationships: Enemy
+		ValidRelationships: Neutral, Enemy
 	Warhead@6Throw: Knockback
 		Distance: 2c0
 		Duration: 12
@@ -1437,7 +1453,7 @@ TGMCPunch:
 	Projectile: InstantHit
 	Warhead@1Dam: TargetDamage
 		Damage: 42
-		ValidRelationships: Enemy
+		ValidRelationships: Neutral, Enemy
 		Versus:
 			HeavyMarine: 60
 			Demolition: 85

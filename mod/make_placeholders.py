@@ -987,6 +987,11 @@ SCENARIOS = {
         ("cryo-pod", "Marines", 6, 6, 0), ("rifleman", "Marines", 17, 22, 512),
         ("hunter", "Xenos", 22, 22, 0), ("hunter", "Xenos", 23, 23, 0), ("hunter", "Xenos", 22, 24, 0), ("resin-silo", "Xenos", 44, 28, 0),
     ]},
+    # Gunfire and acid damage the objects of the converted maps (see scenarios/test-objects-damage.lua): mapobj-0 is any generated map object.
+    "scenario-objects-damage": {"scripts": ("test-objects-damage",), "size": (32, 24), "drop_conquest": True, "actors": [
+        ("rifleman", "Marines", 8, 10, 256), ("mapobj-0", "Neutral", 11, 10, 0),
+        ("spitter", "Xenos", 20, 10, 768), ("mapobj-1", "Neutral", 17, 10, 0), ("resin-silo", "Xenos", 28, 20, 0),
+    ]},
     "scenario-boiler": {"scripts": ("test-boiler",), "size": (48, 24), "drop_conquest": True, "extra_rules": "^Infantry:\n\tAutoTarget:\n\t\tInitialStance: HoldFire\n", "actors": [
         ("boiler", "Xenos", 6, 10, 0), ("rifleman", "Marines", 17, 10, 0),
     ]},

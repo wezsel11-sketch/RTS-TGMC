@@ -2,7 +2,7 @@
 
 For each full-size map (tgmc_dmm.MAPS entries with factor 1) every cell is looked up with tgmc_turfs.cell_tile and the 32x32 picture is cut out of
 its .dmi sheet. The pictures become one-tile terrain templates in the tileset (ids from FIRST_ID), with the terrain type the cell had before
-(floor = Clear, wall and rock and void = Rock, water = Water or Ford), so the maps play as before and look like TGMC. Void (space) is black.
+(floor = Clear, a wall = Wall or ReinforcedWall, which heavy weapons can knock down, rock and void = Rock, water = Water or Ford), so the maps play as before and look like TGMC. Void (space) is black.
 
 Objects on the map (tables, barricades, plants, doors, decals; see tgmc_objects.py) are baked into the tile under them, so a tile is a floor
 picture plus the pictures of the objects standing on it. They do not block movement.
@@ -26,6 +26,16 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 TERRAIN = {"G": "Clear", "D": "Clear", "F": "Ford", "W": "Water", "R": "Rock"}
 
 
+def terrain_of(turf, kind):
+    """The terrain type of a cell: its letter's, except that a plain wall is Wall and a reinforced one ReinforcedWall (they can be shot down)."""
+    if turf.startswith("/turf/closed/wall/r_wall") and "unmeltable" not in turf and "indestructible" not in turf:
+        return "ReinforcedWall"
+    if turf.startswith("/turf/closed/wall") and not turf.startswith("/turf/closed/wall/r_wall") and "indestructible" not in turf:
+        return "Wall"
+    return TERRAIN[kind]
+
+
+
 COLOURS = {}  # template id -> the picture's average colour, for the map preview
 
 
@@ -39,15 +49,15 @@ class Tiles:
         self.terrain = {}   # key -> terrain type
         self.maps = {}      # map name -> (x0, y0, width, height, grid, keys)
 
-    def object_type(self, picture, hp, blocks):
-        key = (picture, hp, blocks)
+    def object_type(self, picture, hp, blocks, cover=False):
+        key = (picture, hp, blocks, cover and blocks)
         if key not in self.types:
             self.types[key] = f"mapobj-{len(self.types)}"
         return self.types[key]
 
     def open_variant(self, name):
         """The same object without the movement blocking (used when a blocker would cut a base off or sit on a base)."""
-        for (picture, hp, blocks), n in list(self.types.items()):
+        for (picture, hp, blocks, cover), n in list(self.types.items()):
             if n == name:
                 return self.object_type(picture, hp, False)
         return name
@@ -115,15 +125,15 @@ def prepare(tgmc, out, names):
                             if dmi is None or dmi.icon_w > 32:
                                 continue
                             if dest:
-                                hp, blocks = dest
+                                hp, blocks, cover = dest
                                 # Rock under it (a window in a wall) is blocked anyway; two blockers on one cell are one too many.
                                 blocks = blocks and kind in "GDF" and not solid_here
                                 solid_here = solid_here or blocks
                                 pic = tiles.pictures.setdefault(layer, len(tiles.pictures))
-                                tiles.actors.setdefault(name, []).append((tiles.object_type(pic, hp, blocks), x - x0, y - y0))
+                                tiles.actors.setdefault(name, []).append((tiles.object_type(pic, hp, blocks, cover), x - x0, y - y0))
                             else:
                                 on.append(layer)
-                row.append(tiles.id_for((key, tuple(on)) if on else key, TERRAIN[kind]))
+                row.append(tiles.id_for((key, tuple(on)) if on else key, terrain_of(turf, kind)))
             rows.append(row)
         tiles.cell_ids[name] = rows
         tiles.maps[name] = (x0, y0, x1 - x0, y1 - y0, grid)
@@ -155,7 +165,7 @@ def prepare(tgmc, out, names):
         meta.add_text("FrameAmount", "1")
         img.save(os.path.join(out, "tiles", f"m{tid}.png"), pnginfo=meta)
 
-    for (picture, hp, blocks) in list(tiles.types):  # every blocking object also has an open twin, for when it must not block
+    for (picture, hp, blocks, cover) in list(tiles.types):  # every blocking object also has an open twin, for when it must not block
         if blocks:
             tiles.object_type(picture, hp, False)
     # The destroyable objects: their pictures on one sheet, a sequence for each, and an actor type for each combination
@@ -178,8 +188,14 @@ def prepare(tgmc, out, names):
     os.makedirs(os.path.join(out, "rules"), exist_ok=True)
     with open(os.path.join(out, "rules", "mapobjects.yaml"), "w", encoding="utf-8", newline="\n") as f:
         f.write(open(os.path.join(ROOT, "tgmc", "rules", "mapobjects.yaml"), encoding="utf-8").read().rstrip("\n") + "\n")
-        for (picture, hp, blocks), n in tiles.types.items():
-            f.write(f"\n{n}:\n\tInherits: {'^MapObjectBlocking' if blocks else '^MapObjectOpen'}\n\tHealth:\n\t\tHP: {hp}\n\tWithSpriteBody:\n\t\tSequence: o{picture}\n")
+        layer_of = {index: layer for layer, index in tiles.pictures.items()}
+        for (picture, hp, blocks, cover), n in tiles.types.items():
+            f.write(f"\n{n}:\n\tInherits: {'^MapObjectCover' if cover else '^MapObjectBlocking' if blocks else '^MapObjectOpen'}\n\tHealth:\n\t\tHP: {hp}\n\tWithSpriteBody:\n\t\tSequence: o{picture}\n")
+            # A barricade only covers whoever is on the side it faces (the picture's direction: south, north, east, west).
+            sheet_path, state, direction = layer_of[picture]
+            if cover and "barricade" in (sheet_path + state).lower():
+                face_x, face_y = ((0, 1), (0, -1), (1, 0), (-1, 0))[direction if direction < 4 else 0]
+                f.write(f"\tBlocksBullets:\n\t\tFaceX: {face_x}\n\t\tFaceY: {face_y}\n")
 
     # The tileset: the repo's own templates and one per picture
     base = open(os.path.join(ROOT, "tgmc", "tilesets", "ground.yaml"), encoding="utf-8").read().rstrip("\n") + "\n"
@@ -190,7 +206,7 @@ def prepare(tgmc, out, names):
     base = base.replace("SheetSize: 512", f"SheetSize: {side}", 1)
     lines = []
     for key, tid in tiles.ids.items():
-        category = {"Rock": "Terrain", "Clear": "Terrain", "Ford": "Water", "Water": "Water"}[tiles.terrain[key]]
+        category = {"Rock": "Terrain", "Wall": "Terrain", "ReinforcedWall": "Terrain", "Clear": "Terrain", "Ford": "Water", "Water": "Water"}[tiles.terrain[key]]
         lines += [f"\tTemplate@{tid}:", f"\t\tId: {tid}", f"\t\tImages: tiles/m{tid}.png", "\t\tSize: 1,1", "\t\tPickAny: True",
                   f"\t\tCategories: {category}", "\t\tTiles:", f"\t\t\t0: {tiles.terrain[key]}"]
     os.makedirs(os.path.join(out, "tilesets"), exist_ok=True)

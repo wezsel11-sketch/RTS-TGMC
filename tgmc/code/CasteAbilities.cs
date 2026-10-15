@@ -29,6 +29,9 @@ namespace OpenRA.Mods.TGMC.Traits
 		"nearest to it with a weapon, and bring up other units (the Carrier's huggers). It has a cooldown and, optionally, charges that refill over time.")]
 	public class ActiveAbilityInfo : ConditionalTraitInfo
 	{
+		[Desc("Plasma the ability costs (see the Plasma trait). 0 for none.")]
+		public readonly int PlasmaCost = 0;
+
 		[Desc("Order name, unique among the unit's abilities.")]
 		public readonly string OrderName = "Ability";
 
@@ -89,6 +92,7 @@ namespace OpenRA.Mods.TGMC.Traits
 		int regen;
 		int buffLeft;
 		int buffToken = Actor.InvalidConditionToken;
+		Plasma plasma;
 
 		public ActiveAbility(Actor self, ActiveAbilityInfo info)
 			: base(info)
@@ -100,7 +104,7 @@ namespace OpenRA.Mods.TGMC.Traits
 		public int CooldownRemaining => cooldown;
 		public int ChargesLeft => charges;
 		public bool Active => buffToken != Actor.InvalidConditionToken;
-		public bool Ready => !IsTraitDisabled && cooldown == 0 && charges > 0;
+		public bool Ready => !IsTraitDisabled && cooldown == 0 && charges > 0 && (Info.PlasmaCost == 0 || (plasma ??= self.TraitOrDefault<Plasma>())?.Has(Info.PlasmaCost) != false);
 
 		float ISelectionBar.GetValue()
 		{
@@ -140,6 +144,9 @@ namespace OpenRA.Mods.TGMC.Traits
 				return false;
 
 			var world = self.World;
+			if (Info.PlasmaCost > 0)
+				(plasma ??= self.TraitOrDefault<Plasma>())?.Spend(Info.PlasmaCost);
+
 			Target aim = Target.Invalid;
 			if (Info.Weapon != null)
 			{
@@ -232,6 +239,64 @@ namespace OpenRA.Mods.TGMC.Traits
 				}));
 			}
 		}
+	}
+}
+
+namespace OpenRA.Mods.TGMC.Traits
+{
+	[Desc("A xeno's plasma: the fuel of its abilities (ActiveAbility.PlasmaCost). It builds up slowly, and faster while the xeno stands on weeds. A purple bar shows it.")]
+	public class PlasmaInfo : TraitInfo
+	{
+		public readonly int Max = 100;
+
+		[Desc("Ticks to gain one point, and ticks to gain one while on weeds.")]
+		public readonly int Regen = 8;
+		public readonly int WeedRegen = 3;
+
+		[Desc("Actor types that count as weeds.")]
+		public readonly string[] Weeds = ["weeds", "weed-node", "forward-hive", "resin-silo"];
+
+		[Desc("Starts with this share of the maximum, in percent.")]
+		public readonly int StartPercent = 60;
+
+		public override object Create(ActorInitializer init) { return new Plasma(init.Self, this); }
+	}
+
+	public class Plasma : ITick, ISelectionBar
+	{
+		readonly Actor self;
+		readonly PlasmaInfo info;
+		int value;
+		int wait;
+
+		public Plasma(Actor self, PlasmaInfo info)
+		{
+			this.self = self;
+			this.info = info;
+			value = info.Max * info.StartPercent / 100;
+		}
+
+		public int Value => value;
+		public bool Has(int amount) { return value >= amount; }
+
+		public void Spend(int amount) { value = System.Math.Max(0, value - amount); }
+
+		void ITick.Tick(Actor self)
+		{
+			if (value >= info.Max)
+				return;
+
+			var onWeeds = self.World.ActorMap.GetActorsAt(self.Location).Any(a => info.Weeds.Contains(a.Info.Name));
+			if (++wait >= (onWeeds ? info.WeedRegen : info.Regen))
+			{
+				wait = 0;
+				value++;
+			}
+		}
+
+		float ISelectionBar.GetValue() { return value / (float)info.Max; }
+		Color ISelectionBar.GetColor() { return Color.FromArgb(190, 90, 255); }
+		bool ISelectionBar.DisplayWhenEmpty => true;
 	}
 }
 

@@ -1022,6 +1022,19 @@ UNITS = {
             "landed": [(DROPPOD, "singlepod_green_inactive", None, {"tick": 400000})],
         },
     },
+    # The supply pod and the crate it leaves, and a smoke screen (tinted chemical smoke): see the support powers in structures.yaml.
+    "supplypod": {
+        "sequences": {
+            "fall": [(DROPPOD, "supplypod_active", None, {"tick": 100000})],
+            "landed": [(DROPPOD, "supplypod_inactive", None, {"tick": 400000})],
+        },
+    },
+    "supply-crate": {
+        "sequences": {"idle": [(DROPPOD, "supplypod_inactive", None, {"tick": 400000})]},
+    },
+    "smoke-cloud": {
+        "sequences": {"idle": [(CHEMSMOKE, "", (225, 225, 225), {"side": "S", "size": 128, "tick": 240})]},
+    },
     "fx-blood-xeno": {
         "zoffset": -1023,
         "sequences": {

@@ -33,6 +33,12 @@ CLOCK_W, CLOCK_H, CLOCK_FRAMES, CLOCK_COLS = 62, 46, 30, 6  # matches the sideba
 # Template ids in tilesets/ground.yaml. Grass lists two images, which the engine picks between per cell. The byte
 # after the id in map.bin is the tile's index within a multi-cell template, so it is 0 for every one of these.
 GRASS, WATER, FORD, DIRT, ROCK = 1, 2, 3, 4, 5
+WALL = 6  # rock that heavy weapons can knock down
+
+
+def walls_ground(x, y):
+    """Grass with a wall of three cells thick at x 14 to 16, y 8 to 15."""
+    return (WALL if 14 <= x <= 16 and 8 <= y <= 15 else GRASS), 0
 
 # (actor, owner, x, y, facing). Facing is in OpenRA angle units: 0 = north, 512 = south.
 TEST_FIELD = [
@@ -379,6 +385,51 @@ def write_pod_icon(out):
     meta.add_text("FrameSize", f"{w},{h}")
     meta.add_text("FrameAmount", "1")
     img.save(os.path.join(out, "pod-icon.png"), pnginfo=meta)
+
+
+SUPPORT_ICONS = ["supply", "sensor", "smoke", "orbital", "sentry", "mortar"]
+
+
+def write_support_icons(out):
+    """The palette icons of the marine support powers (62x46 each, in SUPPORT_ICONS order): a card with a small drawing and a short name. No TGMC art."""
+    import math
+    w, h = 62, 46
+    img = Image.new("RGBA", (w * len(SUPPORT_ICONS), h), (0, 0, 0, 0))
+    d = ImageDraw.Draw(img)
+    white, blue, amber, red, grey = (240, 240, 230, 255), (110, 150, 255, 255), (255, 170, 40, 255), (240, 80, 60, 255), (170, 176, 186, 255)
+    labels = ["SUPPLY", "SENSOR", "SMOKE", "ORBIT", "SENTRY", "MORTAR"]
+    for i, name in enumerate(SUPPORT_ICONS):
+        ox = w * i
+        d.rectangle([ox, 0, ox + w - 1, h - 1], fill=(24, 28, 36, 255), outline=(90, 110, 140, 255))
+        cx, cy = ox + 31, 19
+        if name == "supply":
+            d.rectangle([cx - 10, cy - 7, cx + 10, cy + 8], fill=(150, 120, 70, 255), outline=white)
+            d.rectangle([cx - 2, cy - 4, cx + 2, cy + 5], fill=white)
+            d.rectangle([cx - 6, cy - 1, cx + 6, cy + 1], fill=white)
+        elif name == "sensor":
+            for r in (5, 10, 15):
+                d.arc([cx - r, cy - r, cx + r, cy + r], 200, 340, fill=blue, width=2)
+            d.ellipse([cx - 2, cy + 3, cx + 2, cy + 7], fill=white)
+        elif name == "smoke":
+            for dx, dy, r in ((-8, 3, 7), (0, -2, 9), (8, 3, 7)):
+                d.ellipse([cx + dx - r, cy + dy - r, cx + dx + r, cy + dy + r], fill=grey)
+        elif name == "orbital":
+            d.line([cx, cy - 14, cx, cy + 6], fill=red, width=3)
+            d.ellipse([cx - 10, cy + 2, cx + 10, cy + 14], outline=amber, width=2)
+            d.ellipse([cx - 4, cy + 6, cx + 4, cy + 12], fill=white)
+        elif name == "sentry":
+            d.rectangle([cx - 8, cy + 2, cx + 8, cy + 9], fill=grey)
+            d.rectangle([cx - 3, cy - 5, cx + 3, cy + 2], fill=blue)
+            d.rectangle([cx, cy - 6, cx + 14, cy - 3], fill=white)
+        elif name == "mortar":
+            d.polygon([(cx - 9, cy + 9), (cx + 9, cy + 9), (cx + 3, cy - 2), (cx - 3, cy - 2)], fill=grey)
+            d.line([cx, cy - 2, cx + 8, cy - 14], fill=white, width=4)
+            d.ellipse([cx + 8, cy - 18, cx + 14, cy - 12], fill=amber)
+        d.text((ox + 31 - 3 * len(labels[i]), 33), labels[i], fill=white)
+    meta = PngImagePlugin.PngInfo()
+    meta.add_text("FrameSize", f"{w},{h}")
+    meta.add_text("FrameAmount", str(len(SUPPORT_ICONS)))
+    img.save(os.path.join(out, "support-icon.png"), pnginfo=meta)
 
 
 def write_overlay(out):
@@ -987,10 +1038,38 @@ SCENARIOS = {
         ("cryo-pod", "Marines", 6, 6, 0), ("rifleman", "Marines", 17, 22, 512),
         ("hunter", "Xenos", 22, 22, 0), ("hunter", "Xenos", 23, 23, 0), ("hunter", "Xenos", 22, 24, 0), ("resin-silo", "Xenos", 44, 28, 0),
     ]},
+    # Plasma pays for abilities (see scenarios/test-plasma.lua): a ravager that starts nearly empty.
+    "scenario-plasma": {"scripts": ("test-plasma",), "size": (32, 24), "drop_conquest": True, "extra_rules": "ravager:\n\tPlasma:\n\t\tStartPercent: 10\n", "actors": [
+        ("ravager", "Xenos", 8, 10, 0), ("resin-silo", "Xenos", 28, 20, 0), ("rifleman", "Marines", 4, 4, 0),
+    ]},
+    # A wall stops rifle bullets (see scenarios/test-cover.lua): the wall of the walls ground at x 14 to 16, y 8 to 15.
+    "scenario-cover": {"scripts": ("test-cover",), "size": (32, 24), "drop_conquest": True, "ground": "walls",
+                       "extra_rules": "hunter:\n\tHealth:\n\t\tHP: 3000\n", "actors": [
+        ("rifleman", "Marines", 12, 12, 256), ("hunter", "Xenos", 17, 12, 0),
+        ("rifleman", "Marines", 12, 4, 256), ("hunter", "Xenos", 17, 4, 0), ("resin-silo", "Xenos", 28, 20, 0),
+    ]},
+    # A barricade covers only the side it faces (see scenarios/test-cade.lua): one faces the rifleman in the north, one faces the hunter in the south.
+    "scenario-cade": {"scripts": ("test-cade",), "size": (32, 24), "drop_conquest": True,
+                      "extra_rules": "hunter:\n\tHealth:\n\t\tHP: 3000\ncade-w:\n\tInherits: ^MapObjectCover\n\tHealth:\n\t\tHP: 3000\n\tWithSpriteBody:\n\t\tSequence: o0\n\tBlocksBullets:\n\t\tFaceX: -1\n\t\tFaceY: 0\ncade-e:\n\tInherits: cade-w\n\tBlocksBullets:\n\t\tFaceX: 1\n\t\tFaceY: 0\n", "actors": [
+        ("rifleman", "Marines", 12, 4, 256), ("cade-w", "Neutral", 14, 4, 0), ("hunter", "Xenos", 17, 4, 0),
+        ("rifleman", "Marines", 12, 12, 256), ("cade-e", "Neutral", 14, 12, 0), ("hunter", "Xenos", 17, 12, 0), ("resin-silo", "Xenos", 28, 20, 0),
+    ]},
+    # The marine AI uses its support powers (see scenarios/test-ai-support.lua).
+    "scenario-ai-support": {"scripts": ("test-ai-support",), "marine_bot": "skirmish", "drop_conquest": True, "size": (48, 32),
+                            "extra_rules": "Player:\n\t-SquadManagerBotModule@marines-easy:\n\t-SquadManagerBotModule@marines-normal:\n\t-SquadManagerBotModule@marines-hard:\n^Infantry:\n\tAutoTarget:\n\t\tInitialStance: HoldFire\ncryo-pod:\n\tDropPodPower@sentrydrop:\n\t\tChargeInterval: 60\n\tDropPodPower@mortardrop:\n\t\tChargeInterval: 60\narmory:\n\tDropPodPower@supplydrop:\n\t\tChargeInterval: 60\n\tSpawnActorPower@smoke:\n\t\tChargeInterval: 60\n", "actors": [
+        ("cryo-pod", "Marines", 6, 6, 0), ("armory", "Marines", 10, 6, 0), ("rifleman", "Marines", 17, 22, 512),
+        ("rifleman", "Marines", 17, 23, 512), ("rifleman", "Marines", 17, 24, 512), ("medic", "Marines", 16, 23, 512),
+        ("hunter", "Xenos", 22, 22, 0), ("hunter", "Xenos", 23, 23, 0), ("hunter", "Xenos", 22, 24, 0), ("hunter", "Xenos", 23, 21, 0),
+        ("hunter", "Xenos", 23, 25, 0), ("hunter", "Xenos", 22, 23, 0), ("resin-silo", "Xenos", 44, 28, 0),
+    ]},
     # Gunfire and acid damage the objects of the converted maps (see scenarios/test-objects-damage.lua): mapobj-0 is any generated map object.
     "scenario-objects-damage": {"scripts": ("test-objects-damage",), "size": (32, 24), "drop_conquest": True, "actors": [
         ("rifleman", "Marines", 8, 10, 256), ("mapobj-0", "Neutral", 11, 10, 0),
         ("spitter", "Xenos", 20, 10, 768), ("mapobj-1", "Neutral", 17, 10, 0), ("resin-silo", "Xenos", 28, 20, 0),
+    ]},
+    # A bomb run knocks a wall down (see scenarios/test-walls.lua): a wall of three cells thick, the CAS depot beside it.
+    "scenario-walls": {"scripts": ("test-walls",), "drop_conquest": True, "size": (32, 24), "ground": "walls", "actors": [
+        ("ordnance-depot", "Marines", 6, 6, 0), ("rifleman", "Marines", 10, 12, 0), ("resin-silo", "Xenos", 28, 20, 0),
     ]},
     "scenario-boiler": {"scripts": ("test-boiler",), "size": (48, 24), "drop_conquest": True, "extra_rules": "^Infantry:\n\tAutoTarget:\n\t\tInitialStance: HoldFire\n", "actors": [
         ("boiler", "Xenos", 6, 10, 0), ("rifleman", "Marines", 17, 10, 0),
@@ -1130,7 +1209,7 @@ Actors:
     with open(os.path.join(folder, "map.yaml"), "w", encoding="utf-8", newline="\n") as f:
         f.write(yaml)
 
-    colours = {ROCK: (0x3A, 0x3A, 0x3A, 255), GRASS: (0x2E, 0x52, 0x30, 255), WATER: (0x1C, 0x3A, 0x5E, 255), FORD: (0x4A, 0x72, 0x86, 255), DIRT: (0x7A, 0x62, 0x40, 255)}
+    colours = {ROCK: (0x3A, 0x3A, 0x3A, 255), WALL: (0x48, 0x48, 0x4C, 255), GRASS: (0x2E, 0x52, 0x30, 255), WATER: (0x1C, 0x3A, 0x5E, 255), FORD: (0x4A, 0x72, 0x86, 255), DIRT: (0x7A, 0x62, 0x40, 255)}
     preview = Image.new("RGBA", (size_w, size_h))
     preview.putdata([colours.get(ground(x, y)[0]) or build_maptiles.COLOURS[ground(x, y)[0]] for y in range(size_h) for x in range(size_w)])
     preview.save(os.path.join(folder, "map.png"))
@@ -1225,6 +1304,7 @@ def main():
     write_cas_icon(args.out)
     write_hive_icon(args.out)
     write_pod_icon(args.out)
+    write_support_icons(args.out)
     write_lights(args.out)
     write_shockwave(args.out)
     write_overlay(args.out)
@@ -1254,7 +1334,7 @@ def main():
                   drop_conquest=sc.get("drop_conquest", False), xeno_bot=sc.get("xeno_bot"),
                   marine_bot=sc.get("marine_bot"), fast=sc.get("fast", True),
                   extra_rules=sc.get("extra_rules", ""),
-                  ground=landing_zone_ground if sc.get("ground") == "landing_zone" else flat_ground)
+                  ground={"landing_zone": landing_zone_ground, "walls": walls_ground}.get(sc.get("ground"), flat_ground))
     write_map(os.path.join(args.out, "maps", "hold-the-line"), "Hold the Line", 40, 28, HOLD_THE_LINE, "Lobby",
               [(6, 14), (33, 13)], scripts=("wave-survival",), ground=landing_zone_ground, category="Survival",
               drop_conquest=True, music=True)

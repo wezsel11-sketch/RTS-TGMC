@@ -28,6 +28,15 @@ Terrain:
 		Type: Rock
 		TargetTypes: Rock
 		Color: B2B2B2
+	# The walls of the converted maps: rock to walk, but heavy weapons can knock them down (DestructibleWalls).
+	TerrainType@Wall:
+		Type: Wall
+		TargetTypes: Rock
+		Color: 8C8C94
+	TerrainType@ReinforcedWall:
+		Type: ReinforcedWall
+		TargetTypes: Rock
+		Color: 6E6E78
 
 Templates:
 	Template@1:
@@ -70,3 +79,12 @@ Templates:
 		Categories: Terrain
 		Tiles:
 			0: Rock
+	# A wall that heavy weapons can knock down (DestructibleWalls), the same picture as the rock; scenario maps use it.
+	Template@6:
+		Id: 6
+		Images: wall.png
+		Size: 1,1
+		PickAny: True
+		Categories: Terrain
+		Tiles:
+			0: Wall

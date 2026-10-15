@@ -299,7 +299,10 @@ namespace OpenRA.Mods.TGMC.Widgets.Logic
 			if (a.Active)
 				return a.Info.Label + "!";
 
-			return a.CooldownRemaining > 0 ? $"{a.Info.Label} {(a.CooldownRemaining + 24) / 25}s" : a.Info.Label;
+			if (a.CooldownRemaining > 0)
+				return $"{a.Info.Label} {(a.CooldownRemaining + 24) / 25}s";
+
+			return a.Info.PlasmaCost > 0 ? $"{a.Info.Label} ({a.Info.PlasmaCost})" : a.Info.Label;
 		}
 
 		static bool NeedsMedic(Actor a)

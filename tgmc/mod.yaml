@@ -105,6 +105,9 @@ Sequences:
 	tgmc|sequences/fx-blood.yaml
 	tgmc|sequences/mapobjects.yaml
 	tgmc|sequences/droppod.yaml
+	tgmc|sequences/supplypod.yaml
+	tgmc|sequences/supply-crate.yaml
+	tgmc|sequences/smoke-cloud.yaml
 	tgmc|sequences/fx-gibs.yaml
 	tgmc|sequences/fx-blast-cas.yaml
 	tgmc|sequences/fx-dust-tile.yaml

@@ -35,6 +35,8 @@ def paths():
     # The converted maps' floor and wall pictures: every turf sheet, and the DM code that says which turf shows which picture (tgmc_turfs.py).
     # A trailing slash is a whole directory.
     found.update(['icons/turf/', 'code/game/turfs/', 'icons/misc/beach.dmi'])
+    # The objects on the maps (tgmc_objects.py): the DM code that names their pictures, and the picture sheets.
+    found.update(['code/game/objects/', 'icons/obj/', 'icons/effects/', 'icons/Xeno/'])
     return sorted(found)
 
 

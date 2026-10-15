@@ -94,11 +94,14 @@ namespace OpenRA.Mods.TGMC.Traits
 			if (!landed && tick >= info.FallTicks)
 			{
 				landed = true;
-				world.Remove(falling);
-				world.Add(new SpriteEffect(target, world, info.Image, info.LandedSequence, info.Palette));
-				Fx.Sound(world, target, info.LandSounds);
-				world.WorldActor.TraitOrDefault<ScreenShaker>()?.AddEffect(14, target, 4);
-				Fx.Sprite(world, target, "fx-dust-tile", "dust", "effect");
+				world.AddFrameEndTask(x =>
+				{
+					x.Remove(falling);
+					x.Add(new SpriteEffect(target, x, info.Image, info.LandedSequence, info.Palette));
+					Fx.Sound(x, target, info.LandSounds);
+					x.WorldActor.TraitOrDefault<ScreenShaker>()?.AddEffect(14, target, 4);
+					Fx.Sprite(x, target, "fx-dust-tile", "dust", "effect");
+				});
 			}
 
 			if (landed && tick >= info.FallTicks + info.OpenDelay)

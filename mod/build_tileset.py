@@ -28,6 +28,7 @@ TILES = {
     "ford": (GROUND, "seashallow", 0),
     "water": (GROUND, "seadeep", 0),
     "rock": (CAVE, "cave-255", 0),
+    "wall": (CAVE, "cave-255", 0),
 }
 
 

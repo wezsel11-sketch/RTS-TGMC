@@ -123,6 +123,10 @@ the commits this mod was tested against (see the top of `mod/bootstrap.py`), so 
   - **Production.** Structures build in about half the old time. Each production building trains a unit of its own at the same time
     (`MultiProductionQueue`): two cryo pods train two marines side by side, three silos hatch three xenos.
   - **Facing.** Marines and xenos turn to face what they attack before they fire (`FacingTolerance: 40` in `units.yaml`), and turn faster.
+  - **Destroyable walls.** On the full-size maps the walls are tiles of terrain type Wall (500 hit points a cell) or ReinforcedWall (1500); indestructible walls and
+    the rock stay as they are. Heavy weapons damage the wall cells around where they land (howitzer, bomb run, MOAB, Fatty, mortar a little, SADAR, the demolitionist's grenade
+    and the mech's rocket, RPG and missile). A cell that runs out turns into rubble that units walk over, and the pathfinding follows. The picture of the neighbouring
+    wall pieces is not redrawn, so a hole can look a little ragged.
   - **Vision.** Marines on foot see 10 cells through the fog and xenos 9 (both 7 before); scouts see 13 and rangers 12. Bullets that miss still chip the furniture around where they land.
   - **Armour classes.** The marines come in three weights of Jaeger Mk.II exoskeleton. *Light*: Jaeger Scout (SMG, fast, sees 13 cells, 90) and Jaeger
     Skirmisher (shotgun, 130). *Medium*: Jaeger Trooper (rifle, takes 12 percent less damage, 140) and Jaeger Ranger (M412, sees 12, takes 8 percent less, 170).
@@ -147,7 +151,7 @@ the commits this mod was tested against (see the top of `mod/bootstrap.py`), so 
   - **Firing on the move.** Marines, corpsmen, engineers and the other light infantry shoot at enemies they pass while walking a move or
     attack-move order (`AttackWhileMoving`, within about 70 degrees of their heading). Snipers and machine gunners do not: they stop to shoot
     (`FireWhileMoving: false`).
-  - **Speed.** Every unit moves twice as fast as before (a rifleman's `Speed` is 108, a runner's 288).
+  - **Speed.** Every unit moves twice as fast as before, and every xeno is quicker than a marine on foot: a rifleman's `Speed` is 108, a runner's 300, a hunter's 200, even the slow Behemoth's 115.
   - **Turning.** Infantry turn about five times faster (`TurnSpeed: 160`), so a move order starts almost at once.
   - **Emplacements.** The Mortar Emplacement (Armory, range 24, minimum 5) and the Artillery Emplacement (a 2x2 howitzer, Ordnance Depot,
     range 40, minimum 10, 140 damage, slow reload) are fixed guns that outrange the mortarman. They fire at whatever your units have revealed.
@@ -183,10 +187,21 @@ the commits this mod was tested against (see the top of `mod/bootstrap.py`), so 
     in pairs, the first two built, then the next two: right-click a tunnel with a xeno and it comes out of the other one. The AI uses the powers.
   - **Throws and shake.** A Crusher's charge hurls a marine five cells away and a Warrior's lunge three: he flies in an arc, takes damage when he lands
     (more if a wall or unit stops him early) and stays stunned. Big blasts shake the screen harder the closer they are and, for the biggest, flash it.
+  - **Plasma.** Every xeno has a plasma pool (100, a purple bar under it; it starts at 60 percent) that its abilities spend: 15 for the Sentinel's neurotoxin or the Spitter's
+    burst up to 50 for the Wraith's time stop, the Behemoth's stomp and the Queen's cry. It refills slowly, and more than twice as fast on weeds, so fighting near the hive is stronger.
+    The button shows the cost in brackets and is greyed out when there is not enough.
   - **Caste abilities and controls.** Selected xenos get two ability buttons on the command card (keys R and T): the Ravager has Rage and Endure, the
     Praetorian Acid Spray, the Warrior Fling (throws the nearest marine six cells), and the Carrier throws Facehuggers (it holds four and grows a new
     one every 24 seconds). New selection keys: I selects every idle combat unit, U every wounded or infected one, and Ctrl+W every unit of the
     selected type anywhere on the map.
+  - **More marine support powers.** On the Cryo Pod: *Sentry Drop* and *Mortar Drop* (a pod lands a sentry gun or a mortar emplacement). On the Armory: *Supply Drop*
+    (a crate that heals and refills the ammo of every marine near it for half a minute), *Smoke Screen* (everyone inside takes 45 percent less damage, friend and foe) and
+    *Sensor Sweep* (reveals an area, cloaked xenos too). On the Workshop: *Orbital Bombardment* (ten seconds' warning, a blast bigger than the MOAB that flattens walls).
+    The marine AI uses the first four and the orbital strike.
+  - **Cover.** Direct-fire bullets (rifles, carbines, SMGs, shotguns, smartgun, machine guns, minigun, sniper, sentry, mech guns) stop at walls and at cover objects
+    (barricades, closets, crates, windows) and hit them instead of what is behind. A barricade has a front: shots coming from the side it faces are
+    mostly caught (70%), shots from behind or the flanks go over it, so face barricades toward the enemy and shoot over them from behind.
+    Shells, rockets, grenades and acid fly over.
   - **Drop pod.** The Cryo Pod gives the marines a power on the support bar, like CAS: pick a spot and a pod falls from orbit, shakes the ground and
     opens on four riflemen, an engineer and a medic. Recharges in 2.5 minutes; the marine AI calls it on clusters of xenos.
   - **Gibs and bodies.** A marine or xeno killed by an explosion throws five to eight body parts (TGMC's gib sprites) a few cells around with a splash of blood

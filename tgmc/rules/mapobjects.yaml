@@ -31,6 +31,11 @@
 		Dimensions: 1, 1
 		TerrainTypes: Clear, Road
 
+# A blocking object that also stops bullets (barricades, closets, crates, windows): a CoverBullet hits it instead of what is behind it.
+^MapObjectCover:
+	Inherits: ^MapObjectBlocking
+	BlocksBullets:
+
 ^MapObjectOpen:
 	Inherits: ^MapObject
 	# Units walk over it, as over weeds.

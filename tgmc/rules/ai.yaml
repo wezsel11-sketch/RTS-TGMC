@@ -334,6 +334,92 @@ Player:
 					Attractiveness: -6
 					TargetMetric: None
 					CheckRadius: 3c0
+			supply-drop:
+				OrderName: SupplyDropOrder
+				CoarseScanRadius: 10
+				MinimumAttractiveness: 4
+				Consideration@1:
+					Against: Ally
+					Types: Heal
+					Attractiveness: 1
+					TargetMetric: None
+					CheckRadius: 5c0
+			smoke-screen:
+				OrderName: SmokeScreenOrder
+				CoarseScanRadius: 10
+				MinimumAttractiveness: 5
+				Consideration@1:
+					Against: Enemy
+					Types: Alien
+					Attractiveness: 1
+					TargetMetric: None
+					CheckRadius: 4c0
+				Consideration@2:
+					Against: Ally
+					Types: Infantry
+					Attractiveness: 1
+					TargetMetric: None
+					CheckRadius: 4c0
+			sentry-drop:
+				OrderName: SentryDropOrder
+				CoarseScanRadius: 10
+				MinimumAttractiveness: 4
+				Consideration@1:
+					Against: Enemy
+					Types: Alien
+					Attractiveness: 1
+					TargetMetric: None
+					CheckRadius: 7c0
+				Consideration@2:
+					Against: Ally
+					Types: Infantry
+					Attractiveness: 1
+					TargetMetric: None
+					CheckRadius: 7c0
+			mortar-drop:
+				OrderName: MortarDropOrder
+				CoarseScanRadius: 10
+				MinimumAttractiveness: 4
+				Consideration@1:
+					Against: Enemy
+					Types: Alien
+					Attractiveness: 1
+					TargetMetric: None
+					CheckRadius: 8c0
+				Consideration@2:
+					Against: Ally
+					Types: Infantry
+					Attractiveness: 1
+					TargetMetric: None
+					CheckRadius: 8c0
+			orbital:
+				OrderName: OrbitalOrder
+				CoarseScanRadius: 10
+				MinimumAttractiveness: 16
+				Consideration@1:
+					Against: Enemy
+					Types: Alien
+					Attractiveness: 1
+					TargetMetric: None
+					CheckRadius: 9c0
+				Consideration@2:
+					Against: Enemy
+					Types: Structure
+					Attractiveness: 2
+					TargetMetric: None
+					CheckRadius: 9c0
+				Consideration@3:
+					Against: Ally
+					Types: Infantry
+					Attractiveness: -4
+					TargetMetric: None
+					CheckRadius: 10c0
+				Consideration@4:
+					Against: Ally
+					Types: Structure
+					Attractiveness: -4
+					TargetMetric: None
+					CheckRadius: 10c0
 			psychic-cure:
 				OrderName: PsychicCureOrder
 				CoarseScanRadius: 10

@@ -222,3 +222,30 @@ pod-icon:
 		Filename: pod-icon.png
 		Start: 0
 		Length: 1
+
+# The marine support powers' palette icons, drawn by mod/make_placeholders.py (no TGMC art); frame order is SUPPORT_ICONS there.
+support-icon:
+	supply:
+		Filename: support-icon.png
+		Start: 0
+		Length: 1
+	sensor:
+		Filename: support-icon.png
+		Start: 1
+		Length: 1
+	smoke:
+		Filename: support-icon.png
+		Start: 2
+		Length: 1
+	orbital:
+		Filename: support-icon.png
+		Start: 3
+		Length: 1
+	sentry:
+		Filename: support-icon.png
+		Start: 4
+		Length: 1
+	mortar:
+		Filename: support-icon.png
+		Start: 5
+		Length: 1

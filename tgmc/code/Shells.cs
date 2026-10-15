@@ -35,6 +35,93 @@ namespace OpenRA.Mods.TGMC.Projectiles
 		}
 	}
 
+	[Desc("A bullet that stops at cover: a wall (rock, plain or reinforced) or an object with BlocksBullets between the gun and the target takes the hit instead, " +
+		"at the cell where it was stopped. Shooters see through walls, so without this they would shoot straight through them.")]
+	public class CoverBulletInfo : BulletInfo
+	{
+		public override IProjectile Create(ProjectileArgs args)
+		{
+			var world = args.SourceActor.World;
+			var stop = Stop(world, args.Source, args.PassiveTarget);
+			if (stop != null)
+				args.PassiveTarget = stop.Value;
+
+			return base.Create(args);
+		}
+
+		static WPos? Stop(World world, WPos from, WPos to)
+		{
+			var map = world.Map;
+			var line = to - from;
+			var length = line.HorizontalLength;
+			if (length < 1024)
+				return null;
+
+			var start = map.CellContaining(from);
+			var end = map.CellContaining(to);
+			var steps = length / 400;
+			var last = start;
+			var before = from;
+			for (var i = 1; i < steps; i++)
+			{
+				var point = from + line * i / steps;
+				var cell = map.CellContaining(point);
+				if (cell == last || cell == start || cell == end)
+				{
+					before = point;
+					continue;
+				}
+
+				last = cell;
+				if (!map.Contains(cell))
+					return before;
+
+				if (map.GetTerrainInfo(cell).Type is "Rock" or "Wall" or "ReinforcedWall")
+					return before;
+
+				foreach (var a in world.ActorMap.GetActorsAt(cell))
+				{
+					if (a.IsDead)
+						continue;
+
+					var cover = a.Info.TraitInfoOrDefault<BlocksBulletsInfo>();
+					if (cover != null && cover.Stops(world, a, from))
+						return map.CenterOfCell(cell);
+				}
+
+				before = point;
+			}
+
+			return null;
+		}
+	}
+
+	[Desc("Cover: a CoverBullet stops at this actor (a barricade, a closet, a window...), and hits it. A barricade has a front (FaceX, FaceY, in cells): " +
+		"shots from the front side are mostly caught (FrontBlock percent), shots from behind or the flanks pass over it.")]
+	public class BlocksBulletsInfo : TraitInfo
+	{
+		[Desc("The side the cover faces, as a direction on the map. 0, 0 for cover that protects all around.")]
+		public readonly int FaceX = 0;
+		public readonly int FaceY = 0;
+
+		[Desc("Chance in percent that a shot from the front is stopped (the rest are only off target by the cover). Cover without a front always stops.")]
+		public readonly int FrontBlock = 70;
+
+		public bool Stops(World world, Actor self, WPos shooter)
+		{
+			if (FaceX == 0 && FaceY == 0)
+				return true;
+
+			var offset = shooter - self.CenterPosition;
+			var front = (long)offset.X * FaceX + (long)offset.Y * FaceY > 0;
+			return front && world.SharedRandom.Next(100) < FrontBlock;
+		}
+
+		public override object Create(ActorInitializer init) { return new BlocksBullets(); }
+	}
+
+	public class BlocksBullets { }
+
 	sealed class Whistle : IEffect
 	{
 		readonly WPos pos;

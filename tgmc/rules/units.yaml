@@ -97,6 +97,12 @@
 		EmptyWeapon: TGMCDeathBlood
 	DetectCloaked:
 		Range: 2c0
+	# Standing in a smoke screen: harder to hit.
+	ExternalCondition@smoked:
+		Condition: smoked
+	DamageMultiplier@smoked:
+		RequiresCondition: smoked
+		Modifier: 55
 	# An Ammo Station nearby speeds the reload.
 	ExternalCondition@resupply:
 		Condition: resupplied
@@ -909,6 +915,8 @@ demolitionist:
 
 ^Xeno:
 	Inherits: ^Unit
+	# Plasma fuels the abilities; it builds up slowly, and faster on weeds.
+	Plasma:
 	# Xenos see 9 cells through the fog (the marines on foot 10).
 	RevealsShroud:
 		Range: 9c0
@@ -1067,7 +1075,7 @@ runner:
 	Selectable:
 		Bounds: 1024, 768, -512, -512
 	TgmcMobile:
-		Speed: 288
+		Speed: 300
 	Tooltip:
 		Name: actor-runner.name
 	Valued:
@@ -1111,7 +1119,7 @@ hunter:
 	Selectable:
 		Bounds: 768, 768, -384, -512
 	TgmcMobile:
-		Speed: 176
+		Speed: 200
 	Tooltip:
 		Name: actor-hunter.name
 	Valued:
@@ -1127,6 +1135,7 @@ sentinel:
 	# Command card ability: neurotoxin that hurts and slows the nearest marine.
 	ActiveAbility@abilityneurotoxin:
 		OrderName: AbilityNeurotoxin
+		PlasmaCost: 15
 		Slot: 1
 		Label: Neurotoxin
 		Cooldown: 350
@@ -1145,7 +1154,7 @@ sentinel:
 	Selectable:
 		Bounds: 768, 768, -384, -512
 	TgmcMobile:
-		Speed: 138
+		Speed: 160
 	Armament@PRIMARY:
 		Weapon: TGMCSpit
 	Tooltip:
@@ -1167,7 +1176,7 @@ facehugger:
 	Selectable:
 		Bounds: 512, 512, -256, -256
 	TgmcMobile:
-		Speed: 240
+		Speed: 260
 	# Hunts marines that carry no embryo, leaps at one and is spent planting its own.
 	-Armament@PRIMARY:
 	Armament@HUG:
@@ -1207,7 +1216,7 @@ larva:
 	Selectable:
 		Bounds: 512, 512, -256, -256
 	TgmcMobile:
-		Speed: 100
+		Speed: 120
 	Armament@PRIMARY:
 		Weapon: TGMCBite
 	Tooltip:
@@ -1228,7 +1237,7 @@ drone:
 	Selectable:
 		Bounds: 768, 768, -384, -512
 	TgmcMobile:
-		Speed: 126
+		Speed: 140
 	Armament@PRIMARY:
 		Weapon: TGMCMend
 		Cursor: repair
@@ -1257,6 +1266,7 @@ warrior:
 	# Command card ability: punch the nearest marine.
 	ActiveAbility@abilitypunch:
 		OrderName: AbilityPunch
+		PlasmaCost: 20
 		Slot: 2
 		Label: Punch
 		Cooldown: 300
@@ -1268,6 +1278,7 @@ warrior:
 	# Command card ability: seize the nearest marine and fling him away.
 	ActiveAbility@fling:
 		OrderName: AbilityFling
+		PlasmaCost: 25
 		Slot: 1
 		Label: Fling
 		Cooldown: 400
@@ -1302,7 +1313,7 @@ warrior:
 	Selectable:
 		Bounds: 1024, 1024, -512, -512
 	TgmcMobile:
-		Speed: 80
+		Speed: 140
 	Armament@PRIMARY:
 		Weapon: TGMCSlam
 	Tooltip:
@@ -1320,6 +1331,7 @@ queen:
 	# Command card ability: a cry that sends the xenos around her into a rage.
 	ActiveAbility@abilitycry:
 		OrderName: AbilityCry
+		PlasmaCost: 50
 		Slot: 1
 		Label: Rally Cry
 		Cooldown: 900
@@ -1335,7 +1347,7 @@ queen:
 	Selectable:
 		Bounds: 1536, 1536, -768, -768
 	TgmcMobile:
-		Speed: 100
+		Speed: 120
 	Armament@PRIMARY:
 		Weapon: TGMCSlam
 	# The Deploy key: a screech that stuns marines nearby.
@@ -1366,6 +1378,7 @@ spitter:
 	# Command card ability: a burst of acid on the ground ahead.
 	ActiveAbility@abilityacidburst:
 		OrderName: AbilityAcidBurst
+		PlasmaCost: 15
 		Slot: 1
 		Label: Acid Burst
 		Cooldown: 400
@@ -1384,7 +1397,7 @@ spitter:
 	Selectable:
 		Bounds: 768, 768, -384, -512
 	TgmcMobile:
-		Speed: 120
+		Speed: 140
 	Armament@PRIMARY:
 		Weapon: TGMCSpit
 	Tooltip:
@@ -1402,6 +1415,7 @@ praetorian:
 	# Command card ability: Dodge, quicker and harder to hit for a moment.
 	ActiveAbility@abilitydodge:
 		OrderName: AbilityDodge
+		PlasmaCost: 20
 		Slot: 2
 		Label: Dodge
 		Cooldown: 450
@@ -1418,6 +1432,7 @@ praetorian:
 	# Command card ability: spray acid on the ground in front of him.
 	ActiveAbility@spray:
 		OrderName: AbilityAcidSpray
+		PlasmaCost: 30
 		Slot: 1
 		Label: Acid Spray
 		Cooldown: 350
@@ -1438,7 +1453,7 @@ praetorian:
 	Selectable:
 		Bounds: 768, 768, -384, -512
 	TgmcMobile:
-		Speed: 110
+		Speed: 130
 	Armament@PRIMARY:
 		Weapon: TGMCClaws
 	Tooltip:
@@ -1456,6 +1471,7 @@ crusher:
 	# Command card ability: stomp, stunning the marines around him.
 	ActiveAbility@abilitystomp:
 		OrderName: AbilityStomp
+		PlasmaCost: 35
 		Slot: 1
 		Label: Stomp
 		Cooldown: 500
@@ -1490,7 +1506,7 @@ crusher:
 	Selectable:
 		Bounds: 768, 768, -384, -512
 	TgmcMobile:
-		Speed: 80
+		Speed: 125
 	Armament@PRIMARY:
 		Weapon: TGMCSlam
 	Tooltip:
@@ -1508,6 +1524,7 @@ ravager:
 	# Command card abilities. Rage: hits harder and runs faster for a while. Endure: takes half damage and mends.
 	ActiveAbility@rage:
 		OrderName: AbilityRage
+		PlasmaCost: 25
 		Slot: 1
 		Label: Rage
 		Cooldown: 500
@@ -1517,6 +1534,7 @@ ravager:
 		Sounds: xeno-roar-8.ogg
 	ActiveAbility@endure:
 		OrderName: AbilityEndure
+		PlasmaCost: 30
 		Slot: 2
 		Label: Endure
 		Cooldown: 600
@@ -1553,7 +1571,7 @@ ravager:
 	Selectable:
 		Bounds: 768, 768, -384, -512
 	TgmcMobile:
-		Speed: 180
+		Speed: 200
 	Armament@PRIMARY:
 		Weapon: TGMCClaws
 	Tooltip:
@@ -1571,6 +1589,7 @@ defiler:
 	# Command card ability: breathe out a cloud of neurotoxin.
 	ActiveAbility@abilityemitgas:
 		OrderName: AbilityEmitGas
+		PlasmaCost: 30
 		Slot: 1
 		Label: Emit Gas
 		Cooldown: 450
@@ -1590,7 +1609,7 @@ defiler:
 	RevealsShroud:
 		Range: 11c0
 	TgmcMobile:
-		Speed: 90
+		Speed: 125
 	Armament@PRIMARY:
 		Weapon: TGMCDefilerGas
 	Tooltip:
@@ -1618,7 +1637,7 @@ boiler:
 	RevealsShroud:
 		Range: 13c0
 	TgmcMobile:
-		Speed: 120
+		Speed: 130
 	Armament@PRIMARY:
 		Weapon: TGMCBoilerGlob
 	Tooltip:
@@ -1654,7 +1673,7 @@ carrier:
 	Selectable:
 		Bounds: 768, 768, -384, -512
 	TgmcMobile:
-		Speed: 130
+		Speed: 145
 	Armament@PRIMARY:
 		Weapon: TGMCClaws
 	Tooltip:
@@ -1672,6 +1691,7 @@ warlock:
 	# Command card ability: a psychic blast at the nearest marine.
 	ActiveAbility@abilityblast:
 		OrderName: AbilityBlast
+		PlasmaCost: 30
 		Slot: 1
 		Label: Blast
 		Cooldown: 400
@@ -1689,7 +1709,7 @@ warlock:
 	Selectable:
 		Bounds: 768, 768, -384, -512
 	TgmcMobile:
-		Speed: 110
+		Speed: 125
 	Armament@PRIMARY:
 		Weapon: TGMCSpit
 	Tooltip:
@@ -1707,6 +1727,7 @@ shrike:
 	# Command card abilities: Fling throws the nearest marine, Cure heals the xenos around her.
 	ActiveAbility@abilityfling:
 		OrderName: AbilityFling
+		PlasmaCost: 25
 		Slot: 1
 		Label: Fling
 		Cooldown: 500
@@ -1717,6 +1738,7 @@ shrike:
 		Sounds: xeno-roar-4.ogg
 	ActiveAbility@abilitycure:
 		OrderName: AbilityCure
+		PlasmaCost: 40
 		Slot: 2
 		Label: Cure
 		Cooldown: 700
@@ -1736,7 +1758,7 @@ shrike:
 	Selectable:
 		Bounds: 768, 768, -384, -512
 	TgmcMobile:
-		Speed: 200
+		Speed: 220
 	Armament@PRIMARY:
 		Weapon: TGMCClaws
 	Tooltip:
@@ -1754,6 +1776,7 @@ widow:
 	# Command card ability: web the nearest marine.
 	ActiveAbility@abilityweb:
 		OrderName: AbilityWeb
+		PlasmaCost: 25
 		Slot: 1
 		Label: Web
 		Cooldown: 450
@@ -1772,7 +1795,7 @@ widow:
 	Selectable:
 		Bounds: 768, 768, -384, -512
 	TgmcMobile:
-		Speed: 90
+		Speed: 140
 	Armament@PRIMARY:
 		Weapon: TGMCAcid
 	Tooltip:
@@ -1790,6 +1813,7 @@ wraith:
 	# Command card ability: freeze every marine around her for a moment.
 	ActiveAbility@abilitytimestop:
 		OrderName: AbilityTimestop
+		PlasmaCost: 50
 		Slot: 1
 		Label: Time Stop
 		Cooldown: 700
@@ -1808,7 +1832,7 @@ wraith:
 	Selectable:
 		Bounds: 768, 768, -384, -512
 	TgmcMobile:
-		Speed: 190
+		Speed: 210
 	Armament@PRIMARY:
 		Weapon: TGMCClaws
 	Tooltip:
@@ -1834,7 +1858,7 @@ bull:
 	Selectable:
 		Bounds: 768, 768, -384, -512
 	TgmcMobile:
-		Speed: 140
+		Speed: 155
 	Armament@PRIMARY:
 		Weapon: TGMCSlam
 	Tooltip:
@@ -1852,6 +1876,7 @@ behemoth:
 	# Command card ability: a heavy stomp.
 	ActiveAbility@abilitystomp:
 		OrderName: AbilityStomp
+		PlasmaCost: 50
 		Slot: 1
 		Label: Stomp
 		Cooldown: 600
@@ -1871,7 +1896,7 @@ behemoth:
 	Selectable:
 		Bounds: 768, 768, -384, -512
 	TgmcMobile:
-		Speed: 60
+		Speed: 115
 	Armament@PRIMARY:
 		Weapon: TGMCSlam
 	Tooltip:

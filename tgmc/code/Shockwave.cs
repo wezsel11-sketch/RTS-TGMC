@@ -129,7 +129,7 @@ namespace OpenRA.Mods.TGMC.Warheads
 							continue;
 
 						var next = new CPos(cell.X + dx, cell.Y + dy);
-						if (!map.Contains(next) || map.GetTerrainInfo(next).Type == "Rock")
+						if (!map.Contains(next) || map.GetTerrainInfo(next).Type is "Rock" or "Wall" or "ReinforcedWall")
 							continue;
 
 						var step = dx != 0 && dy != 0 ? 1.414f : 1f;

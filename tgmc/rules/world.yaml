@@ -46,6 +46,9 @@
 	ScreenShaker:
 	# A flash across the screen when a big blast goes off near the middle of it (FlashScreen warheads in weapons.yaml).
 	BlastFlash:
+	# The walls of the converted maps fall to heavy weapons (DamageWalls warheads in weapons.yaml).
+	DestructibleWalls:
+		Sounds: slam-1.ogg, explosion-2.ogg
 	# Pings on the minimap: attacks on your base, a facehugged marine, a CAS target.
 	RadarPings:
 	TgmcEventLog:

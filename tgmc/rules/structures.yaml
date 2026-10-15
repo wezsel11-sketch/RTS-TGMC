@@ -678,6 +678,37 @@ cryo-pod:
 	Building:
 		Footprint: x x
 		Dimensions: 1, 2
+	# Marines call these down from orbit: a sentry gun and a mortar, each in its own pod.
+	DropPodPower@sentrydrop:
+		OrderName: SentryDropOrder
+		Name: support-sentrydrop.name
+		Description: support-sentrydrop.description
+		IconImage: support-icon
+		BlockedCursor: move-blocked
+		Icon: sentry
+		ChargeInterval: 4200
+		BeginChargeSound: ui-ping.ogg
+		EndChargeSound: ui-confirm.ogg
+		Actors: sentry-turret
+		Radius: 1
+		Image: droppod
+		FallSounds: bomb-fall.ogg
+		LandSounds: slam-1.ogg, explosion-1.ogg
+	DropPodPower@mortardrop:
+		OrderName: MortarDropOrder
+		Name: support-mortardrop.name
+		Description: support-mortardrop.description
+		IconImage: support-icon
+		BlockedCursor: move-blocked
+		Icon: mortar
+		ChargeInterval: 4800
+		BeginChargeSound: ui-ping.ogg
+		EndChargeSound: ui-confirm.ogg
+		Actors: mortar-emplacement
+		Radius: 1
+		Image: droppod
+		FallSounds: bomb-fall.ogg
+		LandSounds: slam-1.ogg, explosion-1.ogg
 	Health:
 		HP: 250
 	WithIdleAnimation:
@@ -706,6 +737,55 @@ armory:
 		Description: actor-armory.description
 	AmbientSound:
 		SoundFiles: amb-hum.ogg
+	# Supply drop (a crate that heals and reloads), smoke screen and sensor sweep.
+	DropPodPower@supplydrop:
+		OrderName: SupplyDropOrder
+		Name: support-supplydrop.name
+		Description: support-supplydrop.description
+		IconImage: support-icon
+		BlockedCursor: move-blocked
+		Icon: supply
+		ChargeInterval: 3000
+		BeginChargeSound: ui-ping.ogg
+		EndChargeSound: ui-confirm.ogg
+		Actors: supply-crate
+		Radius: 1
+		Image: supplypod
+		OpenDelay: 5
+		FallSounds: bomb-fall.ogg
+		LandSounds: slam-2.ogg
+	SpawnActorPower@smoke:
+		OrderName: SmokeScreenOrder
+		Name: support-smokescreen.name
+		Description: support-smokescreen.description
+		IconImage: support-icon
+		BlockedCursor: move-blocked
+		Icon: smoke
+		ChargeInterval: 2400
+		BeginChargeSound: ui-ping.ogg
+		EndChargeSound: ui-confirm.ogg
+		Actor: smoke-screen
+		LifeTime: 700
+		DeploySound: smoke-bomb.ogg
+		EffectImage: fx-light
+		EffectSequence: blast
+		EffectPalette: effect
+	SpawnActorPower@sensor:
+		OrderName: SensorSweepOrder
+		Name: support-sensorsweep.name
+		Description: support-sensorsweep.description
+		IconImage: support-icon
+		BlockedCursor: move-blocked
+		Icon: sensor
+		ChargeInterval: 3200
+		BeginChargeSound: ui-ping.ogg
+		EndChargeSound: ui-confirm.ogg
+		Actor: sensor-ping
+		LifeTime: 900
+		DeploySound: ui-ping.ogg
+		EffectImage: fx-light
+		EffectSequence: blast
+		EffectPalette: effect
 	Health:
 		HP: 400
 	Tooltip:
@@ -780,6 +860,26 @@ workshop:
 		VoiceSet: MarineStructureVoice
 	AmbientSound:
 		SoundFiles: amb-hum.ogg
+	# Orbital bombardment: a long warning, then a huge blast.
+	CondorStrikePower@orbital:
+		Variant: orbital
+		OrderName: OrbitalOrder
+		Name: support-orbital.name
+		Description: support-orbital.description
+		IconImage: support-icon
+		BlockedCursor: move-blocked
+		Icon: orbital
+		ChargeInterval: 9000
+		BeginChargeSound: ui-ping.ogg
+		EndChargeSound: ui-confirm.ogg
+		Weapon: TGMCOrbital
+		PassSounds: sonic-boom.ogg
+		DropSounds: cas-voice-bomb.ogg
+		IncomingSounds: ob-incoming.ogg
+		LaunchSound: ui-ping.ogg
+		Pattern: Single
+		FallDelay: 250
+		WarningRadius: 12c0
 	Health:
 		HP: 450
 	Exit@1:
@@ -1093,3 +1193,71 @@ ordnance-depot:
 		Name: actor-ordnance-depot.name
 	Valued:
 		Cost: 400
+
+# Things the support powers put on the map.
+supply-crate:
+	Health:
+		HP: 200
+	Tooltip:
+		Name: actor-supply-crate.name
+	RenderSprites:
+	WithSpriteBody:
+	BodyOrientation:
+		QuantizedFacings: 1
+	Targetable:
+		TargetTypes: Ground, Structure
+	HitShape:
+		UseTargetableCellsOffsets: true
+		Type: Rectangle
+			TopLeft: -384, -384
+			BottomRight: 384, 384
+	Immobile:
+		OccupiesSpace: false
+	Interactable:
+	KillsSelf:
+		Delay: 750
+	Armament@SUPPLY:
+		Weapon: TGMCCrateSupply
+		TargetRelationships: Ally
+		ForceTargetRelationships: None
+	AttackOmni:
+	AutoTarget:
+		InitialStance: AttackAnything
+	AutoTargetPriority@DEFAULT:
+		ValidTargets: Infantry
+
+smoke-screen:
+	Tooltip:
+		Name: actor-smoke-screen.name
+	RenderSprites:
+		Image: smoke-cloud
+		Palette: effect
+	WithSpriteBody:
+	BodyOrientation:
+		QuantizedFacings: 1
+	Immobile:
+		OccupiesSpace: false
+	Interactable:
+	WithIdleOverlay@glow:
+		Image: fx-light
+		Sequence: glow-gas
+		Palette: effect
+	Armament@SMOKE:
+		Weapon: TGMCSmokeScreen
+	AttackOmni:
+	AutoTarget:
+		InitialStance: AttackAnything
+	AutoTargetPriority@DEFAULT:
+		ValidTargets: Ground
+
+sensor-ping:
+	Tooltip:
+		Name: actor-sensor-ping.name
+	RevealsShroud:
+		Range: 20c0
+		Type: CenterPosition
+	DetectCloaked:
+		Range: 20c0
+	Immobile:
+		OccupiesSpace: false
+	Interactable:

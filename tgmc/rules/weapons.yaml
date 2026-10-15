@@ -9,7 +9,7 @@ TGMCRifle:
 	Report: rifle-fire-1.ogg, rifle-fire-2.ogg, rifle-fire-3.ogg, rifle-fire-4.ogg, rifle-fire-5.ogg
 	# Shots scatter a little at full range. Units that fire on the move multiply this (see ^Unit), and a shot that lands
 	# more than about a cell off its mark misses.
-	Projectile: Bullet
+	Projectile: CoverBullet
 		Speed: 600
 		Image: fx-bullet
 		Inaccuracy: 384
@@ -124,6 +124,10 @@ TGMCSadar:
 		Falloff: 100, 85, 40, 0
 		Versus:
 			Heavy: 120
+	# Heavy: it knocks walls down too.
+	Warhead@5Walls: DamageWalls
+		Damage: 300
+		Radius: 2c0
 
 TGMCMortar:
 	Inherits: TGMCGrenade
@@ -171,6 +175,10 @@ TGMCMortar:
 		DustChance: 20
 		DamageTypes: ExplosionDeath
 		ValidRelationships: Ally, Neutral, Enemy
+	# Heavy: it knocks walls down too.
+	Warhead@5Walls: DamageWalls
+		Damage: 120
+		Radius: 2c0
 
 # The mortar emplacement: the mortarman's shell from further away and a little quicker.
 TGMCMortarEmplacement:
@@ -216,6 +224,10 @@ TGMCHowitzer:
 		EdgePercent: 8
 		DustImage: fx-dust-tile
 		DustChance: 25
+	# Heavy: it knocks walls down too.
+	Warhead@5Walls: DamageWalls
+		Damage: 450
+		Radius: 4c0
 
 # What a resin trap does to a marine who comes close: holds him in place for a few seconds and stings.
 TGMCResinTrap:
@@ -329,7 +341,7 @@ TGMCSniper:
 	Burst: 1
 	ReloadDelay: 40
 	Report: sniper-fire-1.ogg, sniper-fire-2.ogg, sniper-fire-3.ogg
-	Projectile: Bullet
+	Projectile: CoverBullet
 		Inaccuracy: 128
 	Warhead@1Dam: SpreadDamage
 		Damage: 60
@@ -344,7 +356,7 @@ TGMCMG60:
 	Burst: 1
 	ReloadDelay: 4
 	Report: mg60-fire-1.ogg, mg60-fire-2.ogg
-	Projectile: Bullet
+	Projectile: CoverBullet
 		Inaccuracy: 512
 	Warhead@1Dam: SpreadDamage
 		Damage: 11
@@ -355,7 +367,7 @@ TGMCSentry:
 	Burst: 1
 	ReloadDelay: 15
 	Report: sentry-fire.ogg
-	Projectile: Bullet
+	Projectile: CoverBullet
 		Sequences: large
 		Inaccuracy: 256
 	Warhead@1Dam: SpreadDamage
@@ -595,7 +607,7 @@ TGMCSmartgun:
 	Range: 7c0
 	ReloadDelay: 5
 	Report: smartgun-fire-1.ogg, smartgun-fire-2.ogg, smartgun-fire-3.ogg
-	Projectile: Bullet
+	Projectile: CoverBullet
 		Speed: 900
 		Image: fx-bullet
 		Inaccuracy: 256
@@ -777,7 +789,7 @@ TGMCMinigun:
 	BurstDelays: 1
 	ReloadDelay: 12
 	Report: minigun-fire.ogg
-	Projectile: Bullet
+	Projectile: CoverBullet
 		Inaccuracy: 640
 	Warhead@1Dam: SpreadDamage
 		Damage: 6
@@ -791,6 +803,10 @@ TGMCHEGrenade:
 	Warhead@1Dam: ExplosiveDamage
 		Damage: 90
 		Spread: 2c512
+	# Heavy: it knocks walls down too.
+	Warhead@5Walls: DamageWalls
+		Damage: 260
+		Radius: 2c0
 
 # The other basic rifles a rifleman may carry (one is picked at random for each marine): the T-18 carbine fires quicker and
 # lighter, the M412 heavier and slower. The T-12 assault rifle is TGMCRifle above.
@@ -799,7 +815,7 @@ TGMCCarbine:
 	Range: 5c256
 	BurstDelays: 2
 	ReloadDelay: 15
-	Projectile: Bullet
+	Projectile: CoverBullet
 		Inaccuracy: 448
 	Warhead@1Dam: SpreadDamage
 		Damage: 7
@@ -810,7 +826,7 @@ TGMCM412:
 	BurstDelays: 4
 	ReloadDelay: 24
 	Report: rifle-fire-m412.ogg
-	Projectile: Bullet
+	Projectile: CoverBullet
 		Inaccuracy: 320
 	Warhead@1Dam: SpreadDamage
 		Damage: 11
@@ -823,7 +839,7 @@ TGMCShotgun:
 	BurstDelays: 1
 	ReloadDelay: 45
 	Report: shotgun-fire-1.ogg, shotgun-fire-2.ogg
-	Projectile: Bullet
+	Projectile: CoverBullet
 		Inaccuracy: 768
 	Warhead@1Dam: SpreadDamage
 		Damage: 6
@@ -835,7 +851,7 @@ TGMCSMG:
 	Burst: 1
 	ReloadDelay: 5
 	Report: smg-fire-1.ogg, smg-fire-2.ogg
-	Projectile: Bullet
+	Projectile: CoverBullet
 		Inaccuracy: 512
 	Warhead@1Dam: SpreadDamage
 		Damage: 5
@@ -914,7 +930,7 @@ TGMCMechGun:
 	BurstDelays: 1
 	ReloadDelay: 10
 	Report: mg60-fire-1.ogg, mg60-fire-2.ogg
-	Projectile: Bullet
+	Projectile: CoverBullet
 		Inaccuracy: 512
 	Warhead@1Dam: SpreadDamage
 		Damage: 10
@@ -926,6 +942,10 @@ TGMCMechRocket:
 	ReloadDelay: 150
 	Warhead@1Dam: ExplosiveDamage
 		Damage: 70
+	# Heavy: it knocks walls down too.
+	Warhead@5Walls: DamageWalls
+		Damage: 300
+		Radius: 2c0
 
 # One bomb of the Condor's CAS run: a big fireball and a shake, and it hurts friend and foe alike.
 TGMCCasBomb:
@@ -962,6 +982,10 @@ TGMCCasBomb:
 	Warhead@7Flash: FlashScreen
 		Duration: 8
 		Strength: 38
+	# Heavy: it knocks walls down too.
+	Warhead@5Walls: DamageWalls
+		Damage: 500
+		Radius: 4c0
 
 # CAS ammo types, after TGMC's dropship ammo (code/game/objects/structures/dropship_ammo.dm). Each is one blast of a strike set up in
 # structures.yaml (CondorStrikePower). All hurt friend and foe alike.
@@ -1089,6 +1113,10 @@ TGMCCasFatty:
 	Warhead@7Flash: FlashScreen
 		Duration: 8
 		Strength: 38
+	# Heavy: it knocks walls down too.
+	Warhead@5Walls: DamageWalls
+		Damage: 300
+		Radius: 3c0
 
 TGMCCasCluster:
 	Inherits: TGMCCasMini
@@ -1183,6 +1211,10 @@ TGMCCasMoab:
 	Warhead@7Flash: FlashScreen
 		Duration: 22
 		Strength: 115
+	# Heavy: it knocks walls down too.
+	Warhead@5Walls: DamageWalls
+		Damage: 1500
+		Radius: 8c0
 
 # What a unit leaves where it dies: a splash of blood (marines) or acid-green gore (xenos). Fired by FireWarheadsOnDeath.
 TGMCDeathBlood:
@@ -1239,10 +1271,14 @@ TGMCMechRPG:
 	ReloadDelay: 170
 	Warhead@1Dam: ExplosiveDamage
 		Damage: 90
+	# Heavy: it knocks walls down too.
+	Warhead@5Walls: DamageWalls
+		Damage: 300
+		Radius: 2c0
 
 TGMCMechTow:
 	Inherits: TGMCSadar
-	Projectile: Bullet
+	Projectile: CoverBullet
 		Sequences: large
 	Range: 12c0
 	ReloadDelay: 230
@@ -1250,6 +1286,10 @@ TGMCMechTow:
 		Damage: 150
 		Versus:
 			Heavy: 140
+	# Heavy: it knocks walls down too.
+	Warhead@5Walls: DamageWalls
+		Damage: 500
+		Radius: 2c0
 
 # The sting of a pool of acid, once a second to marines standing in it.
 TGMCAcidPool:
@@ -1492,3 +1532,48 @@ TGMCObjectBreak:
 		ImpactSounds: slam-2.ogg, explosion-1.ogg
 		ForceDisplayAtGroundLevel: true
 		ValidTargets: Ground, Water, Structure
+
+# The supply crate: it heals and refills the ammo of every marine near it, a little at a time.
+TGMCCrateSupply:
+	Range: 4c768
+	ReloadDelay: 25
+	Projectile: InstantHit
+	ValidTargets: Infantry
+	TargetActorCenter: true
+	Warhead@1Heal: TargetDamage
+		Damage: -12
+		ValidRelationships: Ally
+		ValidTargets: Infantry
+	Warhead@2Ammo: GrantExternalCondition
+		Condition: resupplied
+		Duration: 90
+		ValidRelationships: Ally
+		ValidTargets: Infantry
+	Warhead@3Fx: CreateEffect
+		Image: heal-plus
+		Explosions: idle
+		ValidRelationships: Ally
+		ValidTargets: Infantry
+
+# The smoke screen: everyone inside is harder to hit, friend and foe alike.
+TGMCSmokeScreen:
+	Range: 3c768
+	ReloadDelay: 15
+	Projectile: InstantHit
+	Warhead@1Smoke: GrantExternalCondition
+		Condition: smoked
+		Duration: 30
+		Range: 3c768
+		ValidRelationships: Ally, Neutral, Enemy
+		ValidTargets: Ground
+
+# The orbital bombardment: a bigger blast than the MOAB, and it knocks walls down for twelve cells around.
+TGMCOrbital:
+	Inherits: TGMCCasMoab
+	Warhead@1Wave: Shockwave
+		Damage: 900
+		Radius: 17
+		EdgePercent: 6
+	Warhead@5Walls: DamageWalls
+		Damage: 2200
+		Radius: 12c0

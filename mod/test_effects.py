@@ -63,6 +63,7 @@ def test_death_types_unlisted_damage_type():
 
 
 def test_only_grenade_tags_explosions():
+    # The mortar is a grenade-family shell with its own blast (ExplosionDeath), so it counts as explosive too
     path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "tgmc", "rules", "weapons.yaml")
     with open(path, encoding="utf-8") as f:
         text = f.read()
@@ -71,7 +72,7 @@ def test_only_grenade_tags_explosions():
     for block in text.split("\n\n"):
         if "DamageTypes:" in block:
             names |= {line.split(":")[0] for line in block.splitlines() if line and line[0].isalpha()}
-    assert names == {"TGMCGrenade"}, names
+    assert names == {"TGMCGrenade", "TGMCMortar"}, names
 
 
 if __name__ == "__main__":

@@ -127,3 +127,29 @@ def layers(path, vars_, states, near):
     if state in names:
         return [(icon, state, direction)]
     return []
+
+
+# Objects that can be shot to pieces: (path prefix, hit points, blocks movement while standing). They become actors of the Neutral player
+# (build_maptiles.py); everything else is baked into the floor tile.
+DESTROYABLE = (
+    ("/obj/structure/barricade", 300, True),
+    ("/obj/structure/table", 150, True),
+    ("/obj/structure/rack", 120, True),
+    ("/obj/structure/closet", 100, True),
+    ("/obj/structure/largecrate", 140, True),
+    ("/obj/structure/fence", 90, True),
+    ("/obj/structure/window", 80, True),
+    ("/obj/structure/bed", 70, False),
+    ("/obj/machinery/computer", 120, False),
+    ("/obj/machinery/vending", 220, False),
+    ("/obj/machinery/hydroponics", 90, False),
+    ("/obj/structure/reagent_dispensers", 60, False),
+)
+
+
+def destroyable(path):
+    """(hit points, blocks) for an object that can be destroyed, or None."""
+    for prefix, hp, blocks in DESTROYABLE:
+        if path.startswith(prefix):
+            return hp, blocks
+    return None

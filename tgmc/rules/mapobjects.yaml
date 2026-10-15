@@ -1,0 +1,39 @@
+# Objects that stand on the converted TGMC maps and can be shot to pieces: tables, barricades, windows, vending machines and so on. The actors
+# mapobj-<n> (one per picture, with its hit points and whether it blocks) are written by mod/build_maptiles.py after this file when the mod is built.
+# They belong to the Neutral player: explosions and force-fire (Ctrl) destroy them, and a blocking one that falls opens the way.
+
+^MapObject:
+	Tooltip:
+		Name: actor-mapobject.name
+	Health:
+		HP: 100
+	Targetable:
+		TargetTypes: Ground, Structure, MapObject
+	HitShape:
+		UseTargetableCellsOffsets: true
+		Type: Rectangle
+			TopLeft: -512, -512
+			BottomRight: 512, 512
+	RenderSprites:
+		Image: mapobj
+	FrozenUnderFog:
+	FireWarheadsOnDeath:
+		Weapon: TGMCObjectBreak
+		EmptyWeapon: TGMCObjectBreak
+	Interactable:
+	BodyOrientation:
+		QuantizedFacings: 1
+
+^MapObjectBlocking:
+	Inherits: ^MapObject
+	Building:
+		Footprint: x
+		Dimensions: 1, 1
+		TerrainTypes: Clear, Road
+
+^MapObjectOpen:
+	Inherits: ^MapObject
+	# Units walk over it, as over weeds.
+	Building:
+		Footprint: =
+		Dimensions: 1, 1

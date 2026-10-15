@@ -362,3 +362,6 @@ menu-intel-4 = > Recommend: scout before engaging.
 support-droppod =
     .name = Drop Pod
     .description = A pod falls from orbit onto the spot you pick: four riflemen, an engineer and a medic step out. Granted by the Cryo Pod. Recharges in two and a half minutes.
+
+actor-mapobject =
+    .name = Furniture

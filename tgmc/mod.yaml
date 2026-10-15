@@ -18,6 +18,7 @@ Rules:
 	tgmc|rules/ai.yaml
 	tgmc|rules/units.yaml
 	tgmc|rules/structures.yaml
+	tgmc|rules/mapobjects.yaml
 
 Weapons:
 	tgmc|rules/weapons.yaml
@@ -102,6 +103,7 @@ Sequences:
 	tgmc|sequences/howitzer-shell.yaml
 	tgmc|sequences/fx-slam.yaml
 	tgmc|sequences/fx-blood.yaml
+	tgmc|sequences/mapobjects.yaml
 	tgmc|sequences/droppod.yaml
 	tgmc|sequences/fx-gibs.yaml
 	tgmc|sequences/fx-blast-cas.yaml

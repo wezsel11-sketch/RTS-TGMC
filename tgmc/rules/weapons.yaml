@@ -1465,3 +1465,14 @@ TGMCTimestop:
 		Range: 5c0
 		ValidRelationships: Enemy
 		ValidTargets: Human
+
+# What an object on the map does when it is destroyed: a puff of dust and the crash.
+TGMCObjectBreak:
+	Range: 1c0
+	Projectile: InstantHit
+	Warhead@1Dust: CreateEffect
+		Image: fx-dust-tile
+		Explosions: dust
+		ImpactSounds: slam-2.ogg, explosion-1.ogg
+		ForceDisplayAtGroundLevel: true
+		ValidTargets: Ground, Water, Structure

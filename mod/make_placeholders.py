@@ -1131,7 +1131,7 @@ Actors:
     preview.save(os.path.join(folder, "map.png"))
 
 
-def write_tgmc_map(folder, title, rows, marines, xenos, art=None):
+def write_tgmc_map(folder, title, rows, marines, xenos, art=None, objects=None, open_variant=None):
     """A skirmish map from a converted TGMC map. Landing Zone's two bases go at the given centres, on open ground. With `art`, a function
     (x, y) -> template id (build_maptiles), a cell that was not changed shows its real TGMC picture; a carved or cleared cell shows plain dirt."""
     h, w = len(rows), len(rows[0])
@@ -1180,9 +1180,28 @@ def write_tgmc_map(folder, title, rows, marines, xenos, art=None):
             land[cell[1]][cell[0]] = "D"
         cell = prev[cell]
     codes = {"G": GRASS, "D": DIRT, "F": FORD, "W": WATER, "R": ROCK}
+    # The objects standing on the map (Neutral actors). Blocking ones stay clear of the bases, and when they would still cut the two bases apart
+    # (the match could never be won) none of them blocks.
+    extra = []
+    if objects:
+        near = [(x, y) for _, _, x, y, _ in actors + xeno_actors]
+        placed = [(n, x, y) for n, x, y in objects if 1 <= x < w - 1 and 1 <= y < h - 1]
+        placed = [(open_variant(n) if any(abs(x - bx) < 8 and abs(y - by) < 8 for bx, by in near) else n, x, y) for n, x, y in placed]
+        blocked = {(x, y) for n, x, y in placed if open_variant(n) != n}
+        seen, queue = {spawn_m}, [spawn_m]
+        while queue:
+            cx, cy = queue.pop()
+            for n in ((cx + 1, cy), (cx - 1, cy), (cx, cy + 1), (cx, cy - 1)):
+                if n not in seen and 1 <= n[0] < w - 1 and 1 <= n[1] < h - 1 and land[n[1]][n[0]] in "GDF" and n not in blocked:
+                    seen.add(n)
+                    queue.append(n)
+        if spawn_x not in seen:
+            print(f"{title}: blocking objects would cut the bases apart, so none of them blocks")
+            placed = [(open_variant(n), x, y) for n, x, y in placed]
+        extra = [(n, "Neutral", x, y, 0) for n, x, y in placed]
     original = rows
     ground = (lambda x, y: (art(x, y) if land[y][x] == original[y][x] else codes[land[y][x]], 0)) if art else (lambda x, y: (codes[land[y][x]], 0))
-    write_map(folder, title, w, h, actors + xeno_actors, "Lobby", [spawn_m, spawn_x], ground=ground, category="Conquest")
+    write_map(folder, title, w, h, actors + xeno_actors + extra, "Lobby", [spawn_m, spawn_x], ground=ground, category="Conquest")
 
 
 def main():
@@ -1221,7 +1240,8 @@ def main():
         tiles = build_maptiles.prepare(args.tgmc, args.out, full)
         for name, spec in tgmc_dmm.MAPS.items():
             write_tgmc_map(os.path.join(args.out, "maps", name), spec["title"], *tgmc_dmm.load(args.tgmc, spec),
-                           art=tiles.art(name) if name in full else None)
+                           art=tiles.art(name) if name in full else None,
+                           objects=tiles.actors.get(name) if name in full else None, open_variant=tiles.open_variant)
     for name, sc in SCENARIOS.items():
         width, height = sc.get("size", (24, 24))
         write_map(os.path.join(args.out, "maps", name), name, width, height, sc["actors"], "MissionSelector",

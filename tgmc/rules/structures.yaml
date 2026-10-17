@@ -594,7 +594,7 @@ miner:
 		Sequences: idle
 	CashTrickler:
 		Interval: 50
-		Amount: 8
+		Amount: 12
 
 cade:
 	Inherits: ^Wall

@@ -6,6 +6,7 @@
 Writes build/mod/tgmc/maps/shot-<map>. Not part of the build; the copy is a dev map.
 """
 import os
+import re
 import shutil
 import sys
 
@@ -14,7 +15,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 def main(name, x, y):
     src = os.path.join(ROOT, "build", "mod", "tgmc", "maps", name)
-    dst = os.path.join(ROOT, "build", "mod", "tgmc", "maps", "shot-" + name)
+    dst = os.path.join(ROOT, "build", "dev-maps", "shot-" + name)
     shutil.rmtree(dst, ignore_errors=True)
     shutil.copytree(src, dst)
     with open(os.path.join(dst, "shotcam.lua"), "w", encoding="utf-8", newline="\n") as f:
@@ -28,6 +29,8 @@ def main(name, x, y):
                 "\t\tFogEnabled: False\n\t\tExploredMapEnabled: True\n\tScreenshotAt:\n\t\tTick: 40\nPlayer:\n\t-ConquestVictoryConditions:\n")
     text = open(os.path.join(dst, "map.yaml"), encoding="utf-8").read()
     text = text.replace("Title: ", "Title: shot ", 1)
+    # A dev copy: hidden from every menu.
+    text = re.sub(r"(?m)^Visibility:.*$", "Visibility:", text)
     if "Rules:" not in text:
         text = text.replace("RequiresMod: tgmc\n", "RequiresMod: tgmc\n\nRules: rules.yaml\n", 1)
     with open(os.path.join(dst, "map.yaml"), "w", encoding="utf-8", newline="\n") as f:

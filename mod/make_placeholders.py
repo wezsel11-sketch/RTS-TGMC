@@ -1385,10 +1385,13 @@ def write_tgmc_map(folder, title, rows, marines, xenos, art=None, objects=None, 
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--out", required=True)
+    ap.add_argument("--dev-maps", help="where the scenario, AI-test and screenshot maps go (default: build/dev-maps next to the mod folder's build): they stay out of the game's menus")
     ap.add_argument("--tgmc", help="a TGMC checkout; with it the maps converted from TGMC's own (tgmc_dmm.MAPS) are written too")
     args = ap.parse_args()
 
     os.makedirs(args.out, exist_ok=True)
+    dev_maps = args.dev_maps or os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(args.out))), "dev-maps")
+    os.makedirs(dev_maps, exist_ok=True)
     write_palette(os.path.join(args.out, "tgmc.pal"))
     write_cursor(os.path.join(args.out, "cursor.png"))
     write_clock(os.path.join(args.out, "clock.png"))
@@ -1422,26 +1425,26 @@ def main():
                            art=tiles.art(name) if name in full else None,
                            objects=tiles.actors.get(name) if name in full else None, open_variant=tiles.open_variant)
             if name in full:
-                write_tgmc_map(os.path.join(args.out, "maps", "aimap-" + name), "AI test " + spec["title"], *tgmc_dmm.load(args.tgmc, spec),
+                write_tgmc_map(os.path.join(dev_maps, "aimap-" + name), "AI test " + spec["title"], *tgmc_dmm.load(args.tgmc, spec),
                                art=tiles.art(name), objects=tiles.actors.get(name), open_variant=tiles.open_variant, ai_test=True)
     for name, sc in SCENARIOS.items():
         width, height = sc.get("size", (24, 24))
-        write_map(os.path.join(args.out, "maps", name), name, width, height, sc["actors"], "MissionSelector",
+        write_map(os.path.join(dev_maps, name), name, width, height, sc["actors"], "MissionSelector",
                   sc.get("spawns", [(10, 8), (19, 17)]), scripts=sc["scripts"],
                   drop_conquest=sc.get("drop_conquest", False), xeno_bot=sc.get("xeno_bot"),
                   marine_bot=sc.get("marine_bot"), fast=sc.get("fast", True),
                   extra_rules=sc.get("extra_rules", ""),
                   ground={"landing_zone": landing_zone_ground, "walls": walls_ground, "doorline": doorline_ground}.get(sc.get("ground"), flat_ground))
-    write_map(os.path.join(args.out, "maps", "hold-the-line"), "Hold the Line", 40, 28, HOLD_THE_LINE, "Lobby",
+    write_map(os.path.join(args.out, "maps", "hold-the-line"), "Hold the Line", 40, 28, HOLD_THE_LINE, "Lobby, MissionSelector",
               [(6, 14), (33, 13)], scripts=("wave-survival",), ground=landing_zone_ground, category="Survival",
               drop_conquest=True, music=True)
-    write_map(os.path.join(args.out, "maps", "night-raid"), "Night Raid", 40, 28, HOLD_THE_LINE, "Lobby",
+    write_map(os.path.join(args.out, "maps", "night-raid"), "Night Raid", 40, 28, HOLD_THE_LINE, "Lobby, MissionSelector",
               [(6, 14), (33, 13)], scripts=("wave-survival", "mission-raid"), ground=landing_zone_ground, category="Survival",
               drop_conquest=True, music=True)
-    write_map(os.path.join(args.out, "maps", "last-stand"), "Last Stand", 40, 28, HOLD_THE_LINE, "Lobby",
+    write_map(os.path.join(args.out, "maps", "last-stand"), "Last Stand", 40, 28, HOLD_THE_LINE, "Lobby, MissionSelector",
               [(6, 14), (33, 13)], scripts=("wave-survival", "mission-last-stand"), ground=landing_zone_ground, category="Survival",
               drop_conquest=True, music=True)
-    write_map(os.path.join(args.out, "maps", "the-hundred"), "The Hundred", 40, 28, HOLD_THE_LINE, "Lobby",
+    write_map(os.path.join(args.out, "maps", "the-hundred"), "The Hundred", 40, 28, HOLD_THE_LINE, "Lobby, MissionSelector",
               [(6, 14), (33, 13)], scripts=("wave-survival", "mission-hundred"), ground=landing_zone_ground, category="Survival",
               drop_conquest=True, music=True)
     print(f"placeholders written to {args.out}")

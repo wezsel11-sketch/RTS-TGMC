@@ -20,12 +20,12 @@ OUT=${BALANCE_OUT:-"$ROOT/build/balance"}
 rm -rf "$OUT"
 export LIBGL_ALWAYS_SOFTWARE=1 SDL_AUDIODRIVER=dummy SDL_VIDEODRIVER=offscreen
 export PATH="$ROOT/build/tools/dotnet:$PATH" DOTNET_ROOT="$ROOT/build/tools/dotnet" DOTNET_CLI_TELEMETRY_OPTOUT=1
-uid=$(cd "$OPENRA_DIR" && sh utility.sh tgmc --map-hash "$ROOT/build/mod/tgmc/maps/$MAP" | tail -1)
+mkdir -p "$OUT/maps/tgmc/{DEV_VERSION}"; cp -r "$ROOT/build/dev-maps/$MAP" "$OUT/maps/tgmc/{DEV_VERSION}/$MAP"; uid=$(cd "$OPENRA_DIR" && sh utility.sh tgmc --map-hash "$OUT/maps/tgmc/{DEV_VERSION}/$MAP" | tail -1)
 
 run_one() {
 	n=$1
 	support="$OUT/run$n/support"
-	mkdir -p "$support"
+	mkdir -p "$support/maps/tgmc/{DEV_VERSION}"; cp -r "$ROOT/build/dev-maps/$MAP" "$support/maps/tgmc/{DEV_VERSION}/$MAP"
 	sh -c "
 		cd '$OPENRA_DIR'
 		exec dotnet bin/OpenRA.dll Engine.EngineDir=.. Engine.SupportDir='$support' \\

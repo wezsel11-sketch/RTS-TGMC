@@ -251,7 +251,7 @@ def prepare(tgmc, out, names):
 
         for (sheet_path, closed, half, halves, glass), (dname, found, starts_open, _) in tiles.doors.items():
             hp = 700 if "pdoor" in closed or "shutter" in closed else 450
-            f.write(f"\n{dname}:\n\tInherits: ^MapDoor\n\tHealth:\n\t\tHP: {hp}\n\tWithSpriteBody@closed:\n\t\tRequiresCondition: !door-open\n\t\tSequence: {dname}-closed\n\tWithSpriteBody@open:\n\t\tRequiresCondition: door-open\n\t\tSequence: {dname}-open\n\tMapDoor:\n\t\tPrefix: {dname}\n\t\tStartsOpen: {'true' if starts_open else 'false'}\n\t\tBlocksSight: {'false' if glass else 'true'}\n")
+            f.write(f"\n{dname}:\n\tInherits: ^MapDoor\n\tHealth:\n\t\tHP: {hp}\n\tWithSpriteBody@closed:\n\t\tName: closed\n\t\tRequiresCondition: !door-open\n\t\tSequence: {dname}-closed\n\tWithSpriteBody@open:\n\t\tName: open\n\t\tRequiresCondition: door-open\n\t\tSequence: {dname}-open\n\tMapDoor:\n\t\tPrefix: {dname}\n\t\tStartsOpen: {'true' if starts_open else 'false'}\n\t\tBlocksSight: {'false' if glass else 'true'}\n")
 
     # The tileset: the repo's own templates and one per picture
     base = open(os.path.join(ROOT, "tgmc", "tilesets", "ground.yaml"), encoding="utf-8").read().rstrip("\n") + "\n"

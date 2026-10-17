@@ -11,7 +11,7 @@ using OpenRA.Traits;
 namespace OpenRA.Mods.TGMC.Traits
 {
 	[Desc("A door of a converted TGMC map. It opens by itself, with TGMC's animation, when a unit comes near, and closes again a little after the last unit has gone. " +
-		"Closed, it blocks movement and bullets; units path through it as through a gate. Needs the sequences <Prefix>-closed, -opening, -open and -closing.")]
+		"Closed, it blocks movement and bullets; units path through it as through a gate. Needs the sequences <Prefix>-closed, -opening and -open. Once open, it stays open.")]
 	public class MapDoorInfo : TraitInfo, ITemporaryBlockerInfo, Requires<BuildingInfo>, Requires<WithSpriteBodyInfo>
 	{
 		public readonly string Prefix = "";
@@ -19,12 +19,13 @@ namespace OpenRA.Mods.TGMC.Traits
 		[Desc("The door starts open (a blast door that TGMC maps leave open).")]
 		public readonly bool StartsOpen = false;
 
+		[Desc("A closed door stops the view as well as movement. Glass doors (security, medical, research) do not.")]
+		public readonly bool BlocksSight = true;
+
 		[Desc("A unit this close opens the door.")]
 		public readonly WDist Radius = new(1900);
 
-		[Desc("Ticks the door stays open after the last unit left.")]
-		public readonly int CloseDelay = 60;
-
+		
 		public readonly string[] OpenSound = ["door-open.ogg"];
 		public readonly string[] CloseSound = ["door-close.ogg"];
 
@@ -33,13 +34,12 @@ namespace OpenRA.Mods.TGMC.Traits
 
 	public class MapDoor : ITick, ITemporaryBlocker, INotifyBlockingMove, INotifyAddedToWorld
 	{
-		enum Phase { Closed, Opening, Open, Closing }
+		enum Phase { Closed, Opening, Open }
 
 		readonly MapDoorInfo info;
 		readonly Building building;
 		readonly WithSpriteBody body;
 		Phase phase;
-		int wait;
 		int scan;
 		bool started;
 
@@ -53,6 +53,7 @@ namespace OpenRA.Mods.TGMC.Traits
 		}
 
 		public bool IsOpen => phase == Phase.Open;
+		public bool BlocksSight => info.BlocksSight && phase != Phase.Open;
 
 		void INotifyAddedToWorld.AddedToWorld(Actor self) { }
 
@@ -66,7 +67,6 @@ namespace OpenRA.Mods.TGMC.Traits
 		{
 			if (phase == Phase.Opening || phase == Phase.Open)
 			{
-				wait = info.CloseDelay;
 				return;
 			}
 
@@ -75,21 +75,8 @@ namespace OpenRA.Mods.TGMC.Traits
 			body.PlayCustomAnimation(self, info.Prefix + "-opening", () =>
 			{
 				phase = Phase.Open;
-				wait = info.CloseDelay;
 				self.World.ActorMap.RemoveInfluence(self, building);
 				body.PlayCustomAnimationRepeating(self, info.Prefix + "-open");
-			});
-		}
-
-		void Close(Actor self)
-		{
-			phase = Phase.Closing;
-			Fx.Sound(self.World, self.CenterPosition, info.CloseSound);
-			self.World.ActorMap.AddInfluence(self, building);
-			body.PlayCustomAnimation(self, info.Prefix + "-closing", () =>
-			{
-				phase = Phase.Closed;
-				body.PlayCustomAnimationRepeating(self, info.Prefix + "-closed");
 			});
 		}
 
@@ -111,18 +98,9 @@ namespace OpenRA.Mods.TGMC.Traits
 				return;
 
 			scan = 0;
-			if (phase == Phase.Closed || phase == Phase.Closing)
-			{
-				if (phase == Phase.Closed && Near(self))
-					Open(self);
-			}
-			else if (phase == Phase.Open)
-			{
-				if (Near(self))
-					wait = info.CloseDelay;
-				else if ((wait -= 6) <= 0)
-					Close(self);
-			}
+			// A closed door opens when a unit comes near. An opened door stays open: it never closes again.
+			if (phase == Phase.Closed && Near(self))
+				Open(self);
 		}
 
 		bool ITemporaryBlocker.IsBlocking(Actor self, CPos cell)

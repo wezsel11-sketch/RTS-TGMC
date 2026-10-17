@@ -644,6 +644,28 @@ vendor:
 	Valued:
 		Cost: 200
 
+# The Alamo: the marines' landed dropship, their starting base. Its hatch is the exit; it gives the marine build area around it.
+alamo:
+	Inherits: ^Structure
+	Building:
+		# Footprint from alamo_footprint.py: 21 rows of 11 cells, x = occupied, _ = empty (39 cells; the hull is not a rectangle).
+		Footprint: ___xxxxx___ ___x___x___ ___________ _xx_____xx_ ___________ x_________x ___________ x_________x ___________ _x_______x_ _x_______x_ ___________ ___________ _x_______x_ xx_______xx ___________ ___________ ___________ xxx_____xxx ___x___x___ _xxx___xxx_
+		Dimensions: 11, 21
+	Health:
+		HP: 2000
+	Exit@1:
+		# The hatch cell (1, 9) relative to the footprint origin.
+		SpawnOffset: 0,512,0
+		ExitCell: 1,9
+	RallyPoint:
+		Path: 0, 5
+	GivesBuildableArea:
+		AreaTypes: marine-build
+	Tooltip:
+		Name: actor-alamo.name
+	Valued:
+		Cost: 0
+
 cryo-pod:
 	Inherits: ^Structure
 	Inherits@build: ^MarineBuildable
@@ -926,7 +948,7 @@ sentry-turret:
 		Prerequisites: armory
 		Description: actor-sentry-turret.description
 	Health:
-		HP: 300
+		HP: 450
 	Building:
 		Footprint: x
 		Dimensions: 1, 1
@@ -1276,6 +1298,8 @@ smoke-screen:
 sensor-ping:
 	Tooltip:
 		Name: actor-sensor-ping.name
+	Expires:
+		Ticks: 600
 	RevealsShroud:
 		Range: 20c0
 		Type: CenterPosition

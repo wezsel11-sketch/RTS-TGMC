@@ -2,6 +2,8 @@ mod-title = TGMC Marines vs Xenos (personal, non-commercial)
 mod-windowtitle = TGMC Marines vs Xenos
 faction-marines =
     .name = Marines
+faction-som =
+    .name = Sons of Mars
 faction-xenos =
     .name = Xenos
 faction-random =
@@ -282,6 +284,8 @@ event-screech = The Queen screeched
 cmd-evolve = Evolve
 cmd-devolve = Devolve
 cmd-stop = Stop
+cmd-attack = Attack
+cmd-patrol = Patrol
 cmd-scatter = Scat
 cmd-aggressive = Attack
 cmd-guard = Guard
@@ -362,6 +366,25 @@ menu-intel-4 = > Recommend: scout before engaging.
 support-droppod =
     .name = Drop Pod
     .description = Six pods fall from orbit around the spot you pick, one marine in each (four riflemen, an engineer and a medic). The pods hit hard and crush what is under them, and are gone after a minute. Granted by the Cryo Pod. Recharges in two and a half minutes.
+
+actor-bomber =
+    .name = Suicide Vest
+    .description = A marine in a tactical explosive vest. Detonate: he stands for two seconds, then the vest goes off and takes him with it. Built at the Armory.
+
+actor-squad-leader =
+    .name = Squad Leader
+    .description = The squad's commander with a rifle. Unlocks at the Armory. Buffs and fire support come with the kit.
+
+actor-field-commander =
+    .name = Field Commander
+    .description = The heavy commander with a sidearm and more armour. Unlocks at the Workshop.
+
+actor-mirage-decoy =
+    .name = Mirage decoy
+
+actor-alamo =
+    .name = Alamo
+    .description = The marines' landed dropship: their spawn point and first build area.
 
 actor-mapobject =
     .name = Furniture

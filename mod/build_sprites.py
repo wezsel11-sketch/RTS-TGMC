@@ -431,10 +431,48 @@ UNITS = {
         },
     },
     # Marine roles. Same body as the rifleman, with the role's uniform state on top.
+    # Squad leader: a Jaeger infantry pattern with the rifle, the squad's commander (the TGMC squad leader kit).
+    "squad_leader": {
+        "cell": MARINE_CELL,
+        "sequences": {
+            "stand": jaeger("infantry", (RIFLES, "t12_w")),
+            "die-gib": MARINE_GIB,
+            "run": "stand",
+            "attack": "stand",
+            "die": [(HUMAN, "husk")],
+            "flash": [(PROJECTILES, "muzzle_bullet", None, {"rotate": 90, "facings": 8, "tick": 50})],
+            "icon": "stand:S",
+        },
+    },
+    # Field commander: the heavy Jaeger pattern and a sidearm (the TGMC field commander kit).
+    "field_commander": {
+        "cell": MARINE_CELL,
+        "sequences": {
+            "stand": jaeger("eva", (SMGS, "m25_w")),
+            "die-gib": MARINE_GIB,
+            "run": "stand",
+            "attack": "stand",
+            "die": [(HUMAN, "husk")],
+            "flash": [(PROJECTILES, "muzzle_bullet", None, {"rotate": 90, "facings": 8, "tick": 50})],
+            "icon": "stand:S",
+        },
+    },
     "medic": {
         "cell": MARINE_CELL,
         "sequences": {
             "stand": marine("marine_medic", (SMGS, "m25_w")),
+            "die-gib": MARINE_GIB,
+            "run": "stand",
+            "attack": "stand",
+            "die": [(HUMAN, "husk")],
+            "icon": "stand:S",
+        },
+    },
+    # The suicide vest: an engineer's build in a tactical vest, with no gun (the detonate ability is the attack).
+    "bomber": {
+        "cell": MARINE_CELL,
+        "sequences": {
+            "stand": marine("marine_engineer", (SHOTGUNS, "m37_w")),
             "die-gib": MARINE_GIB,
             "run": "stand",
             "attack": "stand",
@@ -1526,6 +1564,9 @@ def main():
         info = build_condor(args.tgmc, args.out) if unit == "condor" else build_unit(args.tgmc, unit, UNITS[unit], args.out)
         report.append(info)
         print(f"{unit}: {info['cells']} cells of {info['cell'][0]}x{info['cell'][1]}px -> {info['sheet']}")
+    import build_alamo
+    cols, rows = build_alamo.build(args.tgmc, args.out)
+    print(f"alamo: {cols}x{rows} cells -> sprites/alamo.png")
     with open(os.path.join(args.out, "sprites.json"), "w") as f:
         json.dump(report, f, indent=2)
 

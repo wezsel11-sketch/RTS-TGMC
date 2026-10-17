@@ -40,6 +40,8 @@ def paths():
     # The room templates that fill TGMC's modular map slots (see tgmc_modular.py), and the code that lists them.
     # The Alamo dropship's piece layout (see alamo_footprint.py and the Alamo design spec).
     found.add('_maps/shuttles/alamo.dmm')
+    found.add('code/modules/shuttle/marine_dropship.dm')
+    found.add('icons/obj/structures/dropship_structures.dmi')
     found.update(['code/modules/mapping/modular_mapping.dm', 'code/game/objects/effects/spawners/modularmappingspawner.dm', '_maps/modularmaps/big_red/', '_maps/modularmaps/lv624/'])
     return sorted(found)
 

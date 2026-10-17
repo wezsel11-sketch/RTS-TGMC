@@ -406,7 +406,7 @@ ICONS = {
     "slider": {"tick": tick_mark},
     "strategic": {"unowned": lambda: diamond(GREY), "critical_unowned": lambda: diamond(AMBER),
                   "enemy_owned": lambda: diamond(RED), "player_owned": lambda: diamond(OLIVE_HI)},
-    "flags": {"marines": lambda: flag("M", OLIVE_DARK), "xenos": lambda: flag("X", (90, 30, 40, 255)),
+    "flags": {"marines": lambda: flag("M", OLIVE_DARK), "xenos": lambda: flag("X", (90, 30, 40, 255)), "som": lambda: flag("S", (150, 30, 30, 255)),
               "Random": lambda: flag("?", SLATE), "spectator": lambda: flag("O", SLATE)},
     "production-icons": {n: (lambda n=n: production_icon(n)) for n in
                          ["infantry", "infantry-disabled", "infantry-alert", "xeno", "xeno-disabled", "xeno-alert",

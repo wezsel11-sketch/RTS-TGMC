@@ -37,6 +37,10 @@ def paths():
     found.update(['icons/turf/', 'code/game/turfs/', 'icons/misc/beach.dmi'])
     # The objects on the maps (tgmc_objects.py): the DM code that names their pictures, and the picture sheets.
     found.update(['code/game/objects/', 'icons/obj/', 'icons/effects/', 'icons/Xeno/'])
+    # The room templates that fill TGMC's modular map slots (see tgmc_modular.py), and the code that lists them.
+    # The Alamo dropship's piece layout (see alamo_footprint.py and the Alamo design spec).
+    found.add('_maps/shuttles/alamo.dmm')
+    found.update(['code/modules/mapping/modular_mapping.dm', 'code/game/objects/effects/spawners/modularmappingspawner.dm', '_maps/modularmaps/big_red/', '_maps/modularmaps/lv624/'])
     return sorted(found)
 
 

@@ -11,7 +11,8 @@
 		PauseOnCondition: stunned
 	# A click picks a unit before a building under it, and the click area is a little roomier than the sprite.
 	Selectable:
-		Bounds: 640, 896, 0, -128
+		# A 64-pixel frame whose figure fills the middle 32x40 px: the box is centred on the figure, not on the feet.
+		Bounds: 1024, 1280, 0, 0
 		Priority: 20
 	HitShape:
 		UseTargetableCellsOffsets: true
@@ -31,6 +32,8 @@
 	AppearsOnRadar:
 	ScriptTriggers:
 	AttackMove:
+	# Patrol: walk between here and the cell you pick (the Patrol button on the command card).
+	Patrol:
 	SpreadOut:
 	# What you have selected must be easy to see: brackets, a health bar, and a ring that breathes.
 	SelectionDecorations:
@@ -76,8 +79,19 @@
 
 ^Infantry:
 	Inherits: ^Unit
+	# A flashlight: a small pool of light around the marine (see TerrainLighting in world.yaml).
+	TerrainLightSource:
+		Range: 4c0
+		Intensity: 0.6
+		RedTint: 1
+		GreenTint: 0.97
+		BlueTint: 0.9
+	# Balance: marines were losing every AI-vs-AI match, so each marine takes more hits (was 120).
+	Health:
+		HP: 170
 	# Marines see further than xenos do (the rest of the army sees 7 cells).
-	RevealsShroud:
+	# Marines see only what a clear line reaches: rock and walls hide what is behind them (see TgmcSight in tgmc/code/Sight.cs).
+	TgmcSight:
 		Range: 10c0
 	# Marines bleed where they are hit, and drip when badly hurt (the blood lies on the floor for about half a minute).
 	Bleeds:
@@ -236,6 +250,8 @@ rifleman:
 		Queue: Infantry
 		BuildAtProductionType: Infantry
 		BuildPaletteOrder: 10
+		# Riflemen are the marines' first unit: they come off the line 30 percent quicker.
+		BuildDurationModifier: 70
 		Description: actor-rifleman.description
 	Tooltip:
 		Name: actor-rifleman.name
@@ -701,6 +717,110 @@ machinegunner:
 		Prerequisites: armory
 		Description: actor-machinegunner.description
 
+# The suicide vest: a marine in a tactical explosive vest. Detonate: he stands for two seconds, then the vest goes off and he dies in it.
+bomber:
+	Inherits: ^Infantry
+	Health:
+		HP: 100
+	ActiveAbility@detonate:
+		OrderName: AbilityDetonate
+		Slot: 1
+		Label: Detonate
+		Aim: Self
+		Weapon: TGMCVestBlast
+		FuseTicks: 50
+		SelfDestruct: true
+		Cooldown: 0
+	Tooltip:
+		Name: actor-bomber.name
+	Valued:
+		Cost: 120
+	Buildable:
+		Queue: Infantry
+		Prerequisites: armory
+		BuildPaletteOrder: 90
+		Description: actor-bomber.description
+
+# Mirage decoy (the squad leader's Mirage grenade): stands where it is put, draws fire, dies in a few hits, and fades after 30 seconds.
+mirage-decoy:
+	Inherits: ^Infantry
+	# It never moves and never fires: it only stands there to be shot at.
+	TgmcMobile:
+		Speed: 0
+	AutoTarget:
+		InitialStance: HoldFire
+	# The decoy wears a rifleman's body (its own sprite is not needed).
+	RenderSprites:
+		Image: rifleman
+	Health:
+		HP: 60
+	Expires:
+		Ticks: 750
+	Tooltip:
+		Name: actor-mirage-decoy.name
+
+# Squad leader (TGMC kit): the squad's rifleman with the squad's commander role. Unlocked at the Armory.
+squad_leader:
+	Inherits: ^Infantry
+	# Smoke cloak grenade (TGMC kit): a smoke screen on the squad where the leader stands; anyone inside is smoked (see smoked in ^Unit).
+	ActiveAbility@smokecloak:
+		OrderName: AbilitySmokeCloak
+		Slot: 1
+		Label: Smoke
+		Aim: Self
+		Weapon: TGMCSmokeScreen
+		Cooldown: 2400
+	# Mirage decoy: a fake marine dropped four cells ahead.
+	ActiveAbility@mirage:
+		OrderName: AbilityMirage
+		Slot: 2
+		Label: Mirage
+		Aim: Forward
+		ForwardDistance: 4c0
+		Weapon: TGMCMirage
+		Cooldown: 3000
+	# Fire-support mark: the nearest enemy in range gets a sensor ping, showing it to the squad.
+	ActiveAbility@mark:
+		OrderName: AbilityMark
+		Slot: 3
+		Label: Mark
+		Aim: Nearest
+		Range: 12c0
+		Weapon: TGMCMarkTarget
+		Cooldown: 1800
+	Armament@PRIMARY:
+		Weapon: TGMCRifle
+		MuzzleSequence: flash
+		LocalOffset: 256,0,200
+	Buildable:
+		Queue: Infantry
+		Prerequisites: armory
+		BuildPaletteOrder: 15
+		Description: actor-squad-leader.description
+	Tooltip:
+		Name: actor-squad-leader.name
+	Valued:
+		Cost: 180
+
+# Field commander (TGMC kit): the heavier, more expensive commander. Unlocked at the Workshop.
+field_commander:
+	Inherits: ^Infantry
+	Health:
+		HP: 200
+	Armament@PRIMARY:
+		Weapon: TGMCSMG
+		MuzzleSequence: flash
+		LocalOffset: 256,0,200
+	Buildable:
+		Queue: Infantry
+		Prerequisites: workshop
+		BuildPaletteOrder: 16
+		Description: actor-field-commander.description
+	Tooltip:
+		Name: actor-field-commander.name
+	Valued:
+		Cost: 320
+
 grenadier:
 	Inherits: ^Infantry
 	AmmoPool:
@@ -915,6 +1035,11 @@ demolitionist:
 
 ^Xeno:
 	Inherits: ^Unit
+	# Xenos sense what is in front of them through walls: a cone of 120 degrees, nine cells deep (see TgmcSight in tgmc/code/Sight.cs).
+	TgmcSight@cone:
+		Range: 9c0
+		Cone: 120
+		ThroughWalls: true
 	# Plasma fuels the abilities; it builds up slowly, and faster on weeds.
 	Plasma:
 	# Xenos see 9 cells through the fog (the marines on foot 10).
@@ -1610,8 +1735,10 @@ defiler:
 		Range: 11c0
 	TgmcMobile:
 		Speed: 125
+	# Walks and leaves gas behind (see GasTrail): no acid is thrown.
+	GasTrail:
 	Armament@PRIMARY:
-		Weapon: TGMCDefilerGas
+		Weapon: TGMCClaws
 	Tooltip:
 		Name: actor-defiler.name
 	Valued:

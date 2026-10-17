@@ -1035,21 +1035,21 @@ Container@PLAYER_WIDGETS:
 									Background: sidebar-button
 									Text: cmd-stop
 									Font: TinyBold
-								Button@CMD_SCATTER:
+								Button@CMD_ATTACK:
 									X: 228
 									Y: 0
 									Width: 72
 									Height: 30
 									Background: sidebar-button
-									Text: cmd-scatter
+									Text: cmd-attack
 									Font: TinyBold
-								Button@CMD_AGGRESSIVE:
+								Button@CMD_PATROL:
 									X: 0
 									Y: 36
 									Width: 72
 									Height: 30
 									Background: sidebar-button
-									Text: cmd-aggressive
+									Text: cmd-patrol
 									Font: TinyBold
 								Button@CMD_GUARD:
 									X: 76

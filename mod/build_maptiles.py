@@ -17,7 +17,8 @@ from PIL import Image, PngImagePlugin
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import tgmc_dmi  # noqa: E402
-import tgmc_dmm  # noqa: E402
+import tgmc_dmm
+import tgmc_modular  # noqa: E402
 import tgmc_objects  # noqa: E402
 import tgmc_turfs  # noqa: E402
 
@@ -94,6 +95,14 @@ def prepare(tgmc, out, names):
         spec = tgmc_dmm.MAPS[name]
         width, height, grid = tgmc_dmm.parse(os.path.join(tgmc, spec["file"]))
         _, _, things = tgmc_dmm.parse_objects(os.path.join(tgmc, spec["file"]))
+        # TGMC's modular room slots are filled with their fixed template first (see tgmc_modular.py): the holes become rooms.
+        placed = tgmc_modular.apply(tgmc, width, height, grid, things)
+        if placed:
+            print(f"{name}: {len(placed)} modular room slots filled")
+        if "BigRed" in spec["file"]:
+            # Big Red's empty space is filled with ground from its own rooms, so the outer void reads as terrain (see tgmc_modular.fill_space).
+            print(f"{name}: {tgmc_modular.fill_void_with_rooms(tgmc, width, height, grid, things)} modular rooms placed in the void")
+            print(f"{name}: {tgmc_modular.fill_space(tgmc, width, height, grid, things)} space cells filled with modular terrain")
         x0, y0, x1, y1 = tgmc_dmm.crop_box(grid, width, height, spec["factor"])
 
         def near_at(x, y):
@@ -134,9 +143,9 @@ def prepare(tgmc, out, names):
                                     continue
                                 for half in range(halves):
                                     # A horizontal two-wide door is placed at its left cell and covers the cell on its right.
-                                    key = (lay[0], found[0], half, halves)
+                                    key = (lay[0], found[0], half, halves, "glass" in path)
                                     if key not in tiles.doors:
-                                        tiles.doors[key] = (f"mapdoor-{len(tiles.doors)}", found, found[4])
+                                        tiles.doors[key] = (f"mapdoor-{len(tiles.doors)}", found, found[4], key[4])
                                     if x + half - x0 < x1 - x0:
                                         tiles.actors.setdefault(name, []).append((tiles.doors[key][0], x + half - x0, y - y0))
                                 built = True
@@ -196,7 +205,7 @@ def prepare(tgmc, out, names):
     # The doors' animation frames follow the pictures on the same sheet: for each door, closed, opening, open and closing.
     door_frames = []   # (image, ...) in sheet order after the pictures
     door_seq = {}      # actor type -> {sequence: (start, length, delays)}
-    for (sheet_path, closed, half, halves), (dname, found, starts_open) in tiles.doors.items():
+    for (sheet_path, closed, half, halves, glass), (dname, found, starts_open, _) in tiles.doors.items():
         door_seq[dname] = {}
         for seq, state in zip(("closed", "opening", "open", "closing"), (found[0], found[2], found[1], found[3])):
             info = sheets[sheet_path].state(state)
@@ -240,9 +249,9 @@ def prepare(tgmc, out, names):
                 face_x, face_y = ((0, 1), (0, -1), (1, 0), (-1, 0))[direction if direction < 4 else 0]
                 f.write(f"\tBlocksBullets:\n\t\tFaceX: {face_x}\n\t\tFaceY: {face_y}\n")
 
-        for (sheet_path, closed, half, halves), (dname, found, starts_open) in tiles.doors.items():
+        for (sheet_path, closed, half, halves, glass), (dname, found, starts_open, _) in tiles.doors.items():
             hp = 700 if "pdoor" in closed or "shutter" in closed else 450
-            f.write(f"\n{dname}:\n\tInherits: ^MapDoor\n\tHealth:\n\t\tHP: {hp}\n\tWithSpriteBody:\n\t\tSequence: {dname}-{'open' if starts_open else 'closed'}\n\tMapDoor:\n\t\tPrefix: {dname}\n\t\tStartsOpen: {'true' if starts_open else 'false'}\n")
+            f.write(f"\n{dname}:\n\tInherits: ^MapDoor\n\tHealth:\n\t\tHP: {hp}\n\tWithSpriteBody:\n\t\tSequence: {dname}-{'open' if starts_open else 'closed'}\n\tMapDoor:\n\t\tPrefix: {dname}\n\t\tStartsOpen: {'true' if starts_open else 'false'}\n\t\tBlocksSight: {'false' if glass else 'true'}\n")
 
     # The tileset: the repo's own templates and one per picture
     base = open(os.path.join(ROOT, "tgmc", "tilesets", "ground.yaml"), encoding="utf-8").read().rstrip("\n") + "\n"

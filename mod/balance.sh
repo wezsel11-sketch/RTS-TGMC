@@ -18,14 +18,15 @@ MAP=${3:-balance-aivai}
 OUT=${BALANCE_OUT:-"$ROOT/build/balance"}
 
 rm -rf "$OUT"
-export LIBGL_ALWAYS_SOFTWARE=1 SDL_AUDIODRIVER=dummy
+export LIBGL_ALWAYS_SOFTWARE=1 SDL_AUDIODRIVER=dummy SDL_VIDEODRIVER=offscreen
+export PATH="$ROOT/build/tools/dotnet:$PATH" DOTNET_ROOT="$ROOT/build/tools/dotnet" DOTNET_CLI_TELEMETRY_OPTOUT=1
 uid=$(cd "$OPENRA_DIR" && sh utility.sh tgmc --map-hash "$ROOT/build/mod/tgmc/maps/$MAP" | tail -1)
 
 run_one() {
 	n=$1
 	support="$OUT/run$n/support"
 	mkdir -p "$support"
-	xvfb-run -a -s "-screen 0 640x400x24" sh -c "
+	sh -c "
 		cd '$OPENRA_DIR'
 		exec dotnet bin/OpenRA.dll Engine.EngineDir=.. Engine.SupportDir='$support' \\
 			Game.Mod=tgmc Launch.Map=$uid > '$OUT/run$n/game.log' 2>&1

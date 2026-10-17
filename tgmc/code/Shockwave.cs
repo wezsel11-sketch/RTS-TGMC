@@ -66,6 +66,10 @@ namespace OpenRA.Mods.TGMC.Warheads
 			if (!IsValidAgainst(victim, firedBy))
 				return;
 
+			// A strong enough blast throws the unit away from its centre, like the marines' and xenos' throws (see KnockbackWarhead).
+			if (percent >= 30 && args.Source != null)
+				KnockbackWarhead.Throw(victim, firedBy, args.Source.Value, new WDist(percent >= 70 ? 2048 : 1024), 10, new WDist(512), 0, 0, default);
+
 			var shape = (HitShape)victim.EnabledTargetablePositions.MinByOrDefault(t => t is HitShape h ? h.DistanceFromEdge(victim, victim.CenterPosition) : WDist.MaxValue);
 			if (shape == null)
 				return;

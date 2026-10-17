@@ -87,7 +87,7 @@ Player:
 		AdditionalMinimumRefineryCount: 0
 		NewProductionCashThreshold: 0
 		MinBaseRadius: 3
-		MaxBaseRadius: 9
+		MaxBaseRadius: 14
 		ProductionMinCashRequirement: 100
 		BuildingFractions:
 			miner: 25
@@ -109,31 +109,31 @@ Player:
 			cade: 10
 		BuildingLimits:
 			miner: 6
-			weed-node: 14
+			weed-node: 24
 			vendor: 2
-			cryo-pod: 2
+			cryo-pod: 4
 			mini-silo: 3
 			armory: 1
 			ordnance-depot: 1
 			evolution-tower: 1
 			maturity-tower: 1
-			sentry-turret: 4
-			resin-turret: 4
+			sentry-turret: 8
+			resin-turret: 8
 			workshop: 1
-			mortar-emplacement: 3
+			mortar-emplacement: 6
 			artillery-emplacement: 2
-			forward-hive: 2
+			forward-hive: 5
 			resin-trap: 6
 			cade: 8
 		BuildingDelays:
-			armory: 3000
-			ordnance-depot: 6000
+			armory: 1500
+			ordnance-depot: 3000
 			evolution-tower: 800
 			maturity-tower: 2400
-			workshop: 5000
+			workshop: 3000
 			mortar-emplacement: 3500
 			artillery-emplacement: 8000
-			forward-hive: 2500
+			forward-hive: 1500
 			resin-trap: 1500
 			cade: 1200
 	SquadManagerBotModule@marines-easy:

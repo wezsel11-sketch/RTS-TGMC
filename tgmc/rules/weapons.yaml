@@ -27,7 +27,7 @@ TGMCRifle:
 		ValidRelationships: Neutral
 		ValidTargets: MapObject
 	Warhead@1Dam: SpreadDamage
-		Damage: 8
+		Damage: 11
 		Spread: 128
 		# Armoured xenos shrug off ordinary rounds (armour classes are set on the xeno castes; see units.yaml).
 		Versus:
@@ -179,6 +179,31 @@ TGMCMortar:
 	Warhead@5Walls: DamageWalls
 		Damage: 120
 		Radius: 2c0
+
+# The suicide vest's blast: a bigger explosion than a grenade, knocks walls down, kills the wearer (see the bomber in units.yaml).
+TGMCVestBlast:
+	Projectile: InstantHit
+	Warhead@1Wave: Shockwave
+		Damage: 220
+		Radius: 6
+		RingDelay: 2
+		EdgePercent: 8
+		DustImage: fx-dust-tile
+		DustChance: 30
+		DamageTypes: ExplosionDeath
+		ValidRelationships: Ally, Neutral, Enemy
+	Warhead@5Walls: DamageWalls
+		Damage: 200
+		Radius: 3c0
+	Warhead@7Shake: ShakeScreen
+		Duration: 24
+		Intensity: 10
+		Multiplier: 1, 1
+	Warhead@9Light: CreateEffect
+		Image: fx-light
+		Explosions: blast-big
+		ForceDisplayAtGroundLevel: true
+		ValidTargets: Ground, Water, Structure
 
 # A drop pod hitting the ground: a hard impact that shakes the screen and crushes what is under it.
 TGMCPodImpact:
@@ -376,13 +401,13 @@ TGMCMG60:
 TGMCSentry:
 	Inherits: TGMCRifle
 	Burst: 1
-	ReloadDelay: 15
+	ReloadDelay: 12
 	Report: sentry-fire.ogg
 	Projectile: CoverBullet
 		Sequences: large
 		Inaccuracy: 256
 	Warhead@1Dam: SpreadDamage
-		Damage: 10
+		Damage: 14
 
 TGMCHeal:
 	Range: 3c0
@@ -1565,6 +1590,24 @@ TGMCCrateSupply:
 		Explosions: idle
 		ValidRelationships: Ally
 		ValidTargets: Infantry
+
+# Mirage: a decoy dropped in front of the squad leader. Enemies shoot it while the squad moves (see mirage-decoy in units.yaml).
+TGMCMirage:
+	Range: 4c0
+	ReloadDelay: 15
+	Projectile: InstantHit
+	Warhead@1Decoy: SpawnActor
+		Actor: mirage-decoy
+		TrailCells: 0
+
+# Fire-support mark: a sensor ping on the target, so the squad (and the CAS stock) sees it for a while.
+TGMCMarkTarget:
+	Range: 12c0
+	ReloadDelay: 15
+	Projectile: InstantHit
+	Warhead@1Mark: SpawnActor
+		Actor: sensor-ping
+		TrailCells: 0
 
 # The smoke screen: everyone inside is harder to hit, friend and foe alike.
 TGMCSmokeScreen:

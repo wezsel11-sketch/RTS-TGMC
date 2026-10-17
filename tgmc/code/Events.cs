@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using OpenRA.Graphics;
+using OpenRA.Mods.Common.Orders;
 using OpenRA.Mods.Common.Traits;
 using OpenRA.Mods.Common.Widgets;
 using OpenRA.Mods.Common.Widgets.Logic;
@@ -179,7 +180,7 @@ namespace OpenRA.Mods.TGMC.Widgets.Logic
 		}
 	}
 
-	// Buttons under the selection card: evolve and devolve the selected xenos, stop, and scatter.
+	// Buttons under the selection card: evolve and devolve the selected xenos, stop, attack-move, patrol and the stances.
 	public class CommandCardLogic : ChromeLogic
 	{
 		readonly World world;
@@ -203,7 +204,7 @@ namespace OpenRA.Mods.TGMC.Widgets.Logic
 			stop.IsDisabled = () => Selected().Count == 0;
 			stop.OnClick = () => Issue(_ => true, a => new Order("Stop", a, false));
 
-			foreach (var (id, stance) in new[] { ("CMD_AGGRESSIVE", UnitStance.AttackAnything), ("CMD_GUARD", UnitStance.Defend),
+			foreach (var (id, stance) in new[] { ("CMD_GUARD", UnitStance.Defend),
 				("CMD_RETURN", UnitStance.ReturnFire), ("CMD_HOLD", UnitStance.HoldFire) })
 			{
 				var button = widget.GetOrNull<ButtonWidget>(id);
@@ -259,19 +260,27 @@ namespace OpenRA.Mods.TGMC.Widgets.Logic
 					a => new Order(a.TraitsImplementing<ActiveAbility>().First(x => x.Info.Slot == s && x.Ready).Info.OrderName, a, false));
 			}
 
-			var scatter = widget.Get<ButtonWidget>("CMD_SCATTER");
-			scatter.IsDisabled = () => Selected().Count == 0;
-			scatter.OnClick = () => Issue(a => a.Info.HasTraitInfo<MobileInfo>(), a => new Order("Scatter", a, false));
+			// Attack: classic attack-move, the same as the attack-move key (Ctrl for assault move, as in OpenRA).
+			var attack = widget.Get<ButtonWidget>("CMD_ATTACK");
+			attack.IsDisabled = () => Selected().Count == 0;
+			attack.IsHighlighted = () => world.OrderGenerator is AttackMoveOrderGenerator;
+			attack.OnClick = () => world.OrderGenerator = new AttackMoveOrderGenerator(world, Selected());
+
+			// Patrol: the unit walks between where it stands and the cell you pick.
+			var patrol = widget.Get<ButtonWidget>("CMD_PATROL");
+			patrol.IsDisabled = () => Selected().Count == 0;
+			patrol.IsHighlighted = () => world.OrderGenerator is PatrolOrderGenerator;
+			patrol.OnClick = () => world.OrderGenerator = new PatrolOrderGenerator(world, Selected());
 
 			// Evolving is a xeno thing and the medic buttons are a marine thing: each side sees only its own, and Stop and
-			// Scatter slide into the first row's free places for the marines.
+			// Attack slide into the first row's free places for the marines.
 			var faction = world.LocalPlayer?.Faction.InternalName;
 			if (faction == "marines")
 			{
 				evolve.IsVisible = () => false;
 				devolve.IsVisible = () => false;
 				stop.Bounds = evolve.Bounds;
-				scatter.Bounds = devolve.Bounds;
+				attack.Bounds = devolve.Bounds;
 			}
 			else if (faction == "xenos")
 			{

@@ -41,18 +41,23 @@ namespace OpenRA.Mods.TGMC.Warheads
 			if (firedBy == null || victim == null || victim.IsDead || !victim.IsInWorld || !IsValidAgainst(victim, firedBy))
 				return;
 
+			Throw(victim, firedBy, args.Source ?? firedBy.CenterPosition, Distance, Duration, Height, LandDamage, BlockedDamage, DamageTypes);
+		}
+
+		/// <summary>Throws a unit away from `from`: it flies an arc over `distance` and lands, or stops short at an obstacle.</summary>
+		public static void Throw(Actor victim, Actor firedBy, WPos from, WDist distance, int duration, WDist height, int landDamage, int blockedDamage, BitSet<DamageType> damageTypes)
+		{
 			var mobile = victim.TraitOrDefault<Mobile>();
 			if (mobile == null || victim.CurrentActivity is Thrown)
 				return;
 
 			var world = victim.World;
-			var from = args.Source ?? firedBy.CenterPosition;
 			var away = victim.CenterPosition - from;
 			if (away.HorizontalLengthSquared == 0)
 				away = new WVec(1024, 0, 0);
 
 			var step = new WVec(away.X, away.Y, 0) * 1024 / away.HorizontalLength;
-			var cells = Math.Max(1, Distance.Length / 1024);
+			var cells = Math.Max(1, distance.Length / 1024);
 			var landing = victim.Location;
 			var blocked = false;
 			for (var i = 1; i <= cells; i++)
@@ -69,15 +74,15 @@ namespace OpenRA.Mods.TGMC.Warheads
 
 			if (landing == victim.Location)
 			{
-				if (blocked && BlockedDamage > 0)
-					victim.InflictDamage(firedBy, new Damage(BlockedDamage, DamageTypes));
+				if (blocked && blockedDamage > 0)
+					victim.InflictDamage(firedBy, new Damage(blockedDamage, damageTypes));
 
 				return;
 			}
 
 			victim.CancelActivity();
-			victim.QueueActivity(new Thrown(victim, mobile, landing, Duration, Height.Length,
-				LandDamage + (blocked ? BlockedDamage : 0), firedBy, DamageTypes));
+			victim.QueueActivity(new Thrown(victim, mobile, landing, duration, height.Length,
+				landDamage + (blocked ? blockedDamage : 0), firedBy, damageTypes));
 		}
 	}
 

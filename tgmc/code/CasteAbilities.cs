@@ -6,7 +6,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using OpenRA.Effects;
 using OpenRA.GameRules;
+using OpenRA.Graphics;
 using OpenRA.Mods.Common;
 using OpenRA.Mods.Common.Traits;
 using OpenRA.Primitives;
@@ -62,6 +64,12 @@ namespace OpenRA.Mods.TGMC.Traits
 		public readonly AbilityAim Aim = AbilityAim.Nearest;
 		public readonly WDist Range = new(1024);
 		public readonly WDist ForwardDistance = new(2048);
+
+		[Desc("Ticks between the use and the blast. The unit stands still and is seen to go off (the suicide vest's 2-second warcry).")]
+		public readonly int FuseTicks = 0;
+
+		[Desc("The unit dies in its own blast (the suicide vest).")]
+		public readonly bool SelfDestruct = false;
 
 		[ActorReference]
 		[Desc("Units that appear next to the unit, one per entry.")]
@@ -197,7 +205,14 @@ namespace OpenRA.Mods.TGMC.Traits
 					Source = self.CenterPosition,
 					DamageModifiers = self.TraitsImplementing<IFirepowerModifier>().Select(f => f.GetFirepowerModifier()).ToArray()
 				};
-				weapon.Impact(aim, args);
+				if (Info.FuseTicks > 0)
+					world.AddFrameEndTask(w => w.Add(new Fuse(self, Info, weapon, aim.CenterPosition, Info.FuseTicks)));
+				else
+				{
+					weapon.Impact(aim, args);
+					if (Info.SelfDestruct)
+						self.Kill(self);
+				}
 			}
 
 			if (Info.Spawn.Length > 0)
@@ -316,5 +331,49 @@ namespace OpenRA.Mods.TGMC.Scripting
 			var ability = Self.TraitsImplementing<ActiveAbility>().FirstOrDefault(a => a.Info.Slot == slot);
 			return ability != null && ability.Use(Self);
 		}
+	}
+}
+
+namespace OpenRA.Mods.TGMC.Traits
+{
+	/// <summary>A fuse: the blast goes off after the ticks run out, wherever the unit is then, and the unit dies in it if it is meant to.</summary>
+	sealed class Fuse : IEffect
+	{
+		readonly Actor source;
+		readonly ActiveAbilityInfo info;
+		readonly WeaponInfo weapon;
+		readonly WPos pos;
+		int ticks;
+
+		public Fuse(Actor source, ActiveAbilityInfo info, WeaponInfo weapon, WPos pos, int ticks)
+		{
+			this.source = source;
+			this.info = info;
+			this.weapon = weapon;
+			this.pos = pos;
+			ticks = info.FuseTicks;
+		}
+
+		void IEffect.Tick(World world)
+		{
+			if (--ticks > 0)
+				return;
+
+			var at = source.IsDead ? pos : source.CenterPosition;
+			var args = new WarheadArgs
+			{
+				Weapon = weapon,
+				SourceActor = source,
+				Source = at,
+				DamageModifiers = []
+			};
+			weapon.Impact(Target.FromPos(at), args);
+			if (info.SelfDestruct && !source.IsDead)
+				source.Kill(source);
+
+			world.AddFrameEndTask(w => w.Remove(this));
+		}
+
+		IEnumerable<IRenderable> IEffect.Render(WorldRenderer wr) { yield break; }
 	}
 }

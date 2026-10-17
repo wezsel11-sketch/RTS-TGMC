@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using OpenRA.Activities;
 using OpenRA.Mods.Common.Activities;
+using OpenRA.GameRules;
 using OpenRA.Mods.Common.Orders;
 using OpenRA.Mods.Common.Traits;
 using OpenRA.Mods.Common;
@@ -183,6 +184,9 @@ namespace OpenRA.Mods.TGMC.Traits
 		[Desc("Cells around the target they are spread over.")]
 		public readonly int Radius = 3;
 
+		[Desc("No xenos come up within this many cells of a marine structure: the power cannot be called there and is not spent.")]
+		public readonly int BaseRadius = 10;
+
 		public readonly string Image = "fx-infest";
 		public readonly string Sequence = "evolve";
 		public readonly string Palette = "effect";
@@ -203,10 +207,21 @@ namespace OpenRA.Mods.TGMC.Traits
 
 		public override void Activate(Actor self, Order order, SupportPowerManager manager)
 		{
-			base.Activate(self, order, manager);
-
 			var world = self.World;
 			var centre = world.Map.CellContaining(order.Target.CenterPosition);
+
+			// Xenos do not come up inside the marines' base: refuse before the power is spent.
+			var marineStructure = world.ActorsHavingTrait<Building>()
+				.Any(a => !a.IsDead && a.Owner.Faction.InternalName == "marines"
+					&& (a.CenterPosition - world.Map.CenterOfCell(centre)).LengthSquared < (long)info.BaseRadius * info.BaseRadius * 1024 * 1024);
+			if (marineStructure)
+			{
+				TextNotificationsManager.AddTransientLine(self.Owner, "Xenos cannot come up inside the marines' base.");
+				return;
+			}
+
+			base.Activate(self, order, manager);
+
 			var cells = world.Map.FindTilesInCircle(centre, info.Radius).OrderBy(c => (c - centre).LengthSquared).ToList();
 			var used = new HashSet<CPos>();
 			var owner = self.Owner;

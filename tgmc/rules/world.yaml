@@ -97,14 +97,22 @@
 		Name: faction-xenos.name
 		InternalName: xenos
 		Side: Soviet
+	# Sons of Mars: the third faction, red (see the design in the plan). Plays like the marines.
+	Faction@som:
+		Name: faction-som.name
+		InternalName: som
+		Side: Soviet
 	Faction@random:
 		Name: faction-random.name
 		InternalName: Random
-		RandomFactionMembers: marines, xenos
+		RandomFactionMembers: marines, xenos, som
 		Side: Random
 
 World:
 	Inherits: ^BaseWorld
+	# Terrain lighting: the level of the open ground (1 = full light). Dark-mode maps lower it; light sources add light on top (see TerrainLightSource).
+	TerrainLighting:
+		Intensity: 1
 
 # Map editor and lobby marker for a starting position. Actors of this type are read by MapStartingLocations.
 mpspawn:

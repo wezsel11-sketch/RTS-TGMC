@@ -648,6 +648,24 @@ TGMCBoilerGlob:
 TGMCLaserRifle:
 	Inherits: TGMCRifle
 	Report: laser-rifle.ogg
+	# A red laser bolt (TGMC's `laser` projectile): faster and straighter than a bullet.
+	Projectile: CoverBullet
+		Speed: 1000
+		Image: fx-laser
+		Inaccuracy: 256
+
+# The SOM veteran's plasma rifle: a plasma ball, slower and harder-hitting than a laser bolt, with the plasma sound.
+TGMCPlasmaRifle:
+	Inherits: TGMCRifle
+	Report: laser-rifle.ogg
+	Burst: 1
+	ReloadDelay: 22
+	Projectile: CoverBullet
+		Speed: 420
+		Image: fx-plasma
+		Inaccuracy: 128
+	Warhead@1Dam: SpreadDamage
+		Damage: 20
 
 # The boiler as a sniper: a fast, flat acid shot from long range (stopped by walls and cover), bursting into an acid explosion
 # and an acid pool where it lands. No lobbed shell, no gas.

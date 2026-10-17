@@ -66,6 +66,9 @@
 	# Every marine structure gives the build area itself, so marines (and the SOM) build without an engineer: 24 cells from any of their structures.
 	GivesBuildableArea@self:
 		AreaTypes: marine-build
+	# Every marine structure is a builder too, so the build menu works without an engineer (marines and SOM alike).
+	Production@build:
+		Produces: MarineBuild
 
 ^XenoMinorBuildable:
 	RequiresBuildableArea:

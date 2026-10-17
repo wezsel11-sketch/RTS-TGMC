@@ -198,6 +198,11 @@ MECH_PRESETS = {
     "flame": {"paint": (245, 120, 40), "trim": (255, 215, 90), "right": "shotgun_right", "left": "flamer_left"},
     "support": {"paint": (110, 195, 100), "trim": (205, 235, 175), "right": "smg_right", "left": "rpg_left"},
     "tow": {"paint": (215, 215, 220), "trim": (90, 95, 115), "right": "assaultrifle_right", "left": "tow_left"},
+    # The Sons of Mars' walker: the same four builds in SOM red and black.
+    "som_assault": {"paint": (200, 40, 35), "trim": (40, 40, 45), "right": "assaultrifle_right", "left": "rocketlauncher_left"},
+    "som_flame": {"paint": (200, 40, 35), "trim": (255, 150, 60), "right": "shotgun_right", "left": "flamer_left"},
+    "som_support": {"paint": (170, 30, 30), "trim": (60, 60, 65), "right": "smg_right", "left": "rpg_left"},
+    "som_tow": {"paint": (150, 25, 25), "trim": (30, 30, 35), "right": "assaultrifle_right", "left": "tow_left"},
 }
 
 
@@ -540,6 +545,151 @@ UNITS = {
             "icon": "stand:S",
         },
     },
+    # The rest of the SOM roster (see the SOM plan): the higher tiers.
+    "som_smartgunner": {
+        "cell": MARINE_CELL,
+        "sequences": {
+            "stand": som("som_heavy_black", "som_helmet_black", (RIFLES, "t18_w")),
+            "die-gib": MARINE_GIB,
+            "run": "stand",
+            "attack": "stand",
+            "die": [(HUMAN, "husk")],
+            "flash": [(PROJECTILES, "muzzle_bullet", None, {"rotate": 90, "facings": 8, "tick": 50})],
+            "icon": "stand:S",
+        },
+    },
+    "som_flamer": {
+        "cell": MARINE_CELL,
+        "sequences": {
+            "stand": som("som_medium_black", "som_helmet_black", (FLAMER, "m240_w")),
+            "die-gib": MARINE_GIB,
+            "run": "stand",
+            "attack": "stand",
+            "die": [(HUMAN, "husk")],
+            "flash": [(PROJECTILES, "muzzle_bullet", None, {"rotate": 90, "facings": 8, "tick": 50})],
+            "icon": "stand:S",
+        },
+    },
+    "som_grenadier": {
+        "cell": MARINE_CELL,
+        "sequences": {
+            "stand": som("som_medium_black", "som_helmet_light_black", (RIFLES, "t18_w")),
+            "die-gib": MARINE_GIB,
+            "run": "stand",
+            "attack": "stand",
+            "die": [(HUMAN, "husk")],
+            "flash": [(PROJECTILES, "muzzle_bullet", None, {"rotate": 90, "facings": 8, "tick": 50})],
+            "icon": "stand:S",
+        },
+    },
+    "som_machinegunner": {
+        "cell": MARINE_CELL,
+        "sequences": {
+            "stand": som("som_heavy_black", "som_helmet_black", (MG60, "t60_w", None, {"big": True})),
+            "die-gib": MARINE_GIB,
+            "run": "stand",
+            "attack": "stand",
+            "die": [(HUMAN, "husk")],
+            "flash": [(PROJECTILES, "muzzle_bullet", None, {"rotate": 90, "facings": 8, "tick": 50})],
+            "icon": "stand:S",
+        },
+    },
+    "som_blademan": {
+        "cell": MARINE_CELL,
+        "sequences": {
+            "stand": som("som_light_black", "som_helmet_light_black", (VALI, "vali_sword")),
+            "die-gib": MARINE_GIB,
+            "run": "stand",
+            "attack": "stand",
+            "die": [(HUMAN, "husk")],
+            "flash": [(PROJECTILES, "muzzle_bullet", None, {"rotate": 90, "facings": 8, "tick": 50})],
+            "icon": "stand:S",
+        },
+    },
+    "som_scout": {
+        "cell": MARINE_CELL,
+        "sequences": {
+            "stand": som("som_light_black", "som_helmet_bio_black", (MARKSMAN, "svd_w", None, {"big": True})),
+            "die-gib": MARINE_GIB,
+            "run": "stand",
+            "attack": "stand",
+            "die": [(HUMAN, "husk")],
+            "flash": [(PROJECTILES, "muzzle_bullet", None, {"rotate": 90, "facings": 8, "tick": 50})],
+            "icon": "stand:S",
+        },
+    },
+    "som_mortarman": {
+        "cell": MARINE_CELL,
+        "sequences": {
+            "stand": som("som_medium_black", "som_helmet_black", (RIFLES, "t18_w")),
+            "die-gib": MARINE_GIB,
+            "run": "stand",
+            "attack": "stand",
+            "die": [(HUMAN, "husk")],
+            "flash": [(PROJECTILES, "muzzle_bullet", None, {"rotate": 90, "facings": 8, "tick": 50})],
+            "icon": "stand:S",
+        },
+    },
+    "som_heavygunner": {
+        "cell": MARINE_CELL,
+        "sequences": {
+            "stand": som("som_heavy_black", "som_helmet_lorica_black", (MG60, "v41_w", None, {"big": True})),
+            "die-gib": MARINE_GIB,
+            "run": "stand",
+            "attack": "stand",
+            "die": [(HUMAN, "husk")],
+            "flash": [(PROJECTILES, "muzzle_bullet", None, {"rotate": 90, "facings": 8, "tick": 50})],
+            "icon": "stand:S",
+        },
+    },
+    "som_rocketeer": {
+        "cell": MARINE_CELL,
+        "sequences": {
+            "stand": som("som_medium_black", "som_helmet_black", (SADAR, "sadar_100_w", None, {"big": True})),
+            "die-gib": MARINE_GIB,
+            "run": "stand",
+            "attack": "stand",
+            "die": [(HUMAN, "husk")],
+            "flash": [(PROJECTILES, "muzzle_bullet", None, {"rotate": 90, "facings": 8, "tick": 50})],
+            "icon": "stand:S",
+        },
+    },
+    "som_demolitionist": {
+        "cell": MARINE_CELL,
+        "sequences": {
+            "stand": som("som_heavy_black", "som_helmet_engineer_black", (RIFLES, "t18_w")),
+            "die-gib": MARINE_GIB,
+            "run": "stand",
+            "attack": "stand",
+            "die": [(HUMAN, "husk")],
+            "flash": [(PROJECTILES, "muzzle_bullet", None, {"rotate": 90, "facings": 8, "tick": 50})],
+            "icon": "stand:S",
+        },
+    },
+    "som_assault": {
+        "cell": MARINE_CELL,
+        "sequences": {
+            "stand": som("som_heavy_black", "som_helmet_lorica_black", (RIFLES, "v31_w")),
+            "die-gib": MARINE_GIB,
+            "run": "stand",
+            "attack": "stand",
+            "die": [(HUMAN, "husk")],
+            "flash": [(PROJECTILES, "muzzle_bullet", None, {"rotate": 90, "facings": 8, "tick": 50})],
+            "icon": "stand:S",
+        },
+    },
+    "som_bomber": {
+        "cell": MARINE_CELL,
+        "sequences": {
+            "stand": som("som_light_black", "som_helmet_light_black", (SHOTGUNS, "m37_w")),
+            "die-gib": MARINE_GIB,
+            "run": "stand",
+            "attack": "stand",
+            "die": [(HUMAN, "husk")],
+            "flash": [(PROJECTILES, "muzzle_bullet", None, {"rotate": 90, "facings": 8, "tick": 50})],
+            "icon": "stand:S",
+        },
+    },
     "medic": {
         "cell": MARINE_CELL,
         "sequences": {
@@ -772,6 +922,21 @@ UNITS = {
             "icon": "stand:S",
         },
     },
+    "som_mech": {
+        "cell": (96, 96),
+        "sequences": {
+            "stand": mech("som_assault"),
+            "stand-flame": mech("som_flame"),
+            "stand-support": mech("som_support"),
+            "stand-tow": mech("som_tow"),
+            "run": "stand",
+            "attack": "stand",
+            "die": [(layer[0], layer[1], layer[2], dict(layer[3], fade=10, tick=70)) for layer in mech("som_assault")],
+            "die-gib": "die",
+            "flash": [(PROJECTILES, "muzzle_flash", None, {"rotate": 90, "facings": 8, "tick": 30})],
+            "icon": "stand:S",
+        },
+    },
     "medbay": {
         "sequences": {
             "idle": [(VENDING, "marinemed")],
@@ -999,6 +1164,19 @@ UNITS = {
     },
     # Effect images, also named by weapons (Bullet Image, CreateEffect Image). One sheet per cell size.
     # The bullet art points up, so 16 turned copies make a tracer that flies along the shot.
+    # SOM weapons (TGMC's own projectile art): the red laser bolt and the plasma ball.
+    "fx-laser": {
+        "sequences": {
+            "idle": [(PROJECTILES, "laser", None, {"facings": 16})],
+            "large": [(PROJECTILES, "heavylaser", None, {"facings": 16})],
+        },
+    },
+    "fx-plasma": {
+        "sequences": {
+            "idle": [(PROJECTILES, "plasma_ball_small", None, {"tick": 50})],
+            "large": [(PROJECTILES, "plasma_ball_big", None, {"tick": 50})],
+        },
+    },
     "fx-bullet": {
         "sequences": {
             "idle": [(PROJECTILES, "bullet", None, {"facings": 16})],

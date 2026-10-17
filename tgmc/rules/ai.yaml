@@ -38,6 +38,18 @@ Player:
 			som_veteran: 25
 			som_squad_leader: 8
 			som_field_commander: 4
+			som_smartgunner: 25
+			som_flamer: 18
+			som_grenadier: 20
+			som_machinegunner: 15
+			som_blademan: 12
+			som_scout: 15
+			som_mortarman: 10
+			som_heavygunner: 10
+			som_rocketeer: 12
+			som_demolitionist: 8
+			som_assault: 10
+			som_mech: 6
 			medic: 15
 			engineer: 15
 			smartgunner: 25

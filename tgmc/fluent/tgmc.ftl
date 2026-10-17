@@ -406,6 +406,58 @@ actor-som-field-commander =
     .name = SOM Field Commander
     .description = The Sons of Mars' heavy commander with a sidearm and more armour.
 
+actor-som-smartgunner =
+    .name = SOM Smartgunner
+    .description = The Sons of Mars' smartgunner, in SOM black armour.
+
+actor-som-flamer =
+    .name = SOM Plasma Flamer
+    .description = The Sons of Mars' plasma flamer, in SOM black armour.
+
+actor-som-grenadier =
+    .name = SOM Grenadier
+    .description = The Sons of Mars' grenadier, in SOM black armour.
+
+actor-som-machinegunner =
+    .name = SOM Machinegunner
+    .description = The Sons of Mars' machinegunner, in SOM black armour.
+
+actor-som-blademan =
+    .name = SOM Blademan
+    .description = The Sons of Mars' blademan, in SOM black armour.
+
+actor-som-scout =
+    .name = SOM Laser Scout
+    .description = The Sons of Mars' laser scout, in SOM black armour.
+
+actor-som-mortarman =
+    .name = SOM Mortarman
+    .description = The Sons of Mars' mortarman, in SOM black armour.
+
+actor-som-heavygunner =
+    .name = SOM Heavy Gunner
+    .description = The Sons of Mars' heavy gunner, in SOM black armour.
+
+actor-som-rocketeer =
+    .name = SOM Rocketeer
+    .description = The Sons of Mars' rocketeer, in SOM black armour.
+
+actor-som-demolitionist =
+    .name = SOM Demolitionist
+    .description = The Sons of Mars' demolitionist, in SOM black armour.
+
+actor-som-assault =
+    .name = SOM Assault Trooper
+    .description = The Sons of Mars' assault trooper, in SOM black armour.
+
+actor-som-bomber =
+    .name = SOM Suicide Vest
+    .description = The Sons of Mars' suicide vest, in SOM black armour.
+
+actor-som-mech =
+    .name = SOM Mech
+    .description = The Sons of Mars' walker in red and black: four builds, as the marine mech.
+
 actor-mapobject =
     .name = Furniture
 

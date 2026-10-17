@@ -39,6 +39,19 @@ Sequences:
 	tgmc|sequences/som_veteran.yaml
 	tgmc|sequences/som_squad_leader.yaml
 	tgmc|sequences/som_field_commander.yaml
+	tgmc|sequences/som_smartgunner.yaml
+	tgmc|sequences/som_flamer.yaml
+	tgmc|sequences/som_grenadier.yaml
+	tgmc|sequences/som_machinegunner.yaml
+	tgmc|sequences/som_blademan.yaml
+	tgmc|sequences/som_scout.yaml
+	tgmc|sequences/som_mortarman.yaml
+	tgmc|sequences/som_heavygunner.yaml
+	tgmc|sequences/som_rocketeer.yaml
+	tgmc|sequences/som_demolitionist.yaml
+	tgmc|sequences/som_assault.yaml
+	tgmc|sequences/som_bomber.yaml
+	tgmc|sequences/som_mech.yaml
 	tgmc|sequences/squad_leader.yaml
 	tgmc|sequences/field_commander.yaml
 	tgmc|sequences/bomber.yaml
@@ -105,6 +118,8 @@ Sequences:
 	tgmc|sequences/fx-bullet.yaml
 	tgmc|sequences/fx-acid.yaml
 	tgmc|sequences/fx-acidball.yaml
+	tgmc|sequences/fx-laser.yaml
+	tgmc|sequences/fx-plasma.yaml
 	tgmc|sequences/fx-impact.yaml
 	tgmc|sequences/fx-blast.yaml
 	tgmc|sequences/fx-blast-big.yaml

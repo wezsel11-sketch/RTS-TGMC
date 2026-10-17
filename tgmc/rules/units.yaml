@@ -855,7 +855,7 @@ som_veteran:
 	Health:
 		HP: 200
 	Armament@PRIMARY:
-		Weapon: TGMCLaserRifle
+		Weapon: TGMCPlasmaRifle
 		MuzzleSequence: flash
 		LocalOffset: 256,0,200
 	Buildable:
@@ -899,6 +899,111 @@ som_field_commander:
 		Description: actor-som-field-commander.description
 	Tooltip:
 		Name: actor-som-field-commander.name
+
+# SOM higher tiers: the marine roles in SOM black and red, with the same tier prerequisites.
+som_smartgunner:
+	Inherits: smartgunner
+	Buildable:
+		Prerequisites: ~faction-som
+		Description: actor-som-smartgunner.description
+	Tooltip:
+		Name: actor-som-smartgunner.name
+
+som_flamer:
+	Inherits: flamer
+	Buildable:
+		Prerequisites: armory, ~faction-som
+		Description: actor-som-flamer.description
+	Tooltip:
+		Name: actor-som-flamer.name
+
+som_grenadier:
+	Inherits: grenadier
+	Buildable:
+		Prerequisites: armory, ~faction-som
+		Description: actor-som-grenadier.description
+	Tooltip:
+		Name: actor-som-grenadier.name
+
+som_machinegunner:
+	Inherits: machinegunner
+	Buildable:
+		Prerequisites: armory, ~faction-som
+		Description: actor-som-machinegunner.description
+	Tooltip:
+		Name: actor-som-machinegunner.name
+
+som_blademan:
+	Inherits: blademan
+	Buildable:
+		Prerequisites: armory, ~faction-som
+		Description: actor-som-blademan.description
+	Tooltip:
+		Name: actor-som-blademan.name
+
+som_scout:
+	Inherits: sniper
+	Buildable:
+		Prerequisites: armory, ~faction-som
+		Description: actor-som-scout.description
+	Tooltip:
+		Name: actor-som-scout.name
+
+som_mortarman:
+	Inherits: mortarman
+	Buildable:
+		Prerequisites: armory, ~faction-som
+		Description: actor-som-mortarman.description
+	Tooltip:
+		Name: actor-som-mortarman.name
+
+som_heavygunner:
+	Inherits: heavygunner
+	Buildable:
+		Prerequisites: ordnance-depot, ~faction-som
+		Description: actor-som-heavygunner.description
+	Tooltip:
+		Name: actor-som-heavygunner.name
+
+som_rocketeer:
+	Inherits: rocketeer
+	Buildable:
+		Prerequisites: ordnance-depot, ~faction-som
+		Description: actor-som-rocketeer.description
+	Tooltip:
+		Name: actor-som-rocketeer.name
+
+som_demolitionist:
+	Inherits: demolitionist
+	Buildable:
+		Prerequisites: ordnance-depot, ~faction-som
+		Description: actor-som-demolitionist.description
+	Tooltip:
+		Name: actor-som-demolitionist.name
+
+som_assault:
+	Inherits: assault
+	Buildable:
+		Prerequisites: ordnance-depot, ~faction-som
+		Description: actor-som-assault.description
+	Tooltip:
+		Name: actor-som-assault.name
+
+som_bomber:
+	Inherits: bomber
+	Buildable:
+		Prerequisites: ordnance-depot, ~faction-som
+		Description: actor-som-bomber.description
+	Tooltip:
+		Name: actor-som-bomber.name
+
+som_mech:
+	Inherits: mech
+	Buildable:
+		Prerequisites: workshop, ~faction-som
+		Description: actor-som-mech.description
+	Tooltip:
+		Name: actor-som-mech.name
 
 grenadier:
 	Inherits: ^Infantry

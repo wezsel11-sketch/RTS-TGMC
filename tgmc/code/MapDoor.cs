@@ -26,6 +26,10 @@ namespace OpenRA.Mods.TGMC.Traits
 		public readonly WDist Radius = new(1900);
 
 		
+		[GrantedConditionReference]
+		[Desc("Condition granted once the door is open: the open body (a second WithSpriteBody that needs it) takes over from the closed one.")]
+		public readonly string OpenCondition = "door-open";
+
 		public readonly string[] OpenSound = ["door-open.ogg"];
 		public readonly string[] CloseSound = ["door-close.ogg"];
 
@@ -42,12 +46,13 @@ namespace OpenRA.Mods.TGMC.Traits
 		Phase phase;
 		int scan;
 		bool started;
+		int openToken = Actor.InvalidConditionToken;
 
 		public MapDoor(Actor self, MapDoorInfo info)
 		{
 			this.info = info;
 			building = self.Trait<Building>();
-			body = self.Trait<WithSpriteBody>();
+			body = self.TraitsImplementing<WithSpriteBody>().First();
 			phase = info.StartsOpen ? Phase.Open : Phase.Closed;
 			scan = self.World.SharedRandom.Next(8);
 		}
@@ -76,7 +81,9 @@ namespace OpenRA.Mods.TGMC.Traits
 			{
 				phase = Phase.Open;
 				self.World.ActorMap.RemoveInfluence(self, building);
-				body.PlayCustomAnimationRepeating(self, info.Prefix + "-open");
+				// From now on the open body shows the open model, whatever the closed body does (damage states and the like reset it).
+				if (openToken == Actor.InvalidConditionToken)
+					openToken = self.GrantCondition(info.OpenCondition);
 			});
 		}
 
@@ -88,7 +95,8 @@ namespace OpenRA.Mods.TGMC.Traits
 				if (phase == Phase.Open)
 				{
 					self.World.ActorMap.RemoveInfluence(self, building);
-					body.PlayCustomAnimationRepeating(self, info.Prefix + "-open");
+					if (openToken == Actor.InvalidConditionToken)
+						openToken = self.GrantCondition(info.OpenCondition);
 				}
 				else
 					body.PlayCustomAnimationRepeating(self, info.Prefix + "-closed");

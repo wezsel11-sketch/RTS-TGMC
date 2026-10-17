@@ -79,9 +79,6 @@
 
 ^Infantry:
 	Inherits: ^Unit
-	# Marine units are built by the marines; the SOM units below say som.
-	Buildable:
-		ForceFaction: marines
 	# A flashlight: a small pool of light around the marine (see TerrainLighting in world.yaml). Off (0) on normal maps, where the ground is
 	# already at full light and the pool would only blow the ground out; a dark-mode map turns it up (shot-lighting uses 0.6).
 	TerrainLightSource:
@@ -255,6 +252,7 @@ rifleman:
 	WithMuzzleOverlay:
 	Buildable:
 		Queue: Infantry
+		Prerequisites: ~faction-marines
 		BuildAtProductionType: Infantry
 		BuildPaletteOrder: 10
 		# Riflemen are the marines' first unit: they come off the line 30 percent quicker.
@@ -315,6 +313,7 @@ medic:
 		Cost: 120
 	Buildable:
 		Queue: Infantry
+		Prerequisites: ~faction-marines
 		BuildAtProductionType: Infantry
 		BuildPaletteOrder: 20
 		Description: actor-medic.description
@@ -367,6 +366,7 @@ engineer:
 		Cost: 130
 	Buildable:
 		Queue: Infantry
+		Prerequisites: ~faction-marines
 		BuildAtProductionType: Infantry
 		BuildPaletteOrder: 30
 		Description: actor-engineer.description
@@ -399,7 +399,7 @@ scout:
 		Cost: 90
 	Buildable:
 		Queue: Infantry
-		Prerequisites: ~disabled
+		Prerequisites: ~disabled, ~faction-marines
 		BuildAtProductionType: Infantry
 		BuildPaletteOrder: 12
 		Description: actor-scout.description
@@ -427,7 +427,7 @@ skirmisher:
 		Cost: 130
 	Buildable:
 		Queue: Infantry
-		Prerequisites: ~disabled
+		Prerequisites: ~disabled, ~faction-marines
 		BuildAtProductionType: Infantry
 		BuildPaletteOrder: 41
 		Description: actor-skirmisher.description
@@ -457,7 +457,7 @@ trooper:
 		Cost: 140
 	Buildable:
 		Queue: Infantry
-		Prerequisites: ~disabled
+		Prerequisites: ~disabled, ~faction-marines
 		BuildAtProductionType: Infantry
 		BuildPaletteOrder: 13
 		Description: actor-trooper.description
@@ -489,7 +489,7 @@ ranger:
 		Cost: 170
 	Buildable:
 		Queue: Infantry
-		Prerequisites: ~disabled
+		Prerequisites: ~disabled, ~faction-marines
 		BuildAtProductionType: Infantry
 		BuildPaletteOrder: 14
 		Description: actor-ranger.description
@@ -521,7 +521,7 @@ assault:
 		Cost: 280
 	Buildable:
 		Queue: Infantry
-		Prerequisites: ordnance-depot
+		Prerequisites: ordnance-depot, ~faction-marines
 		BuildAtProductionType: Infantry
 		BuildPaletteOrder: 54
 		Description: actor-assault.description
@@ -549,6 +549,7 @@ smartgunner:
 		Cost: 200
 	Buildable:
 		Queue: Infantry
+		Prerequisites: ~faction-marines
 		BuildAtProductionType: Infantry
 		BuildPaletteOrder: 40
 		Description: actor-smartgunner.description
@@ -579,7 +580,7 @@ sniper:
 		Cost: 260
 	Buildable:
 		Queue: Infantry
-		Prerequisites: armory
+		Prerequisites: armory, ~faction-marines
 		BuildAtProductionType: Infantry
 		BuildPaletteOrder: 46
 		Description: actor-sniper.description
@@ -607,7 +608,7 @@ rocketeer:
 		Cost: 280
 	Buildable:
 		Queue: Infantry
-		Prerequisites: ordnance-depot
+		Prerequisites: ordnance-depot, ~faction-marines
 		BuildAtProductionType: Infantry
 		BuildPaletteOrder: 47
 		Description: actor-rocketeer.description
@@ -636,7 +637,7 @@ blademan:
 		Cost: 160
 	Buildable:
 		Queue: Infantry
-		Prerequisites: armory
+		Prerequisites: armory, ~faction-marines
 		BuildAtProductionType: Infantry
 		BuildPaletteOrder: 48
 		Description: actor-blademan.description
@@ -664,7 +665,7 @@ mortarman:
 		Cost: 300
 	Buildable:
 		Queue: Infantry
-		Prerequisites: armory
+		Prerequisites: armory, ~faction-marines
 		BuildAtProductionType: Infantry
 		BuildPaletteOrder: 49
 		Description: actor-mortarman.description
@@ -692,7 +693,7 @@ flamer:
 		Cost: 220
 	Buildable:
 		Queue: Infantry
-		Prerequisites: armory
+		Prerequisites: armory, ~faction-marines
 		BuildAtProductionType: Infantry
 		BuildPaletteOrder: 44
 		Description: actor-flamer.description
@@ -723,7 +724,7 @@ machinegunner:
 		Cost: 230
 	Buildable:
 		Queue: Infantry
-		Prerequisites: armory
+		Prerequisites: armory, ~faction-marines
 		BuildAtProductionType: Infantry
 		BuildPaletteOrder: 45
 		Description: actor-machinegunner.description
@@ -748,7 +749,7 @@ bomber:
 		Cost: 120
 	Buildable:
 		Queue: Infantry
-		Prerequisites: ordnance-depot
+		Prerequisites: ordnance-depot, ~faction-marines
 		BuildPaletteOrder: 90
 		Description: actor-bomber.description
 
@@ -805,6 +806,7 @@ squad_leader:
 		LocalOffset: 256,0,200
 	Buildable:
 		Queue: Infantry
+		Prerequisites: ~faction-marines
 		BuildPaletteOrder: 15
 		Description: actor-squad-leader.description
 	Tooltip:
@@ -823,6 +825,7 @@ field_commander:
 		LocalOffset: 256,0,200
 	Buildable:
 		Queue: Infantry
+		Prerequisites: ~faction-marines
 		BuildPaletteOrder: 16
 		Description: actor-field-commander.description
 	Tooltip:
@@ -839,7 +842,7 @@ som_trooper:
 		LocalOffset: 256,0,200
 	Buildable:
 		Queue: Infantry
-		ForceFaction: som
+		Prerequisites: ~faction-som
 		BuildPaletteOrder: 10
 		Description: actor-som-trooper.description
 	Tooltip:
@@ -857,7 +860,7 @@ som_veteran:
 		LocalOffset: 256,0,200
 	Buildable:
 		Queue: Infantry
-		ForceFaction: som
+		Prerequisites: ~faction-som
 		BuildPaletteOrder: 17
 		Description: actor-som-veteran.description
 	Tooltip:
@@ -868,7 +871,7 @@ som_veteran:
 som_corpsman:
 	Inherits: medic
 	Buildable:
-		ForceFaction: som
+		Prerequisites: ~faction-som
 		Description: actor-som-corpsman.description
 	Tooltip:
 		Name: actor-som-corpsman.name
@@ -876,7 +879,7 @@ som_corpsman:
 som_engineer:
 	Inherits: engineer
 	Buildable:
-		ForceFaction: som
+		Prerequisites: ~faction-som
 		Description: actor-som-engineer.description
 	Tooltip:
 		Name: actor-som-engineer.name
@@ -884,7 +887,7 @@ som_engineer:
 som_squad_leader:
 	Inherits: squad_leader
 	Buildable:
-		ForceFaction: som
+		Prerequisites: ~faction-som
 		Description: actor-som-squad-leader.description
 	Tooltip:
 		Name: actor-som-squad-leader.name
@@ -892,7 +895,7 @@ som_squad_leader:
 som_field_commander:
 	Inherits: field_commander
 	Buildable:
-		ForceFaction: som
+		Prerequisites: ~faction-som
 		Description: actor-som-field-commander.description
 	Tooltip:
 		Name: actor-som-field-commander.name
@@ -918,7 +921,7 @@ grenadier:
 		Cost: 180
 	Buildable:
 		Queue: Infantry
-		Prerequisites: armory
+		Prerequisites: armory, ~faction-marines
 		BuildAtProductionType: Infantry
 		BuildPaletteOrder: 50
 		Description: actor-grenadier.description
@@ -1040,7 +1043,7 @@ mech:
 		Queue: Infantry
 		BuildAtProductionType: Vehicle
 		BuildPaletteOrder: 70
-		Prerequisites: workshop
+		Prerequisites: workshop, ~faction-marines
 		Description: actor-mech.description
 
 # B18 heavy gunner: juggernaut armour and a minigun. Slow, but fast firing and hard to kill.
@@ -1071,7 +1074,7 @@ heavygunner:
 		Cost: 450
 	Buildable:
 		Queue: Infantry
-		Prerequisites: ordnance-depot
+		Prerequisites: ordnance-depot, ~faction-marines
 		BuildAtProductionType: Infantry
 		BuildPaletteOrder: 55
 		Description: actor-heavygunner.description
@@ -1104,7 +1107,7 @@ demolitionist:
 		Cost: 420
 	Buildable:
 		Queue: Infantry
-		Prerequisites: ordnance-depot
+		Prerequisites: ordnance-depot, ~faction-marines
 		BuildAtProductionType: Infantry
 		BuildPaletteOrder: 56
 		Description: actor-demolitionist.description

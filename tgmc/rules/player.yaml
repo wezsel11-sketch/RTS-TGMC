@@ -8,6 +8,13 @@ Player:
 		SelectableCash: 500, 1000, 2500, 5000
 		DefaultCash: 1000
 	PlayerRadarTerrain:
+	# Faction prerequisites: the marines' units and the SOM's units each show only for their own faction (~ hides what is not available).
+	ProvidesPrerequisite@marines:
+		Prerequisite: faction-marines
+		Factions: marines
+	ProvidesPrerequisite@som:
+		Prerequisite: faction-som
+		Factions: som
 	# One unit per production building is built at the same time (MultiProductionQueue in tgmc/code/ProductionQueues.cs).
 	MultiProductionQueue@Infantry:
 		Type: Infantry

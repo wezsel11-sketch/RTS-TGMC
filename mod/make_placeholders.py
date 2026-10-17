@@ -154,6 +154,47 @@ def great_plains_ground(x, y):
     return (DIRT, 0) if _road(x, y, 19, 6, 58) or (x == 32 and 4 <= y <= 36 and not _ellipse(x, y, 32, 19, 3, 2)) else (GRASS, 0)
 
 
+def twin_rivers_ground(x, y):
+    """64x48. Two rivers run north to south between the bases, each with three fords that do not line up: an army crossing both zigzags, and the
+    island between them is a killing ground with two rock outcrops."""
+    if x in (22, 23):
+        return (FORD, 0) if y in (10, 11, 12, 23, 24, 25, 36, 37, 38) else (WATER, 0)
+    if x in (40, 41):
+        return (FORD, 0) if y in (5, 6, 7, 23, 24, 25, 41, 42, 43) else (WATER, 0)
+    if _ellipse(x, y, 32, 12, 3, 2) or _ellipse(x, y, 32, 36, 3, 2):
+        return ROCK, 0
+    return (DIRT, 0) if y in (23, 24) and 6 <= x <= 58 else (GRASS, 0)
+
+
+def quarry_pit_ground(x, y):
+    """64x48. A rock ring around a dirt pit in the middle, open at the four compass points: whoever holds the pit sees all four roads. Ponds in the
+    corners, a dirt road from each base to the pit."""
+    import math
+    dist = math.hypot(x - 32, y - 24)
+    angle = math.degrees(math.atan2(y - 24, x - 32)) % 360
+    if 8 <= dist <= 10:
+        gap = any(abs(((angle - a + 180) % 360) - 180) <= 14 for a in (0, 90, 180, 270))
+        return (DIRT, 0) if gap else (ROCK, 0)
+    if dist < 8:
+        return DIRT, 0
+    if any(_ellipse(x, y, cx, cy, 3, 3) for cx, cy in ((16, 8), (48, 40), (16, 40), (48, 8))):
+        return WATER, 0
+    return (DIRT, 0) if y in (23, 24) and 6 <= x <= 58 else (GRASS, 0)
+
+
+def broken_bridge_ground(x, y):
+    """64x48. A rift cuts the map from the north-west to the south-east: water, rock lips on both sides, and three bridges. Each base can also flank
+    round the ends of the rift, a long way."""
+    centre = 20 + y * 0.5
+    d = x - centre
+    bridges = y in (10, 11, 12, 23, 24, 25, 36, 37, 38)
+    if abs(d) <= 2:
+        return (FORD, 0) if bridges else (WATER, 0)
+    if abs(d) <= 3.5 and not bridges:
+        return ROCK, 0
+    return (DIRT, 0) if y in (23, 24) and 6 <= x <= 58 else (GRASS, 0)
+
+
 def palette_entries():
     """A plain grey ramp. Only the palette-based paths read it; the TGMC-free tiles and sprites are RGBA."""
     return [(i, i, i) for i in range(256)]
@@ -572,6 +613,9 @@ SKIRMISH_MAPS = {
     "jungle-crossing": ("Jungle Crossing", 44, 28, 4, 0, jungle_crossing_ground),
     "close-quarters": ("Close Quarters", 34, 28, -6, 0, close_quarters_ground),
     "great-plains": ("Great Plains", 64, 40, 24, 6, great_plains_ground),
+    "twin-rivers": ("Twin Rivers", 64, 48, 24, 10, twin_rivers_ground),
+    "quarry-pit": ("Quarry Pit", 64, 48, 24, 10, quarry_pit_ground),
+    "broken-bridge": ("Broken Bridge", 64, 48, 24, 10, broken_bridge_ground),
 }
 
 SCENARIOS = {
@@ -1416,6 +1460,9 @@ def main():
             assert 2 <= x <= w - 3 and 2 <= y <= h - 3 and ground(x, y)[0] != WATER, f"{name}: actor at {x},{y} is off the map or in water"
         write_map(os.path.join(args.out, "maps", name), title, w, h, actors, "Lobby", [(6, 14 + dy), (33 + xeno_dx, 13 + dy)],
                   ground=ground, category="Conquest", faction_start=True)
+        # An AI-vs-AI copy for tuning the bots on the map (see scenarios/test-aimap.lua); it stays out of the game's menus.
+        write_map(os.path.join(dev_maps, "aimap-" + name), "AI test " + title, w, h, actors, "MissionSelector", [(6, 14 + dy), (33 + xeno_dx, 13 + dy)],
+                  scripts=("test-aimap",), ground=ground, category="Conquest", marine_bot="skirmish", xeno_bot="skirmish", fast=True)
     if args.tgmc:
         # The full-size maps wear TGMC's own floor and wall pictures; the shrunk ones cannot, a cell there is several TGMC tiles.
         full = [n for n, spec in tgmc_dmm.MAPS.items() if spec["factor"] == 1]

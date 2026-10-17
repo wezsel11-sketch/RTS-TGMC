@@ -29,7 +29,7 @@ No .NET? The script installs a .NET 10 SDK into `build/tools`, and nothing outsi
 ### Linux and macOS
 
 ```sh
-git clone -b ccr-c31f20d2-inlmko https://github.com/wezsel11-sketch/RTS-TGMC.git
+git clone -b main https://github.com/wezsel11-sketch/RTS-TGMC.git
 cd RTS-TGMC
 sh mod/setup.sh      # fetches OpenRA and the TGMC art, builds and checks the mod (about 10 minutes the first time)
 sh mod/play.sh       # main menu; or `sh mod/play.sh landing-zone` to jump straight into a map
@@ -40,7 +40,7 @@ sh mod/play.sh       # main menu; or `sh mod/play.sh landing-zone` to jump strai
 Open PowerShell in the folder you want the game in, then:
 
 ```powershell
-git clone -b ccr-c31f20d2-inlmko https://github.com/wezsel11-sketch/RTS-TGMC.git
+git clone -b main https://github.com/wezsel11-sketch/RTS-TGMC.git
 cd RTS-TGMC
 powershell -ExecutionPolicy Bypass -File mod\windows-prereqs.ps1   # once: installs Git, Python, ffmpeg and Pillow with winget
 ```
@@ -61,7 +61,7 @@ the commits this mod was tested against (see the top of `mod/bootstrap.py`), so 
 
 ## How to play
 
-- **Main menu -> Singleplayer -> Skirmish.** Pick a skirmish map (**Landing Zone**, **Canyon Run**, **Jungle Crossing**, **Close Quarters**, **Great Plains**, plus four converted from TGMC's own maps: **LV-624**, **Big Red**, **Whiskey Outpost**, **Desert Dam**) or one of the wave missions: **Hold the Line** (marines against waves), **Night Raid** (waves from two sides, spitters and a drone) or **Last Stand** (eight growing waves, a Behemoth in the last) or **The Hundred** (a hundred waves, from runners up to behemoths).
+- **Main menu -> Singleplayer -> Skirmish.** Pick a skirmish map (**Landing Zone**, **Canyon Run**, **Jungle Crossing**, **Close Quarters**, **Great Plains**, **Twin Rivers**, **Quarry Pit**, **Broken Bridge**, plus four converted from TGMC's own maps: **LV-624**, **Big Red**, **Whiskey Outpost**, **Desert Dam**) or one of the wave missions: **Hold the Line** (marines against waves), **Night Raid** (waves from two sides, spitters and a drone) or **Last Stand** (eight growing waves, a Behemoth in the last) or **The Hundred** (a hundred waves, from runners up to behemoths).
   In Landing Zone choose a faction for yourself and set the other slot to **Skirmish AI** (Easy, Normal or Hard), then Start Game.
 - **Marines** start with a cryo pod, a vendor and a squad. Click the cryo pod and use the sidebar's *Infantry* tab to train riflemen,
   corpsmen (they heal), engineers (they repair), smartgunners (rapid spread fire) and grenadiers (splash). **Xenos** start with a resin silo and mini silos; use the *Xeno* tab for Runner,

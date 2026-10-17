@@ -79,10 +79,11 @@
 
 ^Infantry:
 	Inherits: ^Unit
-	# A flashlight: a small pool of light around the marine (see TerrainLighting in world.yaml).
+	# A flashlight: a small pool of light around the marine (see TerrainLighting in world.yaml). Off (0) on normal maps, where the ground is
+	# already at full light and the pool would only blow the ground out; a dark-mode map turns it up (shot-lighting uses 0.6).
 	TerrainLightSource:
 		Range: 4c0
-		Intensity: 0.6
+		Intensity: 0
 		RedTint: 1
 		GreenTint: 0.97
 		BlueTint: 0.9

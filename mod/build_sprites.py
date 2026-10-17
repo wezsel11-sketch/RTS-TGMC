@@ -1564,9 +1564,6 @@ def main():
         info = build_condor(args.tgmc, args.out) if unit == "condor" else build_unit(args.tgmc, unit, UNITS[unit], args.out)
         report.append(info)
         print(f"{unit}: {info['cells']} cells of {info['cell'][0]}x{info['cell'][1]}px -> {info['sheet']}")
-    import build_alamo
-    cols, rows = build_alamo.build(args.tgmc, args.out)
-    print(f"alamo: {cols}x{rows} cells -> sprites/alamo.png")
     with open(os.path.join(args.out, "sprites.json"), "w") as f:
         json.dump(report, f, indent=2)
 

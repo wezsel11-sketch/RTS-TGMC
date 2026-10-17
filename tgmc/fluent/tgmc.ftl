@@ -382,10 +382,6 @@ actor-field-commander =
 actor-mirage-decoy =
     .name = Mirage decoy
 
-actor-alamo =
-    .name = Alamo
-    .description = The marines' landed dropship: their spawn point and first build area.
-
 actor-mapobject =
     .name = Furniture
 

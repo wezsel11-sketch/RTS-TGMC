@@ -72,18 +72,16 @@ TEST_FIELD = [
 
 # Two bases facing each other across the middle. Exits are below the producers, so keep those cells clear.
 LANDING_ZONE = [
-    # The marines' base is the Alamo (see the Alamo design spec): the dropship at (2, 4), its hatch exit at (2, 13), and the
-    # start buildings and squad inside its hollow.
-    ("alamo", "Marines", 2, 4, 512),
-    ("vendor", "Marines", 7, 10, 512),
-    ("sentry-turret", "Marines", 4, 10, 256),
-    ("sentry-turret", "Marines", 10, 10, 256),
-    ("rifleman", "Marines", 6, 12, 256),
-    ("rifleman", "Marines", 7, 12, 256),
-    ("rifleman", "Marines", 8, 12, 256),
-    ("rifleman", "Marines", 9, 12, 256),
-    ("medic", "Marines", 7, 8, 256),
-    ("engineer", "Marines", 8, 8, 256),
+    ("cryo-pod", "Marines", 4, 12, 512),
+    ("vendor", "Marines", 7, 12, 512),
+    ("sentry-turret", "Marines", 10, 11, 256),
+    ("sentry-turret", "Marines", 10, 16, 256),
+    ("rifleman", "Marines", 6, 16, 256),
+    ("rifleman", "Marines", 7, 16, 256),
+    ("rifleman", "Marines", 8, 16, 256),
+    ("rifleman", "Marines", 9, 17, 256),
+    ("medic", "Marines", 6, 17, 256),
+    ("engineer", "Marines", 7, 17, 256),
     ("resin-silo", "Xenos", 33, 12, 768),
     ("mini-silo", "Xenos", 36, 7, 768),
     ("mini-silo", "Xenos", 36, 18, 768),
@@ -1110,8 +1108,6 @@ SCENARIOS = {
     "scenario-squadgear": {"scripts": ("test-squadgear",), "drop_conquest": True, "size": (32, 24), "actors": [
         ("squad_leader", "Marines", 10, 10, 256), ("hunter", "Xenos", 16, 10, 0), ("resin-silo", "Xenos", 28, 20, 0),
     ]},
-    # The Alamo is the marines' start (see scenarios/test-alamo-start.lua): the landing zone with the Alamo base.
-    "scenario-alamo-start": {"scripts": ("test-alamo-start",), "drop_conquest": True, "size": (40, 28), "ground": "landing_zone", "actors": LANDING_ZONE},
     # The marine AI uses its support powers (see scenarios/test-ai-support.lua).
     "scenario-ai-support": {"scripts": ("test-ai-support",), "marine_bot": "skirmish", "drop_conquest": True, "size": (48, 32),
                             "extra_rules": "Player:\n\t-SquadManagerBotModule@marines-easy:\n\t-SquadManagerBotModule@marines-normal:\n\t-SquadManagerBotModule@marines-hard:\n^Infantry:\n\tAutoTarget:\n\t\tInitialStance: HoldFire\ncryo-pod:\n\tDropPodPower@sentrydrop:\n\t\tChargeInterval: 60\n\tDropPodPower@mortardrop:\n\t\tChargeInterval: 60\narmory:\n\tDropPodPower@supplydrop:\n\t\tChargeInterval: 60\n\tTgmcSpawnActorPower@smoke:\n\t\tChargeInterval: 60\n", "actors": [

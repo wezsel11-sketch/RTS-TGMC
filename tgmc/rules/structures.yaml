@@ -60,8 +60,6 @@
 # Where a structure may be placed: within Adjacent cells of an actor with GivesBuildableArea of the same type.
 # Marines build almost anywhere: 24 cells from any marine structure or Engineer.
 ^MarineBuildable:
-	# Units trained here walk to the Alamo's hatch while it stands (see Alamo.cs).
-	RallyAtAlamo:
 	RequiresBuildableArea:
 		AreaTypes: marine-build
 		Adjacent: 24
@@ -645,30 +643,6 @@ vendor:
 		Name: actor-vendor.name
 	Valued:
 		Cost: 200
-
-# The Alamo: the marines' landed dropship, their starting base. Its hatch is the exit; it gives the marine build area around it.
-alamo:
-	Inherits: ^Structure
-	Building:
-		# Footprint from alamo_footprint.py: 21 rows of 11 cells, x = occupied, _ = empty (39 cells; the hull is not a rectangle).
-		Footprint: ___xxxxx___ ___x___x___ ___________ _xx_____xx_ ___________ x_________x ___________ x_________x ___________ _x_______x_ _x_______x_ ___________ ___________ _x_______x_ xx_______xx ___________ ___________ ___________ xxx_____xxx ___x___x___ _xxx___xxx_
-		Dimensions: 11, 21
-	Health:
-		HP: 2000
-	AlamoHatch:
-		Hatch: 0,9
-	Exit@1:
-		# The hatch is the hull cell (1, 9); units step out to the free cell beside it, (0, 9), outside the hull.
-		SpawnOffset: 0,512,0
-		ExitCell: 0,9
-	RallyPoint:
-		Path: 0, 5
-	GivesBuildableArea:
-		AreaTypes: marine-build
-	Tooltip:
-		Name: actor-alamo.name
-	Valued:
-		Cost: 0
 
 cryo-pod:
 	Inherits: ^Structure

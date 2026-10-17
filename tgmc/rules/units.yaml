@@ -84,9 +84,10 @@
 	TerrainLightSource:
 		Range: 4c0
 		Intensity: 0
-		RedTint: 1
-		GreenTint: 0.97
-		BlueTint: 0.9
+		# The tint is added to the ground's own tint even at intensity 0, so it stays 0 here (a dark map sets all four together).
+		RedTint: 0
+		GreenTint: 0
+		BlueTint: 0
 	# Balance: marines were losing every AI-vs-AI match, so each marine takes more hits (was 120).
 	Health:
 		HP: 170
@@ -152,8 +153,8 @@
 	WithLingeringCorpse:
 		DeathSequence: die
 		FallbackSequence: die
-		Linger: 4500
-		Fade: 300
+		Linger: 1000
+		Fade: 400
 		DeathTypes:
 			ExplosionDeath: -gib
 	# A marine that is down does not walk.
@@ -904,8 +905,8 @@ mech:
 	WithLingeringCorpse:
 		DeathSequence: die
 		FallbackSequence: die
-		Linger: 4500
-		Fade: 300
+		Linger: 1000
+		Fade: 400
 		DeathTypes:
 			ExplosionDeath: -gib
 	DeathSounds:
@@ -1131,8 +1132,8 @@ demolitionist:
 	WithLingeringCorpse:
 		DeathSequence: die
 		FallbackSequence: die
-		Linger: 4500
-		Fade: 300
+		Linger: 1000
+		Fade: 400
 		DeathTypes:
 			ExplosionDeath: -gib
 	DeathSounds:

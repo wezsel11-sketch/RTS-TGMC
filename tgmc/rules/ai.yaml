@@ -122,7 +122,7 @@ Player:
 			workshop: 1
 			mortar-emplacement: 6
 			artillery-emplacement: 2
-			forward-hive: 5
+			forward-hive: 2
 			resin-trap: 6
 			cade: 8
 		BuildingDelays:
@@ -133,7 +133,7 @@ Player:
 			workshop: 3000
 			mortar-emplacement: 3500
 			artillery-emplacement: 8000
-			forward-hive: 1500
+			forward-hive: 4500
 			resin-trap: 1500
 			cade: 1200
 	SquadManagerBotModule@marines-easy:

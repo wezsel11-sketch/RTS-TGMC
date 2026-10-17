@@ -222,6 +222,9 @@ TGMCMortarEmplacement:
 	Range: 24c0
 	MinRange: 5c0
 	ReloadDelay: 80
+	# Careful with its own side: the blast hurts enemies and neutrals only, never the marines.
+	Warhead@1Wave: Shockwave
+		ValidRelationships: Neutral, Enemy
 
 # The artillery emplacement (a howitzer): the longest reach in the game and a bigger shell than a mortar's (TGMC: heavy 6, light 7), but
 # slow to reload.
@@ -230,6 +233,9 @@ TGMCHowitzer:
 	Range: 40c0
 	MinRange: 10c0
 	ReloadDelay: 240
+	# Careful with its own side: the blast hurts enemies and neutrals only, never the marines.
+	Warhead@1Wave: Shockwave
+		ValidRelationships: Neutral, Enemy
 	Report: howitzer-fire.ogg
 	Projectile: Shell
 		Image: howitzer-shell
@@ -644,10 +650,10 @@ TGMCBoilerSnipe:
 	Inherits: TGMCBoilerGlob
 	Range: 18c0
 	MinRange: 0
-	ReloadDelay: 150
+	ReloadDelay: 300
 	-Projectile:
 	Projectile: CoverBullet
-		Speed: 700
+		Speed: 420
 		Image: fx-acidball
 		Inaccuracy: 0
 	-Warhead@4Gas:

@@ -1108,6 +1108,10 @@ SCENARIOS = {
     "scenario-squadgear": {"scripts": ("test-squadgear",), "drop_conquest": True, "size": (32, 24), "actors": [
         ("squad_leader", "Marines", 10, 10, 256), ("hunter", "Xenos", 16, 10, 0), ("resin-silo", "Xenos", 28, 20, 0),
     ]},
+    # The workshop builds a mech (see scenarios/test-mechbuild.lua).
+    "scenario-mechbuild": {"scripts": ("test-mechbuild",), "drop_conquest": True, "size": (32, 24), "actors": [
+        ("workshop", "Marines", 8, 8, 0), ("armory", "Marines", 12, 8, 0), ("vendor", "Marines", 16, 8, 0), ("resin-silo", "Xenos", 28, 20, 0),
+    ]},
     # The marine AI uses its support powers (see scenarios/test-ai-support.lua).
     "scenario-ai-support": {"scripts": ("test-ai-support",), "marine_bot": "skirmish", "drop_conquest": True, "size": (48, 32),
                             "extra_rules": "Player:\n\t-SquadManagerBotModule@marines-easy:\n\t-SquadManagerBotModule@marines-normal:\n\t-SquadManagerBotModule@marines-hard:\n^Infantry:\n\tAutoTarget:\n\t\tInitialStance: HoldFire\ncryo-pod:\n\tDropPodPower@sentrydrop:\n\t\tChargeInterval: 60\n\tDropPodPower@mortardrop:\n\t\tChargeInterval: 60\narmory:\n\tDropPodPower@supplydrop:\n\t\tChargeInterval: 60\n\tTgmcSpawnActorPower@smoke:\n\t\tChargeInterval: 60\n", "actors": [

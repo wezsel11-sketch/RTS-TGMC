@@ -58,11 +58,14 @@
 		Cost: 200
 
 # Where a structure may be placed: within Adjacent cells of an actor with GivesBuildableArea of the same type.
-# Marines build almost anywhere: 24 cells from any marine structure or Engineer.
+# Marines build almost anywhere: 24 cells from any marine structure (an engineer's area is no longer needed).
 ^MarineBuildable:
 	RequiresBuildableArea:
 		AreaTypes: marine-build
 		Adjacent: 24
+	# Every marine structure gives the build area itself, so marines (and the SOM) build without an engineer: 24 cells from any of their structures.
+	GivesBuildableArea@self:
+		AreaTypes: marine-build
 
 ^XenoMinorBuildable:
 	RequiresBuildableArea:

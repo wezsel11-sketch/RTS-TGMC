@@ -32,6 +32,12 @@ Player:
 		ProductionMinCashRequirement: 60
 		UnitsToBuild:
 			rifleman: 70
+			som_trooper: 70
+			som_corpsman: 15
+			som_engineer: 15
+			som_veteran: 25
+			som_squad_leader: 8
+			som_field_commander: 4
 			medic: 15
 			engineer: 15
 			smartgunner: 25

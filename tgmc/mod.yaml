@@ -33,6 +33,12 @@ Sequences:
 	tgmc|sequences/drone.yaml
 	tgmc|sequences/medic.yaml
 	tgmc|sequences/engineer.yaml
+	tgmc|sequences/som_trooper.yaml
+	tgmc|sequences/som_corpsman.yaml
+	tgmc|sequences/som_engineer.yaml
+	tgmc|sequences/som_veteran.yaml
+	tgmc|sequences/som_squad_leader.yaml
+	tgmc|sequences/som_field_commander.yaml
 	tgmc|sequences/squad_leader.yaml
 	tgmc|sequences/field_commander.yaml
 	tgmc|sequences/bomber.yaml

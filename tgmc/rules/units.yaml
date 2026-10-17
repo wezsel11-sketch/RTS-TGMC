@@ -79,6 +79,9 @@
 
 ^Infantry:
 	Inherits: ^Unit
+	# Marine units are built by the marines; the SOM units below say som.
+	Buildable:
+		ForceFaction: marines
 	# A flashlight: a small pool of light around the marine (see TerrainLighting in world.yaml). Off (0) on normal maps, where the ground is
 	# already at full light and the pool would only blow the ground out; a dark-mode map turns it up (shot-lighting uses 0.6).
 	TerrainLightSource:
@@ -396,6 +399,7 @@ scout:
 		Cost: 90
 	Buildable:
 		Queue: Infantry
+		Prerequisites: ~disabled
 		BuildAtProductionType: Infantry
 		BuildPaletteOrder: 12
 		Description: actor-scout.description
@@ -423,9 +427,9 @@ skirmisher:
 		Cost: 130
 	Buildable:
 		Queue: Infantry
+		Prerequisites: ~disabled
 		BuildAtProductionType: Infantry
 		BuildPaletteOrder: 41
-		Prerequisites: armory
 		Description: actor-skirmisher.description
 
 trooper:
@@ -453,9 +457,9 @@ trooper:
 		Cost: 140
 	Buildable:
 		Queue: Infantry
+		Prerequisites: ~disabled
 		BuildAtProductionType: Infantry
 		BuildPaletteOrder: 13
-		Prerequisites: armory
 		Description: actor-trooper.description
 
 ranger:
@@ -485,9 +489,9 @@ ranger:
 		Cost: 170
 	Buildable:
 		Queue: Infantry
+		Prerequisites: ~disabled
 		BuildAtProductionType: Infantry
 		BuildPaletteOrder: 14
-		Prerequisites: armory
 		Description: actor-ranger.description
 
 assault:
@@ -517,9 +521,9 @@ assault:
 		Cost: 280
 	Buildable:
 		Queue: Infantry
+		Prerequisites: ordnance-depot
 		BuildAtProductionType: Infantry
 		BuildPaletteOrder: 54
-		Prerequisites: ordnance-depot
 		Description: actor-assault.description
 
 smartgunner:
@@ -547,7 +551,6 @@ smartgunner:
 		Queue: Infantry
 		BuildAtProductionType: Infantry
 		BuildPaletteOrder: 40
-		Prerequisites: armory
 		Description: actor-smartgunner.description
 
 sniper:
@@ -576,9 +579,9 @@ sniper:
 		Cost: 260
 	Buildable:
 		Queue: Infantry
+		Prerequisites: armory
 		BuildAtProductionType: Infantry
 		BuildPaletteOrder: 46
-		Prerequisites: armory
 		Description: actor-sniper.description
 
 rocketeer:
@@ -604,9 +607,9 @@ rocketeer:
 		Cost: 280
 	Buildable:
 		Queue: Infantry
+		Prerequisites: ordnance-depot
 		BuildAtProductionType: Infantry
 		BuildPaletteOrder: 47
-		Prerequisites: armory
 		Description: actor-rocketeer.description
 
 blademan:
@@ -633,9 +636,9 @@ blademan:
 		Cost: 160
 	Buildable:
 		Queue: Infantry
+		Prerequisites: armory
 		BuildAtProductionType: Infantry
 		BuildPaletteOrder: 48
-		Prerequisites: armory
 		Description: actor-blademan.description
 
 mortarman:
@@ -661,9 +664,9 @@ mortarman:
 		Cost: 300
 	Buildable:
 		Queue: Infantry
+		Prerequisites: armory
 		BuildAtProductionType: Infantry
 		BuildPaletteOrder: 49
-		Prerequisites: ordnance-depot
 		Description: actor-mortarman.description
 
 flamer:
@@ -689,9 +692,9 @@ flamer:
 		Cost: 220
 	Buildable:
 		Queue: Infantry
+		Prerequisites: armory
 		BuildAtProductionType: Infantry
 		BuildPaletteOrder: 44
-		Prerequisites: armory
 		Description: actor-flamer.description
 
 machinegunner:
@@ -720,9 +723,9 @@ machinegunner:
 		Cost: 230
 	Buildable:
 		Queue: Infantry
+		Prerequisites: armory
 		BuildAtProductionType: Infantry
 		BuildPaletteOrder: 45
-		Prerequisites: armory
 		Description: actor-machinegunner.description
 
 # The suicide vest: a marine in a tactical explosive vest. Detonate: he stands for two seconds, then the vest goes off and he dies in it.
@@ -745,7 +748,7 @@ bomber:
 		Cost: 120
 	Buildable:
 		Queue: Infantry
-		Prerequisites: armory
+		Prerequisites: ordnance-depot
 		BuildPaletteOrder: 90
 		Description: actor-bomber.description
 
@@ -802,7 +805,6 @@ squad_leader:
 		LocalOffset: 256,0,200
 	Buildable:
 		Queue: Infantry
-		Prerequisites: armory
 		BuildPaletteOrder: 15
 		Description: actor-squad-leader.description
 	Tooltip:
@@ -821,13 +823,79 @@ field_commander:
 		LocalOffset: 256,0,200
 	Buildable:
 		Queue: Infantry
-		Prerequisites: workshop
 		BuildPaletteOrder: 16
 		Description: actor-field-commander.description
 	Tooltip:
 		Name: actor-field-commander.name
 	Valued:
 		Cost: 320
+
+# Sons of Mars (see the three-faction plan): the SOM core roster. Same roles as the marines, TGMC's SOM armour and a laser rifle.
+som_trooper:
+	Inherits: ^Infantry
+	Armament@PRIMARY:
+		Weapon: TGMCLaserRifle
+		MuzzleSequence: flash
+		LocalOffset: 256,0,200
+	Buildable:
+		Queue: Infantry
+		ForceFaction: som
+		BuildPaletteOrder: 10
+		Description: actor-som-trooper.description
+	Tooltip:
+		Name: actor-som-trooper.name
+	Valued:
+		Cost: 100
+
+som_veteran:
+	Inherits: ^Infantry
+	Health:
+		HP: 200
+	Armament@PRIMARY:
+		Weapon: TGMCLaserRifle
+		MuzzleSequence: flash
+		LocalOffset: 256,0,200
+	Buildable:
+		Queue: Infantry
+		ForceFaction: som
+		BuildPaletteOrder: 17
+		Description: actor-som-veteran.description
+	Tooltip:
+		Name: actor-som-veteran.name
+	Valued:
+		Cost: 180
+
+som_corpsman:
+	Inherits: medic
+	Buildable:
+		ForceFaction: som
+		Description: actor-som-corpsman.description
+	Tooltip:
+		Name: actor-som-corpsman.name
+
+som_engineer:
+	Inherits: engineer
+	Buildable:
+		ForceFaction: som
+		Description: actor-som-engineer.description
+	Tooltip:
+		Name: actor-som-engineer.name
+
+som_squad_leader:
+	Inherits: squad_leader
+	Buildable:
+		ForceFaction: som
+		Description: actor-som-squad-leader.description
+	Tooltip:
+		Name: actor-som-squad-leader.name
+
+som_field_commander:
+	Inherits: field_commander
+	Buildable:
+		ForceFaction: som
+		Description: actor-som-field-commander.description
+	Tooltip:
+		Name: actor-som-field-commander.name
 
 grenadier:
 	Inherits: ^Infantry
@@ -850,9 +918,9 @@ grenadier:
 		Cost: 180
 	Buildable:
 		Queue: Infantry
+		Prerequisites: armory
 		BuildAtProductionType: Infantry
 		BuildPaletteOrder: 50
-		Prerequisites: ordnance-depot
 		Description: actor-grenadier.description
 
 # The mech: TGMC's Durand. Slow and very tough, with an autocannon and a rocket pod. Built at a Workshop.
@@ -1003,9 +1071,9 @@ heavygunner:
 		Cost: 450
 	Buildable:
 		Queue: Infantry
+		Prerequisites: ordnance-depot
 		BuildAtProductionType: Infantry
 		BuildPaletteOrder: 55
-		Prerequisites: ordnance-depot
 		Description: actor-heavygunner.description
 
 # B17 demolitionist: high explosives, and armour that shrugs off blasts, his own included.
@@ -1036,9 +1104,9 @@ demolitionist:
 		Cost: 420
 	Buildable:
 		Queue: Infantry
+		Prerequisites: ordnance-depot
 		BuildAtProductionType: Infantry
 		BuildPaletteOrder: 56
-		Prerequisites: ordnance-depot
 		Description: actor-demolitionist.description
 
 ^Xeno:

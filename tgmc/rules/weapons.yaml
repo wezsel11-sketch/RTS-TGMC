@@ -644,6 +644,11 @@ TGMCBoilerGlob:
 		Actor: gas-cloud
 		TrailCells: 0
 
+# The SOM laser rifle (TGMC's V-31 class weapon): the rifle with the laser sound.
+TGMCLaserRifle:
+	Inherits: TGMCRifle
+	Report: laser-rifle.ogg
+
 # The boiler as a sniper: a fast, flat acid shot from long range (stopped by walls and cover), bursting into an acid explosion
 # and an acid pool where it lands. No lobbed shell, no gas.
 TGMCBoilerSnipe:

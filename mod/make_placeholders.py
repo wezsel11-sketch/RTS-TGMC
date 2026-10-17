@@ -1218,6 +1218,8 @@ def write_map(folder, title, size_w, size_h, placed, visibility, spawns, scripts
                             os.path.join(folder, f"{name}.lua"))
 
     xeno_bot_line = f"\t\tBot: {xeno_bot}\n" if xeno_bot else ""
+    # The lobby maps let each side pick its faction (marines, SOM or xenos); scenario maps keep them fixed.
+    lock_faction = "False" if "Lobby" in visibility else "True"
     marine_bot_line = f"\t\tBot: {marine_bot}\n" if marine_bot else ""
     # A map needs one playable slot even when both sides are bots. This one has no units and never wins or loses.
     observer_block = ("\tPlayerReference@Observer:\n\t\tName: Observer\n\t\tPlayable: True\n\t\tNonCombatant: True\n"
@@ -1249,7 +1251,7 @@ Players:
 		Name: Marines
 		Playable: {not marine_bot}
 {marine_bot_line}		Faction: marines
-		LockFaction: True
+		LockFaction: {lock_faction}
 		Enemies: Xenos
 		Spawn: 1
 		LockSpawn: True
@@ -1257,7 +1259,7 @@ Players:
 		Name: Xenos
 		Playable: {not script}
 {xeno_bot_line}		Faction: xenos
-		LockFaction: True
+		LockFaction: {lock_faction}
 		Enemies: Marines
 		Spawn: 2
 		LockSpawn: True

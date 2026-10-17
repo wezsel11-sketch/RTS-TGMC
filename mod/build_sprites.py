@@ -131,6 +131,10 @@ FACING_SOURCE = {"N": "N", "NE": "E", "E": "E", "SE": "E", "S": "S", "SW": "W", 
 # (the uniform and the armour) goes blue; the xeno units go red. Skin, helmets, boots and weapons keep their own colours.
 MARINE_TEAM = (120, 150, 255)
 XENO_TEAM = (255, 150, 150)
+# Sons of Mars: red cloth, black armour (TGMC's own SOM sheets, which are black already, so they are not tinted).
+SOM_TEAM = (255, 110, 90)
+SOM_ARMOR = "icons/mob/modular/som_armor.dmi"
+SOM_HELMETS = "icons/mob/modular/som_helmets.dmi"
 GEAR = [(MARINE_ARMOR, "xarmor", MARINE_TEAM), (FEET, "marine"), (MARINE_HELMETS, "helmet", MARINE_TEAM)]
 
 
@@ -180,6 +184,12 @@ def jaeger(pattern, weapon):
     dmi = JAEGER.format(pattern)
     return with_gun([(HUMAN, "body_m"), (MARINE_UNIFORM, "marine_jumpsuit", MARINE_TEAM), (dmi, "chest", MARINE_TEAM),
                      (FEET, "marine"), (dmi, "helm", MARINE_TEAM)], weapon)
+
+
+def som(armor, helmet, weapon):
+    """A Son of Mars: body, red uniform, TGMC's SOM armour and helmet (black), boots, then the weapon."""
+    return with_gun([(HUMAN, "body_m"), (MARINE_UNIFORM, "marine_jumpsuit", SOM_TEAM), (SOM_ARMOR, armor),
+                     (FEET, "marine"), (SOM_HELMETS, helmet)], weapon)
 
 
 # Presets for the mech: the accent colours painted on TGMC's medium mech, and the two weapons on its arms.
@@ -449,6 +459,79 @@ UNITS = {
         "cell": MARINE_CELL,
         "sequences": {
             "stand": jaeger("eva", (SMGS, "m25_w")),
+            "die-gib": MARINE_GIB,
+            "run": "stand",
+            "attack": "stand",
+            "die": [(HUMAN, "husk")],
+            "flash": [(PROJECTILES, "muzzle_bullet", None, {"rotate": 90, "facings": 8, "tick": 50})],
+            "icon": "stand:S",
+        },
+    },
+    # Sons of Mars (TGMC's SOM armour and helmets; see som()).
+    "som_trooper": {
+        "cell": MARINE_CELL,
+        "sequences": {
+            "stand": som("som_medium_black", "som_helmet_black", (RIFLES, "v31_w")),
+            "die-gib": MARINE_GIB,
+            "run": "stand",
+            "attack": "stand",
+            "die": [(HUMAN, "husk")],
+            "flash": [(PROJECTILES, "muzzle_bullet", None, {"rotate": 90, "facings": 8, "tick": 50})],
+            "icon": "stand:S",
+        },
+    },
+    "som_corpsman": {
+        "cell": MARINE_CELL,
+        "sequences": {
+            "stand": som("som_light_black", "som_helmet_light_black", (SMGS, "m25_w")),
+            "die-gib": MARINE_GIB,
+            "run": "stand",
+            "attack": "stand",
+            "die": [(HUMAN, "husk")],
+            "flash": [(PROJECTILES, "muzzle_bullet", None, {"rotate": 90, "facings": 8, "tick": 50})],
+            "icon": "stand:S",
+        },
+    },
+    "som_engineer": {
+        "cell": MARINE_CELL,
+        "sequences": {
+            "stand": som("som_medium_black", "som_helmet_engineer_black", (SHOTGUNS, "m37_w")),
+            "die-gib": MARINE_GIB,
+            "run": "stand",
+            "attack": "stand",
+            "die": [(HUMAN, "husk")],
+            "flash": [(PROJECTILES, "muzzle_bullet", None, {"rotate": 90, "facings": 8, "tick": 50})],
+            "icon": "stand:S",
+        },
+    },
+    "som_veteran": {
+        "cell": MARINE_CELL,
+        "sequences": {
+            "stand": som("som_heavy_black", "som_helmet_lorica_black", (RIFLES, "v31_w")),
+            "die-gib": MARINE_GIB,
+            "run": "stand",
+            "attack": "stand",
+            "die": [(HUMAN, "husk")],
+            "flash": [(PROJECTILES, "muzzle_bullet", None, {"rotate": 90, "facings": 8, "tick": 50})],
+            "icon": "stand:S",
+        },
+    },
+    "som_squad_leader": {
+        "cell": MARINE_CELL,
+        "sequences": {
+            "stand": som("som_leader_black", "som_helmet_leader_black", (RIFLES, "v31_w")),
+            "die-gib": MARINE_GIB,
+            "run": "stand",
+            "attack": "stand",
+            "die": [(HUMAN, "husk")],
+            "flash": [(PROJECTILES, "muzzle_bullet", None, {"rotate": 90, "facings": 8, "tick": 50})],
+            "icon": "stand:S",
+        },
+    },
+    "som_field_commander": {
+        "cell": MARINE_CELL,
+        "sequences": {
+            "stand": som("som_officer_black", "som_helmet_officer_black", (SMGS, "m25_w")),
             "die-gib": MARINE_GIB,
             "run": "stand",
             "attack": "stand",

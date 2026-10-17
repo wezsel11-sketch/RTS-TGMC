@@ -382,6 +382,30 @@ actor-field-commander =
 actor-mirage-decoy =
     .name = Mirage decoy
 
+actor-som-trooper =
+    .name = SOM Trooper
+    .description = The Sons of Mars' standard soldier: black armour and a laser rifle.
+
+actor-som-veteran =
+    .name = SOM Veteran
+    .description = A tougher Son of Mars in heavy armour with a laser rifle.
+
+actor-som-corpsman =
+    .name = SOM Corpsman
+    .description = The Sons of Mars' medic. Heals the wounded.
+
+actor-som-engineer =
+    .name = SOM Engineer
+    .description = The Sons of Mars' builder and repairer.
+
+actor-som-squad-leader =
+    .name = SOM Squad Leader
+    .description = The Sons of Mars' squad commander. Can lay smoke, drop a decoy and mark targets.
+
+actor-som-field-commander =
+    .name = SOM Field Commander
+    .description = The Sons of Mars' heavy commander with a sidearm and more armour.
+
 actor-mapobject =
     .name = Furniture
 

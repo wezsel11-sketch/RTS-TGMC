@@ -1173,9 +1173,25 @@ def write_sound_list(path):
         f.write(f"MusicTracks = {{ {quote(tracks)} }}\n")
 
 
+SOM_UNITS = {"rifleman": "som_trooper", "medic": "som_corpsman", "engineer": "som_engineer"}
+
+
+def faction_start_rules():
+    """The World rules of FactionStart (tgmc/code/FactionStart.cs): what each faction starts with, around its start location. Taken from the
+    Landing Zone layout: the marine side relative to (6, 14), the xeno side relative to (33, 13); SOM gets the marine buildings and its own troops."""
+    def entries(owner, cx, cy, swap=None):
+        out = []
+        for name, o, x, y, facing in LANDING_ZONE:
+            if o == owner:
+                out.append(f"{(swap or {}).get(name, name)}|{x - cx}|{y - cy}|{facing}")
+        return ", ".join(out)
+    return ("World:\n\tFactionStart:\n\t\tMarines: " + entries("Marines", 6, 14) + "\n\t\tSom: " + entries("Marines", 6, 14, SOM_UNITS)
+            + "\n\t\tXenos: " + entries("Xenos", 33, 13) + "\n")
+
+
 def write_map(folder, title, size_w, size_h, placed, visibility, spawns, scripts=(), ground=flat_ground,
               category="Skirmish", drop_conquest=False, xeno_bot=None, marine_bot=None, fast=False, extra_rules="",
-              music=False):
+              music=False, faction_start=False):
     # A scenario map has no slot for the xenos: they are a scripted player, so Lua can find them and they never act.
     os.makedirs(folder, exist_ok=True)
     cells = size_w * size_h
@@ -1188,19 +1204,23 @@ def write_map(folder, title, size_w, size_h, placed, visibility, spawns, scripts
 
     actors = []
     # Spawn points come first so that Spawn: 1 and 2 on the players below are their indices.
+    if faction_start:
+        # The factions place their own start (FactionStart): the map keeps only what is neutral.
+        placed = [a for a in placed if a[1] not in ("Marines", "Xenos")]
+        extra_rules += faction_start_rules()
     placed = [("mpspawn", "Neutral", x, y, 0) for x, y in spawns] + list(placed)
     for i, (name, owner, x, y, facing) in enumerate(placed):
         actors.append(f"\tActor{i}: {name}\n\t\tOwner: {owner}\n\t\tLocation: {x},{y}\n\t\tFacing: {facing}\n")
 
     script = bool(scripts)
     rules_line = ""
-    if scripts:
+    if scripts or faction_start:
         rules_line = "Rules: rules.yaml\n\n"
         listed = [f"{name}.lua" for name in scripts]
         if music:
             # A map's Scripts replaces the world's, which holds the music script. It goes last: it wraps the map's WorldLoaded.
             listed.append("tgmc|scripts/music.lua")
-        rules = "World:\n\tLuaScript:\n\t\tScripts: " + ", ".join(listed) + "\n"
+        rules = ("World:\n\tLuaScript:\n\t\tScripts: " + ", ".join(listed) + "\n") if scripts else ""
         if fast:
             # Scenario maps run at the fastest game speed so a long match (such as AI against AI) finishes quickly.
             rules += "World:\n\tMapOptions:\n\t\tGameSpeed: fastest\n"
@@ -1359,7 +1379,7 @@ def write_tgmc_map(folder, title, rows, marines, xenos, art=None, objects=None, 
         write_map(folder, title, w, h, actors + xeno_actors + extra, "MissionSelector", [spawn_m, spawn_x], scripts=("test-aimap",), ground=ground,
                   category="Conquest", marine_bot="skirmish", xeno_bot="skirmish", fast=True, drop_conquest=False)
         return
-    write_map(folder, title, w, h, actors + xeno_actors + extra, "Lobby", [spawn_m, spawn_x], ground=ground, category="Conquest")
+    write_map(folder, title, w, h, actors + xeno_actors + extra, "Lobby", [spawn_m, spawn_x], ground=ground, category="Conquest", faction_start=True)
 
 
 def main():
@@ -1386,13 +1406,13 @@ def main():
     write_repair_fx(args.out)
     write_map(os.path.join(args.out, "maps", "test-field"), "TGMC test field", 24, 24, TEST_FIELD, "Lobby, Shellmap", [(10, 12), (14, 12)])
     write_map(os.path.join(args.out, "maps", "landing-zone"), "Landing Zone", 40, 28, LANDING_ZONE, "Lobby", [(6, 14), (33, 13)],
-              ground=landing_zone_ground, category="Conquest")
+              ground=landing_zone_ground, category="Conquest", faction_start=True)
     for name, (title, w, h, xeno_dx, dy, ground) in SKIRMISH_MAPS.items():
         actors = _skirmish_actors(xeno_dx, dy)
         for _, _, x, y, _ in actors:
             assert 2 <= x <= w - 3 and 2 <= y <= h - 3 and ground(x, y)[0] != WATER, f"{name}: actor at {x},{y} is off the map or in water"
         write_map(os.path.join(args.out, "maps", name), title, w, h, actors, "Lobby", [(6, 14 + dy), (33 + xeno_dx, 13 + dy)],
-                  ground=ground, category="Conquest")
+                  ground=ground, category="Conquest", faction_start=True)
     if args.tgmc:
         # The full-size maps wear TGMC's own floor and wall pictures; the shrunk ones cannot, a cell there is several TGMC tiles.
         full = [n for n, spec in tgmc_dmm.MAPS.items() if spec["factor"] == 1]

@@ -19,11 +19,17 @@ def main(name, x, y):
     shutil.copytree(src, dst)
     with open(os.path.join(dst, "shotcam.lua"), "w", encoding="utf-8", newline="\n") as f:
         f.write(f"WorldLoaded = function()\n\tCamera.Position = Map.CenterOfCell(CPos.New({x}, {y}))\nend\n")
+    # A map with its own rules (a faction start, scripts) keeps them: the shot rules are appended to them.
+    old_rules = ""
+    if os.path.exists(os.path.join(dst, "rules.yaml")):
+        old_rules = open(os.path.join(dst, "rules.yaml"), encoding="utf-8").read().rstrip("\n") + "\n"
     with open(os.path.join(dst, "rules.yaml"), "w", encoding="utf-8", newline="\n") as f:
-        f.write("World:\n\tLuaScript:\n\t\tScripts: shotcam.lua\n\tShroud:\n\t\tFogCheckboxEnabled: False\n\t\tExploredMapCheckboxEnabled: True\n"
+        f.write(old_rules + "World:\n\tLuaScript:\n\t\tScripts: shotcam.lua\n\tShroud:\n\t\tFogCheckboxEnabled: False\n\t\tExploredMapCheckboxEnabled: True\n"
                 "\t\tFogEnabled: False\n\t\tExploredMapEnabled: True\n\tScreenshotAt:\n\t\tTick: 40\nPlayer:\n\t-ConquestVictoryConditions:\n")
     text = open(os.path.join(dst, "map.yaml"), encoding="utf-8").read()
-    text = text.replace("Title: ", "Title: shot ", 1).replace("RequiresMod: tgmc\n", "RequiresMod: tgmc\n\nRules: rules.yaml\n", 1)
+    text = text.replace("Title: ", "Title: shot ", 1)
+    if "Rules:" not in text:
+        text = text.replace("RequiresMod: tgmc\n", "RequiresMod: tgmc\n\nRules: rules.yaml\n", 1)
     with open(os.path.join(dst, "map.yaml"), "w", encoding="utf-8", newline="\n") as f:
         f.write(text)
     print("wrote", dst)

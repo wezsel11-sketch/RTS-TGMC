@@ -227,8 +227,14 @@ weed-node:
 	CashTrickler:
 		Interval: 50
 		Amount: 7
+	# Marines destroy a weed sack by walking up to it: it is not a Ground or Structure target, so nothing shoots it on its own (force-fire still
+	# works, and the melee units go for it, see blademan).
+	Targetable:
+		TargetTypes: WeedNode
 	# Creeps out on its own, so xenos do not have to place weeds one by one.
 	SpreadWeeds:
+		MaxRadius: 5
+		Interval: 60
 
 weeds:
 	Inherits: weed-node
@@ -969,6 +975,10 @@ mortar-emplacement:
 		Cost: 300
 	Armament@PRIMARY:
 		Weapon: TGMCMortarEmplacement
+	# Built close to an enemy structure it hits much harder (a second, shorter shell for structures only).
+	Armament@SIEGE:
+		Name: siege
+		Weapon: TGMCMortarSiege
 	AttackOmni:
 	WithAttackAnimation:
 		Sequence: fire
@@ -996,6 +1006,10 @@ artillery-emplacement:
 		Cost: 550
 	Armament@PRIMARY:
 		Weapon: TGMCHowitzer
+	# Built close to an enemy structure it hits much harder (a second, shorter shell for structures only).
+	Armament@SIEGE:
+		Name: siege
+		Weapon: TGMCHowitzerSiege
 	AttackOmni:
 	WithAttackAnimation:
 		Sequence: fire

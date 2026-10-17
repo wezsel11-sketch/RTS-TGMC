@@ -638,6 +638,49 @@ TGMCBoilerGlob:
 		Actor: gas-cloud
 		TrailCells: 0
 
+# The boiler as a sniper: a fast, flat acid shot from long range (stopped by walls and cover), bursting into an acid explosion
+# and an acid pool where it lands. No lobbed shell, no gas.
+TGMCBoilerSnipe:
+	Inherits: TGMCBoilerGlob
+	Range: 18c0
+	MinRange: 0
+	ReloadDelay: 150
+	-Projectile:
+	Projectile: CoverBullet
+		Speed: 700
+		Image: fx-acidball
+		Inaccuracy: 0
+	-Warhead@4Gas:
+	Warhead@2Boom: CreateEffect
+		Image: fx-acid
+		Explosions: splash
+		ForceDisplayAtGroundLevel: true
+		ValidTargets: Ground, Water, Structure
+	Warhead@5Burst: CreateEffect
+		Image: fx-blast
+		Explosions: small
+		ForceDisplayAtGroundLevel: true
+		ValidTargets: Ground, Water, Structure
+
+# Siege shells: an emplacement built close to an enemy structure hits it much harder (the mortar and the howitzer, 12 and 18 cells).
+TGMCMortarSiege:
+	Inherits: TGMCMortarEmplacement
+	Range: 12c0
+	MinRange: 5c0
+	ValidTargets: Structure
+	Warhead@1Wave: Shockwave
+		Damage: 140
+		Radius: 5
+
+TGMCHowitzerSiege:
+	Inherits: TGMCHowitzer
+	Range: 18c0
+	MinRange: 10c0
+	ValidTargets: Structure
+	Warhead@1Wave: Shockwave
+		Damage: 260
+		Radius: 6
+
 # Marine gunners. Smartgunner: fast, spread bullets. Grenadier: a grenade launcher, lobbed and explosive.
 TGMCSmartgun:
 	Range: 7c0

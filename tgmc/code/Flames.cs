@@ -28,6 +28,10 @@ namespace OpenRA.Mods.TGMC.Warheads
 			if (firedBy == null || Actor == null)
 				return;
 
+			// The target can be gone by the time an instant weapon lands (a marked enemy that just died): nothing to spawn on.
+			if (target.Type == TargetType.Invalid)
+				return;
+
 			var world = firedBy.World;
 			var impact = target.CenterPosition;
 			var from = args.Source ?? firedBy.CenterPosition;

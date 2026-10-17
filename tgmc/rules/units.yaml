@@ -92,6 +92,8 @@
 		HP: 170
 	# Marines see further than xenos do (the rest of the army sees 7 cells).
 	# Marines see only what a clear line reaches: rock and walls hide what is behind them (see TgmcSight in tgmc/code/Sight.cs).
+	# ^Unit already gave the unit a plain circle of sight; this replaces it, so marines never see through walls.
+	-RevealsShroud:
 	TgmcSight:
 		Range: 10c0
 	# Marines bleed where they are hit, and drip when badly hurt (the blood lies on the floor for about half a minute).
@@ -380,7 +382,7 @@ scout:
 	TgmcMobile:
 		Speed: 136
 	# Scouts see further than other marines.
-	RevealsShroud:
+	TgmcSight:
 		Range: 13c0
 	Armament@PRIMARY:
 		Weapon: TGMCSMG
@@ -469,7 +471,7 @@ ranger:
 		Speed: 108
 	DamageMultiplier@armor:
 		Modifier: 92
-	RevealsShroud:
+	TgmcSight:
 		Range: 12c0
 	Armament@PRIMARY:
 		Weapon: TGMCM412
@@ -618,6 +620,10 @@ blademan:
 		HP: 160
 	TgmcMobile:
 		Speed: 120
+	# Melee: it goes for the weed sacks in reach (nothing else shoots them on its own).
+	AutoTargetPriority@WEEDS:
+		ValidTargets: WeedNode
+		Priority: 1
 	Armament@PRIMARY:
 		Weapon: TGMCVali
 	Tooltip:
@@ -1767,7 +1773,7 @@ boiler:
 	TgmcMobile:
 		Speed: 130
 	Armament@PRIMARY:
-		Weapon: TGMCBoilerGlob
+		Weapon: TGMCBoilerSnipe
 	Tooltip:
 		Name: actor-boiler.name
 	Valued:

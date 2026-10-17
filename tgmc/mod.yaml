@@ -98,6 +98,7 @@ Sequences:
 	tgmc|sequences/grenade.yaml
 	tgmc|sequences/fx-bullet.yaml
 	tgmc|sequences/fx-acid.yaml
+	tgmc|sequences/fx-acidball.yaml
 	tgmc|sequences/fx-impact.yaml
 	tgmc|sequences/fx-blast.yaml
 	tgmc|sequences/fx-blast-big.yaml

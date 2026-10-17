@@ -68,7 +68,8 @@ namespace OpenRA.Mods.TGMC.Traits
 		}
 
 		// Walks the cells between the two from the unit's cell to the target and stops at rock and walls.
-		static bool ClearLine(World world, CPos from, CPos to)
+		/// <summary>True when no rock, wall or closed solid door lies on the cells between the two (the end cells do not count).</summary>
+		public static bool ClearLine(World world, CPos from, CPos to)
 		{
 			var dx = to.X - from.X;
 			var dy = to.Y - from.Y;

@@ -21,6 +21,9 @@ namespace OpenRA.Mods.TGMC.Traits
 		[Desc("How far off its heading (1024 is a full turn) a target may be for a unit that is walking along to shoot at it.")]
 		public readonly WAngle WalkFacingTolerance = new(200);
 
+		[Desc("The unit holds fire when a wall or a closed door stands between it and the target (it can be seen by a friend, but not hit).")]
+		public readonly bool NeedsLineOfFire = true;
+
 		[Desc("Ticks between looks for an enemy while walking, so a unit on the move also shoots at what it passes.")]
 		public readonly int ScanInterval = 8;
 
@@ -37,6 +40,19 @@ namespace OpenRA.Mods.TGMC.Traits
 			: base(self, info)
 		{
 			Info = info;
+		}
+
+		// Holds fire at a target behind a wall: sight is shared across the army, so a friend can see what this unit cannot hit.
+		protected override bool CanAttack(Actor self, in Target target)
+		{
+			if (!base.CanAttack(self, target))
+				return false;
+
+			if (!Info.NeedsLineOfFire || target.Type == TargetType.Invalid)
+				return true;
+
+			var cell = target.Type == TargetType.Actor ? target.Actor.Location : self.World.Map.CellContaining(target.CenterPosition);
+			return Traits.TgmcSight.ClearLine(self.World, self.Location, cell);
 		}
 
 		// Walking along on a move or attack-move order: shoot at the nearest enemy in range without stopping.

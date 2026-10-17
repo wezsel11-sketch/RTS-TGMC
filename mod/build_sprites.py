@@ -940,6 +940,12 @@ UNITS = {
             "sizzle": [(XENO_FX, "acid2", None, {"tick": 60})],
         },
     },
+    # TGMC's boiler glob: a round acid ball, bigger than the small acid spit (its own sheet: another frame size than fx-acid).
+    "fx-acidball": {
+        "sequences": {
+            "idle": [(PROJECTILES, "boiler_corrosive", None, {"tick": 80, "size": 64})],
+        },
+    },
     "fx-impact": {
         "sequences": {
             "spark": [(PROJECTILES, "spark", None, {"tick": 60})],

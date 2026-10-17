@@ -60,6 +60,8 @@
 # Where a structure may be placed: within Adjacent cells of an actor with GivesBuildableArea of the same type.
 # Marines build almost anywhere: 24 cells from any marine structure or Engineer.
 ^MarineBuildable:
+	# Units trained here walk to the Alamo's hatch while it stands (see Alamo.cs).
+	RallyAtAlamo:
 	RequiresBuildableArea:
 		AreaTypes: marine-build
 		Adjacent: 24
@@ -653,6 +655,8 @@ alamo:
 		Dimensions: 11, 21
 	Health:
 		HP: 2000
+	AlamoHatch:
+		Hatch: 0,9
 	Exit@1:
 		# The hatch is the hull cell (1, 9); units step out to the free cell beside it, (0, 9), outside the hull.
 		SpawnOffset: 0,512,0

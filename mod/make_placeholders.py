@@ -1275,7 +1275,7 @@ Actors:
     preview.save(os.path.join(folder, "map.png"))
 
 
-def write_tgmc_map(folder, title, rows, marines, xenos, art=None, objects=None, open_variant=None):
+def write_tgmc_map(folder, title, rows, marines, xenos, art=None, objects=None, open_variant=None, ai_test=False):
     """A skirmish map from a converted TGMC map. Landing Zone's two bases go at the given centres, on open ground. With `art`, a function
     (x, y) -> template id (build_maptiles), a cell that was not changed shows its real TGMC picture; a carved or cleared cell shows plain dirt."""
     h, w = len(rows), len(rows[0])
@@ -1354,6 +1354,11 @@ def write_tgmc_map(folder, title, rows, marines, xenos, art=None, objects=None, 
                         return art(nx, ny)
         return codes[land[y][x]]
     ground = (lambda x, y: (art(x, y) if land[y][x] == original[y][x] else dug_art(x, y), 0)) if art else (lambda x, y: (codes[land[y][x]], 0))
+    if ai_test:
+        # An AI-vs-AI copy of the map for tuning the bots on it (see scenarios/test-aimap.lua).
+        write_map(folder, title, w, h, actors + xeno_actors + extra, "MissionSelector", [spawn_m, spawn_x], scripts=("test-aimap",), ground=ground,
+                  category="Conquest", marine_bot="skirmish", xeno_bot="skirmish", fast=True, drop_conquest=False)
+        return
     write_map(folder, title, w, h, actors + xeno_actors + extra, "Lobby", [spawn_m, spawn_x], ground=ground, category="Conquest")
 
 
@@ -1396,6 +1401,9 @@ def main():
             write_tgmc_map(os.path.join(args.out, "maps", name), spec["title"], *tgmc_dmm.load(args.tgmc, spec),
                            art=tiles.art(name) if name in full else None,
                            objects=tiles.actors.get(name) if name in full else None, open_variant=tiles.open_variant)
+            if name in full:
+                write_tgmc_map(os.path.join(args.out, "maps", "aimap-" + name), "AI test " + spec["title"], *tgmc_dmm.load(args.tgmc, spec),
+                               art=tiles.art(name), objects=tiles.actors.get(name), open_variant=tiles.open_variant, ai_test=True)
     for name, sc in SCENARIOS.items():
         width, height = sc.get("size", (24, 24))
         write_map(os.path.join(args.out, "maps", name), name, width, height, sc["actors"], "MissionSelector",

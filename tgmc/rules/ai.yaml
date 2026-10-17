@@ -123,10 +123,10 @@ Player:
 			ordnance-depot: 1
 			evolution-tower: 1
 			maturity-tower: 1
-			sentry-turret: 8
-			resin-turret: 8
+			sentry-turret: 5
+			resin-turret: 5
 			workshop: 1
-			mortar-emplacement: 6
+			mortar-emplacement: 4
 			artillery-emplacement: 2
 			forward-hive: 2
 			resin-trap: 6
@@ -527,11 +527,12 @@ Player:
 		Refuges: weed-node, resin-silo, forward-hive
 		Exclude: drone, queen, facehugger, larva
 	# On Hard, one cheap fast unit explores the map.
+	# Scouting is for every AI above Easy: the big maps need someone to find the enemy.
 	ScoutBotModule@marines:
-		RequiresCondition: enable-hard-ai && !faction-xenos
+		RequiresCondition: enable-skirmish-ai && !enable-easy-ai && !faction-xenos
 		Scouts: scout, rifleman
 	ScoutBotModule@xenos:
-		RequiresCondition: enable-hard-ai && faction-xenos
+		RequiresCondition: enable-skirmish-ai && !enable-easy-ai && faction-xenos
 		Scouts: runner, hunter
 	# Drones creep the weeds out across the map: they walk to the edge of the weeds, toward the enemy, and the builder plants nodes around them.
 	WeedDroneBotModule@xenos:

@@ -85,7 +85,7 @@ def convert(grid, width, height, factor, box):
 # TGMC tiles (x, y from the top left corner of the .dmm), picked in open ground a good walk apart.
 MAPS = {
     "lv-624": {"title": "LV-624", "file": "_maps/map_files/LV624/LV624.dmm", "factor": 2, "marines": (30, 128), "xenos": (150, 50)},
-    "big-red": {"title": "Big Red", "file": "_maps/map_files/BigRed_v2/BigRed_v2.dmm", "factor": 3, "marines": (28, 118), "xenos": (130, 42)},
+    "big-red": {"title": "Big Red", "file": "_maps/map_files/BigRed_v2/BigRed_v2.dmm", "factor": 3, "marines": (28, 118), "xenos": (127, 28)},
     "whiskey-outpost": {"title": "Whiskey Outpost", "file": "_maps/map_files/Whiskey_Outpost/Whiskey_Outpost_v2.dmm", "factor": 2, "marines": (60, 22), "xenos": (60, 112)},
     "desert-dam": {"title": "Desert Dam", "file": "_maps/map_files/desertdam/desertdam.dmm", "factor": 3, "marines": (40, 150), "xenos": (200, 150)},
 }

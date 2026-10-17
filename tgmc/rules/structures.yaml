@@ -654,9 +654,9 @@ alamo:
 	Health:
 		HP: 2000
 	Exit@1:
-		# The hatch cell (1, 9) relative to the footprint origin.
+		# The hatch is the hull cell (1, 9); units step out to the free cell beside it, (0, 9), outside the hull.
 		SpawnOffset: 0,512,0
-		ExitCell: 1,9
+		ExitCell: 0,9
 	RallyPoint:
 		Path: 0, 5
 	GivesBuildableArea:

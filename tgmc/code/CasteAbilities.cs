@@ -6,6 +6,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using OpenRA.Activities;
 using OpenRA.Effects;
 using OpenRA.GameRules;
 using OpenRA.Graphics;
@@ -92,6 +93,23 @@ namespace OpenRA.Mods.TGMC.Traits
 		public override object Create(ActorInitializer init) { return new ActiveAbility(init.Self, this); }
 	}
 
+	/// <summary>A queued ability use: fires when the unit reaches it, whether or not the use succeeds, then finishes.</summary>
+	class UseAbilityActivity : Activity
+	{
+		readonly ActiveAbility ability;
+
+		public UseAbilityActivity(ActiveAbility ability) { this.ability = ability; }
+
+		public override bool Tick(Actor self)
+		{
+			if (IsCanceling)
+				return true;
+
+			ability.Use(self);
+			return true;
+		}
+	}
+
 	public class ActiveAbility : ConditionalTrait<ActiveAbilityInfo>, IResolveOrder, ITick, ISelectionBar
 	{
 		readonly Actor self;
@@ -142,7 +160,12 @@ namespace OpenRA.Mods.TGMC.Traits
 
 		void IResolveOrder.ResolveOrder(Actor self, Order order)
 		{
-			if (order.OrderString == Info.OrderName)
+			if (order.OrderString != Info.OrderName)
+				return;
+
+			if (order.Queued)
+				self.QueueActivity(true, new UseAbilityActivity(this));
+			else
 				Use(self);
 		}
 
@@ -330,6 +353,23 @@ namespace OpenRA.Mods.TGMC.Scripting
 		{
 			var ability = Self.TraitsImplementing<ActiveAbility>().FirstOrDefault(a => a.Info.Slot == slot);
 			return ability != null && ability.Use(Self);
+		}
+
+		[Desc("Queue the ability in the given slot behind the unit's current orders, as Shift plus its button does. Returns false if the unit has none in that slot.")]
+		public bool QueueAbility(int slot)
+		{
+			var ability = Self.TraitsImplementing<ActiveAbility>().FirstOrDefault(a => a.Info.Slot == slot);
+			if (ability == null)
+				return false;
+
+			Self.QueueActivity(true, new UseAbilityActivity(ability));
+			return true;
+		}
+
+		[Desc("True if the ability in the given slot is ready to use now.")]
+		public bool AbilityReady(int slot)
+		{
+			return Self.TraitsImplementing<ActiveAbility>().Any(a => a.Info.Slot == slot && a.Ready);
 		}
 	}
 }

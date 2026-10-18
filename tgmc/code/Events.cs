@@ -262,7 +262,7 @@ namespace OpenRA.Mods.TGMC.Widgets.Logic
 				button.IsHighlighted = () => Abilities(s).Any(x => x.Active);
 				button.GetText = () => AbilityLabel(Abilities(s).FirstOrDefault());
 				button.OnClick = () => Issue(a => a.TraitsImplementing<ActiveAbility>().Any(x => x.Info.Slot == s && x.Ready),
-					a => new Order(a.TraitsImplementing<ActiveAbility>().First(x => x.Info.Slot == s && x.Ready).Info.OrderName, a, false));
+					a => new Order(a.TraitsImplementing<ActiveAbility>().First(x => x.Info.Slot == s && x.Ready).Info.OrderName, a, Game.GetModifierKeys().HasModifier(Modifiers.Shift)));
 			}
 
 			// Attack: classic attack-move, the same as the attack-move key (Ctrl for assault move, as in OpenRA).

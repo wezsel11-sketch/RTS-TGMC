@@ -646,6 +646,9 @@ SCENARIOS = {
     "scenario-retreat-none": _scenario("test-retreat-none", [
         ("rifleman", "Marines", 4, 4, 512),
     ]),
+    "scenario-queued-ability": _scenario("test-queued-ability", [
+        ("squad_leader", "Marines", 4, 10, 256),
+    ]),
     "scenario-mend": {"scripts": ("test-mend",), "actors": [
         ("drone", "Xenos", 10, 10, 512),
         ("resin-turret", "Xenos", 10, 12, 512),

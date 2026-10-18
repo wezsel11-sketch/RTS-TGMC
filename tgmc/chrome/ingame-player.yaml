@@ -19,7 +19,7 @@ Container@PLAYER_WIDGETS:
 		LogicTicker@SIDEBAR_TICKER:
 		Container@SUPPORT_POWERS:
 			Logic: SupportPowerBinLogic
-			X: 274
+			X: 320
 			Y: 44
 			Children:
 				SupportPowers@SUPPORT_PALETTE:
@@ -36,7 +36,7 @@ Container@PLAYER_WIDGETS:
 			Order: Descending
 		Container@EVENT_LOG:
 			Logic: EventLogLogic
-			X: WINDOW_WIDTH - 316
+			X: 10
 			Y: 48
 			Width: 300
 			Height: 140
@@ -543,7 +543,7 @@ Container@PLAYER_WIDGETS:
 			Height: WINDOW_HEIGHT
 			Children:
 				Background@BUILD_PANEL:
-					X: 10
+					X: WINDOW_WIDTH - 262
 					Y: 44
 					Width: 252
 					Height: WINDOW_HEIGHT - 250
@@ -643,12 +643,11 @@ Container@PLAYER_WIDGETS:
 					Font: Bold
 					DisableWorldSounds: true
 					VisualHeight: 0
-				Background@DOCK:
+				Container@DOCK:
 					X: 10
 					Y: WINDOW_HEIGHT - 196
 					Width: WINDOW_WIDTH - 20
 					Height: 186
-					Background: tgui-window
 					Children:
 						Background@RADAR_FRAME:
 							X: 12
@@ -667,9 +666,9 @@ Container@PLAYER_WIDGETS:
 									Height: 158
 						Background@SELECTION_PANEL:
 							Logic: SelectionReadoutLogic
-							X: 250
+							X: PARENT_WIDTH / 2 - 300
 							Y: 12
-							Width: PARENT_WIDTH - 250 - 324
+							Width: 300
 							Height: 162
 							Background: tgui-card
 							Children:
@@ -710,7 +709,7 @@ Container@PLAYER_WIDGETS:
 									Align: Left
 						Background@GROUP_PANEL:
 							Logic: GroupGridLogic
-							X: 250 + 84
+							X: PARENT_WIDTH / 2 - 216
 							Y: 12 + 82
 							Width: 224
 							Height: 64
@@ -1004,9 +1003,10 @@ Container@PLAYER_WIDGETS:
 											Y: 19
 											Width: 20
 											Height: 3
-						Container@COMMAND_CARD:
+						Background@COMMAND_CARD:
 							Logic: CommandCardLogic
-							X: PARENT_WIDTH - 312
+							Background: tgui-card
+							X: PARENT_WIDTH / 2 + 12
 							Y: 14
 							Width: 300
 							Height: 160

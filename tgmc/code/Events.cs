@@ -204,6 +204,11 @@ namespace OpenRA.Mods.TGMC.Widgets.Logic
 			stop.IsDisabled = () => Selected().Count == 0;
 			stop.OnClick = () => Issue(_ => true, a => new Order("Stop", a, false));
 
+			var retreat = widget.GetOrNull<ButtonWidget>("CMD_RETREAT");
+			if (retreat != null)
+				retreat.OnClick = () => Issue(a => a.TraitOrDefault<Retreat>() != null,
+					a => new Order(Retreat.OrderName, a, Game.GetModifierKeys().HasModifier(Modifiers.Shift)));
+
 			foreach (var (id, stance) in new[] { ("CMD_AGGRESSIVE", UnitStance.AttackAnything), ("CMD_GUARD", UnitStance.Defend),
 				("CMD_RETURN", UnitStance.ReturnFire), ("CMD_HOLD", UnitStance.HoldFire) })
 			{

@@ -2,6 +2,7 @@
 # Sequence names here must exist in the generated sequences/*.yaml.
 
 ^Unit:
+	Retreat:
 	Health:
 		HP: 120
 	TgmcMobile:

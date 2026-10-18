@@ -639,6 +639,13 @@ SCENARIOS = {
         ("rifleman", "Marines", 10, 20, 512),
         ("runner", "Xenos", 13, 20, 0),
     ]),
+    "scenario-retreat": _scenario("test-retreat", [
+        ("rifleman", "Marines", 4, 4, 512),
+        ("cryo-pod", "Marines", 16, 16, 0),
+    ]),
+    "scenario-retreat-none": _scenario("test-retreat-none", [
+        ("rifleman", "Marines", 4, 4, 512),
+    ]),
     "scenario-mend": {"scripts": ("test-mend",), "actors": [
         ("drone", "Xenos", 10, 10, 512),
         ("resin-turret", "Xenos", 10, 12, 512),

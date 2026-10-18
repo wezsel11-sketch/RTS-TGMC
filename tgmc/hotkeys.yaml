@@ -68,3 +68,8 @@ TgmcSelectAllOfType: W Ctrl
 	Description: hotkey-description-tgmcselectalloftype
 	Types: World
 	Contexts: player
+
+TgmcRetreat: V
+	Description: hotkey-description-tgmcretreat
+	Types: World
+	Contexts: player

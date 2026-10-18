@@ -288,6 +288,7 @@ cmd-attack = Attack
 cmd-patrol = Patrol
 cmd-scatter = Scat
 cmd-aggressive = Attack
+cmd-retreat = Retreat
 cmd-guard = Guard
 cmd-return = Return
 cmd-hold = Hold
@@ -349,6 +350,7 @@ actor-assault =
     .description = Heavy Jaeger exoskeleton and a carbine: slow, but shrugs off claws and acid like the other heavy marines. Needs an Ordnance Depot. Costs 280 requisition.
 
 hotkey-description-tgmcability1 = Use the selected units' first caste ability
+hotkey-description-tgmcretreat = Retreat the selected units to the nearest friendly return point
 hotkey-description-tgmcability2 = Use the selected units' second caste ability
 hotkey-description-tgmcselectidle = Select all idle combat units
 hotkey-description-tgmcselectwounded = Select all wounded or infected units

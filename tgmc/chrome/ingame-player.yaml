@@ -1087,6 +1087,15 @@ Container@PLAYER_WIDGETS:
 									Text: cmd-aggressive
 									Key: StanceAttackAnything
 									Font: TinyBold
+								Button@CMD_RETREAT:
+									X: 76
+									Y: 108
+									Width: 72
+									Height: 30
+									Background: sidebar-button
+									Text: cmd-retreat
+									Key: TgmcRetreat
+									Font: TinyBold
 								Button@CMD_ABILITY1:
 									X: 0
 									Y: 72

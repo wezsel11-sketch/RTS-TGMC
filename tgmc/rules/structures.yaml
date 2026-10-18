@@ -132,6 +132,7 @@ resin-turret:
 		ValidTargets: Ground
 
 resin-silo:
+	ReturnPoint:
 	Inherits: ^Structure
 	Inherits@build: ^XenoMajorBuildable
 	Buildable:
@@ -470,6 +471,7 @@ maturity-tower:
 # build area for major structures around it, trains xenos, sees a long way and brings in a little requisition. Marines do not
 # have to destroy it to win.
 forward-hive:
+	ReturnPoint:
 	Inherits: ^Structure
 	Inherits@build: ^XenoMinorBuildable
 	Buildable:
@@ -657,6 +659,7 @@ vendor:
 		Cost: 200
 
 cryo-pod:
+	ReturnPoint:
 	Inherits: ^Structure
 	Inherits@build: ^MarineBuildable
 	Buildable:
@@ -812,6 +815,7 @@ armory:
 
 # Medbay: heals marines within four cells on its own, and a heal clears a facehugger's embryo.
 medbay:
+	ReturnPoint:
 	Inherits: ^Structure
 	Inherits@build: ^MarineBuildable
 	Buildable:

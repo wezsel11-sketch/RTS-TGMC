@@ -1058,6 +1058,7 @@ Container@PLAYER_WIDGETS:
 									Height: 30
 									Background: sidebar-button
 									Text: cmd-guard
+									Key: StanceDefend
 									Font: TinyBold
 								Button@CMD_RETURN:
 									X: 152
@@ -1066,6 +1067,7 @@ Container@PLAYER_WIDGETS:
 									Height: 30
 									Background: sidebar-button
 									Text: cmd-return
+									Key: StanceReturnFire
 									Font: TinyBold
 								Button@CMD_HOLD:
 									X: 228
@@ -1074,6 +1076,16 @@ Container@PLAYER_WIDGETS:
 									Height: 30
 									Background: sidebar-button
 									Text: cmd-hold
+									Key: StanceHoldFire
+									Font: TinyBold
+								Button@CMD_AGGRESSIVE:
+									X: 0
+									Y: 108
+									Width: 72
+									Height: 30
+									Background: sidebar-button
+									Text: cmd-aggressive
+									Key: StanceAttackAnything
 									Font: TinyBold
 								Button@CMD_ABILITY1:
 									X: 0

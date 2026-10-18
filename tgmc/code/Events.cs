@@ -204,7 +204,7 @@ namespace OpenRA.Mods.TGMC.Widgets.Logic
 			stop.IsDisabled = () => Selected().Count == 0;
 			stop.OnClick = () => Issue(_ => true, a => new Order("Stop", a, false));
 
-			foreach (var (id, stance) in new[] { ("CMD_GUARD", UnitStance.Defend),
+			foreach (var (id, stance) in new[] { ("CMD_AGGRESSIVE", UnitStance.AttackAnything), ("CMD_GUARD", UnitStance.Defend),
 				("CMD_RETURN", UnitStance.ReturnFire), ("CMD_HOLD", UnitStance.HoldFire) })
 			{
 				var button = widget.GetOrNull<ButtonWidget>(id);

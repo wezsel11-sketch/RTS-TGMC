@@ -649,6 +649,11 @@ SCENARIOS = {
     "scenario-queued-ability": _scenario("test-queued-ability", [
         ("squad_leader", "Marines", 4, 10, 256),
     ]),
+    "scenario-alert": {"scripts": ("test-alert",), "extra_rules": "rifleman:\n\tHealth:\n\t\tHP: 3000\n", "actors": [
+        ("rifleman", "Marines", 10, 10, 512),
+        ("runner", "Xenos", 13, 10, 0),
+        ("resin-silo", "Xenos", 19, 19, 0),
+    ]},
     "scenario-mend": {"scripts": ("test-mend",), "actors": [
         ("drone", "Xenos", 10, 10, 512),
         ("resin-turret", "Xenos", 10, 12, 512),

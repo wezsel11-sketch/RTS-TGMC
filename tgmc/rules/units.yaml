@@ -3,6 +3,7 @@
 
 ^Unit:
 	Retreat:
+	AlertOnDamage:
 	Health:
 		HP: 120
 	TgmcMobile:

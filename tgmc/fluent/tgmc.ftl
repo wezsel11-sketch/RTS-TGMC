@@ -273,6 +273,7 @@ help-8 = CAS (top left): pick a munition (bombs, 30mm, rockets, flare, missiles)
 help-9 = Weeds spread from Weed Nodes. Xenos build near weeds; marines near their base.
 help-10 = Lobby options switch friendly fire, facehuggers, maturity and tile movement.
 event-facehugged = Marine facehugged
+event-under-attack = Under attack
 event-burst = Marine burst
 event-larva = New larva from a host
 event-evolved = Xeno evolved

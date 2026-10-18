@@ -48,6 +48,7 @@ namespace OpenRA.Mods.TGMC.Traits
 		readonly TgmcEventLogInfo info;
 		readonly List<Entry> entries = [];
 		readonly Dictionary<(Player, string), int> counts = [];
+		readonly Dictionary<(Player, string), int> lastPosted = [];
 
 		public TgmcEventLog(TgmcEventLogInfo info) { this.info = info; }
 
@@ -55,6 +56,21 @@ namespace OpenRA.Mods.TGMC.Traits
 
 		/// <summary>How many times `key` has been posted for `owner` this match; the end screen reads these.</summary>
 		public int Count(Player owner, string key) => counts.TryGetValue((owner, key), out var n) ? n : 0;
+
+		/// <summary>Like Post, but skipped if `key` was already posted for `owner` within the last `cooldownTicks`. Returns whether it posted.</summary>
+		public static bool PostLimited(World world, Player owner, string key, WPos position, int cooldownTicks)
+		{
+			var log = world.WorldActor.TraitOrDefault<TgmcEventLog>();
+			if (log == null)
+				return false;
+
+			if (log.lastPosted.TryGetValue((owner, key), out var last) && world.WorldTick - last < cooldownTicks)
+				return false;
+
+			log.lastPosted[(owner, key)] = world.WorldTick;
+			Post(world, owner, key, position);
+			return true;
+		}
 
 		/// <summary>Records an event for `owner`'s side. `key` is a fluent message key.</summary>
 		public static void Post(World world, Player owner, string key, WPos position)

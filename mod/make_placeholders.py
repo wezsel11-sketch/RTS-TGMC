@@ -664,6 +664,10 @@ SCENARIOS = {
     "scenario-repeat-broke": _scenario("test-repeat-broke", [
         ("cryo-pod", "Marines", 8, 8, 0),
     ]),
+    "scenario-orbital-nojet": _scenario("test-orbital-nojet", [
+        ("workshop", "Marines", 8, 8, 0),
+        ("runner", "Xenos", 14, 10, 0),
+    ]),
     "scenario-mend": {"scripts": ("test-mend",), "actors": [
         ("drone", "Xenos", 10, 10, 512),
         ("resin-turret", "Xenos", 10, 12, 512),

@@ -912,6 +912,7 @@ workshop:
 		BeginChargeSound: ui-ping.ogg
 		EndChargeSound: ui-confirm.ogg
 		Weapon: TGMCOrbital
+		Jet: false
 		PassSounds: sonic-boom.ogg
 		DropSounds: cas-voice-bomb.ogg
 		IncomingSounds: ob-incoming.ogg

@@ -57,6 +57,9 @@ namespace OpenRA.Mods.TGMC.Traits
 		[Desc("Spots hit per interval inside the radius.")]
 		public readonly int LingerSpots = 3;
 
+		[Desc("False: no aircraft. The blasts come straight down from orbit after FallDelay ticks (orbital bombardment).")]
+		public readonly bool Jet = true;
+
 		[Desc("Ticks the target area stays revealed after the strike (a flare). 0: just while the jet passes.")]
 		public readonly int RevealDuration = 0;
 
@@ -176,6 +179,14 @@ namespace OpenRA.Mods.TGMC.Traits
 			world.WorldActor.TraitOrDefault<RadarPings>()?.Add(
 				() => owner.IsAlliedWith(world.RenderPlayer), target, Color.FromArgb(255, 140, 40), 120);
 
+			if (!info.Jet)
+			{
+				world.AddFrameEndTask(w => w.Add(new OrbitalBombardment(self, info, target)));
+				world.AddFrameEndTask(w => w.Add(new RevealShroudEffect(target, info.CameraRange, Shroud.SourceType.Visibility, self.Owner,
+					PlayerRelationship.Ally, 0, info.FallDelay + 40)));
+				return;
+			}
+
 			var reveal = info.RevealDuration > 0
 				? info.RevealDuration
 				: (int)(2 * info.TrackLength.Length / Math.Max(1, info.Speed.Length)) + 40;
@@ -251,6 +262,58 @@ namespace OpenRA.Mods.TGMC.Traits
 
 	// The jet itself: one effect that flies the track, drops bombs as it crosses their spots, and applies the weapon after each
 	// bomb's fall. Cluster missiles add a ring of blasts, and napalm and lasers leave burning ground.
+	/// <summary>An orbital strike: no aircraft. Each spot's blast lands FallDelay ticks after the call, with the incoming whistle first.</summary>
+	sealed class OrbitalBombardment : IEffect
+	{
+		readonly Actor source;
+		readonly CondorStrikePowerInfo info;
+		readonly WPos target;
+		readonly WVec unit;
+		int ticks;
+		bool fired;
+
+		public OrbitalBombardment(Actor source, CondorStrikePowerInfo info, WPos target)
+		{
+			this.source = source;
+			this.info = info;
+			this.target = target;
+			unit = CondorStrikePower.Heading(source.CenterPosition, target);
+		}
+
+		void IEffect.Tick(World world)
+		{
+			ticks++;
+			if (!fired && ticks == 1 && info.IncomingSounds.Length > 0)
+				Fx.Sound(world, target, info.IncomingSounds);
+
+			if (!fired && ticks >= info.FallDelay)
+			{
+				fired = true;
+				foreach (var spot in CondorStrikePower.Spots(info, target, unit))
+					Detonate(world, spot);
+
+				world.AddFrameEndTask(w => w.Remove(this));
+			}
+		}
+
+		void Detonate(World world, WPos spot)
+		{
+			var args = new WarheadArgs
+			{
+				Weapon = info.WeaponInfo,
+				SourceActor = source,
+				Source = spot,
+				ImpactPosition = spot,
+				WeaponTarget = Target.FromPos(spot),
+				DamageModifiers = []
+			};
+
+			info.WeaponInfo.Impact(Target.FromPos(spot), args);
+		}
+
+		IEnumerable<IRenderable> IEffect.Render(WorldRenderer wr) { return SpriteRenderable.None; }
+	}
+
 	sealed class CondorFlight : IEffect
 	{
 		readonly Actor source;

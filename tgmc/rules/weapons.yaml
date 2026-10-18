@@ -1,7 +1,7 @@
 # Effects (fx-* images) are drawn by mod/build_sprites.py from TGMC art. Bullets fly as tracers, hits splash sparks on structures
 # and acid-green gore on xenos, spit is a visible acid glob, the grenade explodes, and melee hits get their own flash.
 TGMCRifle:
-	Range: 6c0
+	Range: 9c0
 	# Fires in bursts of three, then the trigger rests (TGMC rifles have burst_amount 3 and a longer delay between bursts).
 	Burst: 3
 	BurstDelays: 3
@@ -12,7 +12,7 @@ TGMCRifle:
 	Projectile: CoverBullet
 		Speed: 600
 		Image: fx-bullet
-		Inaccuracy: 384
+		Inaccuracy: 576
 	Warhead@8Flash: GrantExternalCondition
 		Condition: hitflash
 		Duration: 3
@@ -652,7 +652,7 @@ TGMCLaserRifle:
 	Projectile: CoverBullet
 		Speed: 1000
 		Image: fx-laser
-		Inaccuracy: 256
+		Inaccuracy: 384
 
 # The SOM veteran's plasma rifle: a plasma ball, slower and harder-hitting than a laser bolt, with the plasma sound.
 TGMCPlasmaRifle:
@@ -663,7 +663,7 @@ TGMCPlasmaRifle:
 	Projectile: CoverBullet
 		Speed: 420
 		Image: fx-plasma
-		Inaccuracy: 128
+		Inaccuracy: 192
 	Warhead@1Dam: SpreadDamage
 		Damage: 20
 
@@ -920,22 +920,22 @@ TGMCHEGrenade:
 # lighter, the M412 heavier and slower. The T-12 assault rifle is TGMCRifle above.
 TGMCCarbine:
 	Inherits: TGMCRifle
-	Range: 5c256
+	Range: 8c0
 	BurstDelays: 2
 	ReloadDelay: 15
 	Projectile: CoverBullet
-		Inaccuracy: 448
+		Inaccuracy: 683
 	Warhead@1Dam: SpreadDamage
 		Damage: 7
 
 TGMCM412:
 	Inherits: TGMCRifle
-	Range: 6c512
+	Range: 10c0
 	BurstDelays: 4
 	ReloadDelay: 24
 	Report: rifle-fire-m412.ogg
 	Projectile: CoverBullet
-		Inaccuracy: 320
+		Inaccuracy: 492
 	Warhead@1Dam: SpreadDamage
 		Damage: 11
 

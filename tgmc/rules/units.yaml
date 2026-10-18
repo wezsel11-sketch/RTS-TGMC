@@ -179,17 +179,6 @@
 		Voice: Attack
 		PauseOnCondition: hugged || stunned
 	ActorLostNotification:
-	# A magazine: it empties, then the marine reloads (the reload starts a moment after the last shot). Each kind of
-	# marine sets its own size and reload time.
-	AmmoPool:
-		Ammo: 30
-		AmmoCondition: ammo
-	ReloadAmmoPool:
-		Delay: 60
-		Count: 30
-		ResetOnFire: true
-		Sound: reload-rifle.ogg
-	AmmoBar:
 	# Words over a marine's head: what is wrong with him, and his magazine when selected.
 	StatusLabel@hugged:
 		RequiresCondition: hugged
@@ -204,18 +193,6 @@
 		Text: STUNNED
 		Color: FFD040
 		Line: 1
-	StatusLabel@reload:
-		RequiresCondition: !ammo
-		Text: RELOADING
-		Color: FFA040
-		Line: 2
-		OnlyWhenSelected: true
-	StatusLabel@lowammo:
-		RequiresCondition: ammo > 0 && ammo < 6
-		Text: LOW AMMO
-		Color: FFC060
-		Line: 2
-		OnlyWhenSelected: true
 
 rifleman:
 	Inherits: ^Infantry
@@ -267,27 +244,10 @@ rifleman:
 
 medic:
 	Inherits: ^Infantry
-	-StatusLabel@reload:
-	-StatusLabel@lowammo:
-	-AmmoBar:
-	AmmoBar@gun:
-		AmmoPool: gun
 	# A submachine gun as well as the hypospray: the gun has its own small magazine.
-	-AmmoPool:
-	-ReloadAmmoPool:
 	Armament@GUN:
 		Name: gun
 		Weapon: TGMCSMG
-	AmmoPool@gun:
-		Name: gun
-		Armaments: gun
-		Ammo: 40
-	ReloadAmmoPool@gun:
-		AmmoPool: gun
-		Delay: 60
-		Count: 40
-		ResetOnFire: true
-		Sound: reload-smg.ogg
 	AutoTargetPriority@GUN:
 		ValidTargets: Ground
 		Priority: 0
@@ -322,27 +282,10 @@ medic:
 
 engineer:
 	Inherits: ^Infantry
-	-StatusLabel@reload:
-	-StatusLabel@lowammo:
-	-AmmoBar:
-	AmmoBar@gun:
-		AmmoPool: gun
 	# A shotgun as well as the repair torch: the gun has its own small magazine.
-	-AmmoPool:
-	-ReloadAmmoPool:
 	Armament@GUN:
 		Name: gun
 		Weapon: TGMCShotgun
-	AmmoPool@gun:
-		Name: gun
-		Armaments: gun
-		Ammo: 12
-	ReloadAmmoPool@gun:
-		AmmoPool: gun
-		Delay: 70
-		Count: 12
-		ResetOnFire: true
-		Sound: reload-shotgun.ogg
 	AutoTargetPriority@GUN:
 		ValidTargets: Ground
 		Priority: 0
@@ -377,12 +320,6 @@ engineer:
 # little less from every hit, heavy (assault, and the heavy gunner and demolitionist further down) is slow and shrugs off claws and acid.
 scout:
 	Inherits: ^Infantry
-	AmmoPool:
-		Ammo: 40
-	ReloadAmmoPool:
-		Delay: 60
-		Count: 40
-		Sound: reload-smg.ogg
 	Health:
 		HP: 85
 	TgmcMobile:
@@ -408,12 +345,6 @@ scout:
 
 skirmisher:
 	Inherits: ^Infantry
-	AmmoPool:
-		Ammo: 8
-	ReloadAmmoPool:
-		Delay: 80
-		Count: 8
-		Sound: reload-shotgun.ogg
 	Health:
 		HP: 95
 	TgmcMobile:
@@ -436,12 +367,6 @@ skirmisher:
 
 trooper:
 	Inherits: ^Infantry
-	AmmoPool:
-		Ammo: 30
-	ReloadAmmoPool:
-		Delay: 70
-		Count: 30
-		Sound: reload-rifle.ogg
 	Health:
 		HP: 140
 	TgmcMobile:
@@ -466,12 +391,6 @@ trooper:
 
 ranger:
 	Inherits: ^Infantry
-	AmmoPool:
-		Ammo: 30
-	ReloadAmmoPool:
-		Delay: 70
-		Count: 30
-		Sound: reload-rifle.ogg
 	Health:
 		HP: 110
 	TgmcMobile:
@@ -498,12 +417,6 @@ ranger:
 
 assault:
 	Inherits: ^Infantry
-	AmmoPool:
-		Ammo: 60
-	ReloadAmmoPool:
-		Delay: 110
-		Count: 60
-		Sound: reload-rifle.ogg
 	Health:
 		HP: 240
 	TgmcMobile:
@@ -530,12 +443,6 @@ assault:
 
 smartgunner:
 	Inherits: ^Infantry
-	AmmoPool:
-		Ammo: 60
-	ReloadAmmoPool:
-		Delay: 100
-		Count: 60
-		Sound: reload-mg.ogg
 	Health:
 		HP: 130
 	TgmcMobile:
@@ -558,12 +465,6 @@ smartgunner:
 
 sniper:
 	Inherits: ^Infantry
-	AmmoPool:
-		Ammo: 10
-	ReloadAmmoPool:
-		Delay: 70
-		Count: 10
-		Sound: reload-sniper.ogg
 	# Heavy weapon: this one stops to shoot.
 	AttackWhileMoving:
 		FireWhileMoving: false
@@ -589,12 +490,6 @@ sniper:
 
 rocketeer:
 	Inherits: ^Infantry
-	AmmoPool:
-		Ammo: 3
-	ReloadAmmoPool:
-		Delay: 120
-		Count: 3
-		Sound: reload-launcher.ogg
 	Health:
 		HP: 120
 	TgmcMobile:
@@ -617,12 +512,7 @@ rocketeer:
 
 blademan:
 	Inherits: ^Infantry
-	-StatusLabel@reload:
-	-StatusLabel@lowammo:
-	-AmmoBar:
 	# Sword swings need no magazine.
-	-AmmoPool:
-	-ReloadAmmoPool:
 	Health:
 		HP: 160
 	TgmcMobile:
@@ -646,12 +536,6 @@ blademan:
 
 mortarman:
 	Inherits: ^Infantry
-	AmmoPool:
-		Ammo: 4
-	ReloadAmmoPool:
-		Delay: 130
-		Count: 4
-		Sound: reload-mortar.ogg
 	Health:
 		HP: 110
 	TgmcMobile:
@@ -674,12 +558,6 @@ mortarman:
 
 flamer:
 	Inherits: ^Infantry
-	AmmoPool:
-		Ammo: 20
-	ReloadAmmoPool:
-		Delay: 90
-		Count: 20
-		Sound: reload-flamer.ogg
 	Health:
 		HP: 140
 	TgmcMobile:
@@ -702,12 +580,6 @@ flamer:
 
 machinegunner:
 	Inherits: ^Infantry
-	AmmoPool:
-		Ammo: 120
-	ReloadAmmoPool:
-		Delay: 150
-		Count: 120
-		Sound: reload-mg.ogg
 	# Heavy weapon: this one stops to shoot.
 	AttackWhileMoving:
 		FireWhileMoving: false
@@ -1009,12 +881,6 @@ som_mech:
 
 grenadier:
 	Inherits: ^Infantry
-	AmmoPool:
-		Ammo: 6
-	ReloadAmmoPool:
-		Delay: 90
-		Count: 6
-		Sound: reload-launcher.ogg
 	Health:
 		HP: 90
 	Armament@PRIMARY:
@@ -1156,12 +1022,6 @@ mech:
 # B18 heavy gunner: juggernaut armour and a minigun. Slow, but fast firing and hard to kill.
 heavygunner:
 	Inherits: ^Infantry
-	AmmoPool:
-		Ammo: 200
-	ReloadAmmoPool:
-		Delay: 190
-		Count: 200
-		Sound: reload-minigun.ogg
 	Health:
 		HP: 320
 	TgmcMobile:
@@ -1189,12 +1049,6 @@ heavygunner:
 # B17 demolitionist: high explosives, and armour that shrugs off blasts, his own included.
 demolitionist:
 	Inherits: ^Infantry
-	AmmoPool:
-		Ammo: 4
-	ReloadAmmoPool:
-		Delay: 110
-		Count: 4
-		Sound: reload-launcher.ogg
 	Health:
 		HP: 260
 	TgmcMobile:

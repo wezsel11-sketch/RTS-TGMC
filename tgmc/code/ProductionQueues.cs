@@ -25,6 +25,10 @@ namespace OpenRA.Mods.TGMC.Traits
 	{
 		readonly Actor self;
 		readonly MultiProductionQueueInfo info;
+		string lastQueued;
+
+		/// <summary>Repeat build: when the queue empties, queue the item it last built again (it waits for cash like any item).</summary>
+		public bool Repeat { get; set; }
 
 		public MultiProductionQueue(ActorInitializer init, MultiProductionQueueInfo info)
 			: base(init, info)
@@ -53,6 +57,11 @@ namespace OpenRA.Mods.TGMC.Traits
 			if (allProductionPaused)
 				return;
 
+			if (Queue.Count > 0)
+				lastQueued = Queue[^1].Item;
+			else if (Repeat && lastQueued != null && BuildableItems().Any(a => a.Name == lastQueued))
+				ResolveOrder(self, Order.StartProduction(self, lastQueued, 1));
+
 			// A finished unit keeps asking to leave until a building has room for it.
 			foreach (var item in Queue.Where(i => !i.Paused && i.Done).ToList())
 				item.Tick(playerResources);
@@ -78,6 +87,16 @@ namespace OpenRA.Mods.TGMC.Scripting
 	{
 		public MultiProductionProperties(ScriptContext context, Player player)
 			: base(context, player) { }
+
+		[Desc("Turn repeat build on or off for every unit queue of this player.")]
+		public void SetRepeat(bool on)
+		{
+			foreach (var q in Player.PlayerActor.TraitsImplementing<MultiProductionQueue>())
+				q.Repeat = on;
+		}
+
+		[Desc("True if repeat build is on for the player's unit queues.")]
+		public bool RepeatOn => Player.PlayerActor.TraitsImplementing<MultiProductionQueue>().Any(q => q.Repeat);
 
 		[Desc("Queue one unit in the unit queue that builds it, as if its palette icon were clicked. Returns false if no queue can.")]
 		public bool QueueUnit(string actorType)

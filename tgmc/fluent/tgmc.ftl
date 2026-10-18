@@ -352,6 +352,8 @@ actor-assault =
 
 hotkey-description-tgmcability1 = Use the selected units' first caste ability
 hotkey-description-tgmcretreat = Retreat the selected units to the nearest friendly return point
+hotkey-description-tgmcrepeatbuild = Toggle repeat build for the unit queues
+cmd-repeat = Repeat
 hotkey-description-tgmcability2 = Use the selected units' second caste ability
 hotkey-description-tgmcselectidle = Select all idle combat units
 hotkey-description-tgmcselectwounded = Select all wounded or infected units

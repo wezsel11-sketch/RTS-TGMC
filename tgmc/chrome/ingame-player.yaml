@@ -548,7 +548,17 @@ Container@PLAYER_WIDGETS:
 					Width: 252
 					Height: WINDOW_HEIGHT - 250
 					Background: tgui-window
+					Logic: RepeatBuildLogic
 					Children:
+						Button@REPEAT_BUILD:
+							X: PARENT_WIDTH - 98
+							Y: 6
+							Width: 88
+							Height: 20
+							Background: sidebar-button
+							Text: cmd-repeat
+							Key: TgmcRepeatBuild
+							Font: TinyBold
 						Label@HEADER:
 							X: 10
 							Y: 6

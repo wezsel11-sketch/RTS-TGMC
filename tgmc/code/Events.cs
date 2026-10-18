@@ -503,3 +503,29 @@ namespace OpenRA.Mods.TGMC.Widgets.Logic
 		}
 	}
 }
+
+namespace OpenRA.Mods.TGMC.Widgets.Logic
+{
+	// The Repeat button on the build panel: toggles repeat build on every unit queue of the local player. Its hotkey is TgmcRepeatBuild.
+	public class RepeatBuildLogic : ChromeLogic
+	{
+		[ObjectCreator.UseCtor]
+		public RepeatBuildLogic(Widget widget, World world)
+		{
+			var button = widget.Get<ButtonWidget>("REPEAT_BUILD");
+			var player = world.LocalPlayer;
+			if (player == null)
+				return;
+
+			IEnumerable<OpenRA.Mods.TGMC.Traits.MultiProductionQueue> Queues() => player.PlayerActor.TraitsImplementing<OpenRA.Mods.TGMC.Traits.MultiProductionQueue>();
+
+			button.IsHighlighted = () => Queues().Any(q => q.Repeat);
+			button.OnClick = () =>
+			{
+				var on = !button.IsHighlighted();
+				foreach (var q in Queues())
+					q.Repeat = on;
+			};
+		}
+	}
+}

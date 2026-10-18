@@ -73,3 +73,8 @@ TgmcRetreat: V
 	Description: hotkey-description-tgmcretreat
 	Types: World
 	Contexts: player
+
+TgmcRepeatBuild: Y
+	Description: hotkey-description-tgmcrepeatbuild
+	Types: World
+	Contexts: player

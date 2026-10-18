@@ -654,6 +654,16 @@ SCENARIOS = {
         ("runner", "Xenos", 13, 10, 0),
         ("resin-silo", "Xenos", 19, 19, 0),
     ]},
+    "scenario-hotkey-queue": {"scripts": ("test-hotkey-queue",), "actors": [
+        ("cryo-pod", "Marines", 8, 8, 0),
+        ("resin-silo", "Xenos", 19, 19, 0),
+    ]},
+    "scenario-repeat": _scenario("test-repeat", [
+        ("cryo-pod", "Marines", 8, 8, 0),
+    ]),
+    "scenario-repeat-broke": _scenario("test-repeat-broke", [
+        ("cryo-pod", "Marines", 8, 8, 0),
+    ]),
     "scenario-mend": {"scripts": ("test-mend",), "actors": [
         ("drone", "Xenos", 10, 10, 512),
         ("resin-turret", "Xenos", 10, 12, 512),

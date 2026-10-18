@@ -115,7 +115,32 @@ def term_style(name):
     return T_BODY, T_EDGE
 
 
+# Soft glass (the translucent concept): white at low alpha over the map, a faint white edge, and an accent-blue state for
+# highlighted buttons. Applies to the in-game HUD panels and sidebar buttons only.
+GLASS_PANELS = ("tgui-window", "tgui-card", "tgui-card-header", "tgmc-radar-frame", "tgmc-selection")
+
+
+def glass_style(name):
+    if name.startswith("sidebar-button") or name.startswith("tgui-tab"):
+        if "disabled" in name:
+            return (255, 255, 255, 10), (255, 255, 255, 40)
+        if "highlighted" in name or name.endswith("active"):
+            return (79, 179, 255, 80), (150, 210, 255, 220)
+        if "pressed" in name:
+            return (255, 255, 255, 45), (255, 255, 255, 130)
+        if "hover" in name:
+            return (255, 255, 255, 62), (210, 235, 255, 170)
+        return (255, 255, 255, 24), (255, 255, 255, 80)
+    if name == "tgui-card-header":
+        return (255, 255, 255, 34), (255, 255, 255, 90)
+    if name == "tgmc-radar-frame":
+        return (255, 255, 255, 18), (79, 179, 255, 150)
+    return (255, 255, 255, 22), (255, 255, 255, 76)
+
+
 def style_for(name):
+    if name in GLASS_PANELS or name.startswith("sidebar-button") or name.startswith("tgui-tab"):
+        return glass_style(name)
     if name == "progressbar-thumb":
         return (64, 196, 104, 255), (140, 235, 165, 255)
     if name == "progressbar-bg":

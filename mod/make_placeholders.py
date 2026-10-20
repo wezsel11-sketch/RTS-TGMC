@@ -1504,7 +1504,8 @@ Actors:
             f"\tPlayerReference@{name}:\n\t\tName: {name}\n\t\tPlayable: True\n\t\tFaction: {faction}\n\t\tLockFaction: False\n"
             f"\t\tEnemies: {', '.join(o for o, _ in players if o != name)}\n\t\tSpawn: {i}\n\t\tLockSpawn: True\n"
             for i, (name, faction) in enumerate(players, 1))
-        yaml = re.sub(r"\tPlayerReference@Marines:.*?(?=\nActors:)", lambda m: slots, yaml, count=1, flags=re.S)
+        yaml, swapped = re.subn(r"\tPlayerReference@Marines:.*?(?=\nActors:)", lambda m: slots, yaml, count=1, flags=re.S)
+        assert swapped, f"{title}: the Marines slot was not found, so the player slots were not replaced"
     with open(os.path.join(folder, "map.yaml"), "w", encoding="utf-8", newline="\n") as f:
         f.write(yaml)
 
@@ -1606,7 +1607,8 @@ def write_tgmc_map(folder, title, rows, marines, xenos, art=None, objects=None, 
     # The ore fields (TGMC's ore drills): one per drill on walkable ground, kept clear of the bases (see mapobjects.yaml).
     extra += [("miner-field", "Neutral", x, y, 0) for x, y in fields
               if 1 <= x < w - 1 and 1 <= y < h - 1 and land[y][x] in "GDF"
-              and not any(abs(x - bx) < 4 and abs(y - by) < 4 for _, _, bx, by, _ in actors + xeno_actors)]
+              and not any(abs(x - bx) < 4 and abs(y - by) < 4 for _, _, bx, by, _ in actors + xeno_actors)
+              and not any(abs(x - bx) < 4 and abs(y - by) < 4 for bx, by in extra_spawn)]
     original = rows
     def dug_art(x, y):
         """A tunnel cell dug through rock wears the picture of the nearest ordinary ground cell, not the repo's flat dirt tile."""

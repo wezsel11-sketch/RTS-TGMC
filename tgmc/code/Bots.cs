@@ -609,6 +609,7 @@ namespace OpenRA.Mods.TGMC.Traits
 				return;
 
 			countdown = Info.Interval;
+			var taken = new HashSet<Actor>();
 			// Dormant fields belong to the Neutral player, which is non-combatant. Miners belong to an enemy player.
 			var fields = world.Actors.Where(a => a.Info.Name == Info.Target && a.IsInWorld && !a.IsDead && (Info.EnemyOnly ? player.RelationshipWith(a.Owner) == PlayerRelationship.Enemy : a.Owner.NonCombatant)).ToList();
 			if (fields.Count == 0)
@@ -616,7 +617,10 @@ namespace OpenRA.Mods.TGMC.Traits
 
 			foreach (var attacker in world.Actors.Where(a => a.Owner == player && a.IsInWorld && !a.IsDead && a.IsIdle && Info.Attackers.Contains(a.Info.Name)))
 			{
-				var field = fields.OrderBy(f => (f.Location - attacker.Location).LengthSquared).First();
+				var nearest = fields.OrderBy(f => (f.Location - attacker.Location).LengthSquared);
+				// Spread the units out: each goes for the nearest target no other unit got this round. With more units than targets they share.
+				var field = nearest.FirstOrDefault(f => !taken.Contains(f)) ?? nearest.First();
+				taken.Add(field);
 				bot.QueueOrder(new Order(Info.Order, attacker, Target.FromActor(field), false));
 			}
 		}

@@ -9,7 +9,7 @@ Background@SERVER_LOBBY:
 			Feedback: TRANSIENT_LINE_TEMPLATE
 	X: (WINDOW_WIDTH - WIDTH) / 2
 	Y: (WINDOW_HEIGHT - HEIGHT) / 2
-	Width: 1062
+	Width: 990
 	Height: 708
 	Children:
 		Label@SERVER_NAME:
@@ -19,97 +19,97 @@ Background@SERVER_LOBBY:
 			Height: 30
 			Font: Bold
 		Container@MAP_PREVIEW_ROOT:
-			X: PARENT_WIDTH - 24 - WIDTH
+			X: PARENT_WIDTH - 22 - WIDTH
 			Y: 79
-			Width: 205
+			Width: 191
 			Height: 295
 		DropDownButton@SLOTS_DROPDOWNBUTTON:
-			X: 24
+			X: 22
 			Y: 343
-			Width: 218
+			Width: 204
 			Height: 30
 			Font: Bold
 			Text: dropdownbutton-server-lobby-slots
 		Button@RESET_OPTIONS_BUTTON:
-			X: 24
+			X: 22
 			Y: 343
-			Width: 218
+			Width: 204
 			Height: 30
 			Font: Bold
 			Text: button-server-lobby-reset-options
 		Container@SKIRMISH_TABS:
-			X: 820 - WIDTH
-			Width: 573
+			X: 765 - WIDTH
+			Width: 535
 			Visible: False
 			Children:
 				Button@PLAYERS_TAB:
 					Y: 336
-					Width: 191
+					Width: 178
 					Height: 37
 					Font: Bold
 					Text: button-skirmish-tabs-players-tab
 				Button@OPTIONS_TAB:
-					X: 191
+					X: 178
 					Y: 336
-					Width: 191
+					Width: 178
 					Height: 37
 					Font: Bold
 					Text: button-skirmish-tabs-options-tab
 				Button@MUSIC_TAB:
-					X: 2 * 191
+					X: 2 * 178
 					Y: 336
-					Width: 191
+					Width: 178
 					Height: 37
 					Font: Bold
 					Text: label-music-title
 		Container@MULTIPLAYER_TABS:
-			X: 820 - WIDTH
-			Width: 573
+			X: 765 - WIDTH
+			Width: 535
 			Visible: False
 			Children:
 				Button@PLAYERS_TAB:
 					Y: 336
-					Width: 143
+					Width: 133
 					Height: 37
 					Font: Bold
 					Text: button-multiplayer-tabs-players-tab
 				Button@OPTIONS_TAB:
-					X: 143
+					X: 133
 					Y: 336
-					Width: 144
+					Width: 134
 					Height: 37
 					Font: Bold
 					Text: button-multiplayer-tabs-options-tab
 				Button@MUSIC_TAB:
-					X: 287
+					X: 267
 					Y: 336
-					Width: 143
+					Width: 133
 					Height: 37
 					Font: Bold
 					Text: label-music-title
 				Button@SERVERS_TAB:
-					X: 430
+					X: 400
 					Y: 336
-					Width: 144
+					Width: 134
 					Height: 37
 					Font: Bold
 					Text: button-multiplayer-tabs-servers-tab
 		Container@TOP_PANELS_ROOT:
-			X: 24
+			X: 22
 			Y: 79
-			Width: 796
+			Width: 743
 			Height: 258
 		Button@CHANGEMAP_BUTTON:
-			X: PARENT_WIDTH - WIDTH - 24
+			X: PARENT_WIDTH - WIDTH - 22
 			Y: 343
-			Width: 205
+			Width: 191
 			Height: 30
 			Text: button-server-lobby-changemap
 			Font: Bold
 		Container@LOBBYCHAT:
-			X: 24
+			X: 22
 			Y: PARENT_HEIGHT - HEIGHT - 24
-			Width: PARENT_WIDTH - 47
+			Width: PARENT_WIDTH - 44
 			Height: 306
 			Children:
 				ScrollPanel@CHAT_DISPLAY:
@@ -119,7 +119,7 @@ Background@SERVER_LOBBY:
 					ItemSpacing: 2
 				Button@CHAT_MODE:
 					Y: PARENT_HEIGHT - HEIGHT
-					Width: 59
+					Width: 55
 					Height: 30
 					Text: button-lobbychat-chat-mode.label
 					Font: Bold
@@ -127,21 +127,21 @@ Background@SERVER_LOBBY:
 					TooltipText: button-lobbychat-chat-mode.tooltip
 					TooltipContainer: TOOLTIP_CONTAINER
 				TextField@CHAT_TEXTFIELD:
-					X: 65
+					X: 61
 					Y: PARENT_HEIGHT - HEIGHT
-					Width: PARENT_WIDTH - 307 - 65
+					Width: PARENT_WIDTH - 286 - 61
 					Height: 30
 		Button@START_GAME_BUTTON:
-			X: PARENT_WIDTH - WIDTH - 177
+			X: PARENT_WIDTH - WIDTH - 165
 			Y: PARENT_HEIGHT - HEIGHT - 24
-			Width: 142
+			Width: 132
 			Height: 30
 			Text: button-server-lobby-start-game
 			Font: Bold
 		Button@DISCONNECT_BUTTON:
-			X: PARENT_WIDTH - WIDTH - 24
+			X: PARENT_WIDTH - WIDTH - 22
 			Y: PARENT_HEIGHT - HEIGHT - 24
-			Width: 142
+			Width: 132
 			Height: 30
 			Text: button-server-lobby-disconnect
 			Font: Bold

@@ -111,7 +111,6 @@ WRAITH = "icons/Xeno/castes/wraith.dmi"
 BULL = "icons/Xeno/castes/bull.dmi"
 BEHEMOTH = "icons/Xeno/castes/behemoth.dmi"
 RESIN_WALL = "icons/obj/smooth_objects/resin-wall.dmi"
-MINING_DRILL = "icons/obj/mining_drill.dmi"
 CADE = "icons/obj/structures/barricades/metal.dmi"
 MECH_MEDIUM = "icons/mecha/mech_medium.dmi"
 MECH_WEAPONS = "icons/mecha/mech_core_weapons.dmi"
@@ -1031,12 +1030,6 @@ UNITS = {
             "die-gib": "die",  # too heavy to gib: TGMC's bomb armour keeps it whole
             "attack": "stand",
             "icon": [(QUEEN, "Queen Walking", None, {"side": "S", "fit": (46, 46)})],
-        },
-    },
-    "miner": {
-        "sequences": {
-            "idle": [(MINING_DRILL, "mining_drill_active_")],
-            "icon": [(MINING_DRILL, "mining_drill_active_", None, {"fit": (44, 44), "frames": (0, 1)})],
         },
     },
     "cade": {

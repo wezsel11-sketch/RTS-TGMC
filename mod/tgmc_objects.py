@@ -14,7 +14,7 @@ _loaded = []
 
 # Never drawn: markers and hidden infrastructure, moving things, loose items.
 SKIP = ("/obj/effect/landmark", "/obj/effect/ai_node", "/obj/effect/spawner", "/obj/structure/cable", "/obj/machinery/atmospherics",
-        "/obj/structure/disposalpipe", "/obj/machinery/light", "/obj/item/", "/obj/effect/step_trigger", "/obj/effect/forcefield",
+        "/obj/structure/disposalpipe", "/obj/machinery/light", "/obj/machinery/miner", "/obj/item/", "/obj/effect/step_trigger", "/obj/effect/forcefield",
         "/mob/", "/obj/effect/alien", "/obj/structure/xeno", "/obj/effect/temp", "/obj/machinery/camera", "/obj/machinery/power/apc",
         "/obj/effect/abstract", "/obj/effect/turf_decal/warning_stripes/thin")
 

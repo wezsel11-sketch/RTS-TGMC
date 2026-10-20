@@ -62,7 +62,7 @@ def test_death_types_unlisted_damage_type():
     assert len(errors) == 1 and "FireDeath" in errors[0]
 
 
-def test_only_grenade_tags_explosions():
+def test_explosions_only_from_listed_weapons():
     path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "tgmc", "rules", "weapons.yaml")
     with open(path, encoding="utf-8") as f:
         text = f.read()
@@ -71,7 +71,9 @@ def test_only_grenade_tags_explosions():
     for block in text.split("\n\n"):
         if "DamageTypes:" in block:
             names |= {line.split(":")[0] for line in block.splitlines() if line and line[0].isalpha()}
-    assert names == {"TGMCGrenade"}, names
+    # Grenades, the mortar shell and the vest detonation are the explosions the design allows. Any other weapon with
+    # DamageTypes is new and needs a look before it is added here.
+    assert names == {"TGMCGrenade", "TGMCMortar", "TGMCVestBlast"}, names
 
 
 if __name__ == "__main__":

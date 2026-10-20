@@ -46,3 +46,37 @@
 	Building:
 		Footprint: =
 		Dimensions: 1, 1
+
+# An ore field: TGMC's ore drill, the one thing on a converted map a player can take. It starts broken and belongs to no one
+# (MinerField in tgmc/code/MinerField.cs). A marine engineer repairs it with the torch; once it is back to full health it becomes
+# that player's miner. It shows on the radar and stays on the map under fog, so every field is marked for both sides.
+# Placed by mod/build_maptiles.py on each TGMC map that has drills (the sprite is drawn by mod/make_placeholders.py).
+miner-field:
+	Tooltip:
+		Name: actor-miner-field.name
+	Health:
+		HP: 500
+	Building:
+		Footprint: =
+		Dimensions: 1, 1
+		TerrainTypes: Clear, Road
+	RenderSprites:
+	WithSpriteBody:
+	WithIdleAnimation:
+		Sequences: idle
+	Targetable:
+		TargetTypes: Ground, Structure, Repair
+	HitShape:
+		UseTargetableCellsOffsets: true
+		Type: Rectangle
+			TopLeft: -512, -512
+			BottomRight: 512, 512
+	Selectable:
+		Bounds: 32, 32
+	BodyOrientation:
+		QuantizedFacings: 1
+	Interactable:
+	AppearsOnRadar:
+	FrozenUnderFog:
+	MinerField:
+		IntoActor: miner

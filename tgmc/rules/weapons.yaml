@@ -411,9 +411,9 @@ TGMCSentry:
 	Report: sentry-fire.ogg
 	Projectile: CoverBullet
 		Sequences: large
-		Inaccuracy: 256
+		Inaccuracy: 128
 	Warhead@1Dam: SpreadDamage
-		Damage: 14
+		Damage: 22
 
 TGMCHeal:
 	Range: 3c0
@@ -441,14 +441,14 @@ TGMCRepair:
 	Projectile: InstantHit
 	Warhead@1Dam: TargetDamage
 		Damage: -30
-		ValidRelationships: Ally
+		ValidRelationships: Ally, Neutral
 		ValidTargets: Repair
 	Warhead@2Fx: CreateEffect
 		Image: repair-wrench
 		Explosions: idle
 		ImpactSounds: spark-1.ogg, spark-2.ogg
 		ImpactSoundChance: 40
-		ValidRelationships: Ally
+		ValidRelationships: Ally, Neutral
 		ValidTargets: Repair
 
 # Xeno claws: a melee hit. Marines bleed, marine structures throw sparks.

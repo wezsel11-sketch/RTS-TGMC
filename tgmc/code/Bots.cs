@@ -4,6 +4,7 @@
 #endregion
 
 using System.Collections.Generic;
+using System;
 using System.Collections.Immutable;
 using System.Linq;
 using OpenRA.Mods.Common;
@@ -565,6 +566,166 @@ namespace OpenRA.Mods.TGMC.Traits
 				if (count >= ability.Info.AiMinTargets)
 					bot.QueueOrder(new Order(ability.Info.OrderName, unit, false));
 			}
+		}
+	}
+
+	[Desc("Sends idle attackers to the ore fields no one has claimed yet, to disable them. A field that falls is gone; one a marine has repaired is " +
+		"a miner, a normal target. Each idle attacker goes for the nearest unclaimed field.")]
+	public class FieldBotModuleInfo : ConditionalTraitInfo
+	{
+		public readonly int Interval = 120;
+
+		[Desc("The units that go for the fields.")]
+		public readonly string[] Attackers = [];
+
+		[Desc("The actor they go for: miner-field for the dormant fields, miner for the marines' miners.")]
+		public readonly string Target = "miner-field";
+
+		[Desc("Only targets owned by an enemy player, such as the marines' miners. Off for the dormant fields, which belong to no one.")]
+		public readonly bool EnemyOnly = false;
+
+		[Desc("The order that sends them. ForceAttack works on a dormant field for engineers (their torch repairs it) and on a miner for xenos.")]
+		public readonly string Order = "ForceAttack";
+
+		public override object Create(ActorInitializer init) { return new FieldBotModule(init.Self, this); }
+	}
+
+	public class FieldBotModule : ConditionalTrait<FieldBotModuleInfo>, IBotTick
+	{
+		readonly World world;
+		readonly Player player;
+		int countdown;
+
+		public FieldBotModule(Actor self, FieldBotModuleInfo info)
+			: base(info)
+		{
+			world = self.World;
+			player = self.Owner;
+		}
+
+		void IBotTick.BotTick(IBot bot)
+		{
+			if (IsTraitDisabled || --countdown > 0)
+				return;
+
+			countdown = Info.Interval;
+			// Dormant fields belong to the Neutral player, which is non-combatant. Miners belong to an enemy player.
+			var fields = world.Actors.Where(a => a.Info.Name == Info.Target && a.IsInWorld && !a.IsDead && (Info.EnemyOnly ? player.RelationshipWith(a.Owner) == PlayerRelationship.Enemy : a.Owner.NonCombatant)).ToList();
+			if (fields.Count == 0)
+				return;
+
+			foreach (var attacker in world.Actors.Where(a => a.Owner == player && a.IsInWorld && !a.IsDead && a.IsIdle && Info.Attackers.Contains(a.Info.Name)))
+			{
+				var field = fields.OrderBy(f => (f.Location - attacker.Location).LengthSquared).First();
+				bot.QueueOrder(new Order(Info.Order, attacker, Target.FromActor(field), false));
+			}
+		}
+	}
+
+	[Desc("Guards the marine miners: when a miner has fewer than Wanted defences within Radius cells, the defence is built in the marines' build queue " +
+		"and placed on a free cell beside that miner.")]
+	public class FieldDefenseBotModuleInfo : ConditionalTraitInfo
+	{
+		public readonly int Interval = 150;
+
+		[Desc("Defences wanted around each miner.")]
+		public readonly int Wanted = 2;
+
+		[Desc("How far from the miner, in cells, a defence may stand.")]
+		public readonly int Radius = 3;
+
+		[Desc("The miner the defences go beside.")]
+		public readonly string Miner = "miner";
+
+		[Desc("The defence to build.")]
+		public readonly string Defense = "sentry-turret";
+
+		[Desc("The production queue that builds the defence.")]
+		public readonly string Queue = "MarineDefense";
+
+		[Desc("Cash and resources needed before a new defence is started.")]
+		public readonly int MinCash = 200;
+
+		public override object Create(ActorInitializer init) { return new FieldDefenseBotModule(init.Self, this); }
+	}
+
+	public class FieldDefenseBotModule : ConditionalTrait<FieldDefenseBotModuleInfo>, IBotTick
+	{
+		readonly World world;
+		readonly Player player;
+		int countdown;
+
+		public FieldDefenseBotModule(Actor self, FieldDefenseBotModuleInfo info)
+			: base(info)
+		{
+			world = self.World;
+			player = self.Owner;
+		}
+
+		int DefencesAround(Actor miner)
+		{
+			return world.FindActorsInCircle(miner.CenterPosition, WDist.FromCells(Info.Radius))
+				.Count(a => a.Owner == player && !a.IsDead && a.Info.Name == Info.Defense);
+		}
+
+		void IBotTick.BotTick(IBot bot)
+		{
+			if (IsTraitDisabled || --countdown > 0)
+				return;
+
+			countdown = Info.Interval;
+			var queue = player.PlayerActor.TraitsImplementing<ProductionQueue>().FirstOrDefault(q => q.Info.Type == Info.Queue);
+			if (queue == null)
+				return;
+
+			var defence = world.Map.Rules.Actors[Info.Defense];
+			var building = defence.TraitInfo<BuildingInfo>();
+			var miners = world.Actors.Where(a => a.Owner == player && a.IsInWorld && !a.IsDead && a.Info.Name == Info.Miner).ToList();
+			var needy = miners.FirstOrDefault(m => DefencesAround(m) < Info.Wanted);
+
+			// A finished defence waits to be placed beside the miner that needs it.
+			var done = queue.AllQueued().FirstOrDefault(i => i.Done && i.Item == Info.Defense);
+			if (done != null)
+			{
+				if (needy == null)
+					return;
+
+				for (var r = 2; r <= Info.Radius; r++)
+				{
+					for (var dx = -r; dx <= r; dx++)
+					{
+						for (var dy = -r; dy <= r; dy++)
+						{
+							if (Math.Max(Math.Abs(dx), Math.Abs(dy)) != r)
+								continue;
+
+							var cell = needy.Location + new CVec(dx, dy);
+							if (!world.CanPlaceBuilding(cell, defence, building, null) || !building.IsCloseEnoughToBase(world, player, defence, cell))
+								continue;
+
+							bot.QueueOrder(new Order("PlaceBuilding", player.PlayerActor, Target.FromCell(world, cell), false)
+							{
+								TargetString = Info.Defense,
+								ExtraData = queue.Actor.ActorID,
+								SuppressVisualFeedback = true
+							});
+							return;
+						}
+					}
+				}
+
+				return;
+			}
+
+			// Nothing in production yet: start one when a miner needs it and the marines can pay.
+			if (needy == null || queue.AllQueued().Any())
+				return;
+
+			var resources = player.PlayerActor.TraitOrDefault<PlayerResources>();
+			if (resources == null || resources.GetCashAndResources() < Info.MinCash)
+				return;
+
+			bot.QueueOrder(Order.StartProduction(queue.Actor, Info.Defense, 1));
 		}
 	}
 }

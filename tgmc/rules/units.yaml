@@ -295,14 +295,16 @@ engineer:
 		Weapon: TGMCRepair
 		Cursor: repair
 		OutsideRangeCursor: repair-blocked
-		TargetRelationships: Ally
-		ForceTargetRelationships: None
+		# An ordinary order (right-click) repairs an ally or a dormant ore field. Auto-targeting still repairs only allies,
+		# so an engineer does not claim a field it walks past.
+		TargetRelationships: Ally, Neutral
+		ForceTargetRelationships: Neutral
 	AutoTarget:
 		ScanRadius: 5
 	AutoTargetPriority@DEFAULT:
 		ValidTargets: Structure
 	Production:
-		Produces: MarineBuild
+		Produces: MarineBuild, MarineDefense
 	GivesBuildableArea:
 		AreaTypes: marine-build
 	Tooltip:

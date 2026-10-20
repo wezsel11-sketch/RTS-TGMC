@@ -38,7 +38,7 @@ def paths():
     # The objects on the maps (tgmc_objects.py): the DM code that names their pictures, and the picture sheets.
     found.update(['code/game/objects/', 'icons/obj/', 'icons/effects/', 'icons/Xeno/'])
     # The room templates that fill TGMC's modular map slots (see tgmc_modular.py), and the code that lists them.
-    found.update(['code/modules/mapping/modular_mapping.dm', 'code/game/objects/effects/spawners/modularmappingspawner.dm', '_maps/modularmaps/big_red/', '_maps/modularmaps/lv624/'])
+    found.update(['code/modules/mapping/modular_mapping.dm', 'code/game/objects/effects/spawners/modularmappingspawner.dm', '_maps/modularmaps/big_red/', '_maps/modularmaps/lv624/', '_maps/modularmaps/fiorina/', '_maps/modularmaps/corsatdome/', '_maps/modularmaps/prison/', '_maps/modularmaps/EORG/', '_maps/modularmaps/jungle_outpost/', '_maps/modularmaps/oscaroutpost/'])
     return sorted(found)
 
 

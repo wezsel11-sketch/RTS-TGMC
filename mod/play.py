@@ -3,7 +3,7 @@
 
     python mod/play.py                  main menu
     python mod/play.py landing-zone     straight into a map (landing-zone, canyon-run, jungle-crossing, close-quarters, great-plains,
-                                        lv-624, big-red, whiskey-outpost, desert-dam, hold-the-line, test-field, and the -full versions)
+                                        lv-624, big-red, whiskey-outpost, desert-dam, fiorina, hold-the-line, test-field, and the -full versions)
     python mod/play.py landing-zone Game.Mod=...   anything after the map (or after --) goes to OpenRA unchanged
 
 Run bootstrap.py (setup.cmd) first. Settings, logs and replays go to OpenRA's usual support directory, not into this repo.

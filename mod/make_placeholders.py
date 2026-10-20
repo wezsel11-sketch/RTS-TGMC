@@ -571,6 +571,65 @@ def write_repair_fx(out):
         img.save(os.path.join(out, f"{name}.png"), pnginfo=meta)
 
 
+def draw_miner(spin=0, broken=False, glow=(120, 230, 100, 255), ring=None):
+    """One drill seen from above, 128 px (scaled down by the caller). spin turns the bit (0-3); broken leaves it out of line and dark."""
+    S = 128
+    img = Image.new("RGBA", (S, S), (0, 0, 0, 0))
+    d = ImageDraw.Draw(img)
+    concrete, concrete_dark = (72, 74, 80, 255), (38, 40, 46, 255)
+    steel, steel_dark, steel_light = (122, 128, 138, 255), (46, 50, 58, 255), (166, 172, 182, 255)
+    gold, gold_dark = (214, 176, 70, 255), (112, 84, 28, 255)
+    d.rounded_rectangle([4, 4, 123, 123], radius=12, fill=concrete_dark)
+    d.rounded_rectangle([8, 8, 119, 119], radius=10, fill=concrete)
+    for bx, by in ((18, 18), (110, 18), (18, 110), (110, 110)):
+        d.ellipse([bx - 5, by - 5, bx + 5, by + 5], fill=steel_dark)
+        d.ellipse([bx - 2, by - 2, bx + 2, by + 2], fill=steel_light)
+    if ring is not None:
+        # the marker on a field: a ring around the pad, so the field shows on the map
+        d.ellipse([10, 10, 117, 117], outline=ring, width=5)
+    cx, cy, r = 64, 60, 36
+    octagon = [(cx + r * math.cos(math.radians(22.5 + 45 * k)), cy + r * math.sin(math.radians(22.5 + 45 * k))) for k in range(8)]
+    d.polygon(octagon, fill=steel_dark)
+    d.polygon([(x * 0.9 + cx * 0.1, y * 0.9 + cy * 0.1) for x, y in octagon], fill=steel)
+    d.line([(cx - r + 6, cy - 6), (cx - 6, cy - r + 6)], fill=steel_light, width=3)  # bevel highlight
+    d.line([(cx, cy + r - 2), (cx, 108)], fill=steel_dark, width=7)  # power cable down to the pad
+    bx, by = (cx + 3, cy - 2) if broken else (cx, cy)
+    d.ellipse([bx - 15, by - 15, bx + 15, by + 15], fill=gold_dark)
+    d.ellipse([bx - 12, by - 12, bx + 12, by + 12], fill=(60, 60, 64, 255) if broken else gold)
+    spokes = (0, 60, 120) if not broken else (0, 90)
+    for k in spokes:
+        a = math.radians(spin * 20 + k)
+        d.line([(bx - 11 * math.cos(a), by - 11 * math.sin(a)), (bx + 11 * math.cos(a), by + 11 * math.sin(a))], fill=gold_dark, width=4)
+    d.ellipse([bx - 3, by - 3, bx + 3, by + 3], fill=steel_dark)  # the spindle
+    d.ellipse([cx + 24, cy - 33, cx + 34, cy - 23], fill=glow)  # status light on the housing
+    return img
+
+
+def write_miner_art(out):
+    """The marine miner and the ore field, drawn here rather than cut from TGMC's 32x48 drill (too tall for a cell). Both are one cell
+    (32 px) and the miner's icon is 44 px. miner.png: 4 frames of the spinning bit. miner-icon.png: the sidebar picture.
+    miner-field.png: 2 frames of the broken drill with a pulsing ring, so the field shows on the map. The sequences are in tgmc/sequences/miner.yaml."""
+    size = 32
+    spin = [draw_miner(spin=i).resize((size, size), Image.LANCZOS) for i in range(4)]
+    strip = Image.new("RGBA", (size * 4, size), (0, 0, 0, 0))
+    for i, f in enumerate(spin):
+        strip.paste(f, (size * i, 0), f)
+    meta = PngImagePlugin.PngInfo()
+    meta.add_text("FrameSize", f"{size},{size}")
+    meta.add_text("FrameAmount", "4")
+    strip.save(os.path.join(out, "miner.png"), pnginfo=meta)
+    draw_miner(spin=0).resize((44, 44), Image.LANCZOS).save(os.path.join(out, "miner-icon.png"))
+
+    field = Image.new("RGBA", (size * 2, size), (0, 0, 0, 0))
+    for i, ring in enumerate(((255, 210, 60, 255), (255, 210, 60, 110))):
+        f = draw_miner(spin=0, broken=True, glow=(255, 150, 40, 255), ring=ring).resize((size, size), Image.LANCZOS)
+        field.paste(f, (size * i, 0), f)
+    meta = PngImagePlugin.PngInfo()
+    meta.add_text("FrameSize", f"{size},{size}")
+    meta.add_text("FrameAmount", "2")
+    field.save(os.path.join(out, "miner-field.png"), pnginfo=meta)
+
+
 def write_clock(path):
     """Frame i darkens the part of the icon the production clock has not swept yet, clockwise from 12 o'clock."""
     rows = (CLOCK_FRAMES + CLOCK_COLS - 1) // CLOCK_COLS
@@ -1200,6 +1259,47 @@ SCENARIOS = {
         ("hunter", "Xenos", 23, 25, 0), ("hunter", "Xenos", 22, 23, 0), ("resin-silo", "Xenos", 44, 28, 0),
     ]},
     # Gunfire and acid damage the objects of the converted maps (see scenarios/test-objects-damage.lua): mapobj-0 is any generated map object.
+    # The xeno AI sends its idle attackers to the unclaimed ore fields (FieldBotModule in tgmc/code/Bots.cs; see scenarios/test-ai-fields.lua).
+    "scenario-ai-fields": {"scripts": ("test-ai-fields",), "xeno_bot": "hard", "drop_conquest": True, "fast": True, "size": (64, 40), "spawns": [(4, 4), (60, 36)], "actors": [
+        ("resin-silo", "Xenos", 8, 8, 0), ("miner-field", "Neutral", 14, 9, 0), ("miner-field", "Neutral", 50, 30, 0),
+    ]},
+    # Marine AI and xeno AI play: marines should claim fields, xenos disable them (see scenarios/test-ai-marine-fields.lua).
+    "scenario-ai-marine-fields": {"scripts": ("test-ai-marine-fields",), "marine_bot": "hard", "xeno_bot": "hard", "fast": True, "size": (64, 40), "spawns": [(4, 30), (58, 8)], "actors": [
+        ("cryo-pod", "Marines", 4, 30, 0), ("resin-silo", "Xenos", 58, 8, 0),
+        ("miner-field", "Neutral", 12, 28, 0), ("miner-field", "Neutral", 30, 18, 0), ("miner-field", "Neutral", 52, 10, 0),
+    ]},
+    # The same match at the easy bot level (see scenarios/test-ai-marine-fields.lua).
+    "scenario-ai-marine-fields-easy": {"scripts": ("test-ai-marine-fields",), "marine_bot": "easy", "xeno_bot": "easy", "fast": True, "size": (64, 40), "spawns": [(4, 30), (58, 8)], "actors": [
+        ("cryo-pod", "Marines", 4, 30, 0), ("resin-silo", "Xenos", 58, 8, 0),
+        ("miner-field", "Neutral", 12, 28, 0), ("miner-field", "Neutral", 30, 18, 0), ("miner-field", "Neutral", 52, 10, 0),
+    ]},
+    # An idle engineer beside a broken ore field, with no order: does it repair the field by itself? (see scenarios/test-engineer-autorepair.lua)
+    "scenario-engineer-autorepair": {"scripts": ("test-engineer-autorepair",), "drop_conquest": True, "size": (32, 24), "actors": [
+        ("engineer", "Marines", 8, 10, 256), ("miner-field", "Neutral", 10, 10, 0), ("resin-silo", "Xenos", 28, 20, 0),
+    ]},
+    # A claimed marine miner pays its income (see scenarios/test-miner-income.lua).
+    "scenario-miner-income": {"scripts": ("test-miner-income",), "drop_conquest": True, "size": (32, 24), "actors": [
+        ("miner", "Marines", 8, 10, 0), ("resin-silo", "Xenos", 28, 20, 0),
+    ]},
+    # A disabled marine miner pays nothing and is never destroyed (see scenarios/test-miner-disabled-income.lua).
+    "scenario-miner-disabled-income": {"scripts": ("test-miner-disabled-income",), "drop_conquest": True, "size": (32, 24), "actors": [
+        ("miner", "Marines", 8, 10, 0), ("hunter", "Xenos", 9, 10, 0),
+    ]},
+    # A sentry turret against one runner, and against three (see scenarios/test-turret-holds.lua).
+    "scenario-turret-1": {"scripts": ("test-turret-holds",), "drop_conquest": True, "size": (32, 24), "actors": [
+        ("sentry-turret", "Marines", 10, 10, 0), ("runner", "Xenos", 18, 10, 256),
+    ]},
+    "scenario-turret-3": {"scripts": ("test-turret-holds",), "drop_conquest": True, "size": (32, 24), "actors": [
+        ("sentry-turret", "Marines", 10, 10, 0), ("runner", "Xenos", 18, 9, 256), ("runner", "Xenos", 18, 10, 256), ("runner", "Xenos", 18, 11, 256),
+    ]},
+    # A xeno runner disables an unclaimed ore field (see scenarios/test-field-contest.lua).
+    "scenario-field-contest": {"scripts": ("test-field-contest",), "size": (32, 24), "drop_conquest": True, "actors": [
+        ("runner", "Xenos", 8, 10, 256), ("miner-field", "Neutral", 11, 10, 0), ("engineer", "Marines", 28, 20, 0),
+    ]},
+    # An engineer repairs an ore field: it turns into the marines' miner (see scenarios/test-miner-field.lua).
+    "scenario-miner-field": {"scripts": ("test-miner-field",), "size": (32, 24), "drop_conquest": True, "actors": [
+        ("engineer", "Marines", 8, 10, 256), ("miner-field", "Neutral", 11, 10, 0), ("resin-silo", "Xenos", 28, 20, 0),
+    ]},
     "scenario-objects-damage": {"scripts": ("test-objects-damage",), "size": (32, 24), "drop_conquest": True, "actors": [
         ("rifleman", "Marines", 8, 10, 256), ("mapobj-0", "Neutral", 11, 10, 0),
         ("spitter", "Xenos", 20, 10, 768), ("mapobj-1", "Neutral", 17, 10, 0), ("resin-silo", "Xenos", 28, 20, 0),
@@ -1253,6 +1353,39 @@ def write_sound_list(path):
 
 
 SOM_UNITS = {"rifleman": "som_trooper", "medic": "som_corpsman", "engineer": "som_engineer"}
+# The four-base (free-for-all) big maps: one slot per base, spawn 1 to 4 in this order. Random picks one of the three factions at the start.
+FOUR_PLAYERS = [("Marines", "marines"), ("Xenos", "xenos"), ("Som", "som"), ("Random", "Random")]
+
+
+def pick_extra_spawns(land, taken, count, radius=6):
+    """Start cells for the extra bases of a four-base map: the open cells farthest from every base taken so far, where the square of
+    radius cells around them is at least 90% ground. Rock inside that square is cleared to dirt, so FactionStart can place its buildings."""
+    h, w = len(land), len(land[0])
+    sums = [[0] * (w + 1) for _ in range(h + 1)]
+    for y in range(h):
+        for x in range(w):
+            sums[y + 1][x + 1] = sums[y][x + 1] + sums[y + 1][x] - sums[y][x] + (land[y][x] in "GDF")
+    side = 2 * radius + 1
+    chosen = []
+    for _ in range(count):
+        best = None
+        for y in range(radius + 1, h - radius - 1):
+            for x in range(radius + 1, w - radius - 1):
+                x0, y0 = x - radius, y - radius
+                ground = sums[y0 + side][x0 + side] - sums[y0][x0 + side] - sums[y0 + side][x0] + sums[y0][x0]
+                if ground < 0.9 * side * side:
+                    continue
+                d = min((x - a) ** 2 + (y - b) ** 2 for a, b in taken + chosen)
+                if best is None or d > best[0]:
+                    best = (d, x, y)
+        assert best is not None, "no open ground left for another base"
+        chosen.append((best[1], best[2]))
+    for x, y in chosen:
+        for ax in range(x - radius, x + radius + 1):
+            for ay in range(y - radius, y + radius + 1):
+                if land[ay][ax] == "R":
+                    land[ay][ax] = "D"
+    return chosen
 
 
 def faction_start_rules():
@@ -1270,7 +1403,7 @@ def faction_start_rules():
 
 def write_map(folder, title, size_w, size_h, placed, visibility, spawns, scripts=(), ground=flat_ground,
               category="Skirmish", drop_conquest=False, xeno_bot=None, marine_bot=None, fast=False, extra_rules="",
-              music=False, faction_start=False):
+              music=False, faction_start=False, players=None):
     # A scenario map has no slot for the xenos: they are a scripted player, so Lua can find them and they never act.
     os.makedirs(folder, exist_ok=True)
     cells = size_w * size_h
@@ -1365,6 +1498,13 @@ Players:
 {observer_block}
 Actors:
 {"".join(actors)}"""
+    if players:
+        # Replace the Marines, Xenos and observer slots with one playable slot per (name, faction); every slot is an enemy of the others.
+        slots = "".join(
+            f"\tPlayerReference@{name}:\n\t\tName: {name}\n\t\tPlayable: True\n\t\tFaction: {faction}\n\t\tLockFaction: False\n"
+            f"\t\tEnemies: {', '.join(o for o, _ in players if o != name)}\n\t\tSpawn: {i}\n\t\tLockSpawn: True\n"
+            for i, (name, faction) in enumerate(players, 1))
+        yaml = re.sub(r"\tPlayerReference@Marines:.*?(?=\nActors:)", lambda m: slots, yaml, count=1, flags=re.S)
     with open(os.path.join(folder, "map.yaml"), "w", encoding="utf-8", newline="\n") as f:
         f.write(yaml)
 
@@ -1374,7 +1514,22 @@ Actors:
     preview.save(os.path.join(folder, "map.png"))
 
 
-def write_tgmc_map(folder, title, rows, marines, xenos, art=None, objects=None, open_variant=None, ai_test=False):
+def ore_fields(tgmc, spec):
+    """The cells of a converted map's ore fields (TGMC's ore drills), in the cells tgmc_dmm.load makes: the same crop, shrunk by the factor."""
+    path = os.path.join(tgmc, spec["file"])
+    width, height, grid = tgmc_dmm.parse(path)
+    _, _, things = tgmc_dmm.parse_objects(path)
+    f = spec["factor"]
+    x0, y0, _, _ = tgmc_dmm.crop_box(grid, width, height, f)
+    cells = set()
+    for x in range(x0, width):
+        for y in range(y0, height):
+            if any(p.startswith("/obj/machinery/miner") for p, _ in things[x][y]):
+                cells.add(((x - x0) // f, (y - y0) // f))
+    return sorted(cells)
+
+
+def write_tgmc_map(folder, title, rows, marines, xenos, art=None, objects=None, open_variant=None, ai_test=False, fields=(), bases=2):
     """A skirmish map from a converted TGMC map. Landing Zone's two bases go at the given centres, on open ground. With `art`, a function
     (x, y) -> template id (build_maptiles), a cell that was not changed shows its real TGMC picture; a carved or cleared cell shows plain dirt."""
     h, w = len(rows), len(rows[0])
@@ -1399,29 +1554,35 @@ def write_tgmc_map(folder, title, rows, marines, xenos, art=None, objects=None, 
 
     actors, spawn_m = place(LANDING_ZONE, "Marines")
     xeno_actors, spawn_x = place(LANDING_ZONE, "Xenos")
+    # A four-base map adds bases with no pre-placed actors: FactionStart gives each playable slot its faction's start at its spawn.
+    extra_spawn = pick_extra_spawns(land, [spawn_m, spawn_x], bases - 2)
     # The bases must be joined by walkable ground, or the match can never be won. Where TGMC's own walls cut them apart (the
     # full size maps keep every wall), dig the cheapest tunnel through the rock: open ground costs 1, rock 6.
     import heapq
     walk = "GDF"
-    dist, prev, heap = {spawn_m: 0}, {}, [(0, spawn_m)]
-    while heap:
-        d, (x, y) = heapq.heappop(heap)
-        if (x, y) == spawn_x:
-            break
-        if d > dist[(x, y)]:
-            continue
-        for n in ((x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1)):
-            if 1 <= n[0] < w - 1 and 1 <= n[1] < h - 1 and land[n[1]][n[0]] != "W":
-                nd = d + (1 if land[n[1]][n[0]] in walk else 6)
-                if nd < dist.get(n, 1 << 30):
-                    dist[n], prev[n] = nd, (x, y)
-                    heapq.heappush(heap, (nd, n))
-    assert spawn_x in dist, f"{title}: the xeno base at {spawn_x} cannot be reached from the marine base at {spawn_m}"
-    cell = spawn_x
-    while cell != spawn_m:
-        if land[cell[1]][cell[0]] == "R":
-            land[cell[1]][cell[0]] = "D"
-        cell = prev[cell]
+    def dig(src, dst):
+        dist, prev, heap = {src: 0}, {}, [(0, src)]
+        while heap:
+            d, (x, y) = heapq.heappop(heap)
+            if (x, y) == dst:
+                break
+            if d > dist[(x, y)]:
+                continue
+            for n in ((x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1)):
+                if 1 <= n[0] < w - 1 and 1 <= n[1] < h - 1 and land[n[1]][n[0]] != "W":
+                    nd = d + (1 if land[n[1]][n[0]] in walk else 6)
+                    if nd < dist.get(n, 1 << 30):
+                        dist[n], prev[n] = nd, (x, y)
+                        heapq.heappush(heap, (nd, n))
+        assert dst in dist, f"{title}: the base at {dst} cannot be reached from the marine base at {src}"
+        cell = dst
+        while cell != src:
+            if land[cell[1]][cell[0]] == "R":
+                land[cell[1]][cell[0]] = "D"
+            cell = prev[cell]
+
+    for target in [spawn_x] + extra_spawn:
+        dig(spawn_m, target)
     codes = {"G": GRASS, "D": DIRT, "F": FORD, "W": WATER, "R": ROCK}
     # The objects standing on the map (Neutral actors). Blocking ones stay clear of the bases, and when they would still cut the two bases apart
     # (the match could never be won) none of them blocks.
@@ -1438,10 +1599,14 @@ def write_tgmc_map(folder, title, rows, marines, xenos, art=None, objects=None, 
                 if n not in seen and 1 <= n[0] < w - 1 and 1 <= n[1] < h - 1 and land[n[1]][n[0]] in "GDF" and n not in blocked:
                     seen.add(n)
                     queue.append(n)
-        if spawn_x not in seen:
+        if any(s not in seen for s in [spawn_x] + extra_spawn):
             print(f"{title}: blocking objects would cut the bases apart, so none of them blocks")
             placed = [(open_variant(n), x, y) for n, x, y in placed]
         extra = [(n, "Neutral", x, y, 0) for n, x, y in placed]
+    # The ore fields (TGMC's ore drills): one per drill on walkable ground, kept clear of the bases (see mapobjects.yaml).
+    extra += [("miner-field", "Neutral", x, y, 0) for x, y in fields
+              if 1 <= x < w - 1 and 1 <= y < h - 1 and land[y][x] in "GDF"
+              and not any(abs(x - bx) < 4 and abs(y - by) < 4 for _, _, bx, by, _ in actors + xeno_actors)]
     original = rows
     def dug_art(x, y):
         """A tunnel cell dug through rock wears the picture of the nearest ordinary ground cell, not the repo's flat dirt tile."""
@@ -1458,7 +1623,8 @@ def write_tgmc_map(folder, title, rows, marines, xenos, art=None, objects=None, 
         write_map(folder, title, w, h, actors + xeno_actors + extra, "MissionSelector", [spawn_m, spawn_x], scripts=("test-aimap",), ground=ground,
                   category="Conquest", marine_bot="skirmish", xeno_bot="skirmish", fast=True, drop_conquest=False)
         return
-    write_map(folder, title, w, h, actors + xeno_actors + extra, "Lobby", [spawn_m, spawn_x], ground=ground, category="Conquest", faction_start=True)
+    write_map(folder, title, w, h, actors + xeno_actors + extra, "Lobby", [spawn_m, spawn_x] + extra_spawn, ground=ground, category="Conquest",
+              faction_start=True, players=FOUR_PLAYERS if bases == 4 else None)
 
 
 def main():
@@ -1486,6 +1652,7 @@ def main():
     write_overlay(args.out)
     write_acid_pool(args.out)
     write_repair_fx(args.out)
+    write_miner_art(args.out)
     write_map(os.path.join(args.out, "maps", "test-field"), "TGMC test field", 24, 24, TEST_FIELD, "Lobby, Shellmap", [(10, 12), (14, 12)])
     write_map(os.path.join(args.out, "maps", "landing-zone"), "Landing Zone", 40, 28, LANDING_ZONE, "Lobby", [(6, 14), (33, 13)],
               ground=landing_zone_ground, category="Conquest", faction_start=True)
@@ -1505,10 +1672,12 @@ def main():
         for name, spec in tgmc_dmm.MAPS.items():
             write_tgmc_map(os.path.join(args.out, "maps", name), spec["title"], *tgmc_dmm.load(args.tgmc, spec),
                            art=tiles.art(name) if name in full else None,
-                           objects=tiles.actors.get(name) if name in full else None, open_variant=tiles.open_variant)
+                           objects=tiles.actors.get(name) if name in full else None, open_variant=tiles.open_variant,
+                           fields=ore_fields(args.tgmc, spec), bases=4 if name in full else 2)
             if name in full:
                 write_tgmc_map(os.path.join(dev_maps, "aimap-" + name), "AI test " + spec["title"], *tgmc_dmm.load(args.tgmc, spec),
-                               art=tiles.art(name), objects=tiles.actors.get(name), open_variant=tiles.open_variant, ai_test=True)
+                               art=tiles.art(name), objects=tiles.actors.get(name), open_variant=tiles.open_variant, ai_test=True,
+                               fields=ore_fields(args.tgmc, spec))
     for name, sc in SCENARIOS.items():
         width, height = sc.get("size", (24, 24))
         write_map(os.path.join(dev_maps, name), name, width, height, sc["actors"], "MissionSelector",

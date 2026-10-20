@@ -38,6 +38,20 @@ Player:
 		LimitedAudio: BuildingInProgress
 		OnHoldAudio: OnHold
 		CancelledAudio: Cancelled
+	# The marines' own queue for defences. The base builder never uses it, so a defence ordered for a miner (FieldDefenseBotModule) does not wait
+	# behind the base's buildings. Cades and sentries can be built from either queue.
+	ClassicProductionQueue@MarineDefense:
+		Type: MarineDefense
+		Group: Build
+		BuildDurationModifier: 110
+		Factions: marines, som
+		DisplayOrder: 4
+		ReadyAudio: UnitReady
+		QueuedAudio: Training
+		BlockedAudio: NoBuild
+		LimitedAudio: BuildingInProgress
+		OnHoldAudio: OnHold
+		CancelledAudio: Cancelled
 	ClassicProductionQueue@MarineBuild:
 		Type: MarineBuild
 		Group: Build

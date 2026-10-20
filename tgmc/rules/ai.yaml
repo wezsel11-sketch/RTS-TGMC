@@ -97,7 +97,8 @@ Player:
 		RequiresCondition: enable-skirmish-ai
 		BuildingQueues: MarineBuild, XenoBuild
 		# A drone gives the build area too, so weed nodes go up around wherever the weed drones stand (see WeedDroneBotModule).
-		ConstructionYardTypes: cryo-pod, resin-silo, forward-hive, drone
+		# A miner gives the build area too, so the marines' defences go up around the miners they claim (see the miner-field notes in mapobjects.yaml).
+		ConstructionYardTypes: cryo-pod, resin-silo, forward-hive, drone, miner
 		# Defences go toward the nearest enemy, around the base closest to the fighting: the Forward Hive too, so the hive grows toward the enemy.
 		DefenseTypes: sentry-turret, resin-turret, mortar-emplacement, artillery-emplacement, resin-trap, cade, forward-hive
 		PlaceDefenseTowardsEnemyChance: 100
@@ -107,6 +108,7 @@ Player:
 		MinBaseRadius: 3
 		MaxBaseRadius: 14
 		ProductionMinCashRequirement: 150
+		# Marines fight with cades and sentries: they are built often and up to a good number, so the miners and the bases get guarded.
 		BuildingFractions:
 			miner: 25
 			weed-node: 25
@@ -117,14 +119,14 @@ Player:
 			ordnance-depot: 8
 			evolution-tower: 8
 			maturity-tower: 8
-			sentry-turret: 12
+			sentry-turret: 30
 			resin-turret: 12
 			workshop: 5
 			mortar-emplacement: 10
 			artillery-emplacement: 6
 			forward-hive: 10
 			resin-trap: 12
-			cade: 10
+			cade: 25
 		BuildingLimits:
 			miner: 6
 			weed-node: 24
@@ -135,14 +137,14 @@ Player:
 			ordnance-depot: 1
 			evolution-tower: 1
 			maturity-tower: 1
-			sentry-turret: 3
+			sentry-turret: 6
 			resin-turret: 5
 			workshop: 1
 			mortar-emplacement: 2
 			artillery-emplacement: 1
 			forward-hive: 2
 			resin-trap: 6
-			cade: 4
+			cade: 10
 		BuildingDelays:
 			armory: 1500
 			ordnance-depot: 3000
@@ -150,13 +152,13 @@ Player:
 			maturity-tower: 2400
 			workshop: 3000
 			mortar-emplacement: 6000
-			sentry-turret: 1500
+			sentry-turret: 600
 			cryo-pod: 1500
 			mini-silo: 2000
 			artillery-emplacement: 8000
 			forward-hive: 4500
 			resin-trap: 1500
-			cade: 1200
+			cade: 400
 	SquadManagerBotModule@marines-easy:
 		RequiresCondition: enable-skirmish-ai && !faction-xenos && enable-easy-ai
 		SquadSize: 12
@@ -549,6 +551,20 @@ Player:
 	ScoutBotModule@xenos:
 		RequiresCondition: enable-skirmish-ai && !enable-easy-ai && faction-xenos
 		Scouts: runner, hunter
+	# Xeno bot: idle attackers go for the marines' miners. Dormant fields are left alone until a marine repairs them (see FieldBotModule in Bots.cs).
+	FieldBotModule@xenos:
+		RequiresCondition: enable-skirmish-ai && faction-xenos
+		Attackers: runner, hunter, sentinel
+		Target: miner
+		EnemyOnly: true
+	# Marine bot: every miner gets sentry turrets beside it (see FieldDefenseBotModule in Bots.cs).
+	FieldDefenseBotModule@marines:
+		RequiresCondition: enable-skirmish-ai && !faction-xenos
+	# Marine bot: idle engineers go to the ore fields the xenos have not disabled yet and repair them (see FieldBotModule in Bots.cs).
+	FieldBotModule@marines:
+		RequiresCondition: enable-skirmish-ai && !faction-xenos
+		Attackers: engineer
+		Order: ForceAttack
 	# Drones creep the weeds out across the map: they walk to the edge of the weeds, toward the enemy, and the builder plants nodes around them.
 	WeedDroneBotModule@xenos:
 		RequiresCondition: enable-skirmish-ai && faction-xenos

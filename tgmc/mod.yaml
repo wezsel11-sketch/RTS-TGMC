@@ -192,7 +192,7 @@ ChromeLayout:
 	common|chrome/settings-gameplay.yaml
 	common|chrome/settings-advanced.yaml
 	common|chrome/credits.yaml
-	common|chrome/lobby.yaml
+	tgmc|chrome/lobby.yaml
 	common|chrome/missionbrowser.yaml
 	common|chrome/lobby-mappreview.yaml
 	tgmc|chrome/lobby-players.yaml

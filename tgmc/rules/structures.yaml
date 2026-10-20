@@ -68,7 +68,7 @@
 		AreaTypes: marine-build
 	# Every marine structure is a builder too, so the build menu works without an engineer (marines and SOM alike).
 	Production@build:
-		Produces: MarineBuild
+		Produces: MarineBuild, MarineDefense
 
 ^XenoMinorBuildable:
 	RequiresBuildableArea:
@@ -588,6 +588,9 @@ miner:
 		SoundFiles: amb-hum.ogg
 	Health:
 		HP: 250
+	# Xenos can disable a miner but never destroy it: it stays at 25% until a marine repairs it (see MinerField in tgmc/code/MinerField.cs).
+	MinerField:
+		DisabledCondition: miner-disabled
 	Tooltip:
 		Name: actor-miner.name
 	Valued:
@@ -597,6 +600,8 @@ miner:
 	CashTrickler:
 		Interval: 50
 		Amount: 12
+		# A disabled miner (at its floor, see MinerField) pays nothing until a marine repairs it.
+		RequiresCondition: !miner-disabled
 
 cade:
 	Inherits: ^Wall
@@ -621,7 +626,7 @@ cade:
 		RequiresCondition: side-west
 		Sequence: idle-west
 	Buildable:
-		Queue: MarineBuild
+		Queue: MarineBuild, MarineDefense
 		BuildPaletteOrder: 20
 		Description: actor-cade.description
 	Tooltip:
@@ -938,12 +943,12 @@ sentry-turret:
 	Inherits: ^Structure
 	Inherits@build: ^MarineBuildable
 	Buildable:
-		Queue: MarineBuild
+		Queue: MarineBuild, MarineDefense
 		BuildPaletteOrder: 60
 		Prerequisites: armory
 		Description: actor-sentry-turret.description
 	Health:
-		HP: 450
+		HP: 900
 	Building:
 		Footprint: x
 		Dimensions: 1, 1

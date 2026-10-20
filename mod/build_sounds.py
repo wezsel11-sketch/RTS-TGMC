@@ -386,7 +386,8 @@ def reencode(src, dst, kind, limit):
     cmd = ["ffmpeg", "-v", "error", "-y", "-i", src]
     if limit:
         cmd += ["-t", str(limit)]
-    cmd += ["-af", ",".join(filters), "-ac", str(channels), "-ar", str(rate), "-c:a", "libvorbis", "-q:a", str(quality), dst]
+    # -vn: a music file can carry a video stream (score-frozen-star did), which would make an Ogg Theora file the game cannot play.
+    cmd += ["-vn", "-af", ",".join(filters), "-ac", str(channels), "-ar", str(rate), "-c:a", "libvorbis", "-q:a", str(quality), dst]
     subprocess.run(cmd, check=True)
     return length, gain
 

@@ -1,0 +1,15 @@
+# The marine miner and the ore field it is repaired from (tgmc/rules/mapobjects.yaml). The sheets are drawn by mod/make_placeholders.py
+# (write_miner_art): one 32 px cell each, so the drill fits its tile.
+miner:
+	idle:
+		Filename: miner.png
+		Length: 4
+		Tick: 100
+	icon:
+		Filename: miner-icon.png
+
+miner-field:
+	idle:
+		Filename: miner-field.png
+		Length: 2
+		Tick: 250

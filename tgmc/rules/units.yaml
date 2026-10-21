@@ -396,7 +396,6 @@ engineer:
 synth:
 	Inherits: ^Infantry
 	-Targetable@INFEST:
-	-Infestable:
 	Health:
 		HP: 320
 	Armament@PRIMARY:

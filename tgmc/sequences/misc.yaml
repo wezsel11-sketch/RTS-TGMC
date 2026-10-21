@@ -4,6 +4,12 @@ clock:
 		Filename: clock.png
 		Length: *
 
+# The same wedge for the compact power icons on the left.
+small-clock:
+	idle:
+		Filename: small-clock.png
+		Length: *
+
 # The rally point marker. Both sheets are drawn by mod/make_placeholders.py (no TGMC art).
 rallypoint:
 	flag:

@@ -487,6 +487,20 @@ def write_support_icons(out):
     img.save(os.path.join(out, "support-icon.png"), pnginfo=meta)
 
 
+def shrink_sheet(out, src, dst, size=(46, 34)):
+    """Scales every frame of a 62x46 icon sheet to size, for the compact power list on the left of the screen."""
+    img = Image.open(os.path.join(out, src))
+    w, h = (int(v) for v in img.info["FrameSize"].split(","))
+    n = img.width // w
+    sheet = Image.new("RGBA", (size[0] * n, size[1]), (0, 0, 0, 0))
+    for i in range(n):
+        sheet.paste(img.crop((i * w, 0, (i + 1) * w, h)).resize(size, Image.LANCZOS), (i * size[0], 0))
+    meta = PngImagePlugin.PngInfo()
+    meta.add_text("FrameSize", f"{size[0]},{size[1]}")
+    meta.add_text("FrameAmount", str(n))
+    sheet.save(os.path.join(out, dst), pnginfo=meta)
+
+
 def write_overlay(out):
     """The building ghost's cell tiles: frame 0 is a green translucent tile for a cell the building may use, frame 1 a red one for a
     blocked cell. The engine's placement preview asks for the image `overlay`, sequences build-valid and build-invalid."""
@@ -1719,6 +1733,10 @@ def main():
     write_hive_icon(args.out)
     write_pod_icon(args.out)
     write_support_icons(args.out)
+    # The power list is the tall column on the left: its icons (and clock) are a quarter smaller than the production icons.
+    for name in ("cas-icon", "hive-icon", "pod-icon", "support-icon"):
+        shrink_sheet(args.out, name + ".png", name + ".png")
+    shrink_sheet(args.out, "clock.png", "small-clock.png")
     write_lights(args.out)
     write_shockwave(args.out)
     write_overlay(args.out)

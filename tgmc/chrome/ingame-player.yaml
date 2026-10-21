@@ -23,9 +23,10 @@ Container@PLAYER_WIDGETS:
 			Y: 8
 			Children:
 				SupportPowers@SUPPORT_PALETTE:
-					IconSize: 56, 42
-					# Tight, so even a dozen powers (every tech building adds some) stop above the minimap.
-					IconMargin: 3
+					IconSize: 46, 34
+					ClockAnimation: small-clock
+					# Small and tight, so even a dozen powers (every tech building adds some) stop above the minimap.
+					IconMargin: 2
 					IconSpriteOffset: 0, 0
 					TooltipContainer: TOOLTIP_CONTAINER
 					ReadyText: supportpowers-support-powers-palette.ready

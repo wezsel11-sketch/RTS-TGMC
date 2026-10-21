@@ -90,6 +90,18 @@ Player:
 		UnitLimits:
 			queen: 1
 			drone: 4
+	# The stock unit builder queues one unit at a time; this fills the other production slots from the same list (see ParallelBuildBotModule in Bots.cs).
+	# Marine bot: while ore fields lie unclaimed it builds a couple of engineers to claim them, for the miners' income (see FieldWorkerBotModule in Bots.cs).
+	FieldWorkerBotModule@marines:
+		RequiresCondition: enable-skirmish-ai && !faction-xenos
+		Workers: engineer, som_engineer
+	# Marine and xeno bots: buy upgrades from the Upgrades tab, the marines their guns and the xenos their carapace, claws and speed (see UpgradeBotModule
+	# in Bots.cs). Easy bots stay on their starting kit.
+	UpgradeBotModule@skirmish:
+		RequiresCondition: enable-skirmish-ai && !enable-easy-ai
+	ParallelBuildBotModule@skirmish:
+		RequiresCondition: enable-skirmish-ai && !enable-easy-ai
+		MinCash: 300
 	# The bot has no builder to walk around, so its cryo pod and silo give it the build area (structures.yaml) and it
 	# places each finished structure in a ring around them. It never builds walls. The refinery counts are zeroed
 	# because the module otherwise holds back all unit production until it owns a refinery.
@@ -132,7 +144,7 @@ Player:
 			weed-node: 24
 			vendor: 3
 			cryo-pod: 4
-			mini-silo: 2
+			mini-silo: 3
 			armory: 1
 			ordnance-depot: 1
 			evolution-tower: 1
@@ -142,7 +154,7 @@ Player:
 			workshop: 1
 			mortar-emplacement: 2
 			artillery-emplacement: 1
-			forward-hive: 2
+			forward-hive: 3
 			resin-trap: 6
 			cade: 10
 		BuildingDelays:
@@ -154,9 +166,9 @@ Player:
 			mortar-emplacement: 6000
 			sentry-turret: 600
 			cryo-pod: 1500
-			mini-silo: 2000
+			mini-silo: 1200
 			artillery-emplacement: 8000
-			forward-hive: 4500
+			forward-hive: 1800
 			resin-trap: 1500
 			cade: 400
 	SquadManagerBotModule@marines-easy:
@@ -563,8 +575,16 @@ Player:
 	# Marine bot: idle engineers go to the ore fields the xenos have not disabled yet and repair them (see FieldBotModule in Bots.cs).
 	FieldBotModule@marines:
 		RequiresCondition: enable-skirmish-ai && !faction-xenos
-		Attackers: engineer
+		Attackers: engineer, som_engineer
 		Order: ForceAttack
+	# Marine bot: weed nodes can only be force-fired, so no squad ever picks one, yet they must fall for a win. Idle marines go and bash them with their rifle butts.
+	FieldBotModule@sweep:
+		RequiresCondition: enable-skirmish-ai && !faction-xenos
+		Attackers: rifleman, smartgunner, grenadier, blademan, som_blademan
+		Target: weed-node
+		EnemyOnly: true
+		Order: AttackMove
+		MinTick: 3000
 	# Drones creep the weeds out across the map: they walk to the edge of the weeds, toward the enemy, and the builder plants nodes around them.
 	WeedDroneBotModule@xenos:
 		RequiresCondition: enable-skirmish-ai && faction-xenos

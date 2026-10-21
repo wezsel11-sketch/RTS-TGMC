@@ -1,5 +1,5 @@
 # The mod's own hotkeys.
-TgmcHelp: F1
+TgmcHelp: Slash
 	Description: hotkey-description-tgmchelp
 	Types: World
 	Contexts: player, spectator

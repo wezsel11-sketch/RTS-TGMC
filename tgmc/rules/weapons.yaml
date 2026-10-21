@@ -296,6 +296,18 @@ TGMCVali:
 	Warhead@1Dam: TargetDamage
 		Damage: 35
 
+# A rifle butt: marines use it on weed sacks, which no gun can target.
+TGMCButt:
+	Range: 1c256
+	ReloadDelay: 20
+	ValidTargets: WeedNode
+	Report: hit-armor-1.ogg, hit-armor-2.ogg, hit-armor-3.ogg
+	TargetActorCenter: true
+	Projectile: InstantHit
+	Warhead@1Dam: TargetDamage
+		Damage: 25
+		ValidTargets: WeedNode
+
 TGMCFlamer:
 	Range: 4c0
 	ReloadDelay: 30
@@ -951,6 +963,14 @@ TGMCShotgun:
 		Inaccuracy: 768
 	Warhead@1Dam: SpreadDamage
 		Damage: 6
+	# A full load of buckshot (five pellets or more) on a small xeno throws it back a few cells.
+	Warhead@6Throw: Knockback
+		Distance: 3c0
+		Duration: 12
+		Height: 0c512
+		MinHits: 5
+		ValidRelationships: Enemy
+		ValidTargets: SmallXeno
 
 # Corpsman's submachine gun: a stream of light rounds at short range.
 TGMCSMG:

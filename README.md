@@ -232,7 +232,7 @@ the commits this mod was tested against (see the top of `mod/bootstrap.py`), so 
     embryo's growth, ability recharge and xeno age. The sidebar card shows a portrait, health, ammunition, xeno tier and infection.
   - **HUD.**
     - A top bar shows income per minute and army size (and waiting larvae).
-    - The `?` button or F1 opens a controls overlay.
+    - The `?` button or the `/` key opens a controls overlay.
     - An event log on the left lists facehuggings, bursts, evolutions, hatched eggs and CAS strikes; click one to jump there.
     - The minimap runs whenever you own a building and pings infections and CAS targets.
     - The selection card has a health bar and Evolve, Devolve, Stop and Scatter buttons.

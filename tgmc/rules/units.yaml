@@ -172,6 +172,14 @@
 		RequiresCondition: hugged
 		MoveSequence: down
 		StandSequences: down
+	# Rifle butt: no gun can target a weed sack, so a marine walks up and bashes it (see weed-node in structures.yaml).
+	Armament@BUTT:
+		# "secondary" is one of the names the attack trait fires; any other name is ignored.
+		Name: secondary
+		Weapon: TGMCButt
+	AutoTargetPriority@WEEDS:
+		ValidTargets: WeedNode
+		Priority: 0
 	Armament@PRIMARY:
 		Weapon: TGMCRifle
 	AttackWhileMoving:
@@ -196,10 +204,17 @@
 
 rifleman:
 	Inherits: ^Infantry
-	# Each rifleman carries one of three basic rifles, chosen at random when he is made: T-12 assault rifle, T-18 carbine
-	# or M412. They differ in sprite (stand-carbine, stand-m412) and in weapon.
-	GrantRandomCondition:
-		Conditions: gun-ar, gun-carbine, gun-m412
+	# The rifle ladder (upgrade-rifle-t12 and upgrade-rifle-m412 in upgrades.yaml): a rifleman starts with the T-18 carbine, and each upgrade
+	# bought moves every rifleman, new and old, to the next gun. They differ in sprite (stand-carbine, stand-m412) and in weapon.
+	GrantConditionOnPrerequisite@carbine:
+		Condition: gun-carbine
+		Prerequisites: !upgrade-rifle-t12
+	GrantConditionOnPrerequisite@ar:
+		Condition: gun-ar
+		Prerequisites: upgrade-rifle-t12, !upgrade-rifle-m412
+	GrantConditionOnPrerequisite@m412:
+		Condition: gun-m412
+		Prerequisites: upgrade-rifle-m412
 	Armament@PRIMARY:
 		RequiresCondition: gun-ar
 		MuzzleSequence: flash
@@ -1122,6 +1137,35 @@ demolitionist:
 	WithColoredOverlay@rage:
 		RequiresCondition: rage
 		Color: FF303050
+	# The Upgrades tab (upgrades.yaml): every xeno, new and old, takes on the upgrades the hive has bought. Carapace stacks (II comes after I) and slows
+	# a little; damage taken stands in for health, since there is no health multiplier.
+	GrantConditionOnPrerequisite@carapace1:
+		Condition: carapace-1
+		Prerequisites: upgrade-carapace-1
+	GrantConditionOnPrerequisite@carapace2:
+		Condition: carapace-2
+		Prerequisites: upgrade-carapace-2
+	GrantConditionOnPrerequisite@claws:
+		Condition: sharp-claws
+		Prerequisites: upgrade-claws
+	GrantConditionOnPrerequisite@hivespeed:
+		Condition: hive-speed
+		Prerequisites: upgrade-hive-speed
+	DamageMultiplier@carapace1:
+		RequiresCondition: carapace-1
+		Modifier: 87
+	DamageMultiplier@carapace2:
+		RequiresCondition: carapace-2
+		Modifier: 87
+	SpeedMultiplier@carapace2:
+		RequiresCondition: carapace-2
+		Modifier: 94
+	FirepowerMultiplier@claws:
+		RequiresCondition: sharp-claws
+		Modifier: 115
+	SpeedMultiplier@hivespeed:
+		RequiresCondition: hive-speed
+		Modifier: 112
 	# A dead xeno leaves a pool of acid that stings marines who walk through it for a few seconds.
 	SpawnActorOnDeath@Acid:
 		Actor: acid-pool
@@ -1207,6 +1251,9 @@ demolitionist:
 
 runner:
 	Inherits: ^Xeno
+	# Small enough for a full load of buckshot to throw it back (see TGMCShotgun).
+	Targetable@SMALL:
+		TargetTypes: SmallXeno
 	StatusLabel@evading:
 		RequiresCondition: evading
 		Text: EVADING
@@ -1254,6 +1301,9 @@ runner:
 
 hunter:
 	Inherits: ^Xeno
+	# Small enough for a full load of buckshot to throw it back (see TGMCShotgun).
+	Targetable@SMALL:
+		TargetTypes: SmallXeno
 	StatusLabel@hidden:
 		RequiresCondition: stealthed
 		Text: HIDDEN
@@ -1299,6 +1349,9 @@ hunter:
 
 sentinel:
 	Inherits: ^Xeno
+	# Small enough for a full load of buckshot to throw it back (see TGMCShotgun).
+	Targetable@SMALL:
+		TargetTypes: SmallXeno
 	# Command card ability: neurotoxin that hurts and slows the nearest marine.
 	ActiveAbility@abilityneurotoxin:
 		OrderName: AbilityNeurotoxin
@@ -1376,6 +1429,9 @@ facehugger:
 
 larva:
 	Inherits: ^Xeno
+	# Small enough for a full load of buckshot to throw it back (see TGMCShotgun).
+	Targetable@SMALL:
+		TargetTypes: SmallXeno
 	Voiced:
 		VoiceSet: LarvaVoice
 	Health:
@@ -1395,6 +1451,9 @@ larva:
 
 drone:
 	Inherits: ^Xeno
+	# Small enough for a full load of buckshot to throw it back (see TGMCShotgun).
+	Targetable@SMALL:
+		TargetTypes: SmallXeno
 	Evolves:
 		Next: sentinel
 	Voiced:

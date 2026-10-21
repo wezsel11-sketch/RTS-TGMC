@@ -372,7 +372,14 @@ def hammer(colour):
     return img
 
 
-PICTOGRAMS = {"infantry": rifle, "xeno": claw, "build": hammer}
+def chevrons(colour):
+    img, d = _canvas(16, 16)
+    for y in (3, 8):
+        d.line([(3, y + 5), (8, y), (13, y + 5)], fill=colour, width=2)
+    return img
+
+
+PICTOGRAMS = {"infantry": rifle, "xeno": claw, "build": hammer, "upgrade": chevrons}
 
 
 def production_icon(name):
@@ -435,7 +442,7 @@ ICONS = {
               "Random": lambda: flag("?", SLATE), "spectator": lambda: flag("O", SLATE)},
     "production-icons": {n: (lambda n=n: production_icon(n)) for n in
                          ["infantry", "infantry-disabled", "infantry-alert", "xeno", "xeno-disabled", "xeno-alert",
-                          "build", "build-disabled", "build-alert"]},
+                          "build", "build-disabled", "build-alert", "upgrade", "upgrade-disabled", "upgrade-alert"]},
 }
 
 # The highlighted checkbox state looks up its own mark collection; it reuses the plain one.

@@ -597,7 +597,7 @@ Container@PLAYER_WIDGETS:
 								Container@PRODUCTION_TYPES:
 									X: 2
 									Width: 28
-									Height: 93
+									Height: 124
 									Children:
 										ProductionTypeButton@INFANTRY:
 											Width: 28
@@ -629,6 +629,18 @@ Container@PLAYER_WIDGETS:
 											VisualHeight: 0
 											Background: sidebar-button
 											ProductionGroup: Build
+											Children:
+												Image@ICON:
+													X: 6
+													Y: 6
+													ImageCollection: production-icons
+										ProductionTypeButton@UPGRADE:
+											Y: 93
+											Width: 28
+											Height: 28
+											VisualHeight: 0
+											Background: sidebar-button
+											ProductionGroup: Upgrade
 											Children:
 												Image@ICON:
 													X: 6

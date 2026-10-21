@@ -1,0 +1,82 @@
+# The Upgrades tab (see PLAN-upgrades.md). Buying an upgrade creates the hidden actor below for the player; ProvidesPrerequisite then hands out a
+# prerequisite with the actor's name, and units that want the upgrade grant themselves a condition from it (GrantConditionOnPrerequisite).
+# BuildLimit 1 keeps one copy. The actor has no health and no place on the map, so nothing can kill it: an upgrade bought stays bought.
+
+^Upgrade:
+	Buildable:
+		Queue: Upgrade
+		BuildLimit: 1
+	# The palette reads the icon sequence through this trait. Nothing else renders: the actor has no sprite body.
+	RenderSprites:
+	# The tooltip wants mouse bounds; the actor is never on the map, so nothing can be clicked.
+	Interactable:
+	ProvidesPrerequisite:
+
+# The rifleman ladder: he starts with the T-18 carbine, then the T-12, then the M412 (see rifleman in units.yaml).
+upgrade-rifle-t12:
+	Inherits: ^Upgrade
+	Buildable:
+		Prerequisites: armory, ~faction-marines
+		BuildPaletteOrder: 10
+		Description: actor-upgrade-rifle-t12.description
+	Tooltip:
+		Name: actor-upgrade-rifle-t12.name
+	Valued:
+		Cost: 300
+
+upgrade-rifle-m412:
+	Inherits: ^Upgrade
+	Buildable:
+		Prerequisites: armory, upgrade-rifle-t12, ~faction-marines
+		BuildPaletteOrder: 11
+		Description: actor-upgrade-rifle-m412.description
+	Tooltip:
+		Name: actor-upgrade-rifle-m412.name
+	Valued:
+		Cost: 500
+
+# The xeno upgrades: stats only, switched on for every xeno by GrantConditionOnPrerequisite on ^Xeno in units.yaml. Carapace shields them
+# (they take less damage, which is a little more health), the claws hit harder, the hive speed makes them quicker. The towers unlock them.
+upgrade-carapace-1:
+	Inherits: ^Upgrade
+	Buildable:
+		Prerequisites: evolution-tower, ~faction-xenos
+		BuildPaletteOrder: 20
+		Description: actor-upgrade-carapace-1.description
+	Tooltip:
+		Name: actor-upgrade-carapace-1.name
+	Valued:
+		Cost: 300
+
+upgrade-carapace-2:
+	Inherits: ^Upgrade
+	Buildable:
+		Prerequisites: maturity-tower, upgrade-carapace-1, ~faction-xenos
+		BuildPaletteOrder: 21
+		Description: actor-upgrade-carapace-2.description
+	Tooltip:
+		Name: actor-upgrade-carapace-2.name
+	Valued:
+		Cost: 600
+
+upgrade-claws:
+	Inherits: ^Upgrade
+	Buildable:
+		Prerequisites: evolution-tower, ~faction-xenos
+		BuildPaletteOrder: 22
+		Description: actor-upgrade-claws.description
+	Tooltip:
+		Name: actor-upgrade-claws.name
+	Valued:
+		Cost: 300
+
+upgrade-hive-speed:
+	Inherits: ^Upgrade
+	Buildable:
+		Prerequisites: evolution-tower, ~faction-xenos
+		BuildPaletteOrder: 23
+		Description: actor-upgrade-hive-speed.description
+	Tooltip:
+		Name: actor-upgrade-hive-speed.name
+	Valued:
+		Cost: 400

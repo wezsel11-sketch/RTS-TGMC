@@ -491,7 +491,7 @@ namespace OpenRA.Mods.TGMC.Widgets.Logic
 		}
 	}
 
-	// The ? button and F1: a panel listing the mod's controls.
+	// The ? button and the / key (F1 is the first production hotkey): a panel listing the mod's controls.
 	public class HelpOverlayLogic : ChromeLogic
 	{
 		[ObjectCreator.UseCtor]

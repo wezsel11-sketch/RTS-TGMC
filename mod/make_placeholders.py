@@ -720,6 +720,10 @@ SCENARIOS = {
     "scenario-repeat": _scenario("test-repeat", [
         ("cryo-pod", "Marines", 8, 8, 0),
     ]),
+    # The only producer is destroyed mid-build with repeat on (see scenarios/test-producer-lost.lua).
+    "scenario-producer-lost": {"scripts": ("test-producer-lost",), "drop_conquest": True, "actors": [
+        ("cryo-pod", "Marines", 8, 8, 0), ("resin-silo", "Xenos", 19, 19, 0),
+    ]},
     "scenario-repeat-broke": _scenario("test-repeat-broke", [
         ("cryo-pod", "Marines", 8, 8, 0),
     ]),
@@ -1280,6 +1284,59 @@ SCENARIOS = {
     # A claimed marine miner pays its income (see scenarios/test-miner-income.lua).
     "scenario-miner-income": {"scripts": ("test-miner-income",), "drop_conquest": True, "size": (32, 24), "actors": [
         ("miner", "Marines", 8, 10, 0), ("resin-silo", "Xenos", 28, 20, 0),
+    ]},
+    # Stances and retreat for SOM and the xenos, and three command-layer edge cases (see scenarios/test-stance-factions.lua,
+    # test-retreat-factions.lua and test-command-edges.lua).
+    # Rows are 14 cells apart so a rifle (range 9) cannot reach the next row. The xeno rows start the runner next to its target (melee).
+    "scenario-stance-factions": {"scripts": ("test-stance-factions",), "drop_conquest": True, "size": (32, 60), "actors": [
+        ("som_trooper", "Marines", 10, 8, 512), ("runner", "Xenos", 13, 8, 0),
+        ("som_trooper", "Marines", 10, 22, 512), ("runner", "Xenos", 13, 22, 0),
+        ("rifleman", "Marines", 10, 36, 512), ("runner", "Xenos", 11, 36, 0),
+        ("rifleman", "Marines", 10, 50, 512), ("runner", "Xenos", 11, 50, 0),
+    ]},
+    "scenario-shotgun-knockback": {"scripts": ("test-shotgun-knockback",), "drop_conquest": True, "size": (32, 28), "actors": [
+        ("skirmisher", "Marines", 8, 8, 256), ("runner", "Xenos", 10, 8, 0),
+        ("skirmisher", "Marines", 8, 22, 256), ("warrior", "Xenos", 10, 22, 0),
+        ("cryo-pod", "Marines", 4, 4, 0), ("resin-silo", "Xenos", 28, 4, 0),
+    ]},
+    "scenario-xeno-upgrade": {"scripts": ("test-xeno-upgrade",), "drop_conquest": True, "size": (32, 28), "actors": [
+        ("resin-silo", "Xenos", 4, 20, 0), ("evolution-tower", "Xenos", 8, 20, 0), ("maturity-tower", "Xenos", 12, 20, 0),
+        ("runner", "Xenos", 4, 6, 0), ("runner", "Xenos", 4, 12, 0), ("cryo-pod", "Marines", 28, 4, 0),
+    ]},
+    "scenario-ai-engineers": {"scripts": ("test-ai-engineers",), "marine_bot": "skirmish", "drop_conquest": True, "fast": True, "size": (40, 28), "actors": [
+        ("cryo-pod", "Marines", 6, 14, 0), ("miner-field", "Neutral", 16, 14, 0), ("resin-silo", "Xenos", 36, 14, 0),
+    ]},
+    "scenario-ai-upgrade": {"scripts": ("test-ai-upgrade",), "marine_bot": "skirmish", "drop_conquest": True, "fast": True, "size": (32, 28), "actors": [
+        ("cryo-pod", "Marines", 6, 4, 0), ("armory", "Marines", 12, 4, 0), ("rifleman", "Marines", 8, 8, 256),
+        ("resin-silo", "Xenos", 28, 24, 0),
+    ]},
+    "scenario-upgrade": {"scripts": ("test-upgrade",), "drop_conquest": True, "size": (32, 28), "actors": [
+        ("cryo-pod", "Marines", 6, 4, 0), ("armory", "Marines", 12, 4, 0),
+        ("rifleman", "Marines", 8, 8, 256), ("runner", "Xenos", 14, 14, 0),
+        ("rifleman", "Marines", 4, 8, 256), ("runner", "Xenos", 11, 15, 0), ("resin-silo", "Xenos", 28, 24, 0),
+    ]},
+    "scenario-weed-bash": {"scripts": ("test-weed-bash",), "drop_conquest": True, "size": (32, 60), "actors": [
+        ("rifleman", "Marines", 10, 8, 512), ("weed-node", "Xenos", 13, 8, 0),
+        ("rifleman", "Marines", 5, 22, 512), ("weed-node", "Xenos", 15, 22, 0),
+        ("rifleman", "Marines", 5, 36, 512), ("weed-node", "Xenos", 15, 36, 0),
+        ("resin-silo", "Xenos", 28, 52, 0), ("cryo-pod", "Marines", 4, 52, 0),
+    ]},
+    "scenario-retreat-factions": {"scripts": ("test-retreat-factions",), "drop_conquest": True, "actors": [
+        ("som_trooper", "Marines", 4, 4, 512), ("cryo-pod", "Marines", 16, 4, 0),
+        ("runner", "Xenos", 4, 16, 0), ("resin-silo", "Xenos", 19, 19, 0),
+    ]},
+    "scenario-command-edges": {"scripts": ("test-command-edges",), "drop_conquest": True, "size": (32, 28), "actors": [
+        ("rifleman", "Marines", 4, 4, 512), ("cryo-pod", "Marines", 16, 16, 0), ("squad_leader", "Marines", 4, 10, 256),
+        ("resin-silo", "Xenos", 28, 24, 0),
+    ]},
+    # A friendly blast hurts an ally but raises no under-attack alert (same layout as scenario-explosive).
+    "scenario-friendly-fire-alert": {"scripts": ("test-friendly-fire-alert",), "actors": [
+        ("demolitionist", "Marines", 10, 10, 512),
+        ("demolitionist", "Marines", 15, 11, 512),
+        ("rifleman", "Marines", 15, 9, 512),
+        ("crusher", "Xenos", 15, 10, 0),
+        ("rifleman", "Marines", 20, 20, 0),
+        ("resin-silo", "Xenos", 19, 19, 0),
     ]},
     # A disabled marine miner pays nothing and is never destroyed (see scenarios/test-miner-disabled-income.lua).
     "scenario-miner-disabled-income": {"scripts": ("test-miner-disabled-income",), "drop_conquest": True, "size": (32, 24), "actors": [

@@ -82,6 +82,9 @@ VENDING = "icons/obj/machines/vending.dmi"
 WARRIOR = "icons/Xeno/castes/warrior.dmi"
 GRENADE = "icons/obj/items/grenade.dmi"
 PROJECTILES = "icons/obj/items/projectiles.dmi"
+# The guns as items lying on the ground: the icons of the Upgrades tab.
+GUN_ITEMS = "icons/obj/items/guns/rifles.dmi"
+GUN_ITEMS_64 = "icons/obj/items/guns/rifles64.dmi"
 FX64 = "icons/effects/64x64.dmi"
 FX96 = "icons/effects/96x96.dmi"
 FX32 = "icons/effects/effects.dmi"
@@ -247,6 +250,14 @@ UNITS = {
             "icon": "stand:S",
         },
     },
+    # The Upgrades tab (tgmc/rules/upgrades.yaml): the gun each upgrade issues.
+    # (build_unit wants a main sequence beside the icon, so each also has an idle frame that nothing draws.)
+    "upgrade-rifle-t12": {"sequences": {"idle": [(GUN_ITEMS, "t12")], "icon": [(GUN_ITEMS, "t12", None, {"fit": (44, 44)})]}},
+    "upgrade-carapace-1": {"sequences": {"idle": [(CRUSHER, "Crusher Walking")], "icon": [(CRUSHER, "Crusher Walking", None, {"side": "S", "frames": (0, 1), "fit": (44, 44)})]}},
+    "upgrade-carapace-2": {"sequences": {"idle": [(RAVAGER, "Ravager Walking")], "icon": [(RAVAGER, "Ravager Walking", None, {"side": "S", "frames": (0, 1), "fit": (44, 44)})]}},
+    "upgrade-claws": {"sequences": {"idle": [(WARRIOR, "Warrior Walking")], "icon": [(WARRIOR, "Warrior Walking", None, {"side": "S", "frames": (0, 1), "fit": (44, 44)})]}},
+    "upgrade-hive-speed": {"sequences": {"idle": [(RUNNER, "Runner Running")], "icon": [(RUNNER, "Runner Running", None, {"side": "S", "frames": (0, 1), "fit": (44, 44)})]}},
+    "upgrade-rifle-m412": {"sequences": {"idle": [(GUN_ITEMS_64, "m412")], "icon": [(GUN_ITEMS_64, "m412", None, {"fit": (44, 44)})]}},
     "runner": {
         "sequences": {
             "stand": [(RUNNER, "Runner Walking")],

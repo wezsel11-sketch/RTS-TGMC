@@ -18,6 +18,7 @@ Rules:
 	tgmc|rules/ai.yaml
 	tgmc|rules/units.yaml
 	tgmc|rules/structures.yaml
+	tgmc|rules/upgrades.yaml
 	tgmc|rules/mapobjects.yaml
 
 Weapons:
@@ -27,6 +28,12 @@ Sequences:
 	tgmc|sequences/misc.yaml
 	tgmc|sequences/shroud.yaml
 	tgmc|sequences/rifleman.yaml
+	tgmc|sequences/upgrade-rifle-t12.yaml
+	tgmc|sequences/upgrade-rifle-m412.yaml
+	tgmc|sequences/upgrade-carapace-1.yaml
+	tgmc|sequences/upgrade-carapace-2.yaml
+	tgmc|sequences/upgrade-claws.yaml
+	tgmc|sequences/upgrade-hive-speed.yaml
 	tgmc|sequences/runner.yaml
 	tgmc|sequences/hunter.yaml
 	tgmc|sequences/sentinel.yaml

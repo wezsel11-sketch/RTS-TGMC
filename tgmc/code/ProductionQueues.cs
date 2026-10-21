@@ -5,6 +5,7 @@
 
 using System.Linq;
 using OpenRA.Mods.Common.Traits;
+using OpenRA.Primitives;
 using OpenRA.Scripting;
 using OpenRA.Traits;
 
@@ -78,6 +79,45 @@ namespace OpenRA.Mods.TGMC.Traits
 	}
 }
 
+namespace OpenRA.Mods.TGMC.Traits
+{
+	[TraitLocation(SystemActors.Player)]
+	[Desc("The Upgrades tab. An upgrade is bought like a unit, but nothing walks out: a small hidden actor is created for the player, and the prerequisite " +
+		"that actor provides (its own name) switches on the upgrade for every unit that asks for it, new and old (GrantConditionOnPrerequisite).")]
+	public class UpgradeQueueInfo : ProductionQueueInfo, Requires<TechTreeInfo>, Requires<PlayerResourcesInfo>
+	{
+		public override object Create(ActorInitializer init) { return new UpgradeQueue(init, this); }
+	}
+
+	public class UpgradeQueue : ProductionQueue
+	{
+		public UpgradeQueue(ActorInitializer init, UpgradeQueueInfo info)
+			: base(init, info) { }
+
+		// No building produces an upgrade, so the base class, which switches a queue on only while one does, would leave it off.
+		protected override void Tick(Actor self)
+		{
+			Enabled = IsValidFaction;
+			TickInner(self, false);
+		}
+
+		protected override bool BuildUnit(ActorInfo unit)
+		{
+			if (!Actor.IsInWorld || Actor.IsDead)
+			{
+				CancelProduction(unit.Name, 1);
+				return false;
+			}
+
+			var item = Queue.First(i => i.Done && i.Item == unit.Name);
+			var owner = Actor.Owner;
+			Actor.World.AddFrameEndTask(w => w.CreateActor(unit.Name, new TypeDictionary { new OwnerInit(owner) }));
+			EndProduction(item);
+			return true;
+		}
+	}
+}
+
 namespace OpenRA.Mods.TGMC.Scripting
 {
 	using OpenRA.Mods.TGMC.Traits;
@@ -101,7 +141,7 @@ namespace OpenRA.Mods.TGMC.Scripting
 		[Desc("Queue one unit in the unit queue that builds it, as if its palette icon were clicked. Returns false if no queue can.")]
 		public bool QueueUnit(string actorType)
 		{
-			var queue = Player.PlayerActor.TraitsImplementing<MultiProductionQueue>().FirstOrDefault(q => q.Enabled && q.BuildableItems().Any(a => a.Name == actorType));
+			var queue = Player.PlayerActor.TraitsImplementing<ProductionQueue>().FirstOrDefault(q => q.Enabled && q.BuildableItems().Any(a => a.Name == actorType));
 			if (queue == null)
 				return false;
 

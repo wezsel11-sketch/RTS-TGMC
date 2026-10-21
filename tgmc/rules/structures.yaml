@@ -234,8 +234,8 @@ weed-node:
 	CashTrickler:
 		Interval: 50
 		Amount: 7
-	# Marines destroy a weed sack by walking up to it: it is not a Ground or Structure target, so nothing shoots it on its own (force-fire still
-	# works, and the melee units go for it, see blademan).
+	# Marines destroy a weed sack in melee: it is not a Ground or Structure target, so no gun shoots it, only the rifle butt (TGMCButt) hits it,
+	# on its own or when the marine bot sends a unit (see FieldBotModule@sweep in ai.yaml).
 	Targetable:
 		TargetTypes: WeedNode
 	# Creeps out on its own, so xenos do not have to place weeds one by one.
@@ -588,6 +588,8 @@ miner:
 		SoundFiles: amb-hum.ogg
 	Health:
 		HP: 250
+	# A miner can never be destroyed, so it must not count toward conquest: a clamped miner would keep its owner alive forever.
+	-MustBeDestroyed:
 	# Xenos can disable a miner but never destroy it: it stays at 25% until a marine repairs it (see MinerField in tgmc/code/MinerField.cs).
 	MinerField:
 		DisabledCondition: miner-disabled

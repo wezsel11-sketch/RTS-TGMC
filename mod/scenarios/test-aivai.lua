@@ -57,6 +57,16 @@ WorldLoaded = function()
 		print(string.format("STAT tick=%d marines: army=%d x=%d structures=%d weakest=%d%% cash=%d | xenos: army=%d x=%d structures=%d weakest=%d%% cash=%d", ticks,
 			count(marines, marineArmy), meanX(marines, marineArmy), count(marines, structures), weakest(marines, structures), marines.Cash,
 			count(xenos, xenoArmy), meanX(xenos, xenoArmy), count(xenos, structures), weakest(xenos, structures), xenos.Cash))
+		-- The xeno unit producers: with none standing the Xeno queue cannot build, and cash piles up.
+		print(string.format("PROD tick=%d xeno silos=%d mini=%d hives=%d drones=%d queens=%d", ticks, #xenos.GetActorsByType("resin-silo"),
+			#xenos.GetActorsByType("mini-silo"), #xenos.GetActorsByType("forward-hive"), #xenos.GetActorsByType("drone"), #xenos.GetActorsByType("queen")))
+		local left = {}
+		for _, a in ipairs(xenos.GetActors()) do
+			if a.Type ~= "player" then
+				left[#left + 1] = a.Type .. "@" .. a.Location.X .. "," .. a.Location.Y
+			end
+		end
+		print("LEFT tick=" .. ticks .. " xeno actors: " .. table.concat(left, " "))
 		if ticks >= MaxTicks then
 			finish("nobody", ticks)
 			return

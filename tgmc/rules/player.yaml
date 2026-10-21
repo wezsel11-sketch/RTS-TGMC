@@ -15,6 +15,26 @@ Player:
 	ProvidesPrerequisite@som:
 		Prerequisite: faction-som
 		Factions: som
+	# The xenos' upgrades hide from the other factions the same way (~faction-xenos).
+	ProvidesPrerequisite@xenos:
+		Prerequisite: faction-xenos
+		Factions: xenos
+	# The Upgrades tab (UpgradeQueue in tgmc/code/ProductionQueues.cs, the upgrades in tgmc/rules/upgrades.yaml). Units switch on an upgrade with
+	# GrantConditionOnPrerequisite, which needs the manager below. It sits before the unit queues on purpose: queues are paid in this order each tick,
+	# and an upgrade takes only a cash a tick, so ahead of the units it still gets paid when they would drain the bank.
+	GrantConditionOnPrerequisiteManager:
+	UpgradeQueue@Upgrade:
+		Type: Upgrade
+		Group: Upgrade
+		BuildDurationModifier: 100
+		Factions: marines, som, xenos
+		DisplayOrder: 5
+		ReadyAudio: UnitReady
+		QueuedAudio: Training
+		BlockedAudio: NoBuild
+		LimitedAudio: BuildingInProgress
+		OnHoldAudio: OnHold
+		CancelledAudio: Cancelled
 	# One unit per production building is built at the same time (MultiProductionQueue in tgmc/code/ProductionQueues.cs).
 	MultiProductionQueue@Infantry:
 		Type: Infantry

@@ -4,6 +4,8 @@
 #endregion
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using OpenRA.Activities;
 using OpenRA.GameRules;
 using OpenRA.Mods.Common.Traits;
@@ -32,16 +34,60 @@ namespace OpenRA.Mods.TGMC.Warheads
 		[Desc("Extra damage if the throw is cut short by an obstacle.")]
 		public readonly int BlockedDamage = 0;
 
+		[Desc("Hits on the same victim, within HitWindow ticks, needed before it is thrown. 1 throws on every hit; a shotgun sets a full load of pellets.")]
+		public readonly int MinHits = 1;
+
+		[Desc("Ticks in which MinHits hits must land.")]
+		public readonly int HitWindow = 10;
+
 		public readonly BitSet<DamageType> DamageTypes = default;
+
+		// Hits so far per victim: the tick of the first and the count. shortcut: a static map, pruned when it grows, so old worlds' entries just go stale.
+		static readonly Dictionary<Actor, (int Start, int Hits)> Recent = new();
+
+		[Desc("A bullet lands on a spot, not on an actor: units this close to the spot count as hit.")]
+		public readonly WDist Spread = new(384);
 
 		public override void DoImpact(in Target target, WarheadArgs args)
 		{
 			var firedBy = args.SourceActor;
-			var victim = target.Type == TargetType.Actor ? target.Actor : null;
-			if (firedBy == null || victim == null || victim.IsDead || !victim.IsInWorld || !IsValidAgainst(victim, firedBy))
+			if (firedBy == null)
 				return;
 
-			Throw(victim, firedBy, args.Source ?? firedBy.CenterPosition, Distance, Duration, Height, LandDamage, BlockedDamage, DamageTypes);
+			var from = args.Source ?? firedBy.CenterPosition;
+			if (target.Type == TargetType.Actor)
+			{
+				Hit(target.Actor, firedBy, from);
+				return;
+			}
+
+			foreach (var victim in firedBy.World.FindActorsInCircle(target.CenterPosition, Spread).ToList())
+				Hit(victim, firedBy, from);
+		}
+
+		void Hit(Actor victim, Actor firedBy, WPos from)
+		{
+			if (victim.IsDead || !victim.IsInWorld || !IsValidAgainst(victim, firedBy))
+				return;
+
+			if (MinHits > 1)
+			{
+				var tick = victim.World.WorldTick;
+				var hits = Recent.TryGetValue(victim, out var seen) && tick - seen.Start <= HitWindow ? (seen.Start, seen.Hits + 1) : (tick, 1);
+				if (hits.Item2 < MinHits)
+				{
+					if (Recent.Count > 256)
+						foreach (var gone in Recent.Keys.Where(a => a.IsDead || !a.IsInWorld).ToList())
+							Recent.Remove(gone);
+
+					Recent[victim] = hits;
+					return;
+				}
+
+				Recent.Remove(victim);
+			}
+
+			Throw(victim, firedBy, from, Distance, Duration, Height, LandDamage, BlockedDamage, DamageTypes);
 		}
 
 		/// <summary>Throws a unit away from `from`: it flies an arc over `distance` and lands, or stops short at an obstacle.</summary>

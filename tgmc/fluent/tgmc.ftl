@@ -394,6 +394,9 @@ actor-tunnel =
     .name = Hive Tunnel
     .description = A tunnel mouth. The first two you build are paired: right-click one with a xeno and it comes out of the other. Needs an Evolution Tower. Costs 100 requisition.
 
+actor-synth =
+    .name = Synthetic
+    .description = A tough synthetic: heals marines, repairs and builds like an engineer, and hits back with a baton. No facehugger can infect it. Needs a Medbay, two at most. Costs 300 requisition.
 actor-skirmisher =
     .name = Skirmisher
     .description = A quick marine with a shotgun: deadly up close, and it throws small xenos back. Needs an Armory. Costs 130 requisition.

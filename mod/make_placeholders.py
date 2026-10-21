@@ -846,6 +846,11 @@ SCENARIOS = {
         ("resin-silo", "Xenos", 19, 19, 0),
     ]},
     # Not a test: selects some units and takes a screenshot, to look at the HUD (see ScreenshotAtInfo in tgmc/code/Hud.cs).
+    # Not a test: the Upgrades tab with the Armory, Ordnance Depot and Workshop standing, to see what the player is offered.
+    "shot-upgrades": {"scripts": ("shot",), "extra_rules": "World:\n\tScreenshotAt:\n\t\tTick: 160\n\t\tClickTick: 80\n\t\tClick: UPGRADE\n", "actors": [
+        ("cryo-pod", "Marines", 6, 4, 0), ("engineer", "Marines", 8, 5, 256), ("armory", "Marines", 11, 7, 0), ("ordnance-depot", "Marines", 14, 7, 0), ("workshop", "Marines", 8, 7, 0), ("medbay", "Marines", 11, 11, 0),
+        ("rifleman", "Marines", 10, 14, 512), ("hunter", "Xenos", 18, 12, 0), ("resin-silo", "Xenos", 19, 19, 0),
+    ]},
     "shot-hud": {"scripts": ("shot",), "extra_rules": "World:\n\tScreenshotAt:\n\t\tTick: 120\n\t\tSelect: rifleman, heavygunner, mech, ordnance-depot\n", "actors": [
         ("ordnance-depot", "Marines", 11, 7, 0),
         ("rifleman", "Marines", 10, 10, 512),
@@ -1311,6 +1316,17 @@ SCENARIOS = {
         ("machinegunner", "Marines", 4, 10, 256), ("crusher", "Xenos", 14, 11, 0), ("crusher", "Xenos", 14, 12, 0),
         ("medic", "Marines", 4, 26, 256), ("engineer", "Marines", 6, 26, 256), ("rocketeer", "Marines", 8, 26, 256),
         ("skirmisher", "Marines", 10, 26, 256), ("field_commander", "Marines", 12, 26, 256), ("sniper", "Marines", 14, 26, 256), ("flamer", "Marines", 16, 26, 256), ("resin-silo", "Xenos", 28, 24, 0),
+    ]},
+    "scenario-synth": {"scripts": ("test-synth",), "drop_conquest": True, "size": (32, 28), "actors": [
+        ("cryo-pod", "Marines", 6, 4, 0), ("armory", "Marines", 16, 4, 0),
+        ("synth", "Marines", 12, 8, 256), ("rifleman", "Marines", 10, 8, 256), ("runner", "Xenos", 13, 8, 0),
+        ("resin-silo", "Xenos", 28, 24, 0),
+    ]},
+    "scenario-synth-infest": {"scripts": ("test-synth-infest",), "drop_conquest": True, "size": (32, 28), "actors": [
+        ("cryo-pod", "Marines", 6, 4, 0),
+        ("rifleman", "Marines", 10, 8, 256), ("facehugger", "Xenos", 11, 8, 0),
+        ("synth", "Marines", 10, 20, 256), ("facehugger", "Xenos", 11, 20, 0),
+        ("resin-silo", "Xenos", 28, 24, 0),
     ]},
     "scenario-weed-bash": {"scripts": ("test-weed-bash",), "drop_conquest": True, "size": (32, 60), "actors": [
         ("rifleman", "Marines", 10, 8, 512), ("weed-node", "Xenos", 13, 8, 0),

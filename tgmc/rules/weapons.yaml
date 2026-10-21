@@ -308,6 +308,18 @@ TGMCButt:
 		Damage: 25
 		ValidTargets: WeedNode
 
+# The synthetic's baton: a plain melee blow at any enemy next to it (the Synthetic in units.yaml mends and repairs first).
+TGMCSynthMelee:
+	Range: 1c256
+	ReloadDelay: 22
+	Report: hit-armor-1.ogg, hit-armor-2.ogg, hit-armor-3.ogg
+	TargetActorCenter: true
+	Projectile: InstantHit
+	Warhead@1Dam: TargetDamage
+		Damage: 18
+		ValidRelationships: Enemy
+		ValidTargets: Ground, Structure
+
 TGMCFlamer:
 	Range: 4c0
 	ReloadDelay: 30

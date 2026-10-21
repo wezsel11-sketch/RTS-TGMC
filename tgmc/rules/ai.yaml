@@ -53,6 +53,7 @@ Player:
 			som_mech: 6
 			medic: 15
 			engineer: 15
+			synth: 8
 			smartgunner: 25
 			grenadier: 20
 			skirmisher: 12
@@ -126,6 +127,7 @@ Player:
 			cryo-pod: 6
 			mini-silo: 8
 			armory: 8
+			medbay: 6
 			ordnance-depot: 8
 			evolution-tower: 8
 			maturity-tower: 8
@@ -144,6 +146,7 @@ Player:
 			cryo-pod: 4
 			mini-silo: 3
 			armory: 1
+			medbay: 1
 			ordnance-depot: 1
 			evolution-tower: 1
 			maturity-tower: 1
@@ -157,6 +160,7 @@ Player:
 			cade: 10
 		BuildingDelays:
 			armory: 1500
+			medbay: 2200
 			ordnance-depot: 3000
 			evolution-tower: 800
 			maturity-tower: 2400
@@ -173,42 +177,42 @@ Player:
 		RequiresCondition: enable-skirmish-ai && !faction-xenos && enable-easy-ai
 		SquadSize: 12
 		SquadSizeRandomBonus: 20
-		ExcludeFromSquadsTypes: medic, engineer, drone, queen
+		ExcludeFromSquadsTypes: medic, engineer, synth, drone, queen
 		ConstructionYardTypes: cryo-pod, resin-silo, forward-hive
 		ProtectionTypes: cryo-pod, vendor, resin-silo, mini-silo, sentry-turret, resin-turret, miner, weed-node, armory, ordnance-depot, evolution-tower, maturity-tower, workshop, mortar-emplacement, artillery-emplacement, forward-hive, cade
 	SquadManagerBotModule@xenos-easy:
 		RequiresCondition: enable-skirmish-ai && faction-xenos && enable-easy-ai
 		SquadSize: 30
 		SquadSizeRandomBonus: 20
-		ExcludeFromSquadsTypes: medic, engineer, drone, queen
+		ExcludeFromSquadsTypes: medic, engineer, synth, drone, queen
 		ConstructionYardTypes: cryo-pod, resin-silo, forward-hive
 		ProtectionTypes: cryo-pod, vendor, resin-silo, mini-silo, sentry-turret, resin-turret, miner, weed-node, armory, ordnance-depot, evolution-tower, maturity-tower, workshop, mortar-emplacement, artillery-emplacement, forward-hive, cade
 	SquadManagerBotModule@marines-normal:
 		RequiresCondition: enable-skirmish-ai && !faction-xenos && !enable-easy-ai && !enable-hard-ai
 		SquadSize: 8
 		SquadSizeRandomBonus: 20
-		ExcludeFromSquadsTypes: medic, engineer, drone, queen
+		ExcludeFromSquadsTypes: medic, engineer, synth, drone, queen
 		ConstructionYardTypes: cryo-pod, resin-silo, forward-hive
 		ProtectionTypes: cryo-pod, vendor, resin-silo, mini-silo, sentry-turret, resin-turret, miner, weed-node, armory, ordnance-depot, evolution-tower, maturity-tower, workshop, mortar-emplacement, artillery-emplacement, forward-hive, cade
 	SquadManagerBotModule@xenos-normal:
 		RequiresCondition: enable-skirmish-ai && faction-xenos && !enable-easy-ai && !enable-hard-ai
 		SquadSize: 24
 		SquadSizeRandomBonus: 20
-		ExcludeFromSquadsTypes: medic, engineer, drone, queen
+		ExcludeFromSquadsTypes: medic, engineer, synth, drone, queen
 		ConstructionYardTypes: cryo-pod, resin-silo, forward-hive
 		ProtectionTypes: cryo-pod, vendor, resin-silo, mini-silo, sentry-turret, resin-turret, miner, weed-node, armory, ordnance-depot, evolution-tower, maturity-tower, workshop, mortar-emplacement, artillery-emplacement, forward-hive, cade
 	SquadManagerBotModule@marines-hard:
 		RequiresCondition: enable-skirmish-ai && !faction-xenos && enable-hard-ai
 		SquadSize: 6
 		SquadSizeRandomBonus: 20
-		ExcludeFromSquadsTypes: medic, engineer, drone, queen
+		ExcludeFromSquadsTypes: medic, engineer, synth, drone, queen
 		ConstructionYardTypes: cryo-pod, resin-silo, forward-hive
 		ProtectionTypes: cryo-pod, vendor, resin-silo, mini-silo, sentry-turret, resin-turret, miner, weed-node, armory, ordnance-depot, evolution-tower, maturity-tower, workshop, mortar-emplacement, artillery-emplacement, forward-hive, cade
 	SquadManagerBotModule@xenos-hard:
 		RequiresCondition: enable-skirmish-ai && faction-xenos && enable-hard-ai
 		SquadSize: 18
 		SquadSizeRandomBonus: 20
-		ExcludeFromSquadsTypes: medic, engineer, drone, queen
+		ExcludeFromSquadsTypes: medic, engineer, synth, drone, queen
 		ConstructionYardTypes: cryo-pod, resin-silo, forward-hive
 		ProtectionTypes: cryo-pod, vendor, resin-silo, mini-silo, sentry-turret, resin-turret, miner, weed-node, armory, ordnance-depot, evolution-tower, maturity-tower, workshop, mortar-emplacement, artillery-emplacement, forward-hive, cade
 	# Calls in CAS (marines) or the hive powers (xenos) when the strike is ready and a cluster of enemies is in sight. A friendly unit in the blast counts against the spot.
@@ -543,12 +547,12 @@ Player:
 	# Medics go to the wounded and infected, and otherwise stay with the fighting units.
 	MedicBotModule@marines:
 		RequiresCondition: enable-skirmish-ai && !enable-easy-ai && !faction-xenos
-		Medics: medic
+		Medics: medic, synth
 	# Badly wounded units fall back to a refuge and come back when mended.
 	RetreatBotModule@marines:
 		RequiresCondition: enable-skirmish-ai && !enable-easy-ai && !faction-xenos
 		Refuges: medbay, medic, cryo-pod
-		Exclude: medic, engineer
+		Exclude: medic, engineer, synth
 	RetreatBotModule@xenos:
 		RequiresCondition: enable-skirmish-ai && !enable-easy-ai && faction-xenos
 		Refuges: weed-node, resin-silo, forward-hive

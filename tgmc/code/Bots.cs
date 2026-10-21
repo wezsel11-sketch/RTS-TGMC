@@ -713,7 +713,7 @@ namespace OpenRA.Mods.TGMC.Traits
 		}
 	}
 
-	[Desc("Buys upgrades from the Upgrades tab (UpgradeQueue). One at a time, the cheapest the bot can buy first, which follows each ladder " +
+	[Desc("Buys upgrades from the Upgrades tab (UpgradeQueue). One at a time, in the palette's order (rifles, then armour, then the rest) and the cheapest first among equals, which follows each ladder " +
 		"because a later step needs the one before. The upgrade is paid for as it is built, like a unit, so it only slows the units down a little.")]
 	public class UpgradeBotModuleInfo : ConditionalTraitInfo
 	{
@@ -754,7 +754,7 @@ namespace OpenRA.Mods.TGMC.Traits
 			foreach (var queue in player.PlayerActor.TraitsImplementing<UpgradeQueue>().Where(q => q.Enabled && !q.AllQueued().Any()))
 			{
 				// BuildableItems leaves out what is already owned (BuildLimit 1) and what still lacks a building or an earlier step.
-				var next = queue.BuildableItems().OrderBy(a => queue.GetProductionCost(a)).FirstOrDefault();
+				var next = queue.BuildableItems().OrderBy(a => a.TraitInfo<BuildableInfo>().BuildPaletteOrder).ThenBy(a => queue.GetProductionCost(a)).FirstOrDefault();
 				if (next != null)
 					bot.QueueOrder(Order.StartProduction(queue.Actor, next.Name, 1));
 			}

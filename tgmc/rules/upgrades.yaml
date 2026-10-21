@@ -41,7 +41,7 @@ upgrade-smg-m25:
 	Inherits: ^Upgrade
 	Buildable:
 		Prerequisites: armory, ~faction-marines
-		BuildPaletteOrder: 12
+		BuildPaletteOrder: 20
 		Description: actor-upgrade-smg-m25.description
 	Tooltip:
 		Name: actor-upgrade-smg-m25.name
@@ -52,7 +52,7 @@ upgrade-shotgun-tx15:
 	Inherits: ^Upgrade
 	Buildable:
 		Prerequisites: armory, ~faction-marines
-		BuildPaletteOrder: 12
+		BuildPaletteOrder: 21
 		Description: actor-upgrade-shotgun-tx15.description
 	Tooltip:
 		Name: actor-upgrade-shotgun-tx15.name
@@ -63,7 +63,7 @@ upgrade-shotgun-sh410:
 	Inherits: ^Upgrade
 	Buildable:
 		Prerequisites: ordnance-depot, upgrade-shotgun-tx15, ~faction-marines
-		BuildPaletteOrder: 13
+		BuildPaletteOrder: 22
 		Description: actor-upgrade-shotgun-sh410.description
 	Tooltip:
 		Name: actor-upgrade-shotgun-sh410.name
@@ -74,7 +74,7 @@ upgrade-mg-minigun:
 	Inherits: ^Upgrade
 	Buildable:
 		Prerequisites: workshop, ordnance-depot, ~faction-marines
-		BuildPaletteOrder: 14
+		BuildPaletteOrder: 23
 		Description: actor-upgrade-mg-minigun.description
 	Tooltip:
 		Name: actor-upgrade-mg-minigun.name
@@ -85,7 +85,7 @@ upgrade-rocket-heavy:
 	Inherits: ^Upgrade
 	Buildable:
 		Prerequisites: ordnance-depot, workshop, ~faction-marines
-		BuildPaletteOrder: 15
+		BuildPaletteOrder: 24
 		Description: actor-upgrade-rocket-heavy.description
 	Tooltip:
 		Name: actor-upgrade-rocket-heavy.name
@@ -96,7 +96,7 @@ upgrade-smg-t90:
 	Inherits: ^Upgrade
 	Buildable:
 		Prerequisites: armory, upgrade-smg-m25, ~faction-marines
-		BuildPaletteOrder: 16
+		BuildPaletteOrder: 25
 		Description: actor-upgrade-smg-t90.description
 	Tooltip:
 		Name: actor-upgrade-smg-t90.name
@@ -107,7 +107,7 @@ upgrade-sniper-svd:
 	Inherits: ^Upgrade
 	Buildable:
 		Prerequisites: armory, ~faction-marines
-		BuildPaletteOrder: 17
+		BuildPaletteOrder: 26
 		Description: actor-upgrade-sniper-svd.description
 	Tooltip:
 		Name: actor-upgrade-sniper-svd.name
@@ -118,7 +118,7 @@ upgrade-sniper-tx8:
 	Inherits: ^Upgrade
 	Buildable:
 		Prerequisites: armory, ordnance-depot, upgrade-sniper-svd, ~faction-marines
-		BuildPaletteOrder: 18
+		BuildPaletteOrder: 27
 		Description: actor-upgrade-sniper-tx8.description
 	Tooltip:
 		Name: actor-upgrade-sniper-tx8.name
@@ -129,7 +129,7 @@ upgrade-sniper-m42c:
 	Inherits: ^Upgrade
 	Buildable:
 		Prerequisites: workshop, upgrade-sniper-tx8, ~faction-marines
-		BuildPaletteOrder: 19
+		BuildPaletteOrder: 28
 		Description: actor-upgrade-sniper-m42c.description
 	Tooltip:
 		Name: actor-upgrade-sniper-m42c.name
@@ -140,7 +140,7 @@ upgrade-flamer-xnapalm:
 	Inherits: ^Upgrade
 	Buildable:
 		Prerequisites: armory, ordnance-depot, ~faction-marines
-		BuildPaletteOrder: 25
+		BuildPaletteOrder: 29
 		Description: actor-upgrade-flamer-xnapalm.description
 	Tooltip:
 		Name: actor-upgrade-flamer-xnapalm.name
@@ -151,7 +151,7 @@ upgrade-armor-1:
 	Inherits: ^Upgrade
 	Buildable:
 		Prerequisites: armory, ~faction-marines
-		BuildPaletteOrder: 30
+		BuildPaletteOrder: 12
 		Description: actor-upgrade-armor-1.description
 	Tooltip:
 		Name: actor-upgrade-armor-1.name
@@ -162,7 +162,7 @@ upgrade-armor-2:
 	Inherits: ^Upgrade
 	Buildable:
 		Prerequisites: armory, ordnance-depot, upgrade-armor-1, ~faction-marines
-		BuildPaletteOrder: 31
+		BuildPaletteOrder: 13
 		Description: actor-upgrade-armor-2.description
 	Tooltip:
 		Name: actor-upgrade-armor-2.name
@@ -173,7 +173,7 @@ upgrade-armor-3:
 	Inherits: ^Upgrade
 	Buildable:
 		Prerequisites: workshop, upgrade-armor-2, ~faction-marines
-		BuildPaletteOrder: 32
+		BuildPaletteOrder: 14
 		Description: actor-upgrade-armor-3.description
 	Tooltip:
 		Name: actor-upgrade-armor-3.name

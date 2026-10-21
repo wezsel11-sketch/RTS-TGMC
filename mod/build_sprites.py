@@ -758,6 +758,18 @@ UNITS = {
         },
     },
     # Marine gunners. Same kit as the other roles with their own uniform state; the weapon art is the rifle's.
+    # The synthetic: a white research jumpsuit, no armour and no gun (it carries a baton the game does not draw).
+    "synth": {
+        "cell": MARINE_CELL,
+        "sequences": {
+            "stand": [(HUMAN, "body_m"), (MARINE_UNIFORM, "research_jumpsuit"), (FEET, "marine")],
+            "die-gib": MARINE_GIB,
+            "run": "stand",
+            "attack": "stand",
+            "die": [(HUMAN, "husk")],
+            "icon": "stand:S",
+        },
+    },
     "skirmisher": {
         "cell": MARINE_CELL,
         "sequences": {

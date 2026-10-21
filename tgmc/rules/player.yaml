@@ -23,6 +23,9 @@ Player:
 	# GrantConditionOnPrerequisite, which needs the manager below. It sits before the unit queues on purpose: queues are paid in this order each tick,
 	# and an upgrade takes only a cash a tick, so ahead of the units it still gets paid when they would drain the bank.
 	GrantConditionOnPrerequisiteManager:
+	# The palette only draws a queue that has a producer, and nothing builds an upgrade, so the player stands in for one.
+	Production@Upgrade:
+		Produces: Upgrade
 	UpgradeQueue@Upgrade:
 		Type: Upgrade
 		Group: Upgrade

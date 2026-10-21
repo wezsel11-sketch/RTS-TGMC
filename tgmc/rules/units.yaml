@@ -391,6 +391,58 @@ engineer:
 		BuildPaletteOrder: 30
 		Description: actor-engineer.description
 
+# The synthetic: a medic and an engineer in one tough body. It heals marines, repairs buildings and builds like the engineer, swings a baton at what
+# comes close, and no facehugger can latch onto it. Built at the Medbay, two at most.
+synth:
+	Inherits: ^Infantry
+	-Targetable@INFEST:
+	-Infestable:
+	Health:
+		HP: 320
+	Armament@PRIMARY:
+		Weapon: TGMCHeal
+		Cursor: heal
+		OutsideRangeCursor: heal-blocked
+		TargetRelationships: Ally
+		ForceTargetRelationships: None
+	Armament@REPAIR:
+		Name: primary
+		Weapon: TGMCRepair
+		Cursor: repair
+		OutsideRangeCursor: repair-blocked
+		TargetRelationships: Ally, Neutral
+		ForceTargetRelationships: Neutral
+	Armament@MELEE:
+		Name: primary
+		Weapon: TGMCSynthMelee
+	AutoTarget:
+		ScanRadius: 6
+	AutoTargetPriority@DEFAULT:
+		ValidTargets: Infantry
+	AutoTargetPriority@INFECTED:
+		ValidTargets: Infected
+		Priority: 10
+	AutoTargetPriority@REPAIR:
+		ValidTargets: Structure
+	AutoTargetPriority@MELEE:
+		ValidTargets: Ground
+		Priority: 0
+	Production:
+		Produces: MarineBuild, MarineDefense
+	GivesBuildableArea:
+		AreaTypes: marine-build
+	Tooltip:
+		Name: actor-synth.name
+	Valued:
+		Cost: 300
+	Buildable:
+		Queue: Infantry
+		Prerequisites: medbay, ~faction-marines
+		BuildAtProductionType: Infantry
+		BuildPaletteOrder: 25
+		BuildLimit: 2
+		Description: actor-synth.description
+
 skirmisher:
 	Inherits: ^Infantry
 	Health:

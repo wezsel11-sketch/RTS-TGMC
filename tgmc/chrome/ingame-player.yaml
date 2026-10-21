@@ -24,6 +24,8 @@ Container@PLAYER_WIDGETS:
 			Children:
 				SupportPowers@SUPPORT_PALETTE:
 					IconSize: 56, 42
+					# Tight, so even a dozen powers (every tech building adds some) stop above the minimap.
+					IconMargin: 3
 					IconSpriteOffset: 0, 0
 					TooltipContainer: TOOLTIP_CONTAINER
 					ReadyText: supportpowers-support-powers-palette.ready

@@ -13,7 +13,7 @@ Usage: make_chrome.py --out DIR
 import argparse
 import os
 
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw, ImageFilter, ImageFont
 
 TILE = 24
 CORNER = 6    # corner and edge width of the nine-slice
@@ -49,7 +49,7 @@ PANEL_COLLECTIONS = [
     # The terminal main menu's own window and tab (the tgui-* ones above belong to the in-game HUD).
     "term-window", "term-titlebar",
     # States and panels the stock settings, music, lobby and observer widgets look up by name.
-    "scrollitem", "scrollitem-nohover", "scrollitem-nohover-highlighted", "progressbar-bg", "progressbar-thumb",
+    "scrollitem", "scrollitem-nohover", "scrollitem-nohover-highlighted", "progressbar-bg", "progressbar-thumb", "progressbar-thumb-mid", "progressbar-thumb-low",
     "panel-bg", "panel-header", "panel-rule", "panel-thinborder", "panel-thinborder-light",
     "textfield-hover", "textfield-focused", "textfield-disabled",
 ]
@@ -174,6 +174,10 @@ def draw_olive_tile(fill, bevel):
 def style_for(name):
     if name in GLASS_PANELS or name.startswith("sidebar-button") or name.startswith("tgui-tab"):
         return glass_style(name)
+    if name == "progressbar-thumb-mid":
+        return (232, 178, 44, 255), (255, 218, 120, 255)
+    if name == "progressbar-thumb-low":
+        return (214, 62, 48, 255), (255, 130, 110, 255)
     if name == "progressbar-thumb":
         return (64, 196, 104, 255), (140, 235, 165, 255)
     if name == "progressbar-bg":
@@ -378,38 +382,103 @@ def vline(colour, h=19):
     return img
 
 
-# Production tab pictograms, drawn at 16x16 in the sidebar's light ink. They are our own shapes, not TGMC art.
+# Production tab pictograms, drawn at 20x20 in the sidebar's light ink. They are our own shapes, not TGMC art.
 PARCHMENT = (226, 222, 196, 255)
 
 
+PICTO = 20  # pictogram size; the sidebar buttons are 28 square
+
+
+def outlined(draw, colour):
+    """Draws a pictogram with `draw(d, ink)` and gives it a one pixel dark outline, so it reads on any button state."""
+    img, d = _canvas(PICTO, PICTO)
+    draw(d, colour)
+    edge = Image.new("RGBA", img.size, (0, 0, 0, 0))
+    edge.paste(O_EDGE, (0, 0), img.getchannel("A").filter(ImageFilter.MaxFilter(3)))
+    edge.alpha_composite(img)
+    return edge
+
+
+RIFLE = [
+"....................",
+"....................",
+"....................",
+"....................",
+"..........####......",
+"..........#..#....#.",
+"...###############..",
+".#####oooooo########",
+".#####oooooo#..##...",
+"..###..#####........",
+"..##...##..#........",
+"..#....##..#........",
+".......##..#........",
+"........#...........",
+"....................",
+"....................",
+"....................",
+"....................",
+"....................",
+"....................",
+]
+WRENCH = [
+"....................",
+"..........###..###..",
+".........####..####.",
+".........###....###.",
+".........###....###.",
+"..........###..###..",
+"...........#####....",
+"..........#####.....",
+".........#####......",
+"........#####.......",
+".......#####........",
+"......#####.........",
+".....#####..........",
+"....#####...........",
+"...#####............",
+"..####..............",
+"..###...............",
+"..##................",
+"....................",
+"....................",
+]
+
+
+def from_art(art, colour):
+    """Pixel art: # is the ink, o a darker detail. Outlined like the other pictograms."""
+    def draw(d, c):
+        for y, row in enumerate(art):
+            for x, ch in enumerate(row):
+                if ch != ".":
+                    d.point((x, y), fill=c if ch == "#" else tuple(v * 2 // 3 for v in c[:3]) + (255,))
+    return outlined(draw, colour)
+
+
 def rifle(colour):
-    img, d = _canvas(16, 16)
-    d.polygon([(1, 6), (4, 6), (4, 11), (2, 11)], fill=colour)  # stock
-    d.rectangle([4, 7, 13, 8], fill=colour)  # barrel
-    d.rectangle([11, 5, 12, 6], fill=colour)  # sight
-    d.polygon([(7, 9), (9, 9), (9, 13), (7, 13)], fill=colour)  # magazine
-    return img
-
-
-def claw(colour):
-    img, d = _canvas(16, 16)
-    for start, end in (((3, 2), (6, 13)), ((7, 2), (9, 14)), ((11, 3), (13, 12))):
-        d.line([start, end], fill=colour, width=2)
-    return img
+    return from_art(RIFLE, colour)
 
 
 def hammer(colour):
-    img, d = _canvas(16, 16)
-    d.line([(4, 14), (10, 7)], fill=colour, width=2)  # handle
-    d.polygon([(7, 3), (13, 4), (12, 8), (6, 7)], fill=colour)  # head
-    return img
+    return from_art(WRENCH, colour)
+
+
+def claw(colour):
+    def draw(d, c):
+        d.ellipse([5, 3, 14, 15], fill=c)                            # head
+        d.polygon([(7, 14), (12, 14), (10, 18)], fill=c)             # jaw
+        d.polygon([(5, 6), (1, 3), (6, 4)], fill=c)                  # crest, left
+        d.polygon([(14, 6), (18, 3), (13, 4)], fill=c)               # crest, right
+        d.line([(7, 8), (9, 10)], fill=O_EDGE, width=1)              # eyes
+        d.line([(12, 8), (10, 10)], fill=O_EDGE, width=1)
+    return outlined(draw, colour)
 
 
 def chevrons(colour):
-    img, d = _canvas(16, 16)
-    for y in (3, 8):
-        d.line([(3, y + 5), (8, y), (13, y + 5)], fill=colour, width=2)
-    return img
+    def draw(d, c):
+        for y in (2, 7, 12):
+            d.line([(3, y + 6), (10, y), (17, y + 6)], fill=c, width=3)
+    return outlined(draw, colour)
 
 
 PICTOGRAMS = {"infantry": rifle, "xeno": claw, "build": hammer, "upgrade": chevrons}
@@ -541,7 +610,10 @@ def main():
         atlas.paste(tile, (x, y))
         lines.append(f"{name}:")
         lines.append("\tImage: chrome.png")
-        lines.append(f"\tPanelRegion: {x}, {y}, {CORNER}, {CORNER}, {CENTRE}, {CENTRE}, {CORNER}, {CORNER}")
+        if name.startswith("progressbar"):  # flat blocks: one pixel corners, so a bar only three pixels high still draws as a bar
+            lines.append(f"\tPanelRegion: {x}, {y}, 1, 1, {TILE - 2}, {TILE - 2}, 1, 1")
+        else:
+            lines.append(f"\tPanelRegion: {x}, {y}, {CORNER}, {CORNER}, {CENTRE}, {CENTRE}, {CORNER}, {CORNER}")
 
     atlas.paste(draw_logo(), (0, logo_y))
     lines += [

@@ -607,8 +607,8 @@ Container@PLAYER_WIDGETS:
 											ProductionGroup: Infantry
 											Children:
 												Image@ICON:
-													X: 6
-													Y: 6
+													X: 4
+													Y: 4
 													ImageCollection: production-icons
 										ProductionTypeButton@XENO:
 											Y: 31
@@ -619,8 +619,8 @@ Container@PLAYER_WIDGETS:
 											ProductionGroup: Xeno
 											Children:
 												Image@ICON:
-													X: 6
-													Y: 6
+													X: 4
+													Y: 4
 													ImageCollection: production-icons
 										ProductionTypeButton@BUILD:
 											Y: 62
@@ -631,8 +631,8 @@ Container@PLAYER_WIDGETS:
 											ProductionGroup: Build
 											Children:
 												Image@ICON:
-													X: 6
-													Y: 6
+													X: 4
+													Y: 4
 													ImageCollection: production-icons
 										ProductionTypeButton@UPGRADE:
 											Y: 93
@@ -643,8 +643,8 @@ Container@PLAYER_WIDGETS:
 											ProductionGroup: Upgrade
 											Children:
 												Image@ICON:
-													X: 6
-													Y: 6
+													X: 4
+													Y: 4
 													ImageCollection: production-icons
 						Label@BUILD_HINT:
 							X: 8
@@ -716,7 +716,8 @@ Container@PLAYER_WIDGETS:
 									X: 84
 									Y: 46
 									Width: 110
-									Height: 10
+									Height: 7
+									BarMargin: 1, 1
 								Label@SEL_AMMO:
 									X: 84
 									Y: 60

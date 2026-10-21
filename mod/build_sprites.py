@@ -37,7 +37,7 @@ import math
 import os
 import sys
 
-from PIL import Image, ImageChops, PngImagePlugin
+from PIL import Image, ImageChops, ImageDraw, ImageFilter, PngImagePlugin
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import tgmc_dmi  # noqa: E402
@@ -1645,6 +1645,57 @@ def save_sheet(sheet_cells, cell_size, path):
     sheet.save(path, pnginfo=meta)
 
 
+ICON_W, ICON_H = 62, 46   # the production palette's cell
+CAMEO_TONES = {"marine": ((64, 72, 48), (30, 35, 23)), "xeno": ((72, 44, 84), (28, 16, 36))}
+
+
+def cameo(img, tone="marine", bust=False):
+    """A palette icon: the sprite trimmed, scaled up in whole steps (crisp pixel art) or smoothly down, outlined so it stands out,
+    on a dark card with a vignette and the olive frame. bust keeps only the top of a standing figure (head and shoulders)."""
+    img = img.convert("RGBA")
+    box = img.getchannel("A").point(lambda a: 255 if a > 40 else 0).getbbox()
+    if box:
+        img = img.crop(box)
+    if bust and img.height > img.width:
+        img = img.crop((0, 0, img.width, max(10, round(img.height * 0.7))))
+    room_w, room_h = ICON_W - 8, ICON_H - 8
+    scale = min(room_w / img.width, room_h / img.height)
+    if scale >= 1:
+        scale = int(scale)
+        img = img.resize((img.width * scale, img.height * scale), Image.NEAREST)
+    else:
+        img = img.resize((max(1, round(img.width * scale)), max(1, round(img.height * scale))), Image.LANCZOS)
+    top, bottom = CAMEO_TONES[tone]
+    card = Image.new("RGBA", (ICON_W, ICON_H))
+    d = ImageDraw.Draw(card)
+    for y in range(ICON_H):
+        t = y / (ICON_H - 1)
+        d.line([(0, y), (ICON_W, y)], fill=tuple(round(a + (b - a) * t) for a, b in zip(top, bottom)) + (255,))
+    vignette = Image.new("L", (ICON_W, ICON_H), 0)
+    ImageDraw.Draw(vignette).ellipse([-ICON_W // 4, -ICON_H // 4, ICON_W * 5 // 4, ICON_H * 5 // 4], fill=255)
+    vignette = vignette.filter(ImageFilter.GaussianBlur(10))
+    card = Image.composite(card, Image.new("RGBA", card.size, (12, 14, 9, 255)), vignette)
+    x, y = (ICON_W - img.width) // 2, (ICON_H - img.height) // 2
+    shadow = Image.new("RGBA", card.size, (0, 0, 0, 0))
+    mask = img.getchannel("A").point(lambda a: 255 if a > 40 else 0)
+    outline = Image.new("L", card.size, 0)
+    outline.paste(mask, (x, y))
+    outline = outline.filter(ImageFilter.MaxFilter(3))
+    shadow.paste((8, 9, 6, 255), (0, 0), outline)
+    card.alpha_composite(shadow)
+    card.alpha_composite(img, (x, y))
+    d = ImageDraw.Draw(card)
+    d.rectangle([1, 1, ICON_W - 2, ICON_H - 2], outline=(94, 101, 70, 255))
+    d.rectangle([0, 0, ICON_W - 1, ICON_H - 1], outline=(31, 34, 22, 255))
+    return card
+
+
+def icon_look(layer_specs):
+    """(tone, bust) for the layers an icon is drawn from: xeno art on purple, a human figure as a head-and-shoulders bust."""
+    files = [spec[0] for spec in layer_specs]
+    return ("xeno" if any("Xeno" in f for f in files) else "marine"), any(f == HUMAN for f in files)
+
+
 def build_unit(tgmc, unit, spec, out_dir):
     # A real (non-alias) "icon" sequence goes on its own sheet, so a big structure can have a palette icon scaled down
     # to fit the 62x46 production cell without shrinking the sprite the map draws.
@@ -1657,7 +1708,13 @@ def build_unit(tgmc, unit, spec, out_dir):
         raise SystemExit(f"{unit}: {e}")
     icon_cells = None
     if own_icon:
-        icon_cells, icon_size, icon_defs, _ = render_sequences(tgmc, {"icon": icon_spec})
+        # No "fit" here: cameo() scales from the full-size art.
+        raw = [(sp[0], sp[1], sp[2] if len(sp) > 2 else None, {k: v for k, v in (sp[3] if len(sp) > 3 else {}).items() if k != "fit"})
+               for sp in icon_spec]
+        icon_cells, icon_size, icon_defs, _ = render_sequences(tgmc, {"icon": raw})
+        tone, bust = icon_look(icon_spec)
+        icon_cells = [cameo(c, tone, bust) for c in icon_cells]
+        icon_size = (ICON_W, ICON_H)
 
     starts = {name: (start, length, facings, tick, stride) for name, start, length, facings, tick, stride in seq_defs}
     for alias, target in aliases:  # an alias may point at an earlier alias, so resolve them in order
@@ -1673,6 +1730,14 @@ def build_unit(tgmc, unit, spec, out_dir):
             facings, stride = 1, None
         starts[alias] = (start, length, facings, tick, stride)
         seq_defs.append((alias, start, length, facings, tick, stride))
+    if isinstance(icon_spec, str):  # an icon that is a still of the unit itself: it too gets a cameo card, on its own sheet
+        layers = spec["sequences"][icon_spec.partition(":")[0].partition("#")[0]]
+        while isinstance(layers, str):
+            layers = spec["sequences"][layers.partition(":")[0].partition("#")[0]]
+        icon_cells = [cameo(sheet_cells[starts["icon"][0]], *icon_look(layers))]
+        icon_size = (ICON_W, ICON_H)
+        icon_defs = [("icon", 0, 1, 1, None, None)]
+        seq_defs = [d for d in seq_defs if d[0] != "icon"]
 
     cw, ch = cell_size
     os.makedirs(os.path.join(out_dir, "sequences"), exist_ok=True)

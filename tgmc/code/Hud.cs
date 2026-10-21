@@ -41,7 +41,7 @@ namespace OpenRA.Mods.TGMC.Widgets.Logic
 				{
 					var healths = Selected().Select(a => a.TraitOrDefault<IHealth>()).Where(x => x != null).ToList();
 					var max = healths.Sum(x => x.MaxHP);
-					return max == 0 ? 0 : 100 * healths.Sum(x => x.HP) / max;
+					return HealthTint.Apply(hpBar, max == 0 ? 0 : 100 * healths.Sum(x => x.HP) / max);
 				};
 			}
 
@@ -467,7 +467,7 @@ namespace OpenRA.Mods.TGMC.Widgets.Logic
 				hp.GetPercentage = () =>
 				{
 					var health = At()?.TraitOrDefault<IHealth>();
-					return health == null || health.MaxHP == 0 ? 0 : 100 * health.HP / health.MaxHP;
+					return HealthTint.Apply(hp, health == null || health.MaxHP == 0 ? 0 : 100 * health.HP / health.MaxHP);
 				};
 
 				button.OnClick = () =>
@@ -503,6 +503,16 @@ namespace OpenRA.Mods.TGMC.Widgets.Logic
 			var open = false;
 			button.IsHighlighted = () => open;
 			button.OnClick = () => open = !open;
+		}
+	}
+
+	// A health bar that turns amber and then red as the unit is hurt (the three bar tiles come from make_chrome.py).
+	static class HealthTint
+	{
+		public static int Apply(ProgressBarWidget bar, int percent)
+		{
+			bar.Bar = percent > 60 ? "progressbar-thumb" : percent > 30 ? "progressbar-thumb-mid" : "progressbar-thumb-low";
+			return percent;
 		}
 	}
 }

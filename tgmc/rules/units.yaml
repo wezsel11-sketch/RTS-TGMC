@@ -261,8 +261,24 @@ medic:
 	Inherits: ^Infantry
 	# A submachine gun as well as the hypospray: the gun has its own small magazine.
 	Armament@GUN:
+		RequiresCondition: !gun-m25
 		Name: gun
 		Weapon: TGMCSMG
+	# Weapon ladder (upgrades.yaml): the SMG gives way to the M25.
+	GrantConditionOnPrerequisite@m25:
+		Condition: gun-m25
+		Prerequisites: upgrade-smg-m25
+	GrantConditionOnPrerequisite@t90:
+		Condition: gun-t90
+		Prerequisites: upgrade-smg-t90
+	Armament@M25:
+		Name: gun
+		Weapon: TGMCMechSMG
+		RequiresCondition: gun-m25 && !gun-t90
+	Armament@T90:
+		Name: gun
+		Weapon: TGMCSMGT90
+		RequiresCondition: gun-t90
 	AutoTargetPriority@GUN:
 		ValidTargets: Ground
 		Priority: 0
@@ -299,8 +315,17 @@ engineer:
 	Inherits: ^Infantry
 	# A shotgun as well as the repair torch: the gun has its own small magazine.
 	Armament@GUN:
+		RequiresCondition: !gun-sh410
 		Name: gun
 		Weapon: TGMCShotgun
+	# Weapon ladder (upgrades.yaml): the pump shotgun gives way to the SH-410.
+	GrantConditionOnPrerequisite@sh410:
+		Condition: gun-sh410
+		Prerequisites: upgrade-shotgun-sh410
+	Armament@SH410:
+		Name: gun
+		Weapon: TGMCMechShotgun
+		RequiresCondition: gun-sh410
 	AutoTargetPriority@GUN:
 		ValidTargets: Ground
 		Priority: 0
@@ -367,7 +392,18 @@ skirmisher:
 	TgmcMobile:
 		Speed: 124
 	Armament@PRIMARY:
+		RequiresCondition: !gun-sh410
 		Weapon: TGMCShotgun
+		MuzzleSequence: flash
+		LocalOffset: 256,0,200
+	# Weapon ladder (upgrades.yaml): the pump shotgun gives way to the SH-410.
+	GrantConditionOnPrerequisite@sh410:
+		Condition: gun-sh410
+		Prerequisites: upgrade-shotgun-sh410
+	Armament@SH410:
+		Name: primary
+		Weapon: TGMCMechShotgun
+		RequiresCondition: gun-sh410
 		MuzzleSequence: flash
 		LocalOffset: 256,0,200
 	WithMuzzleOverlay:
@@ -489,7 +525,36 @@ sniper:
 		HP: 110
 	TgmcMobile:
 		Speed: 80
+	GrantConditionOnPrerequisite@svd:
+		Condition: gun-svd
+		Prerequisites: upgrade-sniper-svd
+	GrantConditionOnPrerequisite@tx8:
+		Condition: gun-tx8
+		Prerequisites: upgrade-sniper-tx8
+	GrantConditionOnPrerequisite@m42c:
+		Condition: gun-m42c
+		Prerequisites: upgrade-sniper-m42c
+	# Weapon ladder (upgrades.yaml): Mosin, then SVD, TX-8 and M42C.
+	Armament@SVD:
+		Name: primary
+		RequiresCondition: gun-svd && !gun-tx8
+		Weapon: TGMCSniperSVD
+		MuzzleSequence: flash
+		LocalOffset: 256,0,200
+	Armament@TX8:
+		Name: primary
+		RequiresCondition: gun-tx8 && !gun-m42c
+		Weapon: TGMCSniperTX8
+		MuzzleSequence: flash
+		LocalOffset: 256,0,200
+	Armament@M42C:
+		Name: primary
+		RequiresCondition: gun-m42c
+		Weapon: TGMCSniperM42C
+		MuzzleSequence: flash
+		LocalOffset: 256,0,200
 	Armament@PRIMARY:
+		RequiresCondition: !gun-svd
 		Weapon: TGMCSniper
 		MuzzleSequence: flash
 		LocalOffset: 256,0,200
@@ -512,7 +577,18 @@ rocketeer:
 	TgmcMobile:
 		Speed: 90
 	Armament@PRIMARY:
+		RequiresCondition: !gun-heavy
 		Weapon: TGMCSadar
+		MuzzleSequence: flash
+		LocalOffset: -300,0,300
+	# Weapon ladder (upgrades.yaml): the SADAR gives way to the heavy RPG.
+	GrantConditionOnPrerequisite@heavy:
+		Condition: gun-heavy
+		Prerequisites: upgrade-rocket-heavy
+	Armament@HEAVY:
+		Name: primary
+		Weapon: TGMCMechRPG
+		RequiresCondition: gun-heavy
 		MuzzleSequence: flash
 		LocalOffset: -300,0,300
 	WithMuzzleOverlay:
@@ -605,7 +681,18 @@ machinegunner:
 	TgmcMobile:
 		Speed: 80
 	Armament@PRIMARY:
+		RequiresCondition: !gun-minigun
 		Weapon: TGMCMG60
+		MuzzleSequence: flash
+		LocalOffset: 256,0,200
+	# Weapon ladder (upgrades.yaml): the SG-60 gives way to the minigun.
+	GrantConditionOnPrerequisite@minigun:
+		Condition: gun-minigun
+		Prerequisites: upgrade-mg-minigun
+	Armament@MINIGUN:
+		Name: primary
+		Weapon: TGMCMinigun
+		RequiresCondition: gun-minigun
 		MuzzleSequence: flash
 		LocalOffset: 256,0,200
 	WithMuzzleOverlay:
@@ -711,7 +798,27 @@ field_commander:
 	Health:
 		HP: 200
 	Armament@PRIMARY:
+		RequiresCondition: !gun-m25
 		Weapon: TGMCSMG
+		MuzzleSequence: flash
+		LocalOffset: 256,0,200
+	# Weapon ladder (upgrades.yaml): the SMG gives way to the M25.
+	GrantConditionOnPrerequisite@m25:
+		Condition: gun-m25
+		Prerequisites: upgrade-smg-m25
+	GrantConditionOnPrerequisite@t90:
+		Condition: gun-t90
+		Prerequisites: upgrade-smg-t90
+	Armament@M25:
+		Name: primary
+		Weapon: TGMCMechSMG
+		RequiresCondition: gun-m25 && !gun-t90
+		MuzzleSequence: flash
+		LocalOffset: 256,0,200
+	Armament@T90:
+		Name: primary
+		Weapon: TGMCSMGT90
+		RequiresCondition: gun-t90
 		MuzzleSequence: flash
 		LocalOffset: 256,0,200
 	Buildable:

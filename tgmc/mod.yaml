@@ -30,6 +30,14 @@ Sequences:
 	tgmc|sequences/rifleman.yaml
 	tgmc|sequences/upgrade-rifle-t12.yaml
 	tgmc|sequences/upgrade-rifle-m412.yaml
+	tgmc|sequences/upgrade-smg-m25.yaml
+	tgmc|sequences/upgrade-shotgun-sh410.yaml
+	tgmc|sequences/upgrade-mg-minigun.yaml
+	tgmc|sequences/upgrade-rocket-heavy.yaml
+	tgmc|sequences/upgrade-smg-t90.yaml
+	tgmc|sequences/upgrade-sniper-svd.yaml
+	tgmc|sequences/upgrade-sniper-tx8.yaml
+	tgmc|sequences/upgrade-sniper-m42c.yaml
 	tgmc|sequences/upgrade-carapace-1.yaml
 	tgmc|sequences/upgrade-carapace-2.yaml
 	tgmc|sequences/upgrade-claws.yaml

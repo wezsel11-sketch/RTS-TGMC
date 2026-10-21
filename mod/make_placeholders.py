@@ -1315,6 +1315,12 @@ SCENARIOS = {
         ("rifleman", "Marines", 8, 8, 256), ("runner", "Xenos", 14, 14, 0),
         ("rifleman", "Marines", 4, 8, 256), ("runner", "Xenos", 11, 15, 0), ("resin-silo", "Xenos", 28, 24, 0),
     ]},
+    "scenario-upgrade-ladders": {"scripts": ("test-upgrade-ladders",), "drop_conquest": True, "size": (32, 28), "actors": [
+        ("cryo-pod", "Marines", 6, 4, 0), ("armory", "Marines", 12, 4, 0), ("ordnance-depot", "Marines", 16, 4, 0), ("workshop", "Marines", 20, 4, 0),
+        ("machinegunner", "Marines", 4, 10, 256), ("crusher", "Xenos", 14, 11, 0), ("crusher", "Xenos", 14, 12, 0),
+        ("medic", "Marines", 4, 26, 256), ("engineer", "Marines", 6, 26, 256), ("rocketeer", "Marines", 8, 26, 256),
+        ("skirmisher", "Marines", 10, 26, 256), ("field_commander", "Marines", 12, 26, 256), ("sniper", "Marines", 14, 26, 256), ("resin-silo", "Xenos", 28, 24, 0),
+    ]},
     "scenario-weed-bash": {"scripts": ("test-weed-bash",), "drop_conquest": True, "size": (32, 60), "actors": [
         ("rifleman", "Marines", 10, 8, 512), ("weed-node", "Xenos", 13, 8, 0),
         ("rifleman", "Marines", 5, 22, 512), ("weed-node", "Xenos", 15, 22, 0),

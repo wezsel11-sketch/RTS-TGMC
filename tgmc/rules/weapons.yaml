@@ -404,6 +404,34 @@ TGMCSniper:
 		Versus:
 			Heavy: 120
 
+# Weapon ladders (upgrades.yaml). The Mosin above is the sniper's start; each step is a different gun with its own cycle and punch.
+TGMCSniperSVD:
+	Inherits: TGMCSniper
+	ReloadDelay: 28
+	Warhead@1Dam: SpreadDamage
+		Damage: 48
+
+TGMCSniperTX8:
+	Inherits: TGMCSniper
+	Range: 14c0
+	ReloadDelay: 36
+	Warhead@1Dam: SpreadDamage
+		Damage: 70
+
+TGMCSniperM42C:
+	Inherits: TGMCSniper
+	Range: 14c0
+	ReloadDelay: 56
+	Warhead@1Dam: SpreadDamage
+		Damage: 110
+
+# The T-90 SMG: the M25's rate with a little more punch and reach.
+TGMCSMGT90:
+	Inherits: TGMCMechSMG
+	Range: 10c0
+	Warhead@1Dam: SpreadDamage
+		Damage: 8
+
 TGMCMG60:
 	Inherits: TGMCRifle
 	Range: 10c512

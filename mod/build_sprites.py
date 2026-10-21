@@ -85,6 +85,13 @@ PROJECTILES = "icons/obj/items/projectiles.dmi"
 # The guns as items lying on the ground: the icons of the Upgrades tab.
 GUN_ITEMS = "icons/obj/items/guns/rifles.dmi"
 GUN_ITEMS_64 = "icons/obj/items/guns/rifles64.dmi"
+SMG_ITEMS_64 = "icons/obj/items/guns/submachineguns64.dmi"
+SMG_ITEMS = "icons/obj/items/guns/submachineguns.dmi"
+SHOTGUN_ITEMS_64 = "icons/obj/items/guns/shotguns64.dmi"
+SPECIAL_ITEMS_64 = "icons/obj/items/guns/special64.dmi"
+MG_ITEMS_64 = "icons/obj/items/guns/machineguns64.dmi"
+MARKSMAN_ITEMS_64 = "icons/obj/items/guns/marksman64.dmi"
+MARKSMAN_ITEMS = "icons/obj/items/guns/marksman.dmi"
 FX64 = "icons/effects/64x64.dmi"
 FX96 = "icons/effects/96x96.dmi"
 FX32 = "icons/effects/effects.dmi"
@@ -258,6 +265,14 @@ UNITS = {
     "upgrade-claws": {"sequences": {"idle": [(WARRIOR, "Warrior Walking")], "icon": [(WARRIOR, "Warrior Walking", None, {"side": "S", "frames": (0, 1), "fit": (44, 44)})]}},
     "upgrade-hive-speed": {"sequences": {"idle": [(RUNNER, "Runner Running")], "icon": [(RUNNER, "Runner Running", None, {"side": "S", "frames": (0, 1), "fit": (44, 44)})]}},
     "upgrade-rifle-m412": {"sequences": {"idle": [(GUN_ITEMS_64, "m412")], "icon": [(GUN_ITEMS_64, "m412", None, {"fit": (44, 44)})]}},
+    "upgrade-smg-m25": {"sequences": {"idle": [(SMG_ITEMS_64, "m25")], "icon": [(SMG_ITEMS_64, "m25", None, {"fit": (44, 44)})]}},
+    "upgrade-shotgun-sh410": {"sequences": {"idle": [(SHOTGUN_ITEMS_64, "sh410")], "icon": [(SHOTGUN_ITEMS_64, "sh410", None, {"fit": (44, 44)})]}},
+    "upgrade-mg-minigun": {"sequences": {"idle": [(SPECIAL_ITEMS_64, "minigun")], "icon": [(SPECIAL_ITEMS_64, "minigun", None, {"fit": (44, 44)})]}},
+    "upgrade-rocket-heavy": {"sequences": {"idle": [(SPECIAL_ITEMS_64, "iccrpg")], "icon": [(SPECIAL_ITEMS_64, "iccrpg", None, {"fit": (44, 44)})]}},
+    "upgrade-smg-t90": {"sequences": {"idle": [(SMG_ITEMS, "t90")], "icon": [(SMG_ITEMS, "t90", None, {"fit": (44, 44)})]}},
+    "upgrade-sniper-svd": {"sequences": {"idle": [(MARKSMAN_ITEMS_64, "svd")], "icon": [(MARKSMAN_ITEMS_64, "svd", None, {"fit": (44, 44)})]}},
+    "upgrade-sniper-tx8": {"sequences": {"idle": [(MARKSMAN_ITEMS_64, "tx8")], "icon": [(MARKSMAN_ITEMS_64, "tx8", None, {"fit": (44, 44)})]}},
+    "upgrade-sniper-m42c": {"sequences": {"idle": [(MARKSMAN_ITEMS, "m42c")], "icon": [(MARKSMAN_ITEMS, "m42c", None, {"fit": (44, 44)})]}},
     "runner": {
         "sequences": {
             "stand": [(RUNNER, "Runner Walking")],

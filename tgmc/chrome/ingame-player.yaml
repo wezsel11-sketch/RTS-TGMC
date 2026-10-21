@@ -19,11 +19,11 @@ Container@PLAYER_WIDGETS:
 		LogicTicker@SIDEBAR_TICKER:
 		Container@SUPPORT_POWERS:
 			Logic: SupportPowerBinLogic
-			X: 320
-			Y: 44
+			X: 10
+			Y: 8
 			Children:
 				SupportPowers@SUPPORT_PALETTE:
-					IconSize: 62, 46
+					IconSize: 56, 42
 					IconSpriteOffset: 0, 0
 					TooltipContainer: TOOLTIP_CONTAINER
 					ReadyText: supportpowers-support-powers-palette.ready
@@ -31,14 +31,14 @@ Container@PLAYER_WIDGETS:
 					HotkeyPrefix: SupportPower
 					HotkeyCount: 6
 		SupportPowerTimer@SUPPORT_POWER_TIMER:
-			X: 346
-			Y: 48
+			X: 34
+			Y: 12
 			Order: Descending
 		Container@EVENT_LOG:
 			Logic: EventLogLogic
-			X: 10
-			Y: 48
-			Width: 300
+			X: 76
+			Y: 8
+			Width: 158
 			Height: 140
 			Children:
 				Button@EVENT_1:
@@ -543,17 +543,17 @@ Container@PLAYER_WIDGETS:
 			Height: WINDOW_HEIGHT
 			Children:
 				Background@BUILD_PANEL:
-					X: WINDOW_WIDTH - 262
+					X: WINDOW_WIDTH - 190
 					Y: 44
-					Width: 252
-					Height: WINDOW_HEIGHT - 250
+					Width: 180
+					Height: WINDOW_HEIGHT - 200
 					Background: tgui-window
 					Logic: RepeatBuildLogic
 					Children:
 						Button@REPEAT_BUILD:
-							X: PARENT_WIDTH - 98
+							X: PARENT_WIDTH - 64
 							Y: 6
-							Width: 88
+							Width: 56
 							Height: 20
 							Background: sidebar-button
 							Text: cmd-repeat
@@ -579,13 +579,13 @@ Container@PLAYER_WIDGETS:
 							Logic: ClassicProductionLogic
 							X: 4
 							Y: 44
-							Width: 244
-							Height: PARENT_HEIGHT - 72
+							Width: 172
+							Height: PARENT_HEIGHT - 82
 							Children:
 								LogicTicker@PRODUCTION_TICKER:
 								ProductionPalette@PRODUCTION_PALETTE:
 									X: 34
-									Columns: 3
+									Columns: 2
 									IconSize: 62, 46
 									IconMargin: 1, 1
 									TooltipContainer: TOOLTIP_CONTAINER
@@ -648,11 +648,12 @@ Container@PLAYER_WIDGETS:
 													ImageCollection: production-icons
 						Label@BUILD_HINT:
 							X: 8
-							Y: PARENT_HEIGHT - 24
+							Y: PARENT_HEIGHT - 34
 							Width: PARENT_WIDTH - 16
-							Height: 18
+							Height: 28
 							Text: hud-build-hint
 							Font: Tiny
+							WordWrap: true
 							Align: Center
 				MenuButton@OPTIONS_BUTTON:
 					X: WINDOW_WIDTH - 70
@@ -672,26 +673,26 @@ Container@PLAYER_WIDGETS:
 					Height: 186
 					Children:
 						Background@RADAR_FRAME:
-							X: 12
-							Y: 12
-							Width: 224
-							Height: 162
+							X: 0
+							Y: 86
+							Width: 190
+							Height: 100
 							Background: tgmc-radar-frame
 							Logic: IngameRadarDisplayLogic
 							Children:
 								LogicTicker@RADAR_TICKER:
 								Radar@RADAR_MINIMAP:
 									WorldInteractionController: INTERACTION_CONTROLLER
-									X: 2
-									Y: 2
-									Width: 220
-									Height: 158
+									X: 3
+									Y: 3
+									Width: 184
+									Height: 94
 						Background@SELECTION_PANEL:
 							Logic: SelectionReadoutLogic
-							X: PARENT_WIDTH / 2 - 300
-							Y: 12
-							Width: 300
-							Height: 162
+							X: 198
+							Y: 86
+							Width: 480
+							Height: 100
 							Background: tgui-card
 							Children:
 								Sprite@SEL_PORTRAIT:
@@ -702,24 +703,24 @@ Container@PLAYER_WIDGETS:
 								Label@SEL_NAME:
 									X: 84
 									Y: 6
-									Width: PARENT_WIDTH - 100
+									Width: 110
 									Height: 22
 									Font: Bold
 								Label@SEL_HEALTH:
 									X: 84
 									Y: 28
-									Width: PARENT_WIDTH - 100
+									Width: 110
 									Height: 16
 									Font: Tiny
 								ProgressBar@SEL_HPBAR:
 									X: 84
 									Y: 46
-									Width: PARENT_WIDTH - 100
+									Width: 110
 									Height: 10
 								Label@SEL_AMMO:
 									X: 84
 									Y: 60
-									Width: PARENT_WIDTH - 100
+									Width: 110
 									Height: 16
 									Font: Tiny
 								Label@SEL_STATUS:
@@ -731,10 +732,10 @@ Container@PLAYER_WIDGETS:
 									Align: Left
 						Background@GROUP_PANEL:
 							Logic: GroupGridLogic
-							X: PARENT_WIDTH / 2 - 216
-							Y: 12 + 82
-							Width: 224
-							Height: 64
+							X: 410
+							Y: 86 + 20
+							Width: 264
+							Height: 60
 							Background: tgui-card
 							Children:
 								Button@GRP_0:
@@ -1028,125 +1029,125 @@ Container@PLAYER_WIDGETS:
 						Background@COMMAND_CARD:
 							Logic: CommandCardLogic
 							Background: tgui-card
-							X: PARENT_WIDTH / 2 + 12
-							Y: 14
-							Width: 300
-							Height: 160
+							X: PARENT_WIDTH - 318
+							Y: 80
+							Width: 312
+							Height: 106
 							Children:
 								Button@CMD_EVOLVE:
-									X: 0
-									Y: 0
+									X: 6
+									Y: 6
 									Width: 72
-									Height: 30
+									Height: 22
 									Background: sidebar-button
 									Text: cmd-evolve
 									Font: TinyBold
 								Button@CMD_DEVOLVE:
-									X: 76
-									Y: 0
+									X: 82
+									Y: 6
 									Width: 72
-									Height: 30
+									Height: 22
 									Background: sidebar-button
 									Text: cmd-devolve
 									Font: TinyBold
 								Button@CMD_STOP:
-									X: 152
-									Y: 0
+									X: 158
+									Y: 6
 									Width: 72
-									Height: 30
+									Height: 22
 									Background: sidebar-button
 									Text: cmd-stop
 									Font: TinyBold
 								Button@CMD_ATTACK:
-									X: 228
-									Y: 0
+									X: 234
+									Y: 6
 									Width: 72
-									Height: 30
+									Height: 22
 									Background: sidebar-button
 									Text: cmd-attack
 									Font: TinyBold
 								Button@CMD_PATROL:
-									X: 0
-									Y: 36
+									X: 6
+									Y: 30
 									Width: 72
-									Height: 30
+									Height: 22
 									Background: sidebar-button
 									Text: cmd-patrol
 									Font: TinyBold
 								Button@CMD_GUARD:
-									X: 76
-									Y: 36
+									X: 82
+									Y: 30
 									Width: 72
-									Height: 30
+									Height: 22
 									Background: sidebar-button
 									Text: cmd-guard
 									Key: StanceDefend
 									Font: TinyBold
 								Button@CMD_RETURN:
-									X: 152
-									Y: 36
+									X: 158
+									Y: 30
 									Width: 72
-									Height: 30
+									Height: 22
 									Background: sidebar-button
 									Text: cmd-return
 									Key: StanceReturnFire
 									Font: TinyBold
 								Button@CMD_HOLD:
-									X: 228
-									Y: 36
+									X: 234
+									Y: 30
 									Width: 72
-									Height: 30
+									Height: 22
 									Background: sidebar-button
 									Text: cmd-hold
 									Key: StanceHoldFire
 									Font: TinyBold
 								Button@CMD_AGGRESSIVE:
-									X: 0
-									Y: 108
+									X: 6
+									Y: 78
 									Width: 72
-									Height: 30
+									Height: 22
 									Background: sidebar-button
 									Text: cmd-aggressive
 									Key: StanceAttackAnything
 									Font: TinyBold
 								Button@CMD_RETREAT:
-									X: 76
-									Y: 108
+									X: 82
+									Y: 78
 									Width: 72
-									Height: 30
+									Height: 22
 									Background: sidebar-button
 									Text: cmd-retreat
 									Key: TgmcRetreat
 									Font: TinyBold
 								Button@CMD_ABILITY1:
-									X: 0
-									Y: 72
+									X: 6
+									Y: 54
 									Width: 148
-									Height: 30
+									Height: 22
 									Background: sidebar-button
 									Key: TgmcAbility1
 									Font: TinyBold
 								Button@CMD_ABILITY2:
-									X: 152
-									Y: 72
+									X: 158
+									Y: 54
 									Width: 148
-									Height: 30
+									Height: 22
 									Background: sidebar-button
 									Key: TgmcAbility2
 									Font: TinyBold
 								Button@CMD_MEDIC:
-									X: 0
-									Y: 72
+									X: 6
+									Y: 54
 									Width: 148
-									Height: 30
+									Height: 22
 									Background: sidebar-button
 									Text: cmd-medic
 									Font: TinyBold
 								Button@CMD_INFECTED:
-									X: 152
-									Y: 72
+									X: 158
+									Y: 54
 									Width: 148
-									Height: 30
+									Height: 22
 									Background: sidebar-button
 									Text: cmd-infected
 									Font: TinyBold

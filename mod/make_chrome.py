@@ -138,6 +138,39 @@ def glass_style(name):
     return (255, 255, 255, 22), (255, 255, 255, 76)
 
 
+# Olive field look (the chosen HUD concept): square tiles, a dark outline, a lighter inner bevel, flat olive-drab fills and a
+# bright olive-green for the active state. Applies to the in-game HUD (is_hud) except the bars.
+O_EDGE = (31, 34, 22, 255)
+O_PANEL = ((74, 80, 54, 205), (94, 101, 70, 235))
+O_BUTTON = ((58, 63, 43, 215), (72, 78, 54, 240))
+O_STATES = (("disabled", ((46, 49, 36, 225), (56, 60, 44, 255))), ("highlighted", ((126, 142, 62, 250), (160, 178, 86, 255))),
+            ("active", ((126, 142, 62, 250), (160, 178, 86, 255))), ("pressed", ((40, 44, 30, 250), (52, 56, 40, 255))),
+            ("hover", ((82, 90, 56, 250), (110, 120, 76, 255))))
+O_PANELS = ("tgui-window", "tgui-card", "tgmc-radar-frame", "tgmc-selection", "tgmc-panel", "sidebar")
+
+
+def olive_style(name):
+    """(fill, bevel) of an in-game HUD collection."""
+    if name in O_PANELS:
+        return O_PANEL
+    if name in ("tgui-card-header", "tgui-titlebar", "tgui-rail"):
+        return (50, 55, 37, 215), (64, 70, 48, 240)
+    for key, style in O_STATES:
+        if key in name:
+            return style
+    return O_BUTTON
+
+
+def draw_olive_tile(fill, bevel):
+    """Rounded: a dark outline, a lighter inner line, flat fill. The corner pixels outside the curve stay clear."""
+    img = Image.new("RGBA", (TILE, TILE), (0, 0, 0, 0))
+    d = ImageDraw.Draw(img)
+    d.rounded_rectangle([0, 0, TILE - 1, TILE - 1], radius=CORNER - 1, fill=O_EDGE)
+    d.rounded_rectangle([1, 1, TILE - 2, TILE - 2], radius=CORNER - 2, fill=bevel)
+    d.rounded_rectangle([2, 2, TILE - 3, TILE - 3], radius=CORNER - 3, fill=fill)
+    return img
+
+
 def style_for(name):
     if name in GLASS_PANELS or name.startswith("sidebar-button") or name.startswith("tgui-tab"):
         return glass_style(name)
@@ -501,7 +534,11 @@ def main():
         x, y = (i % COLS) * TILE, (i // COLS) * TILE
         square = not is_hud(name)
         fill, border = term_style(name) if square else style_for(name)
-        atlas.paste(flat_tile(fill) if name.startswith('progressbar') else draw_tile(fill, border, square), (x, y))
+        if is_hud(name) and not name.startswith(("progressbar", "tgui-bar", "separator", "tooltip-separator")):
+            tile = draw_olive_tile(*olive_style(name))
+        else:
+            tile = flat_tile(fill) if name.startswith('progressbar') else draw_tile(fill, border, square)
+        atlas.paste(tile, (x, y))
         lines.append(f"{name}:")
         lines.append("\tImage: chrome.png")
         lines.append(f"\tPanelRegion: {x}, {y}, {CORNER}, {CORNER}, {CENTRE}, {CENTRE}, {CORNER}, {CORNER}")

@@ -914,15 +914,6 @@ SCENARIOS = {
         ("artillery-emplacement", "Marines", 6, 12, 0), ("rifleman", "Marines", 20, 12, 0),
         ("crusher", "Xenos", 24, 12, 0), ("resin-silo", "Xenos", 40, 28, 0),
     ]},
-    # The Jaeger marines side by side, each three cells from a crusher (see scenarios/test-jaeger.lua).
-    "scenario-jaeger": {"scripts": ("test-jaeger",), "size": (24, 32), "drop_conquest": True, "actors": [
-        ("scout", "Marines", 8, 6, 256), ("crusher", "Xenos", 11, 6, 768),
-        ("skirmisher", "Marines", 8, 10, 256), ("crusher", "Xenos", 11, 10, 768),
-        ("trooper", "Marines", 8, 14, 256), ("crusher", "Xenos", 11, 14, 768),
-        ("ranger", "Marines", 8, 18, 256), ("crusher", "Xenos", 11, 18, 768),
-        ("assault", "Marines", 8, 22, 256), ("crusher", "Xenos", 11, 22, 768),
-        ("resin-silo", "Xenos", 20, 28, 0),
-    ]},
     # A crusher charges a marine, who is thrown away (see scenarios/test-knockback.lua).
     "scenario-knockback": {"scripts": ("test-knockback",), "size": (48, 24), "drop_conquest": True, "extra_rules": "rifleman:\n\tHealth:\n\t\tHP: 3000\ncrusher:\n\tArmament@PRIMARY:\n\t\tWeapon: TGMCCharge\n", "actors": [
         ("crusher", "Xenos", 10, 10, 0), ("rifleman", "Marines", 16, 10, 512), ("resin-silo", "Xenos", 40, 20, 0),
@@ -1319,7 +1310,7 @@ SCENARIOS = {
         ("cryo-pod", "Marines", 6, 4, 0), ("armory", "Marines", 12, 4, 0), ("ordnance-depot", "Marines", 16, 4, 0), ("workshop", "Marines", 20, 4, 0),
         ("machinegunner", "Marines", 4, 10, 256), ("crusher", "Xenos", 14, 11, 0), ("crusher", "Xenos", 14, 12, 0),
         ("medic", "Marines", 4, 26, 256), ("engineer", "Marines", 6, 26, 256), ("rocketeer", "Marines", 8, 26, 256),
-        ("skirmisher", "Marines", 10, 26, 256), ("field_commander", "Marines", 12, 26, 256), ("sniper", "Marines", 14, 26, 256), ("resin-silo", "Xenos", 28, 24, 0),
+        ("skirmisher", "Marines", 10, 26, 256), ("field_commander", "Marines", 12, 26, 256), ("sniper", "Marines", 14, 26, 256), ("flamer", "Marines", 16, 26, 256), ("resin-silo", "Xenos", 28, 24, 0),
     ]},
     "scenario-weed-bash": {"scripts": ("test-weed-bash",), "drop_conquest": True, "size": (32, 60), "actors": [
         ("rifleman", "Marines", 10, 8, 512), ("weed-node", "Xenos", 13, 8, 0),

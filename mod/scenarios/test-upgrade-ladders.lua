@@ -4,13 +4,14 @@
 --     out of the minigun's 9). The crusher must be hurt before the minigun is bought and untouched after it.
 -- The medic, engineer, skirmisher, rocketeer and field commander stand there too, so a broken weapon condition on any of them fails the load.
 -- Then the second rungs: the T-90 SMG needs the M25, and the sniper climbs SVD, TX-8, M42C in that order only (each is refused until the one before is held).
+-- And the shotgun's TX-15 before the SH-410, the flamer's X-Napalm, and the three armour tiers (each refused until the one before is held).
 -- Prints "TEST upgrade-ladders PASS" or "TEST upgrade-ladders FAIL".
 local reported = false
 
 WorldLoaded = function()
 	local marines = Player.GetPlayer("Marines")
 	local xenos = Player.GetPlayer("Xenos")
-	marines.Cash = 5000
+	marines.Cash = 12000
 
 	local gunner = marines.GetActorsByType("machinegunner")[1]
 	local crusher = xenos.GetActorsByType("crusher")[1]
@@ -56,7 +57,7 @@ WorldLoaded = function()
 		Trigger.AfterDelay(150, function() then_(target.IsDead or target.Health < max) end)
 	end
 
-	local names = { "upgrade-smg-m25", "upgrade-shotgun-sh410", "upgrade-mg-minigun", "upgrade-rocket-heavy" }
+	local names = { "upgrade-smg-m25", "upgrade-shotgun-tx15", "upgrade-mg-minigun", "upgrade-rocket-heavy" }
 
 	Trigger.AfterDelay(60, function()
 		volley(crusher, function(hurt)
@@ -80,10 +81,27 @@ WorldLoaded = function()
 						check(marines.QueueUnit("upgrade-sniper-m42c"), "m42c could not be queued after tx8")
 						waitFor("upgrade-sniper-m42c", 2000, function()
 							waitFor("upgrade-smg-t90", 600, function()
-								local before = fresh.Health
-								volley(fresh, function()
-									check(fresh.Health >= before, "the minigun hit a crusher 10 cells away")
-									finish()
+								check(not marines.QueueUnit("upgrade-armor-2"), "armour II bought before I")
+								check(not marines.QueueUnit("upgrade-armor-3"), "armour III bought before II")
+								check(marines.QueueUnit("upgrade-shotgun-sh410"), "sh410 could not be queued after tx15")
+								check(marines.QueueUnit("upgrade-flamer-xnapalm"), "x-napalm could not be queued")
+								check(marines.QueueUnit("upgrade-armor-1"), "armour I could not be queued")
+								waitFor("upgrade-armor-1", 1500, function()
+									check(marines.QueueUnit("upgrade-armor-2"), "armour II could not be queued after I")
+									waitFor("upgrade-armor-2", 1500, function()
+										check(marines.QueueUnit("upgrade-armor-3"), "armour III could not be queued after II")
+										waitFor("upgrade-armor-3", 2000, function()
+											waitFor("upgrade-shotgun-sh410", 1500, function()
+												waitFor("upgrade-flamer-xnapalm", 1500, function()
+													local before = fresh.Health
+													volley(fresh, function()
+														check(fresh.Health >= before, "the minigun hit a crusher 10 cells away")
+														finish()
+													end)
+												end)
+											end)
+										end)
+									end)
 								end)
 							end)
 						end)

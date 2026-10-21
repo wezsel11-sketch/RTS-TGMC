@@ -38,6 +38,12 @@ Sequences:
 	tgmc|sequences/upgrade-sniper-svd.yaml
 	tgmc|sequences/upgrade-sniper-tx8.yaml
 	tgmc|sequences/upgrade-sniper-m42c.yaml
+	tgmc|sequences/upgrade-shotgun-tx15.yaml
+	tgmc|sequences/upgrade-flamer-xnapalm.yaml
+	tgmc|sequences/upgrade-armor-1.yaml
+	tgmc|sequences/upgrade-armor-2.yaml
+	tgmc|sequences/upgrade-armor-3.yaml
+	tgmc|sequences/flame-patch-blue.yaml
 	tgmc|sequences/upgrade-carapace-1.yaml
 	tgmc|sequences/upgrade-carapace-2.yaml
 	tgmc|sequences/upgrade-claws.yaml
@@ -79,11 +85,7 @@ Sequences:
 	tgmc|sequences/resin-silo.yaml
 	tgmc|sequences/mini-silo.yaml
 	tgmc|sequences/smartgunner.yaml
-	tgmc|sequences/scout.yaml
 	tgmc|sequences/skirmisher.yaml
-	tgmc|sequences/trooper.yaml
-	tgmc|sequences/ranger.yaml
-	tgmc|sequences/assault.yaml
 	tgmc|sequences/grenadier.yaml
 	tgmc|sequences/heavygunner.yaml
 	tgmc|sequences/demolitionist.yaml

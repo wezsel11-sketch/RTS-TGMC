@@ -117,6 +117,32 @@
 		EmptyWeapon: TGMCDeathBlood
 	DetectCloaked:
 		Range: 2c0
+	# The armour ladder (upgrades.yaml): each tier is bought for every marine, and the best one held applies. Less damage taken stands in for
+	# more health; the heaviest plates slow a marine down.
+	GrantConditionOnPrerequisite@armor1:
+		Condition: armor-1
+		Prerequisites: upgrade-armor-1, !upgrade-armor-2
+	GrantConditionOnPrerequisite@armor2:
+		Condition: armor-2
+		Prerequisites: upgrade-armor-2, !upgrade-armor-3
+	GrantConditionOnPrerequisite@armor3:
+		Condition: armor-3
+		Prerequisites: upgrade-armor-3
+	DamageMultiplier@armor1:
+		RequiresCondition: armor-1
+		Modifier: 87
+	DamageMultiplier@armor2:
+		RequiresCondition: armor-2
+		Modifier: 76
+	DamageMultiplier@armor3:
+		RequiresCondition: armor-3
+		Modifier: 57
+	SpeedMultiplier@armor1:
+		RequiresCondition: armor-1
+		Modifier: 105
+	SpeedMultiplier@armor3:
+		RequiresCondition: armor-3
+		Modifier: 90
 	# Standing in a smoke screen: harder to hit.
 	ExternalCondition@smoked:
 		Condition: smoked
@@ -315,13 +341,20 @@ engineer:
 	Inherits: ^Infantry
 	# A shotgun as well as the repair torch: the gun has its own small magazine.
 	Armament@GUN:
-		RequiresCondition: !gun-sh410
+		RequiresCondition: !gun-tx15
 		Name: gun
 		Weapon: TGMCShotgun
 	# Weapon ladder (upgrades.yaml): the pump shotgun gives way to the SH-410.
+	GrantConditionOnPrerequisite@tx15:
+		Condition: gun-tx15
+		Prerequisites: upgrade-shotgun-tx15
 	GrantConditionOnPrerequisite@sh410:
 		Condition: gun-sh410
 		Prerequisites: upgrade-shotgun-sh410
+	Armament@TX15:
+		Name: gun
+		Weapon: TGMCShotgunTX15
+		RequiresCondition: gun-tx15 && !gun-sh410
 	Armament@SH410:
 		Name: gun
 		Weapon: TGMCMechShotgun
@@ -358,33 +391,6 @@ engineer:
 		BuildPaletteOrder: 30
 		Description: actor-engineer.description
 
-# Jaeger Mk.II marines: the same man in three weights of armour. Light (scout, skirmisher) is fast and fragile, medium (trooper, ranger) takes a
-# little less from every hit, heavy (assault, and the heavy gunner and demolitionist further down) is slow and shrugs off claws and acid.
-scout:
-	Inherits: ^Infantry
-	Health:
-		HP: 85
-	TgmcMobile:
-		Speed: 136
-	# Scouts see further than other marines.
-	TgmcSight:
-		Range: 13c0
-	Armament@PRIMARY:
-		Weapon: TGMCSMG
-		MuzzleSequence: flash
-		LocalOffset: 256,0,200
-	WithMuzzleOverlay:
-	Tooltip:
-		Name: actor-scout.name
-	Valued:
-		Cost: 90
-	Buildable:
-		Queue: Infantry
-		Prerequisites: ~disabled, ~faction-marines
-		BuildAtProductionType: Infantry
-		BuildPaletteOrder: 12
-		Description: actor-scout.description
-
 skirmisher:
 	Inherits: ^Infantry
 	Health:
@@ -392,14 +398,23 @@ skirmisher:
 	TgmcMobile:
 		Speed: 124
 	Armament@PRIMARY:
-		RequiresCondition: !gun-sh410
+		RequiresCondition: !gun-tx15
 		Weapon: TGMCShotgun
 		MuzzleSequence: flash
 		LocalOffset: 256,0,200
 	# Weapon ladder (upgrades.yaml): the pump shotgun gives way to the SH-410.
+	GrantConditionOnPrerequisite@tx15:
+		Condition: gun-tx15
+		Prerequisites: upgrade-shotgun-tx15
 	GrantConditionOnPrerequisite@sh410:
 		Condition: gun-sh410
 		Prerequisites: upgrade-shotgun-sh410
+	Armament@TX15:
+		Name: primary
+		Weapon: TGMCShotgunTX15
+		RequiresCondition: gun-tx15 && !gun-sh410
+		MuzzleSequence: flash
+		LocalOffset: 256,0,200
 	Armament@SH410:
 		Name: primary
 		Weapon: TGMCMechShotgun
@@ -413,86 +428,10 @@ skirmisher:
 		Cost: 130
 	Buildable:
 		Queue: Infantry
-		Prerequisites: ~disabled, ~faction-marines
+		Prerequisites: armory, ~faction-marines
 		BuildAtProductionType: Infantry
 		BuildPaletteOrder: 41
 		Description: actor-skirmisher.description
-
-trooper:
-	Inherits: ^Infantry
-	Health:
-		HP: 140
-	TgmcMobile:
-		Speed: 104
-	DamageMultiplier@armor:
-		Modifier: 88
-	Armament@PRIMARY:
-		Weapon: TGMCRifle
-		MuzzleSequence: flash
-		LocalOffset: 256,0,200
-	WithMuzzleOverlay:
-	Tooltip:
-		Name: actor-trooper.name
-	Valued:
-		Cost: 140
-	Buildable:
-		Queue: Infantry
-		Prerequisites: ~disabled, ~faction-marines
-		BuildAtProductionType: Infantry
-		BuildPaletteOrder: 13
-		Description: actor-trooper.description
-
-ranger:
-	Inherits: ^Infantry
-	Health:
-		HP: 110
-	TgmcMobile:
-		Speed: 108
-	DamageMultiplier@armor:
-		Modifier: 92
-	TgmcSight:
-		Range: 12c0
-	Armament@PRIMARY:
-		Weapon: TGMCM412
-		MuzzleSequence: flash
-		LocalOffset: 256,0,200
-	WithMuzzleOverlay:
-	Tooltip:
-		Name: actor-ranger.name
-	Valued:
-		Cost: 170
-	Buildable:
-		Queue: Infantry
-		Prerequisites: ~disabled, ~faction-marines
-		BuildAtProductionType: Infantry
-		BuildPaletteOrder: 14
-		Description: actor-ranger.description
-
-assault:
-	Inherits: ^Infantry
-	Health:
-		HP: 240
-	TgmcMobile:
-		Speed: 68
-	Selectable:
-		Bounds: 640, 832, 0, -128
-	Armor:
-		Type: HeavyMarine
-	Armament@PRIMARY:
-		Weapon: TGMCCarbine
-		MuzzleSequence: flash
-		LocalOffset: 256,0,200
-	WithMuzzleOverlay:
-	Tooltip:
-		Name: actor-assault.name
-	Valued:
-		Cost: 280
-	Buildable:
-		Queue: Infantry
-		Prerequisites: ordnance-depot, ~faction-marines
-		BuildAtProductionType: Infantry
-		BuildPaletteOrder: 54
-		Description: actor-assault.description
 
 smartgunner:
 	Inherits: ^Infantry
@@ -655,8 +594,19 @@ flamer:
 		HP: 140
 	TgmcMobile:
 		Speed: 100
+	# X-Napalm (upgrades.yaml): blue fire that hits harder and burns longer.
+	GrantConditionOnPrerequisite@xnapalm:
+		Condition: gun-xnapalm
+		Prerequisites: upgrade-flamer-xnapalm
 	Armament@PRIMARY:
+		RequiresCondition: !gun-xnapalm
 		Weapon: TGMCFlamer
+		MuzzleSequence: flash
+		LocalOffset: 300,0,250
+	Armament@XNAPALM:
+		Name: primary
+		RequiresCondition: gun-xnapalm
+		Weapon: TGMCFlamerX
 		MuzzleSequence: flash
 		LocalOffset: 300,0,250
 	WithMuzzleOverlay:
@@ -980,12 +930,30 @@ som_demolitionist:
 		Name: actor-som-demolitionist.name
 
 som_assault:
-	Inherits: assault
-	Buildable:
-		Prerequisites: ordnance-depot, ~faction-som
-		Description: actor-som-assault.description
+	Inherits: ^Infantry
+	Health:
+		HP: 240
+	TgmcMobile:
+		Speed: 68
+	Selectable:
+		Bounds: 640, 832, 0, -128
+	Armor:
+		Type: HeavyMarine
+	Armament@PRIMARY:
+		Weapon: TGMCCarbine
+		MuzzleSequence: flash
+		LocalOffset: 256,0,200
+	WithMuzzleOverlay:
 	Tooltip:
 		Name: actor-som-assault.name
+	Valued:
+		Cost: 280
+	Buildable:
+		Queue: Infantry
+		Prerequisites: ordnance-depot, ~faction-som
+		BuildAtProductionType: Infantry
+		BuildPaletteOrder: 54
+		Description: actor-som-assault.description
 
 som_bomber:
 	Inherits: bomber
@@ -2328,6 +2296,36 @@ flame-patch:
 		Delay: 200
 	Armament@PRIMARY:
 		Weapon: TGMCFlamePatch
+	AttackOmni:
+	AutoTarget:
+		InitialStance: AttackAnything
+	AutoTargetPriority@DEFAULT:
+		ValidTargets: Ground
+
+# The flame patch X-Napalm leaves: blue fire, burning longer and hotter.
+flame-patch-blue:
+	RevealsShroud:
+		Range: 3c0
+		Type: GroundPosition
+	Immobile:
+		OccupiesSpace: false
+	Interactable:
+	BodyOrientation:
+		QuantizedFacings: 1
+	Tooltip:
+		Name: actor-flame-patch.name
+	RenderSprites:
+		Image: flame-patch-blue
+		Palette: effect
+	WithSpriteBody:
+	WithIdleOverlay@glow:
+		Image: fx-light
+		Sequence: glow-fire
+		Palette: effect
+	KillsSelf:
+		Delay: 320
+	Armament@PRIMARY:
+		Weapon: TGMCFlamePatchBlue
 	AttackOmni:
 	AutoTarget:
 		InitialStance: AttackAnything

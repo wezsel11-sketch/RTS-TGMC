@@ -3,7 +3,7 @@
 An [OpenRA](https://github.com/OpenRA/OpenRA) mod that uses sprites and sounds from
 [Terra Gov Marine Corps (TGMC)](https://github.com/tgstation/terragov-marine-corps), the
 SS13-based game. It has marine infantry (rifleman, corpsman, engineer, smartgunner, grenadier, machine gunner, sniper,
-SADAR rocketeer, Vali blademan, mortarman, flamer, and the armoured Gungnir heavy gunner and EOD demolitionist, and the Jaeger scout, skirmisher, trooper, ranger and assault), marine and xeno
+SADAR rocketeer, Vali blademan, mortarman, flamer, and the armoured Gungnir heavy gunner and EOD demolitionist, and the skirmisher), marine and xeno
 structures you build from a Build menu (supply generators, walls, tech), and a TGMC-styled HUD. The xenos have a Runner, a Hunter, an acid-spitting Sentinel, a
 structure-mending Drone, a heavy Warrior and a long list of further castes, plus facehuggers and larvae. The mod ships a small C# assembly
 (`tgmc/code`, built into `Tgmc.dll` by `mod/build_mod.sh`) for the things OpenRA's YAML cannot do.
@@ -128,10 +128,8 @@ the commits this mod was tested against (see the top of `mod/bootstrap.py`), so 
     and the mech's rocket, RPG and missile). A cell that runs out turns into rubble that units walk over, and the pathfinding follows. The picture of the neighbouring
     wall pieces is not redrawn, so a hole can look a little ragged.
   - **Vision.** Marines on foot see 10 cells through the fog and xenos 9 (both 7 before); scouts see 13 and rangers 12. Bullets that miss still chip the furniture around where they land.
-  - **Armour classes.** The marines come in three weights of Jaeger Mk.II exoskeleton. *Light*: Jaeger Scout (SMG, fast, sees 13 cells, 90) and Jaeger
-    Skirmisher (shotgun, 130). *Medium*: Jaeger Trooper (rifle, takes 12 percent less damage, 140) and Jaeger Ranger (M412, sees 12, takes 8 percent less, 170).
-    *Heavy*: Jaeger Assault (carbine, 240 HP, slow, 280), plus the Gungnir heavy gunner and EOD demolitionist. Heavy armour takes 55 percent from claws
-    and acid. The scout needs nothing, the skirmisher, trooper and ranger an Armory, the assault an Ordnance Depot.
+  - **Armour.** The Jaeger scout, trooper, ranger and assault are gone. Marines get armour as three upgrades instead (Light, Medium, Heavy Armour in the Upgrades tab), and the
+    Gungnir heavy gunner and EOD demolitionist stay as the heavy units. Heavy armour takes 55 percent from claws and acid.
   - **Smarter AI.** The bot comes in three levels, none of which cheat. *Easy* builds its base and units and waits for big squads. *Normal*
     also reacts to what it has seen the enemy field (it asks for flamers and machine guns against swarms, rocketeers and demolitionists
     against heavies, snipers against spitters, and the mirror for xenos), evolves its xenos when cash allows, sends medics to the wounded

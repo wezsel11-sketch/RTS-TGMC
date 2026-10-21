@@ -62,7 +62,8 @@ WorldLoaded = function()
 			#xenos.GetActorsByType("mini-silo"), #xenos.GetActorsByType("forward-hive"), #xenos.GetActorsByType("drone"), #xenos.GetActorsByType("queen")))
 		local left = {}
 		for _, a in ipairs(xenos.GetActors()) do
-			if a.Type ~= "player" then
+			-- The bought upgrades are hidden actors with no place on the map.
+			if a.Type ~= "player" and string.sub(a.Type, 1, 8) ~= "upgrade-" then
 				left[#left + 1] = a.Type .. "@" .. a.Location.X .. "," .. a.Location.Y
 			end
 		end

@@ -389,6 +389,24 @@ TGMCFlamePatch:
 		ValidRelationships: Enemy, Neutral, Ally
 		ValidTargets: Ground
 
+# Weapon ladders (upgrades.yaml): the TX-15 cycles faster than the pump shotgun the engineer and skirmisher start with.
+TGMCShotgunTX15:
+	Inherits: TGMCShotgun
+	ReloadDelay: 32
+
+# X-Napalm: the flamer's second step. Hotter flames, and the ground they leave is blue fire that burns longer (flame-patch-blue).
+TGMCFlamerX:
+	Inherits: TGMCFlamer
+	Warhead@1Cone: ConeDamage
+		Damage: 35
+	Warhead@3Patch: SpawnActor
+		Actor: flame-patch-blue
+
+TGMCFlamePatchBlue:
+	Inherits: TGMCFlamePatch
+	Warhead@1Dam: SpreadDamage
+		Damage: 8
+
 TGMCSniper:
 	Inherits: TGMCRifle
 	Range: 12c0

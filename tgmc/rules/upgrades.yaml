@@ -48,16 +48,27 @@ upgrade-smg-m25:
 	Valued:
 		Cost: 300
 
+upgrade-shotgun-tx15:
+	Inherits: ^Upgrade
+	Buildable:
+		Prerequisites: armory, ~faction-marines
+		BuildPaletteOrder: 12
+		Description: actor-upgrade-shotgun-tx15.description
+	Tooltip:
+		Name: actor-upgrade-shotgun-tx15.name
+	Valued:
+		Cost: 400
+
 upgrade-shotgun-sh410:
 	Inherits: ^Upgrade
 	Buildable:
-		Prerequisites: armory, ordnance-depot, ~faction-marines
+		Prerequisites: ordnance-depot, upgrade-shotgun-tx15, ~faction-marines
 		BuildPaletteOrder: 13
 		Description: actor-upgrade-shotgun-sh410.description
 	Tooltip:
 		Name: actor-upgrade-shotgun-sh410.name
 	Valued:
-		Cost: 450
+		Cost: 650
 
 upgrade-mg-minigun:
 	Inherits: ^Upgrade
@@ -122,6 +133,50 @@ upgrade-sniper-m42c:
 		Description: actor-upgrade-sniper-m42c.description
 	Tooltip:
 		Name: actor-upgrade-sniper-m42c.name
+	Valued:
+		Cost: 1000
+
+upgrade-flamer-xnapalm:
+	Inherits: ^Upgrade
+	Buildable:
+		Prerequisites: armory, ordnance-depot, ~faction-marines
+		BuildPaletteOrder: 25
+		Description: actor-upgrade-flamer-xnapalm.description
+	Tooltip:
+		Name: actor-upgrade-flamer-xnapalm.name
+	Valued:
+		Cost: 600
+
+upgrade-armor-1:
+	Inherits: ^Upgrade
+	Buildable:
+		Prerequisites: armory, ~faction-marines
+		BuildPaletteOrder: 30
+		Description: actor-upgrade-armor-1.description
+	Tooltip:
+		Name: actor-upgrade-armor-1.name
+	Valued:
+		Cost: 300
+
+upgrade-armor-2:
+	Inherits: ^Upgrade
+	Buildable:
+		Prerequisites: armory, ordnance-depot, upgrade-armor-1, ~faction-marines
+		BuildPaletteOrder: 31
+		Description: actor-upgrade-armor-2.description
+	Tooltip:
+		Name: actor-upgrade-armor-2.name
+	Valued:
+		Cost: 600
+
+upgrade-armor-3:
+	Inherits: ^Upgrade
+	Buildable:
+		Prerequisites: workshop, upgrade-armor-2, ~faction-marines
+		BuildPaletteOrder: 32
+		Description: actor-upgrade-armor-3.description
+	Tooltip:
+		Name: actor-upgrade-armor-3.name
 	Valued:
 		Cost: 1000
 

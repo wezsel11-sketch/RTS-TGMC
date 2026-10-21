@@ -88,10 +88,13 @@ GUN_ITEMS_64 = "icons/obj/items/guns/rifles64.dmi"
 SMG_ITEMS_64 = "icons/obj/items/guns/submachineguns64.dmi"
 SMG_ITEMS = "icons/obj/items/guns/submachineguns.dmi"
 SHOTGUN_ITEMS_64 = "icons/obj/items/guns/shotguns64.dmi"
+SHOTGUN_ITEMS = "icons/obj/items/guns/shotguns.dmi"
+SPECIAL_ITEMS = "icons/obj/items/guns/special.dmi"
 SPECIAL_ITEMS_64 = "icons/obj/items/guns/special64.dmi"
 MG_ITEMS_64 = "icons/obj/items/guns/machineguns64.dmi"
 MARKSMAN_ITEMS_64 = "icons/obj/items/guns/marksman64.dmi"
 MARKSMAN_ITEMS = "icons/obj/items/guns/marksman.dmi"
+ARMOR_ITEMS = "icons/obj/clothing/suits/marine_armor.dmi"
 FX64 = "icons/effects/64x64.dmi"
 FX96 = "icons/effects/96x96.dmi"
 FX32 = "icons/effects/effects.dmi"
@@ -273,6 +276,11 @@ UNITS = {
     "upgrade-sniper-svd": {"sequences": {"idle": [(MARKSMAN_ITEMS_64, "svd")], "icon": [(MARKSMAN_ITEMS_64, "svd", None, {"fit": (44, 44)})]}},
     "upgrade-sniper-tx8": {"sequences": {"idle": [(MARKSMAN_ITEMS_64, "tx8")], "icon": [(MARKSMAN_ITEMS_64, "tx8", None, {"fit": (44, 44)})]}},
     "upgrade-sniper-m42c": {"sequences": {"idle": [(MARKSMAN_ITEMS, "m42c")], "icon": [(MARKSMAN_ITEMS, "m42c", None, {"fit": (44, 44)})]}},
+    "upgrade-shotgun-tx15": {"sequences": {"idle": [(SHOTGUN_ITEMS, "tx15")], "icon": [(SHOTGUN_ITEMS, "tx15", None, {"fit": (44, 44)})]}},
+    "upgrade-flamer-xnapalm": {"sequences": {"idle": [(SPECIAL_ITEMS, "m240")], "icon": [(SPECIAL_ITEMS, "m240", None, {"fit": (44, 44)})]}},
+    "upgrade-armor-1": {"sequences": {"idle": [(ARMOR_ITEMS, "tanker")], "icon": [(ARMOR_ITEMS, "tanker", None, {"fit": (44, 44)})]}},
+    "upgrade-armor-2": {"sequences": {"idle": [(ARMOR_ITEMS, "xarmor")], "icon": [(ARMOR_ITEMS, "xarmor", None, {"fit": (44, 44)})]}},
+    "upgrade-armor-3": {"sequences": {"idle": [(ARMOR_ITEMS, "marine_riot")], "icon": [(ARMOR_ITEMS, "marine_riot", None, {"fit": (44, 44)})]}},
     "runner": {
         "sequences": {
             "stand": [(RUNNER, "Runner Walking")],
@@ -750,63 +758,15 @@ UNITS = {
         },
     },
     # Marine gunners. Same kit as the other roles with their own uniform state; the weapon art is the rifle's.
-    "scout": {
-        "cell": MARINE_CELL,
-        "sequences": {
-            "stand": jaeger("scout", (SMGS, "m25_w")),
-            "die-gib": MARINE_GIB,
-            "run": "stand",
-            "attack": "stand",
-            "die": [(HUMAN, "husk")],
-            "flash": [(PROJECTILES, "muzzle_bullet", None, {"rotate": 90, "facings": 8, "tick": 40})],
-            "icon": "stand:S",
-        },
-    },
     "skirmisher": {
         "cell": MARINE_CELL,
         "sequences": {
-            "stand": jaeger("skirmisher", (SHOTGUNS, "m37_w")),
+            "stand": marine("marine_jumpsuit", (SHOTGUNS, "m37_w")),
             "die-gib": MARINE_GIB,
             "run": "stand",
             "attack": "stand",
             "die": [(HUMAN, "husk")],
             "flash": [(PROJECTILES, "muzzle_flash", None, {"rotate": 90, "facings": 8, "tick": 40})],
-            "icon": "stand:S",
-        },
-    },
-    "trooper": {
-        "cell": MARINE_CELL,
-        "sequences": {
-            "stand": jaeger("infantry", (RIFLES, "t12_w")),
-            "die-gib": MARINE_GIB,
-            "run": "stand",
-            "attack": "stand",
-            "die": [(HUMAN, "husk")],
-            "flash": [(PROJECTILES, "muzzle_bullet", None, {"rotate": 90, "facings": 8, "tick": 40})],
-            "icon": "stand:S",
-        },
-    },
-    "ranger": {
-        "cell": MARINE_CELL,
-        "sequences": {
-            "stand": jaeger("ranger", (RIFLES, "m412_w")),
-            "die-gib": MARINE_GIB,
-            "run": "stand",
-            "attack": "stand",
-            "die": [(HUMAN, "husk")],
-            "flash": [(PROJECTILES, "muzzle_bullet", None, {"rotate": 90, "facings": 8, "tick": 40})],
-            "icon": "stand:S",
-        },
-    },
-    "assault": {
-        "cell": MARINE_CELL,
-        "sequences": {
-            "stand": jaeger("assault", (RIFLES, "t18_w")),
-            "die-gib": MARINE_GIB,
-            "run": "stand",
-            "attack": "stand",
-            "die": [(HUMAN, "husk")],
-            "flash": [(PROJECTILES, "muzzle_bullet", None, {"rotate": 90, "facings": 8, "tick": 40})],
             "icon": "stand:S",
         },
     },
@@ -1290,6 +1250,10 @@ UNITS = {
     # Flames the flamer leaves on the ground (the flame-patch actor in units.yaml): a looping fire that burns for several seconds.
     "flame-patch": {
         "sequences": {"idle": [(FIRE, "red_3", None, {"tick": 100})]},
+    },
+    # X-Napalm's patch: the same fire in blue (flame-patch-blue in units.yaml).
+    "flame-patch-blue": {
+        "sequences": {"idle": [(FIRE, "blue_3", None, {"tick": 100})]},
     },
     # A cloud of gas that hangs over the ground (the gas-cloud actor in units.yaml): TGMC's chemical smoke, tinted green.
     "gas-cloud": {

@@ -1,7 +1,8 @@
 # Skirmish AI. One bot drives either faction: it only builds what its queues offer, so a marine
 # bot trains marines and a xeno bot trains xenos. The map places the starting base; the bot
 # then builds generators, tech and turrets, trains units and sends them out in squads. Pattern: OpenRA mods/ra/rules/ai.yaml.
-# Xenos are cheap and fast, so the xeno bot gathers a bigger group before it attacks.
+# Xenos are cheap and fast, so the xeno bot gathers a bigger group before it attacks. A small group that marches out early dies to the guns and takes the
+# resin silo's production with it, so the squads are large (24 on Normal): until then the xenos stay home and defend the hive.
 Player:
 	# Three levels, none of which cheat. Easy has only the basic modules and waits for bigger squads; Normal adds the smart modules (counter-picking,
 	# evolving, medics, retreat, CAS); Hard adds scouting and sends smaller squads sooner.
@@ -54,11 +55,7 @@ Player:
 			engineer: 15
 			smartgunner: 25
 			grenadier: 20
-			scout: 10
 			skirmisher: 12
-			trooper: 25
-			ranger: 15
-			assault: 10
 			sniper: 15
 			rocketeer: 12
 			blademan: 12
@@ -120,6 +117,7 @@ Player:
 		MinBaseRadius: 3
 		MaxBaseRadius: 14
 		ProductionMinCashRequirement: 150
+		# The xeno hive guards its silo with resin turrets: the weight and the limit are high enough that up to ten go up around it, not the odd one.
 		# Marines fight with cades and sentries: they are built often and up to a good number, so the miners and the bases get guarded.
 		BuildingFractions:
 			miner: 25
@@ -132,7 +130,7 @@ Player:
 			evolution-tower: 8
 			maturity-tower: 8
 			sentry-turret: 30
-			resin-turret: 12
+			resin-turret: 30
 			workshop: 5
 			mortar-emplacement: 10
 			artillery-emplacement: 6
@@ -150,7 +148,7 @@ Player:
 			evolution-tower: 1
 			maturity-tower: 1
 			sentry-turret: 6
-			resin-turret: 5
+			resin-turret: 10
 			workshop: 1
 			mortar-emplacement: 2
 			artillery-emplacement: 1
@@ -180,7 +178,7 @@ Player:
 		ProtectionTypes: cryo-pod, vendor, resin-silo, mini-silo, sentry-turret, resin-turret, miner, weed-node, armory, ordnance-depot, evolution-tower, maturity-tower, workshop, mortar-emplacement, artillery-emplacement, forward-hive, cade
 	SquadManagerBotModule@xenos-easy:
 		RequiresCondition: enable-skirmish-ai && faction-xenos && enable-easy-ai
-		SquadSize: 20
+		SquadSize: 30
 		SquadSizeRandomBonus: 20
 		ExcludeFromSquadsTypes: medic, engineer, drone, queen
 		ConstructionYardTypes: cryo-pod, resin-silo, forward-hive
@@ -194,7 +192,7 @@ Player:
 		ProtectionTypes: cryo-pod, vendor, resin-silo, mini-silo, sentry-turret, resin-turret, miner, weed-node, armory, ordnance-depot, evolution-tower, maturity-tower, workshop, mortar-emplacement, artillery-emplacement, forward-hive, cade
 	SquadManagerBotModule@xenos-normal:
 		RequiresCondition: enable-skirmish-ai && faction-xenos && !enable-easy-ai && !enable-hard-ai
-		SquadSize: 14
+		SquadSize: 24
 		SquadSizeRandomBonus: 20
 		ExcludeFromSquadsTypes: medic, engineer, drone, queen
 		ConstructionYardTypes: cryo-pod, resin-silo, forward-hive
@@ -208,7 +206,7 @@ Player:
 		ProtectionTypes: cryo-pod, vendor, resin-silo, mini-silo, sentry-turret, resin-turret, miner, weed-node, armory, ordnance-depot, evolution-tower, maturity-tower, workshop, mortar-emplacement, artillery-emplacement, forward-hive, cade
 	SquadManagerBotModule@xenos-hard:
 		RequiresCondition: enable-skirmish-ai && faction-xenos && enable-hard-ai
-		SquadSize: 10
+		SquadSize: 18
 		SquadSizeRandomBonus: 20
 		ExcludeFromSquadsTypes: medic, engineer, drone, queen
 		ConstructionYardTypes: cryo-pod, resin-silo, forward-hive
@@ -517,11 +515,11 @@ Player:
 				Bonus: 150
 			heavy:
 				Enemies: crusher, praetorian, behemoth, bull, ravager
-				Units: rocketeer, demolitionist, heavygunner, mortarman, assault
+				Units: rocketeer, demolitionist, heavygunner, mortarman
 				Bonus: 150
 			ranged:
 				Enemies: spitter, boiler, defiler, widow, warlock, shrike, wraith, carrier
-				Units: sniper, rifleman, blademan, mech, ranger, scout
+				Units: sniper, rifleman, blademan, mech
 				Bonus: 120
 	CounterPickBotModule@xenos:
 		RequiresCondition: enable-skirmish-ai && !enable-easy-ai && faction-xenos
@@ -559,7 +557,7 @@ Player:
 	# Scouting is for every AI above Easy: the big maps need someone to find the enemy.
 	ScoutBotModule@marines:
 		RequiresCondition: enable-skirmish-ai && !enable-easy-ai && !faction-xenos
-		Scouts: scout, rifleman
+		Scouts: rifleman
 	ScoutBotModule@xenos:
 		RequiresCondition: enable-skirmish-ai && !enable-easy-ai && faction-xenos
 		Scouts: runner, hunter
@@ -568,6 +566,8 @@ Player:
 		RequiresCondition: enable-skirmish-ai && faction-xenos
 		Attackers: runner, hunter, sentinel
 		Target: miner
+		# Raiding the miners at once sends the starting pack at turrets and rifles, and it never comes back: wait until there is a pack to send.
+		MinTick: 3000
 		EnemyOnly: true
 	# Marine bot: every miner gets sentry turrets beside it (see FieldDefenseBotModule in Bots.cs).
 	FieldDefenseBotModule@marines:

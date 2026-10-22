@@ -25,12 +25,12 @@ def main(name, x, y):
     if os.path.exists(os.path.join(dst, "rules.yaml")):
         old_rules = open(os.path.join(dst, "rules.yaml"), encoding="utf-8").read().rstrip("\n") + "\n"
     with open(os.path.join(dst, "rules.yaml"), "w", encoding="utf-8", newline="\n") as f:
-        f.write(old_rules + "World:\n\tLuaScript:\n\t\tScripts: shotcam.lua\n\tShroud:\n\t\tFogCheckboxEnabled: False\n\t\tExploredMapCheckboxEnabled: True\n"
-                "\t\tFogEnabled: False\n\t\tExploredMapEnabled: True\n\tScreenshotAt:\n\t\tTick: 40\nPlayer:\n\t-ConquestVictoryConditions:\n")
+        f.write(old_rules + "World:\n\tLuaScript:\n\t\tScripts: shotcam.lua\n\tShroud:\n\t\tFogCheckboxEnabled: False\n\t\tExploredMapCheckboxEnabled: True\n\t\tFogCheckboxLocked: True\n\t\tExploredMapCheckboxLocked: True\n"
+                "\tScreenshotAt:\n\t\tTick: 40\nPlayer:\n\t-ConquestVictoryConditions:\n")
     text = open(os.path.join(dst, "map.yaml"), encoding="utf-8").read()
     text = text.replace("Title: ", "Title: shot ", 1)
     # A dev copy: hidden from every menu.
-    text = re.sub(r"(?m)^Visibility:.*$", "Visibility:", text)
+    text = re.sub(r"(?m)^Visibility:.*$", "Visibility: Shellmap", text)
     if "Rules:" not in text:
         text = text.replace("RequiresMod: tgmc\n", "RequiresMod: tgmc\n\nRules: rules.yaml\n", 1)
     with open(os.path.join(dst, "map.yaml"), "w", encoding="utf-8", newline="\n") as f:

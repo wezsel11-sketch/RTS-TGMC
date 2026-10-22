@@ -126,6 +126,10 @@ def prepare(tgmc, out, names):
                     if key is None or key[1] not in states(key[0]):
                         key = "plain-" + kind
                 on = []
+                if "plating_catwalk" in turf and not isinstance(key, str):
+                    # A catwalk is plating with the grating drawn over it (update_turf_overlay in plating.dm).
+                    if "catwalk" in states(key[0]):
+                        on.append((key[0], "catwalk", 0))
                 if key != "void":
                     solid_here = False
                     for path, vars_ in things[x][y]:
@@ -143,11 +147,11 @@ def prepare(tgmc, out, names):
                                     continue
                                 for half in range(halves):
                                     # A horizontal two-wide door is placed at its left cell and covers the cell on its right.
-                                    key = (lay[0], found[0], half, halves, "glass" in path)
-                                    if key not in tiles.doors:
-                                        tiles.doors[key] = (f"mapdoor-{len(tiles.doors)}", found, found[4], key[4])
+                                    dkey = (lay[0], found[0], half, halves, "glass" in path or "/door/window" in path, lay[2] if len(dmi.frames(found[0])[0]) > 1 else 0)
+                                    if dkey not in tiles.doors:
+                                        tiles.doors[dkey] = (f"mapdoor-{len(tiles.doors)}", found, found[4], dkey[4])
                                     if x + half - x0 < x1 - x0:
-                                        tiles.actors.setdefault(name, []).append((tiles.doors[key][0], x + half - x0, y - y0))
+                                        tiles.actors.setdefault(name, []).append((tiles.doors[dkey][0], x + half - x0, y - y0))
                                 built = True
                             if built:
                                 continue
@@ -205,14 +209,14 @@ def prepare(tgmc, out, names):
     # The doors' animation frames follow the pictures on the same sheet: for each door, closed, opening, open and closing.
     door_frames = []   # (image, ...) in sheet order after the pictures
     door_seq = {}      # actor type -> {sequence: (start, length, delays)}
-    for (sheet_path, closed, half, halves, glass), (dname, found, starts_open, _) in tiles.doors.items():
+    for (sheet_path, closed, half, halves, glass, dirn), (dname, found, starts_open, _) in tiles.doors.items():
         door_seq[dname] = {}
         for seq, state in zip(("closed", "opening", "open", "closing"), (found[0], found[2], found[1], found[3])):
             info = sheets[sheet_path].state(state)
             row = sheets[sheet_path].frames(state)
             door_seq[dname][seq] = (len(tiles.pictures) + len(door_frames), len(row), info["delays"])
             for frames in row:
-                part = frames[0].convert("RGBA")
+                part = frames[dirn if dirn < len(frames) else 0].convert("RGBA")
                 bottom = part.crop((0, part.height - 32, part.width, part.height))
                 door_frames.append(bottom.crop((32 * half, 0, 32 * half + 32, 32)))
     count = max(1, len(tiles.pictures) + len(door_frames))
@@ -249,7 +253,7 @@ def prepare(tgmc, out, names):
                 face_x, face_y = ((0, 1), (0, -1), (1, 0), (-1, 0))[direction if direction < 4 else 0]
                 f.write(f"\tBlocksBullets:\n\t\tFaceX: {face_x}\n\t\tFaceY: {face_y}\n")
 
-        for (sheet_path, closed, half, halves, glass), (dname, found, starts_open, _) in tiles.doors.items():
+        for (sheet_path, closed, half, halves, glass, dirn), (dname, found, starts_open, _) in tiles.doors.items():
             hp = 700 if "pdoor" in closed or "shutter" in closed else 450
             f.write(f"\n{dname}:\n\tInherits: ^MapDoor\n\tHealth:\n\t\tHP: {hp}\n\tWithSpriteBody@closed:\n\t\tName: closed\n\t\tRequiresCondition: !door-open\n\t\tSequence: {dname}-closed\n\tWithSpriteBody@open:\n\t\tName: open\n\t\tRequiresCondition: door-open\n\t\tSequence: {dname}-open\n\tMapDoor:\n\t\tPrefix: {dname}\n\t\tStartsOpen: {'true' if starts_open else 'false'}\n\t\tBlocksSight: {'false' if glass else 'true'}\n")
 

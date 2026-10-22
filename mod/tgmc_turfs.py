@@ -11,6 +11,7 @@ import os
 import re
 
 DEFS = {}
+HISTORY = {}  # turf path -> every icon_state it sets, for initial(icon_state)
 _loaded = []
 
 
@@ -25,11 +26,14 @@ def _parse(path):
             cur = m.group(1)
             DEFS.setdefault(cur, {})
             continue
-        if cur and re.match(r"^\t[a-z_]+\s*=", line):
+        if cur and re.match(r"^\t(?:var/(?:[\w/]+/)?)?[a-z_]+\s*=", line):
             k, v = line.strip().split("=", 1)
-            DEFS[cur][k.strip()] = v.strip()
-        elif re.match(r"^\S", line) and not line.startswith("/"):
-            cur = None
+            v = re.sub(r"\s+//.*$", "", v).strip()
+            DEFS[cur][k.strip().split("/")[-1]] = v
+            if k.strip() == "icon_state":
+                HISTORY.setdefault(cur, []).append(v)
+        elif re.match(r"^\S", line):
+            cur = None  # a proc (`/obj/thing/Initialize()`) or other code: its tabbed lines are not variables of the type
 
 
 def load(tgmc):
@@ -56,6 +60,46 @@ def resolve(path):
 def _string(v):
     m = re.match(r"""^['"](.*)['"]$""", v or "")
     return m.group(1) if m else None
+
+
+def _initial(path):
+    """The icon_state a turf has before its Initialize changes it: the nearest literal one on the path."""
+    parts = path.split("/")[1:]
+    for i in range(len(parts), 0, -1):
+        for v in HISTORY.get("/" + "/".join(parts[:i]), []):
+            if _string(v) is not None and "[" not in v:
+                return _string(v)
+    return None
+
+
+def expand(turf, r, state, names, x, y):
+    """A picture state that exists on the sheet for a DM state written as an expression (`"[initial(icon_state)]_[rand(1, icon_variants)]"`,
+    `base_state`, `icon_spawn_state`, ...), picked among the variants by the cell, so a field of grass is not one tile repeated."""
+    if state is None:
+        raw = r.get("icon_state") or ""
+        if raw in r and r.get(raw):  # icon_state = base_state: a variable of the turf
+            state = _string(r.get(raw))
+        elif raw == "icon_spawn_state":
+            state = _string(r.get("icon_spawn_state"))
+        if state is None and raw.startswith(("base_state", "icon_spawn_state")):
+            state = _string(r.get(raw.split()[0]))
+        if state is not None and state in names:
+            return state
+        return None
+    if "[" not in state:
+        return None
+
+    def sub(m):
+        body = m.group(1)
+        if body.startswith("initial("):
+            return re.escape(_initial(turf) or "")
+        if body.startswith("rand"):
+            return r"\d+"
+        value = _string(r.get(body.strip()))
+        return re.escape(value) if value is not None else ".*"
+    pattern = re.compile("^" + re.sub(r"\[([^\]]*)\]", sub, re.escape(state).replace("\\[", "[").replace("\\]", "]")) + "$")
+    found = sorted(n for n in names if pattern.match(n))
+    return found[(x * 7 + y * 13) % len(found)] if found else None
 
 
 def solid(turf):
@@ -88,6 +132,10 @@ def cell_tile(grid, x, y, states):
     turf = grid[x][y]
     r = resolve(turf)
     icon, state = _string(r.get("icon")), _string(r.get("icon_state"))
+    if icon and (not state or "[" in state):
+        guess = expand(turf, r, state, states(icon), x, y)
+        if guess:
+            return icon, guess
     if not icon or not state:
         return None
     if "SMOOTH_BITMASK" in r.get("smoothing_flags", ""):

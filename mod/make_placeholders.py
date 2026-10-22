@@ -1374,6 +1374,11 @@ SCENARIOS = {
         ("medic", "Marines", 4, 26, 256), ("engineer", "Marines", 6, 26, 256), ("rocketeer", "Marines", 8, 26, 256),
         ("skirmisher", "Marines", 10, 26, 256), ("field_commander", "Marines", 12, 26, 256), ("sniper", "Marines", 14, 26, 256), ("flamer", "Marines", 16, 26, 256), ("resin-silo", "Xenos", 28, 24, 0),
     ]},
+    "scenario-gasmask": {"scripts": ("test-gasmask",), "drop_conquest": True, "size": (32, 28), "actors": [
+        ("cryo-pod", "Marines", 6, 4, 0), ("armory", "Marines", 16, 4, 0),
+        ("rifleman", "Marines", 8, 14, 256), ("rifleman", "Marines", 8, 20, 256),
+        ("resin-silo", "Xenos", 28, 24, 0),
+    ]},
     "scenario-synth": {"scripts": ("test-synth",), "drop_conquest": True, "size": (32, 28), "actors": [
         ("cryo-pod", "Marines", 6, 4, 0), ("armory", "Marines", 16, 4, 0),
         ("synth", "Marines", 12, 8, 256), ("rifleman", "Marines", 10, 8, 256), ("runner", "Xenos", 13, 8, 0),

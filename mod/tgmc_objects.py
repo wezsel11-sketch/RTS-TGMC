@@ -14,9 +14,11 @@ _loaded = []
 
 # Never drawn: markers and hidden infrastructure, moving things, loose items.
 SKIP = ("/obj/effect/landmark", "/obj/effect/ai_node", "/obj/effect/spawner", "/obj/structure/cable", "/obj/machinery/atmospherics",
-        "/obj/structure/disposalpipe", "/obj/machinery/light", "/obj/machinery/miner", "/obj/item/", "/obj/effect/step_trigger", "/obj/effect/forcefield",
+        "/obj/structure/disposalpipe", "/obj/machinery/miner", "/obj/effect/step_trigger", "/obj/effect/forcefield",
         "/mob/", "/obj/effect/alien", "/obj/structure/xeno", "/obj/effect/temp", "/obj/machinery/camera", "/obj/machinery/power/apc",
-        "/obj/effect/abstract", "/obj/effect/turf_decal/warning_stripes/thin")
+        "/obj/effect/abstract",
+        # The poddoors that wall in the landing zone (TGMC opens them on a timer); the RTS has no use for them.
+        "/obj/machinery/door/poddoor/timed_late/containment/landing_zone")
 
 DIR_INDEX = {2: 0, 1: 1, 4: 2, 8: 3}  # BYOND SOUTH, NORTH, EAST, WEST -> the order tgmc_dmi.DIRS4 uses (S, N, E, W)
 
@@ -32,14 +34,20 @@ def _parse(path):
             cur = m.group(1)
             DEFS.setdefault(cur, {})
             continue
-        if cur and re.match(r"^\t[a-z_]+\s*=", line):
+        if cur and re.match(r"^\t(?:var/(?:[\w/]+/)?)?[a-z_]+\s*=", line):
             k, v = line.strip().split("=", 1)
-            DEFS[cur][k.strip()] = v.strip()
-        elif re.match(r"^\S", line) and not line.startswith("/"):
-            cur = None
+            DEFS[cur][k.strip().split("/")[-1]] = re.sub(r"\s+//.*$", "", v).strip().rstrip(";")
+        elif re.match(r"^\S", line):
+            cur = None  # a proc (`/obj/thing/Initialize()`) or other code: its tabbed lines are not variables of the type
 
 
-def load(tgmc, dirs=("code/game/objects", "code/modules/flora", "code/game/turfs")):
+OBJECT_DIRS = ("code/game/objects", "code/game/turfs", "code/modules/flora", "code/modules/power", "code/modules/paperwork", "code/modules/reagents/chemistry/machinery",
+               "code/modules/vehicles", "code/modules/recycling", "code/modules/atmospherics/machinery", "code/modules/hydroponics", "code/modules/mapping",
+               "code/modules/food_and_drinks/kitchen_machinery", "code/modules/economy", "code/modules/shuttle", "code/modules/mining",
+               "code/modules/clothing", "code/modules/reagents", "code/modules/food_and_drinks", "code/modules/projectiles", "code/modules/medical")
+
+
+def load(tgmc, dirs=OBJECT_DIRS):
     if _loaded:
         return
     for d in dirs:
@@ -90,6 +98,13 @@ def layers(path, vars_, states, near):
     if not icon or not state:
         return []
     names = states(icon)
+    if icon.endswith("decals_arrow.dmi") and state not in names:
+        # The mapper's copy of the sign sheet has no safety signs, and the plain sheet has not either: they are on safety_signs.dmi.
+        for other in ("decals", "safety_signs"):
+            if state in states(icon.replace("decals_arrow", other)):
+                icon = icon.replace("decals_arrow", other)
+                break
+        names = states(icon)
     if not names:
         return []
     direction = 0
@@ -157,12 +172,15 @@ def destroyable(path):
 
 def door_states(names, state):
     """For a door picture, its animation states: (closed, open, opening, closing, starts_open), or None when it is not a door TGMC animates this way.
-    Airlocks use door_closed / door_open / door_opening / door_closing; blast doors and shutters use pdoor1 / pdoor0 / pdoorc0 / pdoorc1."""
+    Airlocks and firedoors use door_closed / door_open / door_opening / door_closing; blast doors, shutters and the morgue door use pdoor1 / pdoor0 / pdoorc0 / pdoorc1
+    (door1 / door0 / doorc0 / doorc1); windoors use left / leftopen / leftopening / leftclosing (and right, leftsecure, rightsecure)."""
     if state.endswith("_closed") or state.endswith("_open"):
         base = state.rsplit("_", 1)[0]
         found = (base + "_closed", base + "_open", base + "_opening", base + "_closing", state.endswith("_open"))
+    elif re.match(r"^(left|right)(secure)?$", state):
+        found = (state, state + "open", state + "opening", state + "closing", False)
     else:
-        m = re.match(r"^(pdoor|shutter)([01]?)$", state)
+        m = re.match(r"^(pdoor|shutter|door)([01]?)$", state)
         if not m:
             return None
         base = m.group(1)
@@ -172,6 +190,9 @@ def door_states(names, state):
     return found
 
 
+DOORS = ("/obj/machinery/door/airlock", "/obj/machinery/door/poddoor", "/obj/machinery/door/firedoor", "/obj/machinery/door/window", "/obj/machinery/door/morgue")
+
+
 def is_door(path):
-    """Doors that open for units on their own: airlocks and blast doors, not the timed landing-zone containment doors."""
-    return (path.startswith("/obj/machinery/door/airlock") or path.startswith("/obj/machinery/door/poddoor")) and "/timed_late" not in path
+    """Doors that open for units on their own: airlocks, blast doors, shutters, firedoors, windoors and the morgue door."""
+    return path.startswith(DOORS) 

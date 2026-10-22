@@ -148,6 +148,12 @@
 		RequiresCondition: gasmask
 		DamageTypes: GasDeath
 		Modifier: 35
+	# Against a spat glob of acid (no gas in it) the mask is only a little help.
+	TypedDamageMultiplier@gasmask-spit:
+		RequiresCondition: gasmask
+		DamageTypes: AcidDeath
+		IgnoredDamageTypes: GasDeath
+		Modifier: 92
 	SpeedMultiplier@armor1:
 		RequiresCondition: armor-1
 		Modifier: 105

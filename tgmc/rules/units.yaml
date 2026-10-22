@@ -128,15 +128,26 @@
 	GrantConditionOnPrerequisite@armor3:
 		Condition: armor-3
 		Prerequisites: upgrade-armor-3
-	DamageMultiplier@armor1:
+	TypedDamageMultiplier@armor1:
 		RequiresCondition: armor-1
+		IgnoredDamageTypes: AcidDeath
 		Modifier: 87
-	DamageMultiplier@armor2:
+	TypedDamageMultiplier@armor2:
 		RequiresCondition: armor-2
+		IgnoredDamageTypes: AcidDeath
 		Modifier: 76
-	DamageMultiplier@armor3:
+	TypedDamageMultiplier@armor3:
 		RequiresCondition: armor-3
+		IgnoredDamageTypes: AcidDeath
 		Modifier: 57
+	# Acid eats through plates, so armour does not stop it (above). The gas mask that comes with the first armour upgrade does stop the fumes.
+	GrantConditionOnPrerequisite@gasmask:
+		Condition: gasmask
+		Prerequisites: upgrade-armor-1
+	TypedDamageMultiplier@gasmask:
+		RequiresCondition: gasmask
+		DamageTypes: GasDeath
+		Modifier: 35
 	SpeedMultiplier@armor1:
 		RequiresCondition: armor-1
 		Modifier: 105
@@ -185,6 +196,8 @@
 		Fade: 400
 		DeathTypes:
 			ExplosionDeath: -gib
+			AcidDeath: -gib
+			GasDeath: -gib
 	# A marine that is down does not walk.
 	TgmcMobile:
 		PauseOnCondition: hugged || stunned
@@ -397,6 +410,11 @@ synth:
 	Inherits: ^Infantry
 	-Targetable@INFEST:
 	-Infestable:
+	# Never hugged or infected, but the marine body traits above still read these two conditions.
+	ExternalCondition@hugged:
+		Condition: hugged
+	ExternalCondition@infected:
+		Condition: infected
 	Health:
 		HP: 320
 	Armament@PRIMARY:
@@ -1097,6 +1115,8 @@ mech:
 		Fade: 400
 		DeathTypes:
 			ExplosionDeath: -gib
+			AcidDeath: -gib
+			GasDeath: -gib
 	DeathSounds:
 	# Each mech is built to one of four presets, picked at random: assault (autocannon and rocket pod), flame (shotgun and
 	# flamer), support (SMG and RPG) or tow (autocannon and anti-armour missile). They differ in sprite and in weapons.
@@ -1341,6 +1361,8 @@ demolitionist:
 		Fade: 400
 		DeathTypes:
 			ExplosionDeath: -gib
+			AcidDeath: -gib
+			GasDeath: -gib
 	DeathSounds:
 	Armament@PRIMARY:
 		Weapon: TGMCClaws
@@ -1694,7 +1716,7 @@ queen:
 		AiMinTargets: 3
 		Sounds: xeno-roar-1.ogg
 	Voiced:
-		VoiceSet: HunterVoice
+		VoiceSet: QueenVoice
 	Health:
 		HP: 300
 	Selectable:
@@ -1789,9 +1811,9 @@ praetorian:
 		Slot: 1
 		Label: Acid Spray
 		Cooldown: 350
-		Weapon: TGMCAcidSpray
+		Weapon: TGMCAcidCone
 		Aim: Forward
-		ForwardDistance: 2c512
+		ForwardDistance: 3c0
 		AiRange: 3c0
 		Sounds: acid-spit-1.ogg, acid-spit-2.ogg
 	Armor:
@@ -1843,7 +1865,7 @@ crusher:
 		Sounds: xeno-roar-5.ogg, xeno-roar-6.ogg
 	SpeedMultiplier@pounce:
 		RequiresCondition: pouncing
-		Modifier: 260
+		Modifier: 520
 	Armament@POUNCE:
 		Weapon: TGMCCharge
 		RequiresCondition: pounce-strike
@@ -1939,7 +1961,7 @@ ravager:
 
 defiler:
 	Inherits: ^Xeno
-	# Command card ability: breathe out a cloud of neurotoxin.
+	# Command card ability: breathe out a cloud of neurotoxin, and for six seconds fill the cells around him with more as he walks.
 	ActiveAbility@abilityemitgas:
 		OrderName: AbilityEmitGas
 		PlasmaCost: 30
@@ -1947,6 +1969,8 @@ defiler:
 		Label: Emit Gas
 		Cooldown: 450
 		Weapon: TGMCDefilerEmit
+		Condition: emitting
+		Duration: 150
 		Aim: Self
 		AiRange: 3c0
 		Sounds: acid-spit-1.ogg
@@ -1965,6 +1989,11 @@ defiler:
 		Speed: 125
 	# Walks and leaves gas behind (see GasTrail): no acid is thrown.
 	GasTrail:
+	GasTrail@emit:
+		RequiresCondition: emitting
+		Interval: 6
+		Radius: 2
+		Spacing: 2
 	Armament@PRIMARY:
 		Weapon: TGMCClaws
 	Tooltip:
@@ -2177,6 +2206,20 @@ wraith:
 		AiRange: 4c0
 		AiMinTargets: 2
 		Sounds: xeno-roar-2.ogg
+	# Command card ability: blink up to nine cells, next to the nearest marine if one is that close.
+	ActiveAbility@abilityblink:
+		OrderName: AbilityBlink
+		PlasmaCost: 25
+		Slot: 2
+		Label: Blink
+		Cooldown: 300
+		TeleportDistance: 9c0
+		Aim: Self
+		AiRange: 9c0
+		AiMinTargets: 1
+		Sounds: xeno-hiss-3.ogg
+		EffectImage: fx-light
+		EffectSequence: blast
 	Evolves:
 		Next: shrike
 		Previous: ravager
@@ -2293,6 +2336,26 @@ gas-cloud:
 		InitialStance: AttackAnything
 	AutoTargetPriority@DEFAULT:
 		ValidTargets: Ground
+
+# The boiler glob's acid: a cloud of gas, a patch of them over a few cells, that burns whoever stands in it for about eight seconds.
+acid-gas:
+	Inherits: gas-cloud
+	Tooltip:
+		Name: actor-acid-gas.name
+	KillsSelf:
+		Delay: 200
+	Armament@PRIMARY:
+		Weapon: TGMCAcidGas
+
+# The plasma-draining warhead's gas: it empties the plasma of every xeno in it for about twenty seconds.
+plasma-gas:
+	Inherits: gas-cloud
+	Tooltip:
+		Name: actor-plasma-gas.name
+	KillsSelf:
+		Delay: 500
+	Armament@PRIMARY:
+		Weapon: TGMCPlasmaGas
 
 # The acid a dead xeno leaves behind. It owns itself for a few seconds and hurts enemy infantry standing in it.
 acid-pool:

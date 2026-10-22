@@ -129,11 +129,180 @@ TGMCSadar:
 		Damage: 300
 		Radius: 2c0
 
+# The particles of a small blast (a mortar shell, a grenade): TGMC's explosions.dm, a grey smoke cloud and ring, brown dust, flying rocks and sparks. A weapon takes them with Inherits@fx.
+TGMCBlastFxSmall:
+	Warhead@7Smoke: ExplosionParticles
+		Image: fx-smoke-puff
+		Count: 10
+		Spread: 512
+		MinSpeed: 20
+		MaxSpeed: 60
+		MinRise: 10
+		MaxRise: 30
+		Friction: 6
+		MinLife: 18
+		MaxLife: 26
+		FadeIn: 3
+		FadeOut: 10
+		StartScale: 0.5
+		EndScale: 1.4
+		Tint: 969696
+		Alpha: 0.8
+		ValidTargets: Ground, Water, Structure
+	Warhead@7Wave: ExplosionParticles
+		Image: fx-smoke-puff
+		Count: 14
+		MinSpeed: 90
+		MaxSpeed: 130
+		Friction: 5
+		MinLife: 14
+		MaxLife: 20
+		FadeOut: 8
+		StartScale: 0.35
+		EndScale: 0.9
+		Tint: B4B4B4
+		Alpha: 0.5
+		ValidTargets: Ground, Water, Structure
+	Warhead@7Dirt: ExplosionParticles
+		Image: fx-dirt-puff
+		Count: 14
+		Spread: 700
+		MinSpeed: 15
+		MaxSpeed: 50
+		MinRise: 40
+		MaxRise: 90
+		Gravity: 4
+		MinLife: 24
+		MaxLife: 34
+		FadeIn: 3
+		FadeOut: 12
+		StartScale: 0.35
+		EndScale: 0.7
+		Tint: 966B3C
+		Alpha: 0.8
+		ValidTargets: Ground, Water, Structure
+	Warhead@7Rocks: ExplosionParticles
+		Image: fx-rock
+		Count: 12
+		Spread: 256
+		MinSpeed: 40
+		MaxSpeed: 110
+		MinRise: 110
+		MaxRise: 220
+		Gravity: 14
+		MinLife: 20
+		MaxLife: 30
+		FadeOut: 4
+		StartScale: 0.8
+		EndScale: 0.7
+		Tint: 5A4128
+		ValidTargets: Ground, Water, Structure
+	Warhead@7Sparks: ExplosionParticles
+		Image: fx-spark
+		Count: 14
+		MinSpeed: 120
+		MaxSpeed: 260
+		MinRise: 30
+		MaxRise: 90
+		Gravity: 3
+		Friction: 5
+		MinLife: 10
+		MaxLife: 16
+		FadeOut: 8
+		StartScale: 1
+		EndScale: 0.3
+		ValidTargets: Ground, Water, Structure
+
+# The same, for a bomb or a howitzer shell: twice the particles, thrown further (a weapon that inherits both gets these).
+TGMCBlastFxBig:
+	Warhead@7Smoke: ExplosionParticles
+		Image: fx-smoke-puff
+		Count: 20
+		Spread: 1024
+		MinSpeed: 32
+		MaxSpeed: 96
+		MinRise: 10
+		MaxRise: 30
+		Friction: 6
+		MinLife: 18
+		MaxLife: 26
+		FadeIn: 3
+		FadeOut: 10
+		StartScale: 1.0
+		EndScale: 2.8
+		Tint: 969696
+		Alpha: 0.8
+		ValidTargets: Ground, Water, Structure
+	Warhead@7Wave: ExplosionParticles
+		Image: fx-smoke-puff
+		Count: 28
+		MinSpeed: 144
+		MaxSpeed: 208
+		Friction: 5
+		MinLife: 14
+		MaxLife: 20
+		FadeOut: 8
+		StartScale: 0.7
+		EndScale: 1.8
+		Tint: B4B4B4
+		Alpha: 0.5
+		ValidTargets: Ground, Water, Structure
+	Warhead@7Dirt: ExplosionParticles
+		Image: fx-dirt-puff
+		Count: 28
+		Spread: 1400
+		MinSpeed: 24
+		MaxSpeed: 80
+		MinRise: 40
+		MaxRise: 180
+		Gravity: 4
+		MinLife: 24
+		MaxLife: 34
+		FadeIn: 3
+		FadeOut: 12
+		StartScale: 0.7
+		EndScale: 1.4
+		Tint: 966B3C
+		Alpha: 0.8
+		ValidTargets: Ground, Water, Structure
+	Warhead@7Rocks: ExplosionParticles
+		Image: fx-rock
+		Count: 24
+		Spread: 256
+		MinSpeed: 64
+		MaxSpeed: 176
+		MinRise: 220
+		MaxRise: 440
+		Gravity: 14
+		MinLife: 20
+		MaxLife: 30
+		FadeOut: 4
+		StartScale: 0.8
+		EndScale: 0.7
+		Tint: 5A4128
+		ValidTargets: Ground, Water, Structure
+	Warhead@7Sparks: ExplosionParticles
+		Image: fx-spark
+		Count: 28
+		MinSpeed: 192
+		MaxSpeed: 416
+		MinRise: 30
+		MaxRise: 90
+		Gravity: 3
+		Friction: 5
+		MinLife: 10
+		MaxLife: 16
+		FadeOut: 8
+		StartScale: 1
+		EndScale: 0.3
+		ValidTargets: Ground, Water, Structure
+
 TGMCMortar:
 	Inherits: TGMCGrenade
+	Inherits@fx: TGMCBlastFxSmall
 	Range: 14c0
 	MinRange: 3c0
-	ReloadDelay: 100
+	ReloadDelay: 160
 	Report: mortar-fire.ogg
 	# The shell whistles at the spot where it will land, shortly before it does.
 	Projectile: Shell
@@ -182,6 +351,7 @@ TGMCMortar:
 
 # The suicide vest's blast: a bigger explosion than a grenade, knocks walls down, kills the wearer (see the bomber in units.yaml).
 TGMCVestBlast:
+	Inherits: TGMCBlastFxSmall
 	Projectile: InstantHit
 	Warhead@1Wave: Shockwave
 		Damage: 220
@@ -221,21 +391,22 @@ TGMCMortarEmplacement:
 	Inherits: TGMCMortar
 	Range: 24c0
 	MinRange: 5c0
-	ReloadDelay: 80
-	# Careful with its own side: the blast hurts enemies and neutrals only, never the marines.
+	ReloadDelay: 130
+	# No mercy for its own side either: the blast hurts the marines too (unless the lobby's friendly fire option is off).
 	Warhead@1Wave: Shockwave
-		ValidRelationships: Neutral, Enemy
+		ValidRelationships: Ally, Neutral, Enemy
 
 # The artillery emplacement (a howitzer): the longest reach in the game and a bigger shell than a mortar's (TGMC: heavy 6, light 7), but
 # slow to reload.
 TGMCHowitzer:
 	Inherits: TGMCMortar
+	Inherits@fx: TGMCBlastFxBig
 	Range: 40c0
 	MinRange: 10c0
-	ReloadDelay: 240
-	# Careful with its own side: the blast hurts enemies and neutrals only, never the marines.
+	ReloadDelay: 360
+	# No mercy for its own side either: the blast hurts the marines too (unless the lobby's friendly fire option is off).
 	Warhead@1Wave: Shockwave
-		ValidRelationships: Neutral, Enemy
+		ValidRelationships: Ally, Neutral, Enemy
 	Report: howitzer-fire.ogg
 	Projectile: Shell
 		Image: howitzer-shell
@@ -360,8 +531,23 @@ TGMCGasCloud:
 		ValidTargets: Ground
 		InvalidTargets: MapObject
 	Warhead@2Dam: SpreadDamage
+		DamageTypes: AcidDeath, GasDeath
 		Damage: 4
 		Spread: 1c768
+		Falloff: 100, 100, 0
+		ValidRelationships: Enemy, Neutral
+		ValidTargets: Ground
+		InvalidTargets: MapObject
+
+# What the boiler's acid gas does to whoever stands in it: no slowdown, but it burns, and it takes marines' armour no mercy.
+TGMCAcidGas:
+	Range: 1c768
+	ReloadDelay: 15
+	Projectile: InstantHit
+	Warhead@1Dam: SpreadDamage
+		DamageTypes: AcidDeath, GasDeath
+		Damage: 7
+		Spread: 1c256
 		Falloff: 100, 100, 0
 		ValidRelationships: Enemy, Neutral
 		ValidTargets: Ground
@@ -536,7 +722,7 @@ TGMCClaws:
 		ValidTargets: Infantry
 	Warhead@1Dam: TargetDamage
 		Damage: 20
-		# B18 heavy armour turns a good share of a claw or acid hit aside; B17 demolition armour a little.
+		# B18 heavy armour turns a good share of a claw hit aside; B17 demolition armour a little.
 		Versus:
 			HeavyMarine: 55
 			Demolition: 85
@@ -598,11 +784,12 @@ TGMCSpit:
 		ValidRelationships: Enemy
 		ValidTargets: Infantry
 	Warhead@1Dam: SpreadDamage
+		DamageTypes: AcidDeath
 		Damage: 16
 		Spread: 256
 		Falloff: 100, 100, 60, 0
 		ValidRelationships: Neutral, Enemy
-		# B18 heavy armour turns a good share of a claw or acid hit aside; B17 demolition armour a little.
+		# B18 heavy armour turns a good share of a claw hit aside; B17 demolition armour a little.
 		Versus:
 			HeavyMarine: 55
 			Demolition: 85
@@ -662,14 +849,11 @@ TGMCAcid:
 		ValidRelationships: Enemy
 		ValidTargets: Infantry
 	Warhead@1Dam: SpreadDamage
+		DamageTypes: AcidDeath
 		Damage: 30
 		Spread: 256
 		Falloff: 100, 100, 60, 0
 		ValidRelationships: Neutral, Enemy
-		# B18 heavy armour turns a good share of a claw or acid hit aside; B17 demolition armour a little.
-		Versus:
-			HeavyMarine: 55
-			Demolition: 85
 	Warhead@2Hit: CreateEffect
 		Image: fx-acid
 		Explosions: splash
@@ -700,19 +884,19 @@ TGMCBoilerGlob:
 		WhistleSounds: mortar-long-whistle.ogg
 		WhistleLead: 60
 	Warhead@1Dam: SpreadDamage
+		DamageTypes: AcidDeath
 		Damage: 55
 		Spread: 1c512
 		Falloff: 100, 70, 35, 0
 		ValidRelationships: Neutral, Enemy
-		Versus:
-			HeavyMarine: 55
-			Demolition: 85
 	Warhead@3Pool: SpawnActor
 		Actor: acid-pool
 		TrailCells: 0
+	# The glob bursts into a cloud of acid gas over a few cells.
 	Warhead@4Gas: SpawnActor
-		Actor: gas-cloud
+		Actor: acid-gas
 		TrailCells: 0
+		Radius: 2
 
 # The SOM laser rifle (TGMC's V-31 class weapon): the rifle with the laser sound.
 TGMCLaserRifle:
@@ -882,7 +1066,7 @@ TGMCSlam:
 		Spread: 1c256
 		Falloff: 100, 60, 25
 		ValidRelationships: Neutral, Enemy
-		# B18 heavy armour turns a good share of a claw or acid hit aside; B17 demolition armour a little.
+		# B18 heavy armour turns a good share of a claw hit aside; B17 demolition armour a little.
 		Versus:
 			HeavyMarine: 55
 			Demolition: 85
@@ -1136,9 +1320,11 @@ TGMCMechRocket:
 # One bomb of the Condor's CAS run: a big fireball and a shake, and it hurts friend and foe alike.
 TGMCCasBomb:
 	Inherits: TGMCGrenade
+	Inherits@fx: TGMCBlastFxBig
 	Range: 90c0
 	-Warhead@1Dam:
 	Warhead@1Wave: Shockwave
+		DamageTypes: ExplosionDeath
 		Damage: 150
 		Radius: 7
 		RingDelay: 2
@@ -1284,8 +1470,10 @@ TGMCCasFire:
 # The Fatty: a first, smaller blast, then a ring of eight more.
 TGMCCasFatty:
 	Inherits: TGMCCasMini
+	Inherits@fx: TGMCBlastFxBig
 	-Warhead@1Dam:
 	Warhead@1Wave: Shockwave
+		DamageTypes: ExplosionDeath
 		Damage: 120
 		Radius: 6
 		RingDelay: 2
@@ -1348,7 +1536,9 @@ TGMCCasFlare:
 
 TGMCCasMoab:
 	Inherits: TGMCCasNapalm
+	Inherits@fx: TGMCBlastFxBig
 	Warhead@1Wave: Shockwave
+		DamageTypes: ExplosionDeath
 		Damage: 700
 		Radius: 14
 		RingDelay: 2
@@ -1485,6 +1675,7 @@ TGMCAcidPool:
 	ReloadDelay: 20
 	Projectile: InstantHit
 	Warhead@1Dam: SpreadDamage
+		DamageTypes: AcidDeath
 		Damage: 4
 		Spread: 1c0
 		Falloff: 100, 0
@@ -1492,10 +1683,48 @@ TGMCAcidPool:
 		ValidTargets: Infantry
 
 # The praetorian's acid spray: a splash of acid on the ground in front of him, thicker than a spit.
+# The praetorian's acid: a wide cone of acid in front of him that burns, fills the ground ahead with acid gas, and stuns every marine in it.
+TGMCAcidCone:
+	Range: 5c0
+	TargetActorCenter: true
+	Projectile: InstantHit
+	Warhead@1Cone: ConeDamage
+		DamageTypes: AcidDeath
+		Damage: 30
+		ConeRange: 5c0
+		HalfAngle: 140
+		FarEndPercent: 60
+		ValidRelationships: Neutral, Enemy
+		Versus:
+			HeavyMarine: 55
+			Demolition: 85
+	Warhead@9Stun: GrantExternalCondition
+		Condition: stunned
+		Duration: 50
+		Range: 3c512
+		ValidRelationships: Enemy
+		ValidTargets: Human
+	Warhead@2Hit: CreateEffect
+		Image: fx-acid
+		Explosions: splash
+		ImpactSounds: acid-impact.ogg
+		ForceDisplayAtGroundLevel: true
+		ValidTargets: Ground, Water, Structure
+	Warhead@3Gas: SpawnActor
+		Actor: acid-gas
+		TrailCells: 0
+		Radius: 2
+	Warhead@9Light1: CreateEffect
+		Image: fx-light
+		Explosions: acid
+		ForceDisplayAtGroundLevel: true
+		ValidTargets: Ground, Water, Structure
+
 TGMCAcidSpray:
 	Range: 3c0
 	Projectile: InstantHit
 	Warhead@1Dam: SpreadDamage
+		DamageTypes: AcidDeath
 		Damage: 32
 		Spread: 1c768
 		Falloff: 100, 100, 50, 0
@@ -1773,13 +2002,91 @@ TGMCSmokeScreen:
 		ValidRelationships: Ally, Neutral, Enemy
 		ValidTargets: Ground
 
-# The orbital bombardment: a bigger blast than the MOAB, and it knocks walls down for twelve cells around.
+# The orbital bombardment, TGMC's explosive warhead (orbital_cannon.dm: explosion of 15 cells): a bigger blast than the MOAB that knocks walls down for twelve cells around.
 TGMCOrbital:
 	Inherits: TGMCCasMoab
 	Warhead@1Wave: Shockwave
+		DamageTypes: ExplosionDeath
 		Damage: 900
-		Radius: 17
+		Radius: 15
 		EdgePercent: 6
 	Warhead@5Walls: DamageWalls
 		Damage: 2200
 		Radius: 12c0
+
+# TGMC's incendiary warhead: a blast with a field of blue fire around it that burns on the ground (flame_radius, blue, intensity 46).
+TGMCOrbitalFire:
+	Inherits: TGMCBlastFxBig
+	Projectile: InstantHit
+	Warhead@1Wave: Shockwave
+		DamageTypes: ExplosionDeath
+		Damage: 150
+		Radius: 5
+		EdgePercent: 10
+		DustImage: fx-dust-tile
+		DustChance: 25
+	Warhead@2Boom: CreateEffect
+		Image: fx-blast-cas
+		Explosions: boom
+		ImpactSounds: explosion-big.ogg
+		ForceDisplayAtGroundLevel: true
+		ValidTargets: Ground, Water, Structure
+	Warhead@3Fire: SpawnActor
+		Actor: flame-patch-blue
+		TrailCells: 0
+		Radius: 7
+	Warhead@7Shake: ShakeScreen
+		Duration: 20
+		Intensity: 8
+		Multiplier: 1, 1
+
+# One blast of the cluster warhead: TGMC's explosion(2, 4, 6) on a random spot, twenty-two of them in a tenth of a second each.
+TGMCOrbitalClusterBlast:
+	Inherits: TGMCCasCluster
+	Warhead@1Dam: ExplosiveDamage
+		Spread: 2c0
+
+# The plasma-draining warhead: a cloud of gas over the target that empties every xeno's plasma while it stands in it.
+TGMCOrbitalPlasma:
+	Projectile: InstantHit
+	Warhead@1Gas: SpawnActor
+		Actor: plasma-gas
+		TrailCells: 0
+		Radius: 5
+	Warhead@2Puff: CreateEffect
+		Image: fx-blast
+		Explosions: grenade
+		ImpactSounds: explosion-1.ogg
+		ForceDisplayAtGroundLevel: true
+		ValidTargets: Ground, Water, Structure
+
+TGMCPlasmaGas:
+	Range: 1c768
+	ReloadDelay: 15
+	Projectile: InstantHit
+	Warhead@1Drain: DrainPlasma
+		Range: 1c768
+		ValidRelationships: Enemy, Neutral
+		ValidTargets: Ground
+
+# The rail gun (ship_rail_gun in orbital_cannon.dm): a slug that comes down a second after the shot, small blast of 2 heavy and 4 light cells.
+TGMCRailgun:
+	Inherits: TGMCBlastFxSmall
+	Projectile: InstantHit
+	Warhead@1Wave: Shockwave
+		DamageTypes: ExplosionDeath
+		Damage: 160
+		Radius: 4
+		EdgePercent: 12
+		DustImage: fx-dust-tile
+		DustChance: 20
+	Warhead@2Boom: CreateEffect
+		Image: fx-blast-mortar
+		Explosions: boom
+		ImpactSounds: explosion-big.ogg
+		ForceDisplayAtGroundLevel: true
+		ValidTargets: Ground, Water, Structure
+	Warhead@7Shake: ShakeScreen
+		Duration: 10
+		Intensity: 4
+		Multiplier: 1, 1

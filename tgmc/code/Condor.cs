@@ -5,6 +5,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using OpenRA.Effects;
 using OpenRA.GameRules;
 using OpenRA.Graphics;
@@ -35,6 +36,9 @@ namespace OpenRA.Mods.TGMC.Traits
 
 		[Desc("Line: bombs along the jet's track. Single: one missile at the target. Cluster: one missile, then a ring of blasts.")]
 		public readonly StrikePattern Pattern = StrikePattern.Line;
+
+		[Desc("Orbital strikes only: the blast lands up to this far off the target in each direction (the rail gun's slugs scatter four cells).")]
+		public readonly WDist Scatter = WDist.Zero;
 
 		[Desc("Bombs dropped along the jet's track, centred on the target.")]
 		public readonly int Bombs = 5;
@@ -269,6 +273,7 @@ namespace OpenRA.Mods.TGMC.Traits
 		readonly CondorStrikePowerInfo info;
 		readonly WPos target;
 		readonly WVec unit;
+		readonly List<(int Tick, WPos Spot)> volley = [];
 		int ticks;
 		bool fired;
 
@@ -289,18 +294,40 @@ namespace OpenRA.Mods.TGMC.Traits
 			if (!fired && ticks >= info.FallDelay)
 			{
 				fired = true;
+				var random = world.SharedRandom;
 				foreach (var spot in CondorStrikePower.Spots(info, target, unit))
-					Detonate(world, spot);
+				{
+					var hit = spot + new WVec(random.Next(-info.Scatter.Length, info.Scatter.Length + 1), random.Next(-info.Scatter.Length, info.Scatter.Length + 1), 0);
+					Detonate(world, hit, info.WeaponInfo);
 
-				world.AddFrameEndTask(w => w.Remove(this));
+					// The cluster warhead: ClusterCount blasts at random spots of the disc, one every three ticks (TGMC's tenth of a second).
+					if (info.Pattern == StrikePattern.Cluster && info.ClusterWeaponInfo != null)
+					{
+						for (var i = 0; i < info.ClusterCount; i++)
+						{
+							var angle = new WAngle(random.Next(1024));
+							var reach = random.Next(info.ClusterRadius.Length + 1);
+							volley.Add((ticks + info.ClusterDelay + 3 * i, hit + new WVec(reach, 0, 0).Rotate(WRot.FromYaw(angle))));
+						}
+					}
+				}
 			}
+
+			foreach (var due in volley.Where(v => v.Tick <= ticks).ToList())
+			{
+				volley.Remove(due);
+				Detonate(world, due.Spot, info.ClusterWeaponInfo);
+			}
+
+			if (fired && volley.Count == 0)
+				world.AddFrameEndTask(w => w.Remove(this));
 		}
 
-		void Detonate(World world, WPos spot)
+		void Detonate(World world, WPos spot, WeaponInfo weapon)
 		{
 			var args = new WarheadArgs
 			{
-				Weapon = info.WeaponInfo,
+				Weapon = weapon,
 				SourceActor = source,
 				Source = spot,
 				ImpactPosition = spot,
@@ -308,7 +335,7 @@ namespace OpenRA.Mods.TGMC.Traits
 				DamageModifiers = []
 			};
 
-			info.WeaponInfo.Impact(Target.FromPos(spot), args);
+			weapon.Impact(Target.FromPos(spot), args);
 		}
 
 		IEnumerable<IRenderable> IEffect.Render(WorldRenderer wr) { return SpriteRenderable.None; }

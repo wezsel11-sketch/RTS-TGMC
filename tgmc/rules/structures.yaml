@@ -927,6 +927,90 @@ workshop:
 		Pattern: Single
 		FallDelay: 250
 		WarningRadius: 12c0
+	CondorStrikePower@orbital-fire:
+		Variant: orbital-fire
+		OrderName: OrbitalFireOrder
+		Name: support-orbitalfire.name
+		Description: support-orbitalfire.description
+		IconImage: support-icon
+		BlockedCursor: move-blocked
+		Icon: orbital
+		ChargeInterval: 9000
+		BeginChargeSound: ui-ping.ogg
+		EndChargeSound: ui-confirm.ogg
+		Weapon: TGMCOrbitalFire
+		Jet: false
+		PassSounds: sonic-boom.ogg
+		DropSounds: cas-voice-bomb.ogg
+		IncomingSounds: ob-incoming.ogg
+		LaunchSound: ui-ping.ogg
+		Pattern: Single
+		FallDelay: 250
+		WarningRadius: 12c0
+	CondorStrikePower@orbital-cluster:
+		Variant: orbital-cluster
+		OrderName: OrbitalClusterOrder
+		Name: support-orbitalcluster.name
+		Description: support-orbitalcluster.description
+		IconImage: support-icon
+		BlockedCursor: move-blocked
+		Icon: orbital
+		ChargeInterval: 9000
+		BeginChargeSound: ui-ping.ogg
+		EndChargeSound: ui-confirm.ogg
+		Weapon: TGMCOrbitalClusterBlast
+		Jet: false
+		PassSounds: sonic-boom.ogg
+		DropSounds: cas-voice-bomb.ogg
+		IncomingSounds: ob-incoming.ogg
+		LaunchSound: ui-ping.ogg
+		FallDelay: 250
+		WarningRadius: 12c0
+		Pattern: Cluster
+		ClusterWeapon: TGMCOrbitalClusterBlast
+		ClusterCount: 22
+		ClusterRadius: 7c0
+		ClusterDelay: 4
+	CondorStrikePower@orbital-plasma:
+		Variant: orbital-plasma
+		OrderName: OrbitalPlasmaOrder
+		Name: support-orbitalplasma.name
+		Description: support-orbitalplasma.description
+		IconImage: support-icon
+		BlockedCursor: move-blocked
+		Icon: orbital
+		ChargeInterval: 9000
+		BeginChargeSound: ui-ping.ogg
+		EndChargeSound: ui-confirm.ogg
+		Weapon: TGMCOrbitalPlasma
+		Jet: false
+		PassSounds: sonic-boom.ogg
+		DropSounds: cas-voice-bomb.ogg
+		IncomingSounds: ob-incoming.ogg
+		LaunchSound: ui-ping.ogg
+		Pattern: Single
+		FallDelay: 250
+		WarningRadius: 12c0
+	CondorStrikePower@railgun:
+		Variant: railgun
+		OrderName: RailgunOrder
+		Name: support-railgun.name
+		Description: support-railgun.description
+		IconImage: support-icon
+		BlockedCursor: move-blocked
+		Icon: orbital
+		ChargeInterval: 1000
+		BeginChargeSound: ui-ping.ogg
+		EndChargeSound: ui-confirm.ogg
+		Weapon: TGMCRailgun
+		Jet: false
+		PassSounds: sonic-boom.ogg
+		DropSounds: cas-voice-bomb.ogg
+		LaunchSound: ui-ping.ogg
+		Pattern: Single
+		FallDelay: 40
+		WarningRadius: 4c0
+		Scatter: 4c0
 	Health:
 		HP: 450
 	Exit@1:
@@ -976,7 +1060,7 @@ sentry-turret:
 	AutoTargetPriority@DEFAULT:
 		ValidTargets: Ground
 
-# Fixed guns that out-range the mortarman. They need no facing and shoot anything a friendly unit has revealed.
+# Fixed guns that out-range the mortarman. They turn to face the target and shoot anything a friendly unit has revealed.
 mortar-emplacement:
 	Inherits: ^Structure
 	Inherits@build: ^MarineBuildable
@@ -991,13 +1075,22 @@ mortar-emplacement:
 		Name: actor-mortar-emplacement.name
 	Valued:
 		Cost: 300
+	WithSpriteBody:
+		Sequence: turret
+	QuantizeFacingsFromSequence:
+		Sequence: turret
+	Turreted:
+		TurnSpeed: 12
+		InitialFacing: 512
 	Armament@PRIMARY:
 		Weapon: TGMCMortarEmplacement
+		Turret: primary
 	# Built close to an enemy structure it hits much harder (a second, shorter shell for structures only).
 	Armament@SIEGE:
 		Name: siege
 		Weapon: TGMCMortarSiege
-	AttackOmni:
+		Turret: primary
+	AttackTurreted:
 	WithAttackAnimation:
 		Sequence: fire
 	AutoTarget:
@@ -1022,13 +1115,22 @@ artillery-emplacement:
 		Name: actor-artillery-emplacement.name
 	Valued:
 		Cost: 550
+	WithSpriteBody:
+		Sequence: turret
+	QuantizeFacingsFromSequence:
+		Sequence: turret
+	Turreted:
+		TurnSpeed: 12
+		InitialFacing: 512
 	Armament@PRIMARY:
 		Weapon: TGMCHowitzer
+		Turret: primary
 	# Built close to an enemy structure it hits much harder (a second, shorter shell for structures only).
 	Armament@SIEGE:
 		Name: siege
 		Weapon: TGMCHowitzerSiege
-	AttackOmni:
+		Turret: primary
+	AttackTurreted:
 	WithAttackAnimation:
 		Sequence: fire
 	AutoTarget:

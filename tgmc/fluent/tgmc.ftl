@@ -374,6 +374,12 @@ actor-flame-patch =
 actor-gas-cloud =
     .name = Gas cloud
 
+actor-acid-gas =
+    .name = Acid gas
+
+actor-plasma-gas =
+    .name = Plasma-draining gas
+
 dropdown-tgmc-weather =
     .label = Weather
     .description = Rain or a dust storm drifts across the map. Only a picture; it changes nothing in the fight.
@@ -536,8 +542,20 @@ support-mechdrop =
     .name = Mech Drop
     .description = A pod drops a mech on the spot you pick: the heavy walker, with its autocannon and rockets. Granted by the Workshop. Recharges in four minutes.
 support-orbital =
-    .name = Orbital Bombardment
-    .description = Ten seconds after you call it a huge blast lands, bigger than the MOAB, and flattens walls twelve cells around. Hurts your own units too. Granted by the Workshop. Recharges in six minutes.
+    .name = Orbital HE
+    .description = TGMC's explosive orbital warhead. Ten seconds after you call it a huge blast lands, bigger than the MOAB, and flattens walls twelve cells around. Hurts your own units too. Granted by the Workshop. Recharges in six minutes.
+support-orbitalfire =
+    .name = Orbital Fire
+    .description = TGMC's incendiary orbital warhead. Ten seconds after you call it a blast lands and a field of blue fire burns around it for many seconds. Hurts your own units too. Granted by the Workshop. Recharges in six minutes.
+support-orbitalcluster =
+    .name = Orbital Cluster
+    .description = TGMC's cluster orbital warhead. Ten seconds after you call it twenty-two blasts rain over a wide patch in a few seconds. Hurts your own units too. Granted by the Workshop. Recharges in six minutes.
+support-orbitalplasma =
+    .name = Orbital Plasma
+    .description = TGMC's plasma-draining orbital warhead. Ten seconds after you call it a gas cloud settles that empties the plasma of every xeno in it. Granted by the Workshop. Recharges in six minutes.
+support-railgun =
+    .name = Rail Gun
+    .description = TGMC's ship rail gun: a slug lands a second and a half after the call, within four cells of the spot, in a small hard blast. Hurts your own units too. Granted by the Workshop. Recharges in forty seconds.
 actor-supply-crate =
     .name = Supply crate
 actor-smoke-screen =

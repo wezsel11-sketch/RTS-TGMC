@@ -45,8 +45,8 @@ namespace OpenRA.Mods.TGMC.Traits
 		[Desc("The pod hits the ground hard: this weapon goes off where it lands (it hurts whatever is under it).")]
 		public readonly string LandWeapon = "TGMCPodImpact";
 
-		[Desc("Ticks the empty pod stays on the ground before it is gone.")]
-		public readonly int WreckTicks = 1500;
+		[Desc("Ticks the empty pod stays on the ground before it is gone (750 is 30 seconds).")]
+		public readonly int WreckTicks = 750;
 
 		public readonly string Image = "droppod";
 		public readonly string FallSequence = "fall";

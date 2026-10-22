@@ -44,6 +44,15 @@ HunterVoice:
 		Attack: xeno-roar-5, xeno-roar-6, xeno-roar-7, xeno-roar-9, xeno-roar-11, xeno-roar-12
 		Die: xeno-death-1, xeno-death-2
 
+# The Queen: a hunter's voice, but she dies with the long screech of the Queen's own cry.
+QueenVoice:
+	DefaultVariant: .ogg
+	Voices:
+		Select: xeno-growl-1, xeno-growl-2, xeno-roar-8, xeno-roar-10
+		Action: xeno-roar-1, xeno-roar-2, xeno-roar-3, xeno-roar-4
+		Attack: xeno-roar-5, xeno-roar-6, xeno-roar-7, xeno-roar-9, xeno-roar-11, xeno-roar-12
+		Die: xeno-screech
+
 SentinelVoice:
 	DefaultVariant: .ogg
 	Voices:

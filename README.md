@@ -194,7 +194,7 @@ the commits this mod was tested against (see the top of `mod/bootstrap.py`), so 
     selected type anywhere on the map.
   - **More marine support powers.** On the Cryo Pod: *Sentry Drop* and *Mortar Drop* (a pod lands a sentry gun or a mortar emplacement). On the Armory: *Supply Drop*
     (a crate that heals and refills the ammo of every marine near it for half a minute), *Smoke Screen* (everyone inside takes 45 percent less damage, friend and foe) and
-    *Sensor Sweep* (reveals an area, cloaked xenos too). On the Workshop: *Orbital Bombardment* (ten seconds' warning, a blast bigger than the MOAB that flattens walls).
+    *Sensor Sweep* (reveals an area, cloaked xenos too). On the Workshop: the four orbital warheads of TGMC's cannon (*Orbital HE*, a blast bigger than the MOAB that flattens walls; *Orbital Fire*, a blast with a field of blue fire; *Orbital Cluster*, twenty-two blasts over a wide patch; *Orbital Plasma*, a gas that drains the xenos' plasma), each with ten seconds' warning, and the *Rail Gun* (a small hard blast a second and a half after the call, scattered up to four cells).
     The marine AI uses the first four and the orbital strike.
   - **Cover.** Direct-fire bullets (rifles, carbines, SMGs, shotguns, smartgun, machine guns, minigun, sniper, sentry, mech guns) stop at walls and at cover objects
     (barricades, closets, crates, windows) and hit them instead of what is behind. A barricade has a front: shots coming from the side it faces are

@@ -75,7 +75,6 @@ miner-field:
 		Bounds: 32, 32
 	BodyOrientation:
 		QuantizedFacings: 1
-	Interactable:
 	AppearsOnRadar:
 	FrozenUnderFog:
 	MinerField:

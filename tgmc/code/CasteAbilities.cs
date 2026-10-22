@@ -66,6 +66,9 @@ namespace OpenRA.Mods.TGMC.Traits
 		public readonly WDist Range = new(1024);
 		public readonly WDist ForwardDistance = new(2048);
 
+		[Desc("The unit blinks this far: next to the nearest enemy within it if there is one, else straight ahead (the wraith). 0 for no blink.")]
+		public readonly WDist TeleportDistance = WDist.Zero;
+
 		[Desc("Ticks between the use and the blast. The unit stands still and is seen to go off (the suicide vest's 2-second warcry).")]
 		public readonly int FuseTicks = 0;
 
@@ -175,6 +178,9 @@ namespace OpenRA.Mods.TGMC.Traits
 				return false;
 
 			var world = self.World;
+			if (Info.TeleportDistance.Length > 0 && !Teleport(self))
+				return false;
+
 			if (Info.PlasmaCost > 0)
 				(plasma ??= self.TraitOrDefault<Plasma>())?.Spend(Info.PlasmaCost);
 
@@ -226,6 +232,8 @@ namespace OpenRA.Mods.TGMC.Traits
 					Weapon = weapon,
 					SourceActor = self,
 					Source = self.CenterPosition,
+					ImpactPosition = aim.CenterPosition,
+					WeaponTarget = aim,
 					DamageModifiers = self.TraitsImplementing<IFirepowerModifier>().Select(f => f.GetFirepowerModifier()).ToArray()
 				};
 				if (Info.FuseTicks > 0)
@@ -243,6 +251,34 @@ namespace OpenRA.Mods.TGMC.Traits
 
 			Fx.Sound(world, self.CenterPosition, Info.Sounds);
 			Fx.Sprite(world, self.CenterPosition, Info.EffectImage, Info.EffectSequence, Info.Palette);
+			return true;
+		}
+
+		bool Teleport(Actor self)
+		{
+			var map = self.World.Map;
+			var body = self.TraitOrDefault<IPositionable>();
+			if (body == null || !self.IsInWorld)
+				return false;
+
+			var foe = Nearest(self, Info.TeleportDistance);
+			IEnumerable<CPos> options;
+			if (foe != null)
+				options = map.FindTilesInCircle(foe.Location, 2).Where(c => c != foe.Location).OrderBy(c => (c - self.Location).LengthSquared);
+			else
+			{
+				var facing = self.TraitOrDefault<IFacing>()?.Facing ?? WAngle.Zero;
+				var ahead = new WVec(0, -1024, 0).Rotate(WRot.FromYaw(facing));
+				options = Enumerable.Range(1, Info.TeleportDistance.Length / 1024).Reverse().Select(i => map.CellContaining(self.CenterPosition + ahead * i));
+			}
+
+			var cell = options.FirstOrDefault(c => c != self.Location && map.Contains(c) && body.CanEnterCell(c));
+			if (cell == default)
+				return false;
+
+			Fx.Sprite(self.World, self.CenterPosition, Info.EffectImage, Info.EffectSequence, Info.Palette);
+			self.CancelActivity();
+			body.SetPosition(self, cell);
 			return true;
 		}
 

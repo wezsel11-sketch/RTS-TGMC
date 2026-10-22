@@ -27,6 +27,7 @@ from PIL import Image, ImageDraw, PngImagePlugin
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import build_sounds  # noqa: E402
 import build_maptiles  # noqa: E402
+import tgmc_dmi  # noqa: E402
 import tgmc_dmm  # noqa: E402
 
 CLOCK_W, CLOCK_H, CLOCK_FRAMES, CLOCK_COLS = 62, 46, 30, 6  # matches the sidebar palette's IconSize
@@ -619,6 +620,37 @@ def draw_miner(spin=0, broken=False, glow=(120, 230, 100, 255), ring=None):
     return img
 
 
+def write_tgmc_miner_art(out, tgmc):
+    """The marine miner and the ore field cut from TGMC's own drill (icons/obj/mining_drill.dmi, 32x48): the running drill (4 frames) and the
+    icon, and the broken one (2 frames) standing in a pulsing ring, so the field shows on the map. Same file names as write_miner_art."""
+    sheet = tgmc_dmi.Dmi(os.path.join(tgmc, "icons", "obj", "mining_drill.dmi"))
+
+    def frames(state):
+        return [(f[0] if isinstance(f, list) else f).convert("RGBA") for f in sheet.frames(state)]
+
+    running, broken = frames("mining_drill_active_"), frames("mining_drill_error_")
+    w, h = running[0].size
+
+    def strip(images, name, under=None):
+        out_img = Image.new("RGBA", (w * len(images), h), (0, 0, 0, 0))
+        for i, im in enumerate(images):
+            if under is not None:
+                ring = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+                ImageDraw.Draw(ring).ellipse([0, h - w, w - 1, h - 1], outline=under[i], width=2)
+                out_img.paste(ring, (w * i, 0), ring)
+            out_img.paste(im, (w * i, 0), im)
+        meta = PngImagePlugin.PngInfo()
+        meta.add_text("FrameSize", f"{w},{h}")
+        meta.add_text("FrameAmount", str(len(images)))
+        out_img.save(os.path.join(out, name), pnginfo=meta)
+
+    strip(running, "miner.png")
+    strip(broken, "miner-field.png", under=((255, 210, 60, 255), (255, 210, 60, 110)))
+    icon = running[0].copy()
+    icon.thumbnail((44, 44), Image.NEAREST)
+    icon.save(os.path.join(out, "miner-icon.png"))
+
+
 def write_miner_art(out):
     """The marine miner and the ore field, drawn here rather than cut from TGMC's 32x48 drill (too tall for a cell). Both are one cell
     (32 px) and the miner's icon is 44 px. miner.png: 4 frames of the spinning bit. miner-icon.png: the sidebar picture.
@@ -865,6 +897,10 @@ SCENARIOS = {
         ("cryo-pod", "Marines", 6, 4, 0), ("engineer", "Marines", 8, 5, 256), ("armory", "Marines", 11, 7, 0), ("ordnance-depot", "Marines", 14, 7, 0), ("workshop", "Marines", 8, 7, 0), ("medbay", "Marines", 11, 11, 0),
         ("rifleman", "Marines", 10, 14, 512), ("hunter", "Xenos", 18, 12, 0), ("resin-silo", "Xenos", 19, 19, 0),
     ]},
+    "shot-blast": {"scripts": ("shot-blast",), "extra_rules": "World:\n\tScreenshotAt:\n\t\tTick: 215\n", "actors": [
+        ("ordnance-depot", "Marines", 6, 6, 0), ("workshop", "Marines", 6, 9, 0),
+        ("rifleman", "Marines", 12, 14, 512), ("hunter", "Xenos", 17, 12, 0), ("hunter", "Xenos", 14, 10, 0), ("resin-silo", "Xenos", 19, 19, 0),
+    ]},
     "shot-hud": {"scripts": ("shot",), "extra_rules": "World:\n\tScreenshotAt:\n\t\tTick: 120\n\t\tSelect: rifleman, heavygunner, mech, ordnance-depot\n", "actors": [
         ("ordnance-depot", "Marines", 11, 7, 0),
         ("rifleman", "Marines", 10, 10, 512),
@@ -940,9 +976,10 @@ SCENARIOS = {
     # The caste abilities (see scenarios/test-abilities.lua): a ravager, a praetorian facing a marine, a warrior beside one, a carrier.
     "scenario-abilities": {"scripts": ("test-abilities",), "size": (48, 32), "drop_conquest": True, "extra_rules": "rifleman:\n\tHealth:\n\t\tHP: 3000\n", "actors": [
         ("ravager", "Xenos", 6, 4, 0),
-        ("praetorian", "Xenos", 10, 10, 256), ("rifleman", "Marines", 12, 10, 0),
+        ("praetorian", "Xenos", 10, 10, 768), ("rifleman", "Marines", 12, 10, 0),
         ("warrior", "Xenos", 10, 16, 256), ("rifleman", "Marines", 11, 16, 0),
         ("carrier", "Xenos", 30, 24, 768), ("rifleman", "Marines", 44, 28, 0),
+        ("wraith", "Xenos", 6, 20, 256), ("rifleman", "Marines", 12, 20, 0), ("defiler", "Xenos", 20, 26, 768),
         ("resin-silo", "Xenos", 40, 4, 0),
     ]},
     # Not a test: marines being clawed, to see the blood on the floor (see Bleeds in tgmc/code/Blood.cs).
@@ -1233,6 +1270,12 @@ SCENARIOS = {
     # The orbital strike (see scenarios/test-orbital.lua): hunters and a wall at the target.
     "scenario-orbital": {"scripts": ("test-orbital",), "drop_conquest": True, "size": (32, 24), "ground": "walls", "actors": [
         ("workshop", "Marines", 6, 6, 0), ("hunter", "Xenos", 12, 11, 0), ("hunter", "Xenos", 18, 12, 0), ("hunter", "Xenos", 15, 9, 0),
+        ("resin-silo", "Xenos", 28, 20, 0),
+    ]},
+    # The rail gun, the cluster warhead and the incendiary warhead (see scenarios/test-orbital-kinds.lua).
+    "scenario-orbital-kinds": {"scripts": ("test-orbital-kinds",), "drop_conquest": True, "size": (32, 24), "ground": "walls", "actors": [
+        ("workshop", "Marines", 6, 6, 0), ("hunter", "Xenos", 12, 11, 0), ("hunter", "Xenos", 13, 11, 0), ("hunter", "Xenos", 12, 12, 0), ("hunter", "Xenos", 11, 11, 0),
+        ("hunter", "Xenos", 24, 12, 0), ("hunter", "Xenos", 25, 12, 0), ("hunter", "Xenos", 23, 13, 0), ("hunter", "Xenos", 24, 11, 0),
         ("resin-silo", "Xenos", 28, 20, 0),
     ]},
     # Pods carrying a mortar and a sentry on awkward spots (see scenarios/test-podcarry.lua).
@@ -1582,11 +1625,14 @@ Players:
 {observer_block}
 Actors:
 {"".join(actors)}"""
+    if not marine_bot and not script:
+        # Both sides are open slots: an Enemies line would override the lobby's teams (it made teammates fight). With a script or a bot-only side the line stays, because the engine makes slots without a lobby client neutral.
+        yaml = re.sub(r"\t\tEnemies: .*\n", "", yaml)
     if players:
-        # Replace the Marines, Xenos and observer slots with one playable slot per (name, faction); every slot is an enemy of the others.
+        # Replace the Marines, Xenos and observer slots with one playable slot per (name, faction). No Enemies line: the lobby's teams decide who is whose ally (team 0 is everyone for themselves).
         slots = "".join(
             f"\tPlayerReference@{name}:\n\t\tName: {name}\n\t\tPlayable: True\n\t\tFaction: {faction}\n\t\tLockFaction: False\n"
-            f"\t\tEnemies: {', '.join(o for o, _ in players if o != name)}\n\t\tSpawn: {i}\n\t\tLockSpawn: True\n"
+            f"\t\tSpawn: {i}\n\t\tLockSpawn: True\n"
             for i, (name, faction) in enumerate(players, 1))
         yaml, swapped = re.subn(r"\tPlayerReference@Marines:.*?(?=\nActors:)", lambda m: slots, yaml, count=1, flags=re.S)
         assert swapped, f"{title}: the Marines slot was not found, so the player slots were not replaced"
@@ -1743,6 +1789,8 @@ def main():
     write_acid_pool(args.out)
     write_repair_fx(args.out)
     write_miner_art(args.out)
+    if args.tgmc:
+        write_tgmc_miner_art(args.out, args.tgmc)
     write_map(os.path.join(args.out, "maps", "test-field"), "TGMC test field", 24, 24, TEST_FIELD, "Lobby, Shellmap", [(10, 12), (14, 12)])
     write_map(os.path.join(args.out, "maps", "landing-zone"), "Landing Zone", 40, 28, LANDING_ZONE, "Lobby", [(6, 14), (33, 13)],
               ground=landing_zone_ground, category="Conquest", faction_start=True)

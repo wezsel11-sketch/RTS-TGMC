@@ -457,6 +457,90 @@ Player:
 					Attractiveness: -4
 					TargetMetric: None
 					CheckRadius: 10c0
+			orbital-fire:
+				OrderName: OrbitalFireOrder
+				CoarseScanRadius: 10
+				MinimumAttractiveness: 16
+				Consideration@1:
+					Against: Enemy
+					Types: Alien
+					Attractiveness: 1
+					TargetMetric: None
+					CheckRadius: 9c0
+				Consideration@2:
+					Against: Enemy
+					Types: Structure
+					Attractiveness: 2
+					TargetMetric: None
+					CheckRadius: 9c0
+				Consideration@3:
+					Against: Ally
+					Types: Infantry
+					Attractiveness: -4
+					TargetMetric: None
+					CheckRadius: 10c0
+				Consideration@4:
+					Against: Ally
+					Types: Structure
+					Attractiveness: -4
+					TargetMetric: None
+					CheckRadius: 10c0
+			orbital-cluster:
+				OrderName: OrbitalClusterOrder
+				CoarseScanRadius: 10
+				MinimumAttractiveness: 14
+				Consideration@1:
+					Against: Enemy
+					Types: Alien
+					Attractiveness: 1
+					TargetMetric: None
+					CheckRadius: 9c0
+				Consideration@2:
+					Against: Enemy
+					Types: Structure
+					Attractiveness: 2
+					TargetMetric: None
+					CheckRadius: 9c0
+				Consideration@3:
+					Against: Ally
+					Types: Infantry
+					Attractiveness: -4
+					TargetMetric: None
+					CheckRadius: 10c0
+				Consideration@4:
+					Against: Ally
+					Types: Structure
+					Attractiveness: -4
+					TargetMetric: None
+					CheckRadius: 10c0
+			railgun:
+				OrderName: RailgunOrder
+				CoarseScanRadius: 10
+				MinimumAttractiveness: 6
+				Consideration@1:
+					Against: Enemy
+					Types: Alien
+					Attractiveness: 1
+					TargetMetric: None
+					CheckRadius: 4c0
+				Consideration@2:
+					Against: Enemy
+					Types: Structure
+					Attractiveness: 2
+					TargetMetric: None
+					CheckRadius: 4c0
+				Consideration@3:
+					Against: Ally
+					Types: Infantry
+					Attractiveness: -4
+					TargetMetric: None
+					CheckRadius: 5c0
+				Consideration@4:
+					Against: Ally
+					Types: Structure
+					Attractiveness: -4
+					TargetMetric: None
+					CheckRadius: 5c0
 			psychic-cure:
 				OrderName: PsychicCureOrder
 				CoarseScanRadius: 10

@@ -154,6 +154,10 @@ Sequences:
 	tgmc|sequences/fx-gibs.yaml
 	tgmc|sequences/fx-blast-cas.yaml
 	tgmc|sequences/fx-dust-tile.yaml
+	tgmc|sequences/fx-smoke-puff.yaml
+	tgmc|sequences/fx-dirt-puff.yaml
+	tgmc|sequences/fx-rock.yaml
+	tgmc|sequences/fx-spark.yaml
 	tgmc|sequences/fx-blast-moab.yaml
 	tgmc|sequences/fx-blast-moab2.yaml
 	tgmc|sequences/fx-dust-moab.yaml

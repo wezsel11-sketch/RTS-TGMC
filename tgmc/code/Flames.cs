@@ -22,6 +22,9 @@ namespace OpenRA.Mods.TGMC.Warheads
 		[Desc("How many cells back from the impact toward the firer get one as well.")]
 		public readonly int TrailCells = 0;
 
+		[Desc("Cells around the impact that get one too, as a disc (2 is a patch of about 13 cells). Rock and walls are skipped.")]
+		public readonly int Radius = 0;
+
 		public override void DoImpact(in Target target, WarheadArgs args)
 		{
 			var firedBy = args.SourceActor;
@@ -48,6 +51,16 @@ namespace OpenRA.Mods.TGMC.Warheads
 				{
 					var c = map.CellContaining(impact + step * i);
 					if (c != map.CellContaining(from) && !cells.Contains(c))
+						cells.Add(c);
+				}
+			}
+
+			for (var dx = -Radius; dx <= Radius; dx++)
+			{
+				for (var dy = -Radius; dy <= Radius; dy++)
+				{
+					var c = new CPos(end.X + dx, end.Y + dy);
+					if (dx * dx + dy * dy <= Radius * Radius && map.Contains(c) && !cells.Contains(c) && map.GetTerrainInfo(c).Type is not ("Rock" or "Wall" or "ReinforcedWall"))
 						cells.Add(c);
 				}
 			}

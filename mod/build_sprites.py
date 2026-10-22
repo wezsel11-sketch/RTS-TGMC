@@ -972,18 +972,18 @@ UNITS = {
             "flash": [(PROJECTILES, "muzzle_flash", None, {"facings": 8, "tick": 50})],
         },
     },
-    # Emplacements: a mortar (32px) and a howitzer (64px), each drawn from TGMC's deployed art with its own firing frames.
+    # Emplacements: a mortar (32px) and a howitzer (64px), each drawn from TGMC's deployed art with its own firing frames, in 8 facings: they turn to face the target.
     "mortar-emplacement": {
         "sequences": {
-            "idle": [(MORTAR, "mortar_deployed", None, {"side": "S"})],
-            "fire": [(MORTAR, "mortar_deployed_fire", None, {"side": "S", "tick": 60})],
+            "turret": [(MORTAR, "mortar_deployed")],
+            "fire": [(MORTAR, "mortar_deployed_fire", None, {"tick": 60})],
             "icon": [(MORTAR, "mortar_deployed", None, {"side": "S", "fit": (44, 44), "frames": (0, 1)})],
         },
     },
     "artillery-emplacement": {
         "sequences": {
-            "idle": [(HOWITZER, "howitzer_deployed", None, {"side": "S"})],
-            "fire": [(HOWITZER, "howitzer_deployed_fire", None, {"side": "S", "tick": 50})],
+            "turret": [(HOWITZER, "howitzer_deployed")],
+            "fire": [(HOWITZER, "howitzer_deployed_fire", None, {"tick": 50})],
             "icon": [(HOWITZER, "howitzer_deployed", None, {"side": "S", "fit": (44, 44), "frames": (0, 1)})],
         },
     },
@@ -1225,6 +1225,11 @@ UNITS = {
     "fx-dust-tile": {
         "sequences": {"dust": [(FX32, "landslide_dust", None, {"tick": 110, "size": 96})]},
     },
+    # The particles of a blast (ExplosionParticles warhead), TGMC's own: the grey smoke and the brown dust of explosions.dm, rocks and sparks.
+    "fx-smoke-puff": {"sequences": {"idle": [(FX96, "smoke3", None, {"size": 96})]}},
+    "fx-dirt-puff": {"sequences": {"idle": [("icons/effects/96x157.dmi", "smoke", None, {"fit": (96, 96)})]}},
+    "fx-rock": {"sequences": {"idle": [("icons/effects/particles/generic_particles.dmi", "rock")]}},
+    "fx-spark": {"sequences": {"idle": [(FX64, "flare", None, {"size": 14})]}},
     "fx-blast-moab": {
         "sequences": {"boom": [(FX96, "explosion", None, {"frames": (0, 65, 3), "tick": 45, "size": 576})]},
     },

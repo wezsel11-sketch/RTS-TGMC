@@ -1,10 +1,11 @@
-# The marine miner and the ore field it is repaired from (tgmc/rules/mapobjects.yaml). The sheets are drawn by mod/make_placeholders.py
-# (write_miner_art): one 32 px cell each, so the drill fits its tile.
+# The marine miner and the ore field it is repaired from (tgmc/rules/mapobjects.yaml). The sheets are cut from TGMC's drill by mod/make_placeholders.py
+# (write_tgmc_miner_art): 32x48, standing on its tile, so the sprite is lifted 8 px. Without a TGMC checkout write_miner_art draws a 32 px stand-in instead.
 miner:
 	idle:
 		Filename: miner.png
 		Length: 4
 		Tick: 100
+		Offset: 0, -8
 	icon:
 		Filename: miner-icon.png
 
@@ -13,3 +14,4 @@ miner-field:
 		Filename: miner-field.png
 		Length: 2
 		Tick: 250
+		Offset: 0, -8

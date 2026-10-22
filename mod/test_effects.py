@@ -69,11 +69,11 @@ def test_explosions_only_from_listed_weapons():
     # A blank line separates weapons; comments above one belong to its block, so keep only the name line
     names = set()
     for block in text.split("\n\n"):
-        if "DamageTypes:" in block:
+        if "DamageTypes: ExplosionDeath" in block:  # acid and gas weapons carry their own types (AcidDeath, GasDeath)
             names |= {line.split(":")[0] for line in block.splitlines() if line and line[0].isalpha()}
-    # Grenades, the mortar shell and the vest detonation are the explosions the design allows. Any other weapon with
-    # DamageTypes is new and needs a look before it is added here.
-    assert names == {"TGMCGrenade", "TGMCMortar", "TGMCVestBlast"}, names
+    # Grenades, the mortar shell, the vest detonation and the CAS bombs (bomb run, Fatty, MOAB, the orbital warheads, the rail gun) are the explosions the design allows.
+    # Any other weapon with DamageTypes is new and needs a look before it is added here.
+    assert names == {"TGMCGrenade", "TGMCMortar", "TGMCVestBlast", "TGMCCasBomb", "TGMCCasFatty", "TGMCCasMoab", "TGMCOrbital", "TGMCOrbitalFire", "TGMCRailgun"}, names
 
 
 if __name__ == "__main__":

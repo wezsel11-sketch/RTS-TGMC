@@ -39,3 +39,6 @@ __pycache__/
 .DS_Store
 tgmc/code/bin/
 tgmc/code/obj/
+
+# Brainstorm mockups and plan-execution ledgers (superpowers skills): scratch, never commit.
+.superpowers/

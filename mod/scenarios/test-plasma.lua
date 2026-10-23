@@ -2,6 +2,8 @@
 -- Prints "TEST plasma PASS" or "TEST plasma FAIL".
 WorldLoaded = function()
 	local ravager = Player.GetPlayer("Xenos").GetActorsByType("ravager")[1]
+	-- The rifleman is only there so the match does not end; left to fire he can kill the ravager before the second try.
+	Player.GetPlayer("Marines").GetActorsByType("rifleman")[1].Stance = "HoldFire"
 	local early, late
 	Trigger.AfterDelay(10, function()
 		early = ravager.UseAbility(1)

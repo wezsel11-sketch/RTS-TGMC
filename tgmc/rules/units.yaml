@@ -58,6 +58,84 @@
 	WithColoredOverlay@gassed:
 		RequiresCondition: gassed
 		Color: 70FF4050
+	# Buffs that abilities' auras hand out: a leader's yelled orders, the medic's stim, the queen's screeches. Each shows a
+	# small word over the unit, or a tint, while it lasts.
+	AuraReceiver:
+		Conditions: order-move, order-hold, order-focus, stim, screech-heal, screech-frenzy
+	SpeedMultiplier@ordermove:
+		RequiresCondition: order-move
+		Modifier: 125
+	DamageMultiplier@orderhold:
+		RequiresCondition: order-hold
+		Modifier: 75
+	InaccuracyMultiplier@orderfocus:
+		RequiresCondition: order-focus
+		Modifier: 60
+	FirepowerMultiplier@orderfocus:
+		RequiresCondition: order-focus
+		Modifier: 110
+	SpeedMultiplier@stim:
+		RequiresCondition: stim
+		Modifier: 130
+	ChangesHealth@stim:
+		RequiresCondition: stim
+		PercentageStep: 1
+		Delay: 25
+	ChangesHealth@screechheal:
+		RequiresCondition: screech-heal
+		PercentageStep: 2
+		Delay: 25
+	FirepowerMultiplier@screechfrenzy:
+		RequiresCondition: screech-frenzy
+		Modifier: 120
+	StatusLabel@ordermove:
+		RequiresCondition: order-move
+		Text: MOVE
+		Color: FFD040
+		Height: 1250
+	StatusLabel@orderhold:
+		RequiresCondition: order-hold
+		Text: HOLD
+		Color: 60A0FF
+		Height: 1250
+	StatusLabel@orderfocus:
+		RequiresCondition: order-focus
+		Text: FOCUS
+		Color: FF6040
+		Height: 1250
+	StatusLabel@stim:
+		RequiresCondition: stim
+		Text: STIM
+		Color: 60FF80
+		Height: 1250
+	WithColoredOverlay@screechheal:
+		RequiresCondition: screech-heal
+		Color: 5040FF60
+	WithColoredOverlay@screechfrenzy:
+		RequiresCondition: screech-frenzy
+		Color: 50FF3020
+	# Silenced by a hunter: slower to fire for a few seconds. Enhanced by a drone: harder hits, faster steps.
+	ExternalCondition@silenced:
+		Condition: silenced
+	ReloadDelayMultiplier@silenced:
+		RequiresCondition: silenced
+		Modifier: 150
+	StatusLabel@silenced:
+		RequiresCondition: silenced
+		Text: SILENCED
+		Color: B080FF
+		Height: 1250
+	ExternalCondition@enhanced:
+		Condition: enhanced
+	FirepowerMultiplier@enhanced:
+		RequiresCondition: enhanced
+		Modifier: 115
+	SpeedMultiplier@enhanced:
+		RequiresCondition: enhanced
+		Modifier: 110
+	WithColoredOverlay@enhanced:
+		RequiresCondition: enhanced
+		Color: 40C060FF
 	# A unit hit by a bullet or a claw flashes white for a moment, so you can see who is under fire.
 	ExternalCondition@hitflash:
 		Condition: hitflash
@@ -305,6 +383,9 @@ rifleman:
 medic:
 	Inherits: ^Infantry
 	# A submachine gun as well as the hypospray: the gun has its own small magazine.
+	# The attack trait fires only the armaments it names: without "gun" here the gun never fires.
+	AttackWhileMoving:
+		Armaments: primary, secondary, gun
 	Armament@GUN:
 		RequiresCondition: !gun-m25
 		Name: gun
@@ -359,6 +440,9 @@ medic:
 engineer:
 	Inherits: ^Infantry
 	# A shotgun as well as the repair torch: the gun has its own small magazine.
+	# The attack trait fires only the armaments it names: without "gun" here the gun never fires.
+	AttackWhileMoving:
+		Armaments: primary, secondary, gun
 	Armament@GUN:
 		RequiresCondition: !gun-tx15
 		Name: gun
@@ -380,7 +464,8 @@ engineer:
 		RequiresCondition: gun-sh410
 	AutoTargetPriority@GUN:
 		ValidTargets: Ground
-		Priority: 0
+		# Above the repair torch (Priority 1): an enemy in reach gets shot first, the welding waits until it is gone.
+		Priority: 2
 		# Only enemies: a dormant ore field is Ground too, and the repair tool would claim it.
 		ValidRelationships: Enemy
 	Health:
@@ -1558,6 +1643,7 @@ facehugger:
 		Bounds: 512, 512, 0, 0
 	TgmcMobile:
 		Speed: 260
+		PauseOnCondition: latched || stunned
 	# Hunts marines that carry no embryo, leaps at one and is spent planting its own.
 	-Armament@PRIMARY:
 	Armament@HUG:
@@ -1566,8 +1652,6 @@ facehugger:
 	# is no loss worth announcing. Only marines can be hugged: the host trait is on infantry, not on machines.
 	ExternalCondition@latched:
 		Condition: latched
-	TgmcMobile:
-		PauseOnCondition: latched || stunned
 	AttackWhileMoving:
 		FacingTolerance: 40
 		PauseOnCondition: latched || stunned

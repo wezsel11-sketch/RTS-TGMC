@@ -11,6 +11,7 @@ using OpenRA.Mods.Common.Orders;
 using OpenRA.Mods.Common.Traits;
 using OpenRA.Mods.Common.Widgets;
 using OpenRA.Mods.Common.Widgets.Logic;
+using OpenRA.Mods.TGMC.Orders;
 using OpenRA.Mods.TGMC.Traits;
 using OpenRA.Traits;
 using OpenRA.Widgets;
@@ -196,126 +197,199 @@ namespace OpenRA.Mods.TGMC.Widgets.Logic
 		}
 	}
 
-	// Buttons under the selection card: evolve and devolve the selected xenos, stop, attack-move, patrol and the stances.
+	// The command card, Warcraft style: a fixed row (attack-move, stop, patrol, stance) and eight slots that fill with what the
+	// selected unit type can do: its abilities on their own slots, then evolve/devolve, retreat, and the medic buttons while
+	// someone needs them.
 	public class CommandCardLogic : ChromeLogic
 	{
+		// What one slot button shows and does.
+		sealed class Entry
+		{
+			public string Text;
+			public string Tooltip;
+			public bool Disabled;
+			public bool Highlighted;
+			public Action Click;
+		}
+
+		const int Slots = 8;
+		static readonly (UnitStance Stance, string Name)[] Stances =
+		{
+			(UnitStance.AttackAnything, "Aggressive"), (UnitStance.Defend, "Guard"), (UnitStance.ReturnFire, "Return fire"), (UnitStance.HoldFire, "Hold fire")
+		};
+
 		readonly World world;
+		Entry[] entries = new Entry[Slots];
+		int entriesTick = -1;
 
 		[ObjectCreator.UseCtor]
 		public CommandCardLogic(Widget widget, World world)
 		{
 			this.world = world;
 
-			var evolve = widget.Get<ButtonWidget>("CMD_EVOLVE");
-			evolve.IsDisabled = () => !Selected().Any(a => a.Info.TraitInfoOrDefault<EvolvesInfo>()?.Next != null);
-			evolve.GetText = () => Label(true);
-			evolve.OnClick = () => Issue(a => a.Info.TraitInfoOrDefault<EvolvesInfo>()?.Next != null, a => new Order("Evolve", a, false));
-
-			var devolve = widget.Get<ButtonWidget>("CMD_DEVOLVE");
-			devolve.IsDisabled = () => !Selected().Any(a => a.Info.TraitInfoOrDefault<EvolvesInfo>()?.Previous != null);
-			devolve.GetText = () => Label(false);
-			devolve.OnClick = () => Issue(a => a.Info.TraitInfoOrDefault<EvolvesInfo>()?.Previous != null, a => new Order("Evolve", a, true));
+			// Row one shows its keys in the tooltip too.
+			static string Keyed(string text, string hotkey)
+			{
+				var key = Game.ModData.Hotkeys[hotkey].GetValue();
+				return key.IsValid() ? $"{text} [{key.DisplayString()}]" : text;
+			}
 
 			var stop = widget.Get<ButtonWidget>("CMD_STOP");
+			stop.GetTooltipText = () => Keyed("Stop", "Stop");
 			stop.IsDisabled = () => Selected().Count == 0;
 			stop.OnClick = () => Issue(_ => true, a => new Order("Stop", a, false));
-
-			var retreat = widget.GetOrNull<ButtonWidget>("CMD_RETREAT");
-			if (retreat != null)
-				retreat.OnClick = () => Issue(a => a.TraitOrDefault<Retreat>() != null,
-					a => new Order(Retreat.OrderName, a, Game.GetModifierKeys().HasModifier(Modifiers.Shift)));
-
-			foreach (var (id, stance) in new[] { ("CMD_AGGRESSIVE", UnitStance.AttackAnything), ("CMD_GUARD", UnitStance.Defend),
-				("CMD_RETURN", UnitStance.ReturnFire), ("CMD_HOLD", UnitStance.HoldFire) })
-			{
-				var button = widget.GetOrNull<ButtonWidget>(id);
-				if (button == null)
-					continue;
-
-				button.IsDisabled = () => !Selected().Any(a => a.TraitOrDefault<AutoTarget>() != null);
-				button.IsHighlighted = () => Selected().Select(a => a.TraitOrDefault<AutoTarget>()).FirstOrDefault(t => t != null)?.Stance == stance;
-				button.OnClick = () => Issue(a => a.TraitOrDefault<AutoTarget>() != null,
-					a => new Order("SetUnitStance", a, false) { ExtraData = (uint)stance });
-			}
-
-			// Send the hurt and the infected among the selection to the nearest Medbay or corpsman.
-			var medic = widget.GetOrNull<ButtonWidget>("CMD_MEDIC");
-			if (medic != null)
-			{
-				medic.IsDisabled = () => !Selected().Any(NeedsMedic);
-				medic.OnClick = () =>
-				{
-					foreach (var a in Selected().Where(NeedsMedic))
-					{
-						var healer = world.Actors
-							.Where(h => h.Owner == a.Owner && h.IsInWorld && !h.IsDead && h != a && (h.Info.Name == "medbay" || h.Info.Name == "medic"))
-							.OrderBy(h => (h.CenterPosition - a.CenterPosition).LengthSquared)
-							.FirstOrDefault();
-						if (healer != null)
-							world.IssueOrder(new Order("Move", a, Target.FromCell(world, healer.Location), false));
-					}
-				};
-			}
-
-			// Select every infected marine you own, wherever he is.
-			var infected = widget.GetOrNull<ButtonWidget>("CMD_INFECTED");
-			if (infected != null)
-			{
-				infected.IsDisabled = () => !Infected().Any();
-				infected.OnClick = () => world.Selection.Combine(world, Infected().ToList(), false, false);
-			}
-
-			// Caste abilities (Rage, Acid Spray, Fling, huggers...): two buttons that show whatever the selection can do, with a cooldown.
-			foreach (var slot in new[] { 1, 2 })
-			{
-				var button = widget.GetOrNull<ButtonWidget>("CMD_ABILITY" + slot);
-				if (button == null)
-					continue;
-
-				var s = slot;
-				button.IsVisible = () => Abilities(s).Any();
-				button.IsDisabled = () => !Abilities(s).Any(x => x.Ready);
-				button.IsHighlighted = () => Abilities(s).Any(x => x.Active);
-				button.GetText = () => AbilityLabel(Abilities(s).FirstOrDefault());
-				button.OnClick = () => Issue(a => a.TraitsImplementing<ActiveAbility>().Any(x => x.Info.Slot == s && x.Ready),
-					a => new Order(a.TraitsImplementing<ActiveAbility>().First(x => x.Info.Slot == s && x.Ready).Info.OrderName, a, Game.GetModifierKeys().HasModifier(Modifiers.Shift)));
-			}
 
 			// Attack: classic attack-move, the same as the attack-move key (Ctrl for assault move, as in OpenRA).
 			var attack = widget.Get<ButtonWidget>("CMD_ATTACK");
 			attack.IsDisabled = () => Selected().Count == 0;
 			attack.IsHighlighted = () => world.OrderGenerator is AttackMoveOrderGenerator;
+			attack.GetTooltipText = () => Keyed("Attack-move: walk there, fighting what you meet", "AttackMove");
 			attack.OnClick = () => world.OrderGenerator = new AttackMoveOrderGenerator(world, Selected());
 
 			// Patrol: the unit walks between where it stands and the cell you pick.
 			var patrol = widget.Get<ButtonWidget>("CMD_PATROL");
 			patrol.IsDisabled = () => Selected().Count == 0;
 			patrol.IsHighlighted = () => world.OrderGenerator is PatrolOrderGenerator;
+			patrol.GetTooltipText = () => "Patrol between here and the cell you pick";
 			patrol.OnClick = () => world.OrderGenerator = new PatrolOrderGenerator(world, Selected());
 
-			// Evolving is a xeno thing and the medic buttons are a marine thing: each side sees only its own, and Stop and
-			// Attack slide into the first row's free places for the marines.
-			var faction = world.LocalPlayer?.Faction.InternalName;
-			if (faction == "marines")
+			// One stance button that steps through the four; the four stance keys still set one directly (zero-size buttons).
+			var stance = widget.Get<ButtonWidget>("CMD_STANCE");
+			stance.IsDisabled = () => !Selected().Any(a => a.TraitOrDefault<AutoTarget>() != null);
+			stance.GetText = () => "Stance\n" + Stances.FirstOrDefault(s => s.Stance == CurrentStance()).Name;
+			stance.GetTooltipText = () => "Cycle the stance: Aggressive, Guard, Return fire, Hold fire";
+			stance.OnClick = () => SetStance(Stances[(Array.FindIndex(Stances, s => s.Stance == CurrentStance()) + 1) % Stances.Length].Stance);
+			foreach (var (id, s) in new[] { ("CMD_AGGRESSIVE", UnitStance.AttackAnything), ("CMD_GUARD", UnitStance.Defend),
+				("CMD_RETURN", UnitStance.ReturnFire), ("CMD_HOLD", UnitStance.HoldFire) })
 			{
-				evolve.IsVisible = () => false;
-				devolve.IsVisible = () => false;
-				stop.Bounds = evolve.Bounds;
-				attack.Bounds = devolve.Bounds;
+				var button = widget.GetOrNull<ButtonWidget>(id);
+				if (button != null)
+					button.OnClick = () => SetStance(s);
 			}
-			else if (faction == "xenos")
-			{
-				if (medic != null)
-					medic.IsVisible = () => false;
 
-				if (infected != null)
-					infected.IsVisible = () => false;
+			var retreatKey = widget.GetOrNull<ButtonWidget>("CMD_RETREAT");
+			if (retreatKey != null)
+				retreatKey.OnClick = Retreat;
+
+			for (var i = 0; i < Slots; i++)
+			{
+				var button = widget.Get<ButtonWidget>("CMD_SLOT" + (i + 1));
+				var n = i;
+				var key = button.Key;
+				button.IsVisible = () => Entries()[n] != null;
+				button.IsDisabled = () => Entries()[n]?.Disabled ?? true;
+				button.IsHighlighted = () => Entries()[n]?.Highlighted ?? false;
+				// The hotkey goes in the tooltip, not on the button, to keep the buttons small.
+				button.GetText = () => Entries()[n]?.Text ?? "";
+				button.GetTooltipText = () => Entries()[n]?.Tooltip + (key.GetValue().IsValid() ? $" [{key.GetValue().DisplayString()}]" : "");
+				button.OnClick = () => Entries()[n]?.Click();
 			}
 		}
 
-		IEnumerable<ActiveAbility> Abilities(int slot)
+		// Built once per tick: the slot buttons ask for it many times a frame.
+		Entry[] Entries()
 		{
-			return Selected().SelectMany(a => a.TraitsImplementing<ActiveAbility>()).Where(x => x.Info.Slot == slot && !x.IsTraitDisabled);
+			if (entriesTick == world.WorldTick && !world.Paused)
+				return entries;
+
+			entriesTick = world.WorldTick;
+			entries = new Entry[Slots];
+			var selected = Selected();
+
+			// The card shows the unit type with the most units selected; ties go to the one selected first.
+			var units = selected.GroupBy(a => a.Info.Name).OrderByDescending(g => g.Count()).FirstOrDefault()?.ToList();
+			if (units == null)
+				return entries;
+
+			foreach (var ability in units[0].TraitsImplementing<ActiveAbility>().Where(x => !x.IsTraitDisabled))
+			{
+				var slot = ability.Info.Slot - 1;
+				if (slot < 0 || slot >= Slots || entries[slot] != null)
+					continue;
+
+				var order = ability.Info.OrderName;
+				var mine = units
+					.Select(u => (Unit: u, Ability: u.TraitsImplementing<ActiveAbility>().FirstOrDefault(x => x.Info.OrderName == order && !x.IsTraitDisabled)))
+					.Where(x => x.Ability != null).ToList();
+				var shown = mine.Select(x => x.Ability).FirstOrDefault(x => x.Ready) ?? ability;
+				entries[slot] = new Entry
+				{
+					Text = AbilityLabel(shown),
+					Tooltip = (ability.Info.Description ?? ability.Info.Label) + $" (cooldown {(ability.Info.Cooldown + 24) / 25} s)",
+					Disabled = !mine.Any(x => x.Ability.Ready),
+					Highlighted = mine.Any(x => x.Ability.Active)
+						|| (world.OrderGenerator is AbilityOrderGenerator g && g.OrderName == order),
+					Click = () =>
+					{
+						// An aimed ability waits for the click that says where.
+						if (ability.IsAimed)
+						{
+							world.OrderGenerator = new AbilityOrderGenerator(world, mine.Select(x => x.Unit), ability.Info);
+							return;
+						}
+
+						var queued = Game.GetModifierKeys().HasModifier(Modifiers.Shift);
+						foreach (var x in mine.Where(x => x.Ability.Ready))
+							world.IssueOrder(new Order(order, x.Unit, queued));
+					}
+				};
+			}
+
+			if (selected.Any(a => a.Info.TraitInfoOrDefault<EvolvesInfo>()?.Next != null))
+				AddSide(Label(true).Replace(": ", "\n"), "Evolve into the next caste", () =>
+					Issue(a => a.Info.TraitInfoOrDefault<EvolvesInfo>()?.Next != null, a => new Order("Evolve", a, false)));
+
+			if (selected.Any(a => a.Info.TraitInfoOrDefault<EvolvesInfo>()?.Previous != null))
+				AddSide(Label(false).Replace(": ", "\n"), "Devolve into the previous caste", () =>
+					Issue(a => a.Info.TraitInfoOrDefault<EvolvesInfo>()?.Previous != null, a => new Order("Evolve", a, true)));
+
+			if (selected.Any(a => a.TraitOrDefault<Retreat>() != null))
+				AddSide("Retreat", "Send the selected units back to the nearest return point", Retreat);
+
+			if (selected.Any(NeedsMedic))
+				AddSide("To medic", "Send the hurt and the infected to the nearest Medbay or corpsman", ToMedic);
+
+			if (selected.Any(a => a.Info.HasTraitInfo<InfestableInfo>()) && Infected().Any())
+				AddSide("Infected", "Select every infected marine you own", () => world.Selection.Combine(world, Infected().ToList(), false, false));
+
+			return entries;
+		}
+
+		// A side button takes the first free slot; with none free it is left off the card.
+		void AddSide(string text, string tooltip, Action click)
+		{
+			var free = Array.IndexOf(entries, null);
+			if (free >= 0)
+				entries[free] = new Entry { Text = text, Tooltip = tooltip, Click = click };
+		}
+
+		void Retreat()
+		{
+			Issue(a => a.TraitOrDefault<Retreat>() != null, a => new Order(Traits.Retreat.OrderName, a, Game.GetModifierKeys().HasModifier(Modifiers.Shift)));
+		}
+
+		// Send the hurt and the infected among the selection to the nearest Medbay or corpsman.
+		void ToMedic()
+		{
+			foreach (var a in Selected().Where(NeedsMedic))
+			{
+				var healer = world.Actors
+					.Where(h => h.Owner == a.Owner && h.IsInWorld && !h.IsDead && h != a && (h.Info.Name == "medbay" || h.Info.Name == "medic"))
+					.OrderBy(h => (h.CenterPosition - a.CenterPosition).LengthSquared)
+					.FirstOrDefault();
+				if (healer != null)
+					world.IssueOrder(new Order("Move", a, Target.FromCell(world, healer.Location), false));
+			}
+		}
+
+		UnitStance CurrentStance()
+		{
+			return Selected().Select(a => a.TraitOrDefault<AutoTarget>()).FirstOrDefault(t => t != null)?.Stance ?? UnitStance.AttackAnything;
+		}
+
+		void SetStance(UnitStance stance)
+		{
+			Issue(a => a.TraitOrDefault<AutoTarget>() != null, a => new Order("SetUnitStance", a, false) { ExtraData = (uint)stance });
 		}
 
 		static string AbilityLabel(ActiveAbility a)
@@ -323,16 +397,17 @@ namespace OpenRA.Mods.TGMC.Widgets.Logic
 			if (a == null)
 				return "";
 
+			// The name, then a second line with what the player needs to know right now.
 			if (a.Info.Charges > 1)
-				return $"{a.Info.Label} {a.ChargesLeft}/{a.Info.Charges}";
+				return $"{a.Info.Label}\n{a.ChargesLeft}/{a.Info.Charges}";
 
 			if (a.Active)
-				return a.Info.Label + "!";
+				return a.Info.Label + "\nON";
 
 			if (a.CooldownRemaining > 0)
-				return $"{a.Info.Label} {(a.CooldownRemaining + 24) / 25}s";
+				return $"{a.Info.Label}\n{(a.CooldownRemaining + 24) / 25}s";
 
-			return a.Info.PlasmaCost > 0 ? $"{a.Info.Label} ({a.Info.PlasmaCost})" : a.Info.Label;
+			return a.Info.PlasmaCost > 0 ? $"{a.Info.Label}\n{a.Info.PlasmaCost} plasma" : a.Info.Label;
 		}
 
 		static bool NeedsMedic(Actor a)

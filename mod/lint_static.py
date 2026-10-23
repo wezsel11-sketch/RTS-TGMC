@@ -131,8 +131,9 @@ def main():
     for n in sorted(used - defined):
         errors.append(f"notification {n} is used by a rule but not defined in audio/notifications.yaml")
 
-    # Weapons
-    weapons = top_level_keys(rules["weapons.yaml"])
+    # Weapons: the guns in weapons.yaml and the ability weapons in kit-weapons.yaml (both on mod.yaml's Weapons list)
+    weapon_text = rules["weapons.yaml"] + "\n" + rules.get("kit-weapons.yaml", "")
+    weapons = top_level_keys(weapon_text)
     for w in sorted(set(re.findall(r"^\s*Weapon: (\S+)", all_rules, re.M)) - weapons):
         errors.append(f"weapon {w} is not defined in weapons.yaml")
 
@@ -185,7 +186,7 @@ def main():
                 if s not in seqs[actor]:
                     errors.append(f"{actor} asks for sequence {s}, which build_sprites.py does not make for it")
 
-    errors += check_death_types(all_rules, rules["weapons.yaml"], seqs)
+    errors += check_death_types(all_rules, weapon_text, seqs)
 
     # Muzzle flashes come from the actor's own sheet, so the actor must make the sequence its Armament names
     actor = None
@@ -214,7 +215,7 @@ def main():
                 if n not in seqs[image]:
                     errors.append(f"{weapon} {block} asks for {image} sequence {n}, which build_sprites.py does not make")
 
-    for line in read("rules", "weapons.yaml").splitlines() + ["X:"]:
+    for line in weapon_text.splitlines() + ["X:"]:
         if re.match(r"^[A-Za-z^][\w-]*:", line) or re.match(r"^\t(Warhead@\S+|Projectile):", line):
             check_block()
             block, image, names = None, None, None

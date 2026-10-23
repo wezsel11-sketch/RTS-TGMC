@@ -1,0 +1,391 @@
+# Weapons of the unit abilities on the command card (tgmc/rules/kits.yaml). Most are variants of a unit's own gun: other shells for the
+# mortar and the howitzer, other rockets for the SADAR, other grenades for the launcher, after TGMC's own ammo types.
+
+# Mortar shells. HE is the mortar's own TGMCMortar.
+TGMCMortarIncendiary:
+	Inherits: TGMCMortar
+	Warhead@1Wave: Shockwave
+		Damage: 35
+	Warhead@3Fire: CreateEffect
+		Image: fx-fire
+		Explosions: burn
+		ForceDisplayAtGroundLevel: true
+		ValidTargets: Ground, Water, Structure
+	Warhead@3Patch: SpawnActor
+		Actor: flame-patch
+		Radius: 2
+
+TGMCMortarSmoke:
+	Inherits: TGMCMortar
+	-Warhead@1Wave:
+	-Warhead@5Walls:
+	-Warhead@7Shake:
+	Warhead@3Smoke: SpawnActor
+		Actor: smoke-shell-cloud
+
+# Plasma-drain: a purple burst that empties the plasma of the xenos it catches (TGMC's plasma loss shell).
+TGMCMortarPlasma:
+	Inherits: TGMCMortar
+	Warhead@1Wave: Shockwave
+		Damage: 25
+	Warhead@2Boom: CreateEffect
+		Image: fx-plasma
+		Explosions: large
+		ImpactSounds: explosion-big.ogg
+		ForceDisplayAtGroundLevel: true
+		ValidTargets: Ground, Water, Structure
+	Warhead@4Drain: DrainPlasma
+		Range: 3c0
+
+# A flare: lights up and reveals the ground around it for a while.
+TGMCMortarFlare:
+	Inherits: TGMCMortar
+	-Warhead@1Wave:
+	-Warhead@5Walls:
+	-Warhead@7Shake:
+	-Warhead@7Flash:
+	-Warhead@3Dust:
+	Warhead@2Boom: CreateEffect
+		Image: fx-impact
+		Explosions: burst
+		ImpactSounds: flare-pop.ogg
+		ForceDisplayAtGroundLevel: true
+		ValidTargets: Ground, Water, Structure
+	Warhead@3Light: SpawnActor
+		Actor: flare-light
+
+TGMCMortarEmplacementIncendiary:
+	Inherits: TGMCMortarIncendiary
+	Range: 24c0
+	MinRange: 5c0
+
+TGMCMortarEmplacementSmoke:
+	Inherits: TGMCMortarSmoke
+	Range: 24c0
+	MinRange: 5c0
+
+TGMCMortarEmplacementPlasma:
+	Inherits: TGMCMortarPlasma
+	Range: 24c0
+	MinRange: 5c0
+
+# Howitzer shells. HE is TGMCHowitzer.
+TGMCHowitzerIncendiary:
+	Inherits: TGMCHowitzer
+	Warhead@1Wave: Shockwave
+		Damage: 70
+	Warhead@3Fire: CreateEffect
+		Image: fx-fire
+		Explosions: burn
+		ForceDisplayAtGroundLevel: true
+		ValidTargets: Ground, Water, Structure
+	Warhead@3Patch: SpawnActor
+		Actor: flame-patch
+		Radius: 3
+
+# White phosphorus: a wide splash of blue fire and a cloud of white smoke.
+TGMCHowitzerWP:
+	Inherits: TGMCHowitzer
+	Warhead@1Wave: Shockwave
+		Damage: 50
+	Warhead@3Patch: SpawnActor
+		Actor: flame-patch-blue
+		Radius: 3
+	Warhead@3Smoke: SpawnActor
+		Actor: smoke-shell-cloud
+
+TGMCHowitzerPlasma:
+	Inherits: TGMCHowitzer
+	Warhead@1Wave: Shockwave
+		Damage: 60
+	Warhead@2Boom: CreateEffect
+		Image: fx-plasma
+		Explosions: large
+		ImpactSounds: explosion-big.ogg
+		ForceDisplayAtGroundLevel: true
+		ValidTargets: Ground, Water, Structure
+	Warhead@4Drain: DrainPlasma
+		Range: 5c0
+
+# SADAR rockets. HEAT is TGMCSadar.
+TGMCSadarAP:
+	Inherits: TGMCSadar
+	Warhead@1Dam: ExplosiveDamage
+		Damage: 140
+		Range: 0c0, 0c512, 1c0, 2c0
+		Versus:
+			Heavy: 150
+			HeavyMarine: 130
+
+TGMCSadarWP:
+	Inherits: TGMCSadar
+	Warhead@1Dam: ExplosiveDamage
+		Damage: 45
+	Warhead@3Patch: SpawnActor
+		Actor: flame-patch-blue
+		Radius: 1
+	Warhead@3Smoke: SpawnActor
+		Actor: smoke-shell-cloud
+
+TGMCSadarSmoke:
+	Inherits: TGMCSadar
+	-Warhead@1Dam:
+	-Warhead@5Walls:
+	-Warhead@7Shake:
+	Warhead@3Smoke: SpawnActor
+		Actor: smoke-shell-cloud
+
+# Grenade launcher: incendiary and smoke grenades besides the frag.
+TGMCGrenadeIncendiary:
+	Inherits: TGMCGrenade
+	Warhead@1Dam: ExplosiveDamage
+		Damage: 20
+	Warhead@3Fire: CreateEffect
+		Image: fx-fire
+		Explosions: burn
+		ForceDisplayAtGroundLevel: true
+		ValidTargets: Ground, Water, Structure
+	Warhead@3Patch: SpawnActor
+		Actor: flame-patch
+		Radius: 1
+
+TGMCGrenadeSmoke:
+	Inherits: TGMCGrenade
+	-Warhead@1Dam:
+	Warhead@3Smoke: SpawnActor
+		Actor: smoke-shell-cloud
+
+# The mech's Assault Armor: a crackling burst of energy all around it.
+TGMCAssaultArmor:
+	Range: 2c512
+	Projectile: InstantHit
+	Warhead@1Dam: SpreadDamage
+		Damage: 90
+		Spread: 2c512
+		Falloff: 100, 60, 0
+		ValidRelationships: Enemy
+		DamageTypes: ExplosionDeath
+	Warhead@2Boom: CreateEffect
+		Image: fx-plasma
+		Explosions: large
+		ImpactSounds: laser-zap.ogg
+		ForceDisplayAtGroundLevel: true
+		ValidTargets: Ground, Water, Structure
+	Warhead@9Light: CreateEffect
+		Image: fx-light
+		Explosions: blast-big
+		ForceDisplayAtGroundLevel: true
+		ValidTargets: Ground, Water, Structure
+
+# The mech's rocket barrage: the rocket pod emptied on one spot.
+TGMCMechBarrage:
+	Inherits: TGMCMechRocket
+	Range: 10c0
+	Warhead@1Dam: ExplosiveDamage
+		Damage: 160
+		Range: 0c0, 1c0, 2c512, 4c0
+
+# The sniper's aimed shot: one careful, heavy round.
+TGMCAimedShot:
+	Inherits: TGMCSniper
+	Range: 14c0
+	Warhead@1Dam: SpreadDamage
+		Damage: 260
+
+# The demolitionist's charge: a big blast on a building.
+TGMCPlantedCharge:
+	Inherits: TGMCSadar
+	Range: 1c512
+	Report: bang.ogg
+	Projectile: InstantHit
+	Warhead@1Dam: ExplosiveDamage
+		Damage: 300
+		Range: 0c0, 1c0, 2c0, 3c0
+		Versus:
+			Heavy: 200
+	Warhead@5Walls: DamageWalls
+		Damage: 900
+
+# The synth's repair burst: mends friendly units and buildings around it.
+TGMCRepairBurst:
+	Range: 3c0
+	Projectile: InstantHit
+	Warhead@1Heal: SpreadDamage
+		Damage: -60
+		Spread: 3c0
+		ValidRelationships: Ally
+	Warhead@2Fx: CreateEffect
+		Image: repair-wrench
+		Explosions: idle
+		ImpactSounds: repair.ogg
+
+# The flamer's wall of fire: a wide patch of burning ground where it is aimed.
+TGMCFireWall:
+	Inherits: TGMCGrenade
+	Range: 5c0
+	Report: flamer-fire-1.ogg, flamer-fire-2.ogg
+	Projectile: InstantHit
+	Warhead@1Dam: ExplosiveDamage
+		Damage: 25
+	Warhead@3Fire: CreateEffect
+		Image: fx-fire
+		Explosions: burn
+		ForceDisplayAtGroundLevel: true
+		ValidTargets: Ground, Water, Structure
+	Warhead@3Patch: SpawnActor
+		Actor: flame-patch
+		Radius: 2
+
+# Xeno abilities.
+
+# The runner's acidic missile: a glob of acid lobbed at a spot.
+TGMCAcidMissile:
+	Inherits: TGMCAcid
+	Range: 7c0
+	Warhead@1Dam: SpreadDamage
+		Damage: 45
+	Warhead@3Pool: SpawnActor
+		Actor: acid-pool
+
+# Hunter's Silence: a psychic hush on a spot; marines there fight slower for a few seconds.
+TGMCSilence:
+	Range: 8c0
+	Projectile: InstantHit
+	Warhead@1Silence: GrantExternalCondition
+		Condition: silenced
+		Duration: 125
+		Range: 2c0
+		ValidRelationships: Enemy
+	Warhead@2Fx: CreateEffect
+		Image: fx-shockwave
+		Explosions: ring
+		ImpactSounds: xeno-hiss-2.ogg
+		ForceDisplayAtGroundLevel: true
+		ValidTargets: Ground, Water, Structure
+
+# The drone's acidic salve: mends one xeno a lot.
+TGMCSalve:
+	Inherits: TGMCMend
+	Range: 3c0
+	Warhead@1Dam: TargetDamage
+		Damage: -90
+
+# The drone's enhancement: one xeno hits harder and moves faster for a while.
+TGMCEnhance:
+	Range: 3c0
+	Projectile: InstantHit
+	Warhead@1Buff: GrantExternalCondition
+		Condition: enhanced
+		Duration: 250
+		Range: 0c512
+		ValidRelationships: Ally
+
+# The boiler's bombard: an acid glob or a neurotoxin glob lobbed far.
+TGMCBombardAcid:
+	Inherits: TGMCBoilerGlob
+	Range: 22c0
+	MinRange: 0c0
+
+TGMCBombardNeuro:
+	Inherits: TGMCBoilerGlob
+	Range: 22c0
+	MinRange: 0c0
+	-Warhead@3Pool:
+	Warhead@4Gas: SpawnActor
+		Actor: gas-cloud
+
+# The boiler's acid shroud: a ring of acid gas around itself to cover a retreat.
+TGMCAcidShroud:
+	Range: 1c0
+	Projectile: InstantHit
+	Warhead@3Gas: SpawnActor
+		Actor: acid-gas
+		Radius: 1
+
+# The bull's three charges: plow throws them aside, headbutt is TGMCCharge, gore cuts deep.
+TGMCPlow:
+	Inherits: TGMCClaws
+	Range: 1c512
+	Warhead@1Dam: TargetDamage
+		Damage: 25
+
+TGMCGore:
+	Inherits: TGMCClaws
+	Range: 1c512
+	Warhead@1Dam: TargetDamage
+		Damage: 90
+
+# The sentinel's toxic grenade and the spitter's acid grenade: lobbed balls of gas and acid.
+TGMCToxicGrenade:
+	Range: 6c0
+	Projectile: Bullet
+		Speed: 240
+		Image: fx-acidball
+		LaunchAngle: 150
+		Blockable: false
+	Warhead@3Gas: SpawnActor
+		Actor: gas-cloud
+		Radius: 1
+	Warhead@2Fx: CreateEffect
+		Image: fx-acid
+		Explosions: splash
+		ImpactSounds: acid-impact.ogg
+		ForceDisplayAtGroundLevel: true
+		ValidTargets: Ground, Water, Structure
+
+TGMCAcidGrenade:
+	Inherits: TGMCToxicGrenade
+	Warhead@3Gas: SpawnActor
+		Actor: acid-gas
+		Radius: 1
+	Warhead@3Pool: SpawnActor
+		Actor: acid-pool
+
+# The queen's heal on one xeno, and her plasma gift.
+TGMCQueenHeal:
+	Inherits: TGMCMend
+	Range: 4c0
+	Warhead@1Dam: TargetDamage
+		Damage: -200
+
+TGMCGivePlasma:
+	Range: 4c0
+	Projectile: InstantHit
+	Warhead@1Give: DrainPlasma
+		Amount: -50
+		Range: 0c512
+		ValidRelationships: Ally
+	Warhead@2Fx: CreateEffect
+		Image: fx-plasma
+		Explosions: idle
+		ForceDisplayAtGroundLevel: true
+		ValidTargets: Ground, Water, Structure
+
+# The queen's screeches: the sound and the shockwave; the buff comes from the ability's aura.
+TGMCScreechFx:
+	Range: 1c0
+	Projectile: InstantHit
+	Warhead@2Fx: CreateEffect
+		Image: fx-shockwave
+		Explosions: ring
+		ImpactSounds: xeno-screech-2.ogg
+		ForceDisplayAtGroundLevel: true
+		ValidTargets: Ground, Water, Structure
+
+# SOM rockets.
+TGMCSomThermobaric:
+	Inherits: TGMCSadar
+	Warhead@1Dam: ExplosiveDamage
+		Damage: 90
+		Range: 0c0, 1c512, 3c0, 4c512
+	Warhead@3Patch: SpawnActor
+		Actor: flame-patch
+		Radius: 2
+
+TGMCSomRadiation:
+	Inherits: TGMCSadar
+	Warhead@1Dam: ExplosiveDamage
+		Damage: 40
+	Warhead@3Gas: SpawnActor
+		Actor: gas-cloud
+		Radius: 1

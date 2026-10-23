@@ -549,7 +549,8 @@ Container@PLAYER_WIDGETS:
 					X: WINDOW_WIDTH - 190
 					Y: 44
 					Width: 180
-					Height: WINDOW_HEIGHT - 200
+					# Ends above the command card.
+					Height: WINDOW_HEIGHT - 196
 					Background: tgui-window
 					Logic: RepeatBuildLogic
 					Children:
@@ -1033,125 +1034,147 @@ Container@PLAYER_WIDGETS:
 						Background@COMMAND_CARD:
 							Logic: CommandCardLogic
 							Background: tgui-card
-							X: PARENT_WIDTH - 318
-							Y: 80
-							Width: 312
-							Height: 106
+							X: PARENT_WIDTH - 265
+							Y: 50
+							Width: 259
+							Height: 136
 							Children:
-								Button@CMD_EVOLVE:
-									X: 6
-									Y: 6
-									Width: 72
-									Height: 22
-									Background: sidebar-button
-									Text: cmd-evolve
-									Font: TinyBold
-								Button@CMD_DEVOLVE:
-									X: 82
-									Y: 6
-									Width: 72
-									Height: 22
-									Background: sidebar-button
-									Text: cmd-devolve
-									Font: TinyBold
-								Button@CMD_STOP:
-									X: 158
-									Y: 6
-									Width: 72
-									Height: 22
-									Background: sidebar-button
-									Text: cmd-stop
-									Font: TinyBold
 								Button@CMD_ATTACK:
-									X: 234
-									Y: 6
-									Width: 72
-									Height: 22
+									X: 5
+									Y: 5
+									Width: 60
+									Height: 40
 									Background: sidebar-button
+									Font: TinyBold
 									Text: cmd-attack
+									TooltipContainer: TOOLTIP_CONTAINER
+									TooltipTemplate: SIMPLE_TOOLTIP
+								Button@CMD_STOP:
+									X: 68
+									Y: 5
+									Width: 60
+									Height: 40
+									Background: sidebar-button
 									Font: TinyBold
+									Text: cmd-stop
+									TooltipContainer: TOOLTIP_CONTAINER
+									TooltipTemplate: SIMPLE_TOOLTIP
 								Button@CMD_PATROL:
-									X: 6
-									Y: 30
-									Width: 72
-									Height: 22
+									X: 131
+									Y: 5
+									Width: 60
+									Height: 40
 									Background: sidebar-button
+									Font: TinyBold
 									Text: cmd-patrol
-									Font: TinyBold
-								Button@CMD_GUARD:
-									X: 82
-									Y: 30
-									Width: 72
-									Height: 22
+									TooltipContainer: TOOLTIP_CONTAINER
+									TooltipTemplate: SIMPLE_TOOLTIP
+								Button@CMD_STANCE:
+									X: 194
+									Y: 5
+									Width: 60
+									Height: 40
 									Background: sidebar-button
-									Text: cmd-guard
-									Key: StanceDefend
 									Font: TinyBold
-								Button@CMD_RETURN:
-									X: 158
-									Y: 30
-									Width: 72
-									Height: 22
+									TooltipContainer: TOOLTIP_CONTAINER
+									TooltipTemplate: SIMPLE_TOOLTIP
+								Button@CMD_SLOT1:
+									X: 5
+									Y: 48
+									Width: 60
+									Height: 40
 									Background: sidebar-button
-									Text: cmd-return
-									Key: StanceReturnFire
 									Font: TinyBold
-								Button@CMD_HOLD:
-									X: 234
-									Y: 30
-									Width: 72
-									Height: 22
-									Background: sidebar-button
-									Text: cmd-hold
-									Key: StanceHoldFire
-									Font: TinyBold
-								Button@CMD_AGGRESSIVE:
-									X: 6
-									Y: 78
-									Width: 72
-									Height: 22
-									Background: sidebar-button
-									Text: cmd-aggressive
-									Key: StanceAttackAnything
-									Font: TinyBold
-								Button@CMD_RETREAT:
-									X: 82
-									Y: 78
-									Width: 72
-									Height: 22
-									Background: sidebar-button
-									Text: cmd-retreat
-									Key: TgmcRetreat
-									Font: TinyBold
-								Button@CMD_ABILITY1:
-									X: 6
-									Y: 54
-									Width: 148
-									Height: 22
-									Background: sidebar-button
 									Key: TgmcAbility1
-									Font: TinyBold
-								Button@CMD_ABILITY2:
-									X: 158
-									Y: 54
-									Width: 148
-									Height: 22
+									TooltipContainer: TOOLTIP_CONTAINER
+									TooltipTemplate: SIMPLE_TOOLTIP
+								Button@CMD_SLOT2:
+									X: 68
+									Y: 48
+									Width: 60
+									Height: 40
 									Background: sidebar-button
+									Font: TinyBold
 									Key: TgmcAbility2
-									Font: TinyBold
-								Button@CMD_MEDIC:
-									X: 6
-									Y: 54
-									Width: 148
-									Height: 22
+									TooltipContainer: TOOLTIP_CONTAINER
+									TooltipTemplate: SIMPLE_TOOLTIP
+								Button@CMD_SLOT3:
+									X: 131
+									Y: 48
+									Width: 60
+									Height: 40
 									Background: sidebar-button
-									Text: cmd-medic
 									Font: TinyBold
-								Button@CMD_INFECTED:
-									X: 158
-									Y: 54
-									Width: 148
-									Height: 22
+									Key: TgmcAbility3
+									TooltipContainer: TOOLTIP_CONTAINER
+									TooltipTemplate: SIMPLE_TOOLTIP
+								Button@CMD_SLOT4:
+									X: 194
+									Y: 48
+									Width: 60
+									Height: 40
 									Background: sidebar-button
-									Text: cmd-infected
 									Font: TinyBold
+									Key: TgmcAbility4
+									TooltipContainer: TOOLTIP_CONTAINER
+									TooltipTemplate: SIMPLE_TOOLTIP
+								Button@CMD_SLOT5:
+									X: 5
+									Y: 91
+									Width: 60
+									Height: 40
+									Background: sidebar-button
+									Font: TinyBold
+									Key: TgmcAbility5
+									TooltipContainer: TOOLTIP_CONTAINER
+									TooltipTemplate: SIMPLE_TOOLTIP
+								Button@CMD_SLOT6:
+									X: 68
+									Y: 91
+									Width: 60
+									Height: 40
+									Background: sidebar-button
+									Font: TinyBold
+									Key: TgmcAbility6
+									TooltipContainer: TOOLTIP_CONTAINER
+									TooltipTemplate: SIMPLE_TOOLTIP
+								Button@CMD_SLOT7:
+									X: 131
+									Y: 91
+									Width: 60
+									Height: 40
+									Background: sidebar-button
+									Font: TinyBold
+									Key: TgmcAbility7
+									TooltipContainer: TOOLTIP_CONTAINER
+									TooltipTemplate: SIMPLE_TOOLTIP
+								Button@CMD_SLOT8:
+									X: 194
+									Y: 91
+									Width: 60
+									Height: 40
+									Background: sidebar-button
+									Font: TinyBold
+									Key: TgmcAbility8
+									TooltipContainer: TOOLTIP_CONTAINER
+									TooltipTemplate: SIMPLE_TOOLTIP
+								Button@CMD_AGGRESSIVE:
+									Width: 0
+									Height: 0
+									Key: StanceAttackAnything
+								Button@CMD_GUARD:
+									Width: 0
+									Height: 0
+									Key: StanceDefend
+								Button@CMD_RETURN:
+									Width: 0
+									Height: 0
+									Key: StanceReturnFire
+								Button@CMD_HOLD:
+									Width: 0
+									Height: 0
+									Key: StanceHoldFire
+								Button@CMD_RETREAT:
+									Width: 0
+									Height: 0
+									Key: TgmcRetreat

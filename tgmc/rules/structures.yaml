@@ -224,7 +224,7 @@ weed-node:
 	Voiced:
 		VoiceSet: XenoStructureVoice
 	Health:
-		HP: 250
+		HP: 160
 	Tooltip:
 		Name: actor-weed-node.name
 	Valued:

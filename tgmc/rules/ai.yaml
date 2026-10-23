@@ -685,3 +685,6 @@ Player:
 	# The xeno AI uses its caste abilities: attacks when marines are close, heals and cries when its xenos are hurt or gathered.
 	AbilityBotModule@xenos:
 		RequiresCondition: enable-skirmish-ai && !enable-easy-ai && faction-xenos
+	# Marines and SOM have abilities too (tgmc/rules/kits.yaml): leader orders, frags, the mech's modules.
+	AbilityBotModule@marines:
+		RequiresCondition: enable-skirmish-ai && !enable-easy-ai && !faction-xenos

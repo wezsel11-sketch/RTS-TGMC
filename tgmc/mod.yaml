@@ -20,9 +20,11 @@ Rules:
 	tgmc|rules/structures.yaml
 	tgmc|rules/upgrades.yaml
 	tgmc|rules/mapobjects.yaml
+	tgmc|rules/kits.yaml
 
 Weapons:
 	tgmc|rules/weapons.yaml
+	tgmc|rules/kit-weapons.yaml
 
 Sequences:
 	tgmc|sequences/misc.yaml

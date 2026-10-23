@@ -1073,7 +1073,23 @@ SCENARIOS = {
         ("rifleman", "Marines", 10, 10, 512),
         ("resin-silo", "Xenos", 19, 19, 0),
     ]},
-    "shot-medic": {"scripts": ("shot-medic",), "extra_rules": "World:\n\tScreenshotAt:\n\t\tTick: 160\n\t\tClickTick: 20\n\t\tSelect: rifleman\n\t\tClick: CMD_MEDIC\n", "actors": [
+    # The command card with a squad leader selected (Not a test: a screenshot of the ability slots).
+    "shot-card": {"scripts": ("shot",), "extra_rules": "World:\n\tScreenshotAt:\n\t\tTick: 80\n\t\tSelect: squad_leader\n", "actors": [
+        ("squad_leader", "Marines", 15, 12, 512),
+        ("rifleman", "Marines", 16, 13, 512),
+        ("resin-silo", "Xenos", 22, 22, 0),
+    ]},
+    # The squad leader's MOVE! yell: the shout, the ring and the buff labels (Not a test).
+    "shot-yell": {"scripts": ("shot-yell",), "extra_rules": "World:\n\tScreenshotAt:\n\t\tTick: 72\n\t\tSelect: squad_leader\n", "actors": [
+        ("squad_leader", "Marines", 15, 12, 512), ("rifleman", "Marines", 16, 13, 512), ("rifleman", "Marines", 14, 13, 512),
+        ("rifleman", "Marines", 16, 11, 512), ("medic", "Marines", 13, 12, 512), ("resin-silo", "Xenos", 22, 22, 0),
+    ]},
+    # A boiler's bombard and a bull's charge on a squad (Not a test).
+    "shot-xeno-kits": {"scripts": ("shot-xeno-kits",), "extra_rules": "World:\n\tScreenshotAt:\n\t\tTick: 74\n\t\tSelect: bull\n^Xeno:\n\tPlasma:\n\t\tStartPercent: 100\n", "actors": [
+        ("boiler", "Xenos", 8, 10, 256), ("bull", "Xenos", 12, 8, 256), ("rifleman", "Marines", 16, 11, 768), ("rifleman", "Marines", 17, 12, 768),
+        ("rifleman", "Marines", 16, 13, 768), ("cryo-pod", "Marines", 22, 22, 0), ("resin-silo", "Xenos", 3, 3, 0),
+    ]},
+    "shot-medic": {"scripts": ("shot-medic",), "extra_rules": "World:\n\tScreenshotAt:\n\t\tTick: 160\n\t\tClickTick: 20\n\t\tSelect: rifleman\n\t\tClick: CMD_SLOT2\n", "actors": [
         ("medbay", "Marines", 6, 8, 0),
         ("rifleman", "Marines", 15, 12, 512),
         ("rifleman", "Marines", 16, 13, 512),
@@ -1335,6 +1351,49 @@ SCENARIOS = {
         ("miner-field", "Neutral", 12, 28, 0), ("miner-field", "Neutral", 30, 18, 0), ("miner-field", "Neutral", 52, 10, 0),
     ]},
     # An idle engineer beside a broken ore field, with no order: does it repair the field by itself? (see scenarios/test-engineer-autorepair.lua)
+    # An engineer beside a damaged cade shoots the xeno in reach before it welds (see scenarios/test-engineer-shoots.lua).
+    "scenario-engineer-shoots": {"scripts": ("test-engineer-shoots",), "drop_conquest": True, "size": (32, 24), "actors": [
+        ("engineer", "Marines", 8, 10, 256), ("cade", "Marines", 9, 11, 0), ("runner", "Xenos", 11, 10, 768), ("resin-silo", "Xenos", 28, 20, 0),
+    ]},
+    "scenario-card-slots": {"scripts": ("test-card-slots",), "drop_conquest": True, "size": (32, 24), "actors": [
+        ("squad_leader", "Marines", 10, 10, 256), ("runner", "Xenos", 16, 10, 768), ("cryo-pod", "Marines", 4, 18, 0), ("resin-silo", "Xenos", 28, 20, 0),
+    ]},
+    "scenario-card-mixed": {"scripts": ("test-card-mixed",), "drop_conquest": True, "size": (32, 24), "actors": [
+        ("squad_leader", "Marines", 10, 10, 256), ("rifleman", "Marines", 11, 10, 256), ("rifleman", "Marines", 10, 11, 256),
+        ("rifleman", "Marines", 11, 11, 256), ("cryo-pod", "Marines", 4, 18, 0), ("resin-silo", "Xenos", 28, 20, 0),
+    ]},
+    "scenario-ability-aim": {"scripts": ("test-ability-aim",), "drop_conquest": True, "size": (32, 24), "extra_rules": "rifleman:\n\tActiveAbility@testaim:\n\t\tOrderName: AbilityTestAim\n\t\tSlot: 7\n\t\tLabel: Grenade\n\t\tAim: Target\n\t\tRange: 5c0\n\t\tCooldown: 50\n\t\tWeapon: TGMCGrenade\n\tActiveAbility@testaimactor:\n\t\tOrderName: AbilityTestAimActor\n\t\tSlot: 8\n\t\tLabel: Throw\n\t\tAim: TargetActor\n\t\tRange: 5c0\n\t\tCooldown: 50\n\t\tWeapon: TGMCGrenade\n", "actors": [
+        ("rifleman", "Marines", 6, 10, 256), ("runner", "Xenos", 10, 10, 768), ("runner", "Xenos", 18, 10, 768), ("runner", "Xenos", 8, 21, 0),
+        ("cryo-pod", "Marines", 2, 2, 0), ("resin-silo", "Xenos", 28, 20, 0),
+    ]},
+    "scenario-ability-toggle": {"scripts": ("test-ability-toggle",), "drop_conquest": True, "size": (32, 24), "extra_rules": "mortarman:\n\tArmament@PRIMARY:\n\t\tRequiresCondition: shell-he\n\tArmament@SMOKE:\n\t\tWeapon: TGMCSmokeScreen\n\t\tRequiresCondition: shell-smoke\n\tActiveAbility@he:\n\t\tOrderName: AbilityShellHE\n\t\tSlot: 1\n\t\tLabel: HE\n\t\tToggle: true\n\t\tGroup: shell\n\t\tStartOn: true\n\t\tCondition: shell-he\n\t\tCooldown: 0\n\tActiveAbility@smoke:\n\t\tOrderName: AbilityShellSmoke\n\t\tSlot: 2\n\t\tLabel: Smoke\n\t\tToggle: true\n\t\tGroup: shell\n\t\tCondition: shell-smoke\n\t\tCooldown: 0\n", "actors": [
+        ("mortarman", "Marines", 6, 10, 256), ("cryo-pod", "Marines", 2, 2, 0), ("resin-silo", "Xenos", 28, 20, 0),
+    ]},
+    "scenario-ability-aura": {"scripts": ("test-ability-aura",), "drop_conquest": True, "size": (32, 24), "extra_rules": "squad_leader:\n\tActiveAbility@testorder:\n\t\tOrderName: AbilityTestOrder\n\t\tSlot: 8\n\t\tLabel: Move\n\t\tAim: Self\n\t\tCooldown: 100\n\t\tAuraRange: 6c0\n\t\tAuraCondition: order-move\n\t\tAuraDuration: 150\n\t\tShout: MOVE!\n\t\tRing: FFD040\n", "actors": [
+        ("squad_leader", "Marines", 8, 10, 256), ("squad_leader", "Marines", 8, 11, 256), ("rifleman", "Marines", 11, 10, 256),
+        ("rifleman", "Marines", 18, 10, 256), ("cryo-pod", "Marines", 2, 2, 0), ("resin-silo", "Xenos", 28, 20, 0),
+    ]},
+    "scenario-ability-dash": {"scripts": ("test-ability-dash",), "drop_conquest": True, "size": (32, 24), "extra_rules": "rifleman:\n\tActiveAbility@testdash:\n\t\tOrderName: AbilityTestDash\n\t\tSlot: 8\n\t\tLabel: Dash\n\t\tAim: Target\n\t\tRange: 6c0\n\t\tCooldown: 50\n\t\tChargeDistance: 5c0\n\t\tChargeTicks: 10\n\t\tWeapon: TGMCPunch\n", "actors": [
+        ("rifleman", "Marines", 4, 4, 256), ("runner", "Xenos", 6, 5, 768), ("rifleman", "Marines", 4, 10, 256), ("cade", "Marines", 7, 10, 0),
+        ("rifleman", "Marines", 27, 16, 256), ("cryo-pod", "Marines", 2, 20, 0), ("resin-silo", "Xenos", 20, 21, 0),
+    ]},
+    "scenario-kits-marines": {"scripts": ("test-kits-marines",), "drop_conquest": True, "size": (48, 32), "extra_rules": "runner:\n\tHealth:\n\t\tHP: 50000\n", "actors": [
+        ("rifleman", "Marines", 6, 10, 512), ("medic", "Marines", 9, 10, 512), ("engineer", "Marines", 12, 10, 512), ("synth", "Marines", 15, 10, 512), ("skirmisher", "Marines", 18, 10, 512), ("smartgunner", "Marines", 21, 10, 512), ("sniper", "Marines", 24, 10, 512), ("rocketeer", "Marines", 27, 10, 512), ("blademan", "Marines", 30, 10, 512), ("mortarman", "Marines", 33, 10, 512), ("flamer", "Marines", 6, 13, 512), ("machinegunner", "Marines", 9, 13, 512), ("bomber", "Marines", 12, 13, 512), ("squad_leader", "Marines", 15, 13, 512), ("field_commander", "Marines", 18, 13, 512), ("grenadier", "Marines", 21, 13, 512), ("mech", "Marines", 24, 13, 512), ("heavygunner", "Marines", 27, 13, 512), ("demolitionist", "Marines", 30, 13, 512), ("mortar-emplacement", "Marines", 8, 20, 0), ("artillery-emplacement", "Marines", 14, 20, 0), ("runner", "Xenos", 8, 16, 0), ("runner", "Xenos", 12, 16, 0), ("runner", "Xenos", 16, 16, 0), ("runner", "Xenos", 20, 16, 0), ("runner", "Xenos", 24, 16, 0), ("runner", "Xenos", 28, 16, 0), ("cryo-pod", "Marines", 3, 3, 0), ("resin-silo", "Xenos", 44, 28, 0),
+    ]},
+    "scenario-kits-xenos": {"scripts": ("test-kits-xenos",), "drop_conquest": True, "size": (48, 32), "extra_rules": "rifleman:\n\tHealth:\n\t\tHP: 50000\n^Xeno:\n\tPlasma:\n\t\tStartPercent: 100\n", "actors": [
+        ("runner", "Xenos", 6, 10, 512), ("hunter", "Xenos", 9, 10, 512), ("sentinel", "Xenos", 12, 10, 512), ("facehugger", "Xenos", 15, 10, 512), ("drone", "Xenos", 18, 10, 512), ("warrior", "Xenos", 21, 10, 512), ("queen", "Xenos", 24, 10, 512), ("spitter", "Xenos", 27, 10, 512), ("praetorian", "Xenos", 30, 10, 512), ("crusher", "Xenos", 33, 10, 512), ("ravager", "Xenos", 6, 13, 512), ("defiler", "Xenos", 9, 13, 512), ("boiler", "Xenos", 12, 13, 512), ("carrier", "Xenos", 15, 13, 512), ("warlock", "Xenos", 18, 13, 512), ("shrike", "Xenos", 21, 13, 512), ("widow", "Xenos", 24, 13, 512), ("wraith", "Xenos", 27, 13, 512), ("bull", "Xenos", 30, 13, 512), ("behemoth", "Xenos", 33, 13, 512), ("larva", "Xenos", 4, 20, 0), ("rifleman", "Marines", 8, 16, 0), ("rifleman", "Marines", 12, 16, 0), ("rifleman", "Marines", 16, 16, 0), ("rifleman", "Marines", 20, 16, 0), ("rifleman", "Marines", 24, 16, 0), ("rifleman", "Marines", 28, 16, 0), ("cryo-pod", "Marines", 44, 28, 0), ("resin-silo", "Xenos", 3, 3, 0),
+    ]},
+    "scenario-kits-som": {"scripts": ("test-kits-som",), "drop_conquest": True, "size": (48, 32), "extra_rules": "runner:\n\tHealth:\n\t\tHP: 50000\n", "actors": [
+        ("som_trooper", "Marines", 6, 10, 512), ("som_veteran", "Marines", 9, 10, 512), ("som_corpsman", "Marines", 12, 10, 512), ("som_engineer", "Marines", 15, 10, 512), ("som_squad_leader", "Marines", 18, 10, 512), ("som_field_commander", "Marines", 21, 10, 512), ("som_smartgunner", "Marines", 24, 10, 512), ("som_flamer", "Marines", 27, 10, 512), ("som_grenadier", "Marines", 30, 10, 512), ("som_machinegunner", "Marines", 33, 10, 512), ("som_blademan", "Marines", 6, 13, 512), ("som_scout", "Marines", 9, 13, 512), ("som_mortarman", "Marines", 12, 13, 512), ("som_heavygunner", "Marines", 15, 13, 512), ("som_rocketeer", "Marines", 18, 13, 512), ("som_demolitionist", "Marines", 21, 13, 512), ("som_assault", "Marines", 24, 13, 512), ("som_bomber", "Marines", 27, 13, 512), ("som_mech", "Marines", 30, 13, 512), ("runner", "Xenos", 8, 16, 0), ("runner", "Xenos", 12, 16, 0), ("runner", "Xenos", 16, 16, 0), ("runner", "Xenos", 20, 16, 0), ("runner", "Xenos", 24, 16, 0), ("runner", "Xenos", 28, 16, 0), ("cryo-pod", "Marines", 3, 3, 0), ("resin-silo", "Xenos", 44, 28, 0),
+    ]},
+    # The bots use the new ability kinds (scenarios/test-ai-kits.lua): squads only, no squad manager, so they fight where they stand.
+    "scenario-ai-kits": {"scripts": ("test-ai-kits",), "marine_bot": "skirmish", "xeno_bot": "skirmish", "drop_conquest": True, "size": (40, 28),
+                              "extra_rules": "Player:\n\t-SquadManagerBotModule@marines-easy:\n\t-SquadManagerBotModule@marines-normal:\n\t-SquadManagerBotModule@marines-hard:\n\t-SquadManagerBotModule@xenos-easy:\n\t-SquadManagerBotModule@xenos-normal:\n\t-SquadManagerBotModule@xenos-hard:\n^Xeno:\n\tPlasma:\n\t\tStartPercent: 100\n", "actors": [
+        ("squad_leader", "Marines", 14, 12, 256), ("rifleman", "Marines", 13, 11, 256), ("rifleman", "Marines", 13, 13, 256),
+        ("rifleman", "Marines", 15, 11, 256), ("rifleman", "Marines", 15, 13, 256), ("blademan", "Marines", 16, 12, 256),
+        ("bull", "Xenos", 21, 12, 768), ("runner", "Xenos", 20, 11, 768), ("runner", "Xenos", 20, 13, 768), ("runner", "Xenos", 22, 11, 768),
+        ("cryo-pod", "Marines", 3, 3, 0), ("resin-silo", "Xenos", 36, 24, 0),
+    ]},
     "scenario-engineer-autorepair": {"scripts": ("test-engineer-autorepair",), "drop_conquest": True, "size": (32, 24), "actors": [
         ("engineer", "Marines", 8, 10, 256), ("miner-field", "Neutral", 10, 10, 0), ("resin-silo", "Xenos", 28, 20, 0),
     ]},

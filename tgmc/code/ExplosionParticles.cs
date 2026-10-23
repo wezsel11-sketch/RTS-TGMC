@@ -75,10 +75,14 @@ namespace OpenRA.Mods.TGMC.Warheads
 		}
 	}
 
-	[Desc("Empties the plasma of every xeno within Range of the impact (the plasma-draining orbital warhead's gas).")]
+	[Desc("Empties the plasma of every xeno within Range of the impact (the plasma-draining orbital warhead's gas). A negative Amount " +
+		"gives plasma instead (the queen's Give Plasma).")]
 	public class DrainPlasmaWarhead : Warhead
 	{
 		public readonly WDist Range = new(1536);
+
+		[Desc("Plasma taken from each xeno; negative gives it.")]
+		public readonly int Amount = 1000;
 
 		public override void DoImpact(in Target target, WarheadArgs args)
 		{
@@ -88,7 +92,7 @@ namespace OpenRA.Mods.TGMC.Warheads
 			foreach (var victim in args.SourceActor.World.FindActorsInCircle(target.CenterPosition, Range))
 			{
 				if (!victim.IsDead && IsValidAgainst(victim, args.SourceActor))
-					victim.TraitOrDefault<Plasma>()?.Spend(1000);
+					victim.TraitOrDefault<Plasma>()?.Spend(Amount);
 			}
 		}
 	}

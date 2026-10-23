@@ -3,9 +3,13 @@
 // the same licence as OpenRA, whose traits this file extends.
 #endregion
 
+using System.Collections.Generic;
+using OpenRA.Effects;
 using OpenRA.GameRules;
+using OpenRA.Graphics;
 using OpenRA.Mods.Common;
 using OpenRA.Mods.Common.Effects;
+using OpenRA.Mods.Common.Graphics;
 using OpenRA.Mods.Common.Traits;
 using OpenRA.Mods.Common.Warheads;
 using OpenRA.Primitives;
@@ -30,6 +34,53 @@ namespace OpenRA.Mods.TGMC
 				return;
 
 			world.AddFrameEndTask(w => w.Add(new SpriteEffect(pos, w, image, sequence, palette)));
+		}
+
+		/// <summary>A word shouted over a unit's head ("MOVE!"), floating up for a second and a half.</summary>
+		public static void Shout(World world, Actor actor, string text, Color color)
+		{
+			if (string.IsNullOrEmpty(text))
+				return;
+
+			var pos = actor.CenterPosition + new WVec(0, 0, 1024);
+			world.AddFrameEndTask(w => w.Add(new FloatingText(pos, color, text, 36)));
+		}
+
+		/// <summary>A ring that spreads from a spot out to a radius and fades: how far an aura or a screech reached.</summary>
+		public static void Ring(World world, WPos pos, WDist radius, Color color)
+		{
+			if (radius.Length > 0)
+				world.AddFrameEndTask(w => w.Add(new RingEffect(pos, radius, color)));
+		}
+	}
+
+	sealed class RingEffect : IEffect, IEffectAnnotation
+	{
+		const int Ticks = 15;
+		readonly WPos pos;
+		readonly WDist radius;
+		readonly Color color;
+		int tick;
+
+		public RingEffect(WPos pos, WDist radius, Color color)
+		{
+			this.pos = pos;
+			this.radius = radius;
+			this.color = color;
+		}
+
+		public void Tick(World world)
+		{
+			if (++tick >= Ticks)
+				world.AddFrameEndTask(w => w.Remove(this));
+		}
+
+		public IEnumerable<IRenderable> Render(WorldRenderer wr) { return []; }
+
+		public IEnumerable<IRenderable> RenderAnnotation(WorldRenderer wr)
+		{
+			var r = new WDist(radius.Length * tick / Ticks);
+			yield return new CircleAnnotationRenderable(pos, r, 2, Color.FromArgb(255 * (Ticks - tick) / Ticks, color));
 		}
 	}
 }

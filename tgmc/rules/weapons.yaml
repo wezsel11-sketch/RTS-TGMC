@@ -476,7 +476,7 @@ TGMCButt:
 	TargetActorCenter: true
 	Projectile: InstantHit
 	Warhead@1Dam: TargetDamage
-		Damage: 25
+		Damage: 40
 		ValidTargets: WeedNode
 
 # The synthetic's baton: a plain melee blow at any enemy next to it (the Synthetic in units.yaml mends and repairs first).
@@ -494,6 +494,8 @@ TGMCSynthMelee:
 TGMCFlamer:
 	Range: 4c0
 	ReloadDelay: 30
+	# It can be aimed at weed sacks too, so a flamer burns them out from range instead of walking up to bash them.
+	ValidTargets: Ground, Structure, WeedNode
 	Report: flamer-fire-1.ogg, flamer-fire-2.ogg, flamer-fire-3.ogg
 	TargetActorCenter: true
 	Projectile: InstantHit
@@ -513,6 +515,14 @@ TGMCFlamer:
 		Explosions: blast
 		ForceDisplayAtGroundLevel: true
 		ValidTargets: Ground, Structure
+	# Fire is what clears a hive: enemy structures and weed sacks in the cone take a lot more on top.
+	Warhead@4Burn: ConeDamage
+		Damage: 50
+		ConeRange: 4c0
+		HalfAngle: 64
+		FarEndPercent: 40
+		ValidRelationships: Enemy
+		ValidTargets: Structure, WeedNode
 	# The ground where the flames land keeps burning (see flame-patch in units.yaml).
 	Warhead@3Patch: SpawnActor
 		Actor: flame-patch

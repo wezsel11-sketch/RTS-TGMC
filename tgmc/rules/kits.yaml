@@ -1,0 +1,1174 @@
+# Unit ability kits: what each unit can do from the command card's slots (ActiveAbility, tgmc/code/CasteAbilities.cs), after TGMC's
+# own kits. Their weapons are in kit-weapons.yaml. Numbers are first guesses, to be tuned in play.
+
+# A leader's three orders (TGMC's issue_order: move, hold, focus): a yell that buffs the marines around him for ten seconds. The buffs
+# themselves are on ^Unit (order-move, order-hold, order-focus).
+^LeaderOrders:
+	ActiveAbility@ordermove:
+		OrderName: AbilityOrderMove
+		Slot: 1
+		Label: Move
+		Description: Yell MOVE: marines around you run 25% faster for 10 s.
+		Aim: Self
+		Cooldown: 900
+		AuraRange: 6c0
+		AuraCondition: order-move
+		AuraDuration: 250
+		Shout: MOVE!
+		Ring: FFD040
+		Sounds: marine-m-warcry-1.ogg, marine-m-warcry-3.ogg, marine-m-warcry-5.ogg, marine-f-warcry-2.ogg
+		EffectImage: fx-shockwave
+		EffectSequence: ring
+		AiRange: 6c0
+		AiMinTargets: 2
+	ActiveAbility@orderhold:
+		OrderName: AbilityOrderHold
+		Slot: 2
+		Label: Hold
+		Description: Yell HOLD: marines around you take 25% less damage for 10 s.
+		Aim: Self
+		Cooldown: 900
+		AuraRange: 6c0
+		AuraCondition: order-hold
+		AuraDuration: 250
+		Shout: HOLD!
+		ShoutColor: 60A0FF
+		Ring: 60A0FF
+		Sounds: marine-m-warcry-7.ogg, marine-m-warcry-9.ogg, marine-f-warcry-4.ogg
+		EffectImage: fx-shockwave
+		EffectSequence: ring
+		AiRange: 5c0
+		AiMinTargets: 3
+	ActiveAbility@orderfocus:
+		OrderName: AbilityOrderFocus
+		Slot: 3
+		Label: Focus
+		Description: Yell FOCUS: marines around you aim better and hit 10% harder for 10 s.
+		Aim: Self
+		Cooldown: 900
+		AuraRange: 6c0
+		AuraCondition: order-focus
+		AuraDuration: 250
+		Shout: FOCUS!
+		ShoutColor: FF6040
+		Ring: FF6040
+		Sounds: marine-m-warcry-11.ogg, marine-m-warcry-13.ogg, marine-f-warcry-6.ogg
+		EffectImage: fx-shockwave
+		EffectSequence: ring
+		AiRange: 8c0
+		AiMinTargets: 2
+
+squad_leader:
+	Inherits@orders: ^LeaderOrders
+	ActiveAbility@ordermove:
+		Slot: 4
+	ActiveAbility@orderhold:
+		Slot: 5
+	ActiveAbility@orderfocus:
+		Slot: 6
+
+# The field commander's orders carry further than a squad leader's.
+field_commander:
+	Inherits@orders: ^LeaderOrders
+	ActiveAbility@ordermove:
+		AuraRange: 9c0
+	ActiveAbility@orderhold:
+		AuraRange: 9c0
+	ActiveAbility@orderfocus:
+		AuraRange: 9c0
+	ActiveAbility@mark:
+		OrderName: AbilityMark
+		Slot: 4
+		Label: Mark
+		Description: Ping the nearest enemy within 12 cells so the squad can see it.
+		Aim: Nearest
+		Range: 12c0
+		Weapon: TGMCMarkTarget
+		Cooldown: 1800
+
+rifleman:
+	ActiveAbility@frag:
+		OrderName: AbilityFrag
+		Slot: 1
+		Label: Frag
+		Description: Throw a frag grenade where you click.
+		Aim: Target
+		Range: 6c0
+		Launch: true
+		Weapon: TGMCGrenade
+		Cooldown: 500
+		Sounds: marine-m-grenadethrow-1.ogg, marine-m-grenadethrow-2.ogg, marine-f-grenadethrow-1.ogg
+		AiRange: 6c0
+		AiMinTargets: 2
+
+grenadier:
+	Armament@PRIMARY:
+		RequiresCondition: grenade-frag
+	Armament@INCENDIARY:
+		Weapon: TGMCGrenadeIncendiary
+		RequiresCondition: grenade-incendiary
+		MuzzleSequence: flash
+		LocalOffset: 300,0,260
+	Armament@SMOKE:
+		Weapon: TGMCGrenadeSmoke
+		RequiresCondition: grenade-smoke
+		MuzzleSequence: flash
+		LocalOffset: 300,0,260
+	ActiveAbility@frag:
+		OrderName: AbilityGrenadeFrag
+		Slot: 1
+		Label: Frag
+		Description: Load frag grenades.
+		Toggle: true
+		Group: grenade
+		StartOn: true
+		Condition: grenade-frag
+		Cooldown: 25
+		Sounds: reload-launcher.ogg
+	ActiveAbility@incendiary:
+		OrderName: AbilityGrenadeIncendiary
+		Slot: 2
+		Label: Incend.
+		Description: Load incendiary grenades: they leave the ground burning.
+		Toggle: true
+		Group: grenade
+		Condition: grenade-incendiary
+		Cooldown: 25
+		Sounds: reload-launcher.ogg
+	ActiveAbility@smoke:
+		OrderName: AbilityGrenadeSmoke
+		Slot: 3
+		Label: Smoke
+		Description: Load smoke grenades: a screen that makes everyone inside hard to hit.
+		Toggle: true
+		Group: grenade
+		Condition: grenade-smoke
+		Cooldown: 25
+		Sounds: reload-launcher.ogg
+
+mortarman:
+	Armament@PRIMARY:
+		RequiresCondition: shell-he
+	Armament@INCENDIARY:
+		Weapon: TGMCMortarIncendiary
+		RequiresCondition: shell-incendiary
+		MuzzleSequence: flash
+		LocalOffset: 200,0,300
+	Armament@SMOKE:
+		Weapon: TGMCMortarSmoke
+		RequiresCondition: shell-smoke
+		MuzzleSequence: flash
+		LocalOffset: 200,0,300
+	Armament@PLASMA:
+		Weapon: TGMCMortarPlasma
+		RequiresCondition: shell-plasma
+		MuzzleSequence: flash
+		LocalOffset: 200,0,300
+	ActiveAbility@he:
+		OrderName: AbilityShellHE
+		Slot: 1
+		Label: HE
+		Description: Load high-explosive shells.
+		Toggle: true
+		Group: shell
+		StartOn: true
+		Condition: shell-he
+		Cooldown: 25
+		Sounds: reload-mortar.ogg
+	ActiveAbility@incendiary:
+		OrderName: AbilityShellIncendiary
+		Slot: 2
+		Label: Incend.
+		Description: Load incendiary shells: they set the ground on fire.
+		Toggle: true
+		Group: shell
+		Condition: shell-incendiary
+		Cooldown: 25
+		Sounds: reload-mortar.ogg
+	ActiveAbility@smoke:
+		OrderName: AbilityShellSmoke
+		Slot: 3
+		Label: Smoke
+		Description: Load smoke shells.
+		Toggle: true
+		Group: shell
+		Condition: shell-smoke
+		Cooldown: 25
+		Sounds: reload-mortar.ogg
+	ActiveAbility@plasma:
+		OrderName: AbilityShellPlasma
+		Slot: 4
+		Label: Plasma
+		Description: Load plasma-drain shells: they empty the plasma of the xenos they hit.
+		Toggle: true
+		Group: shell
+		Condition: shell-plasma
+		Cooldown: 25
+		Sounds: reload-mortar.ogg
+	ActiveAbility@flare:
+		OrderName: AbilityFlare
+		Slot: 5
+		Label: Flare
+		Description: Fire a flare where you click: it lights the ground up for 12 s.
+		Aim: Target
+		Range: 14c0
+		Launch: true
+		Weapon: TGMCMortarFlare
+		Cooldown: 600
+		AiRange: 0c0
+
+mortar-emplacement:
+	# The shell types are their own armament, "shell"; the turret fires only the armaments it names (siege is the close-range shell).
+	AttackTurreted:
+		Armaments: primary, shell, siege
+	Armament@PRIMARY:
+		RequiresCondition: shell-he
+	Armament@INCENDIARY:
+		Weapon: TGMCMortarEmplacementIncendiary
+		RequiresCondition: shell-incendiary
+		Name: shell
+		Turret: primary
+	Armament@SMOKE:
+		Weapon: TGMCMortarEmplacementSmoke
+		RequiresCondition: shell-smoke
+		Name: shell
+		Turret: primary
+	Armament@PLASMA:
+		Weapon: TGMCMortarEmplacementPlasma
+		RequiresCondition: shell-plasma
+		Name: shell
+		Turret: primary
+	ActiveAbility@he:
+		OrderName: AbilityShellHE
+		Slot: 1
+		Label: HE
+		Description: Load high-explosive shells.
+		Toggle: true
+		Group: shell
+		StartOn: true
+		Condition: shell-he
+		Cooldown: 25
+		Sounds: reload-mortar.ogg
+	ActiveAbility@incendiary:
+		OrderName: AbilityShellIncendiary
+		Slot: 2
+		Label: Incend.
+		Description: Load incendiary shells.
+		Toggle: true
+		Group: shell
+		Condition: shell-incendiary
+		Cooldown: 25
+		Sounds: reload-mortar.ogg
+	ActiveAbility@smoke:
+		OrderName: AbilityShellSmoke
+		Slot: 3
+		Label: Smoke
+		Description: Load smoke shells.
+		Toggle: true
+		Group: shell
+		Condition: shell-smoke
+		Cooldown: 25
+		Sounds: reload-mortar.ogg
+	ActiveAbility@plasma:
+		OrderName: AbilityShellPlasma
+		Slot: 4
+		Label: Plasma
+		Description: Load plasma-drain shells.
+		Toggle: true
+		Group: shell
+		Condition: shell-plasma
+		Cooldown: 25
+		Sounds: reload-mortar.ogg
+
+artillery-emplacement:
+	# The shell types are their own armament, "shell"; the turret fires only the armaments it names (siege is the close-range shell).
+	AttackTurreted:
+		Armaments: primary, shell, siege
+	Armament@PRIMARY:
+		RequiresCondition: shell-he
+	Armament@INCENDIARY:
+		Weapon: TGMCHowitzerIncendiary
+		RequiresCondition: shell-incendiary
+		Name: shell
+		Turret: primary
+	Armament@WP:
+		Weapon: TGMCHowitzerWP
+		RequiresCondition: shell-wp
+		Name: shell
+		Turret: primary
+	Armament@PLASMA:
+		Weapon: TGMCHowitzerPlasma
+		RequiresCondition: shell-plasma
+		Name: shell
+		Turret: primary
+	ActiveAbility@he:
+		OrderName: AbilityShellHE
+		Slot: 1
+		Label: HE
+		Description: Load high-explosive shells.
+		Toggle: true
+		Group: shell
+		StartOn: true
+		Condition: shell-he
+		Cooldown: 25
+		Sounds: reload-mortar.ogg
+	ActiveAbility@incendiary:
+		OrderName: AbilityShellIncendiary
+		Slot: 2
+		Label: Incend.
+		Description: Load incendiary shells.
+		Toggle: true
+		Group: shell
+		Condition: shell-incendiary
+		Cooldown: 25
+		Sounds: reload-mortar.ogg
+	ActiveAbility@wp:
+		OrderName: AbilityShellWP
+		Slot: 3
+		Label: W.Phos.
+		Description: Load white phosphorus: blue fire and a smoke cloud.
+		Toggle: true
+		Group: shell
+		Condition: shell-wp
+		Cooldown: 25
+		Sounds: reload-mortar.ogg
+	ActiveAbility@plasma:
+		OrderName: AbilityShellPlasma
+		Slot: 4
+		Label: Plasma
+		Description: Load plasma-drain shells.
+		Toggle: true
+		Group: shell
+		Condition: shell-plasma
+		Cooldown: 25
+		Sounds: reload-mortar.ogg
+
+rocketeer:
+	Armament@PRIMARY:
+		RequiresCondition: !gun-heavy && rocket-heat
+	Armament@AP:
+		Weapon: TGMCSadarAP
+		RequiresCondition: !gun-heavy && rocket-ap
+		MuzzleSequence: flash
+		LocalOffset: -300,0,300
+	Armament@WP:
+		Weapon: TGMCSadarWP
+		RequiresCondition: !gun-heavy && rocket-wp
+		MuzzleSequence: flash
+		LocalOffset: -300,0,300
+	Armament@SMOKE:
+		Weapon: TGMCSadarSmoke
+		RequiresCondition: !gun-heavy && rocket-smoke
+		MuzzleSequence: flash
+		LocalOffset: -300,0,300
+	ActiveAbility@heat:
+		OrderName: AbilityRocketHEAT
+		Slot: 1
+		Label: HEAT
+		Description: Load HEAT rockets (the SADAR's own).
+		Toggle: true
+		Group: rocket
+		StartOn: true
+		Condition: rocket-heat
+		Cooldown: 25
+		Sounds: reload-launcher.ogg
+	ActiveAbility@ap:
+		OrderName: AbilityRocketAP
+		Slot: 2
+		Label: AP
+		Description: Load armour-piercing rockets: a small blast that tears through heavy armour.
+		Toggle: true
+		Group: rocket
+		Condition: rocket-ap
+		Cooldown: 25
+		Sounds: reload-launcher.ogg
+	ActiveAbility@wp:
+		OrderName: AbilityRocketWP
+		Slot: 3
+		Label: W.Phos.
+		Description: Load white phosphorus rockets: blue fire and smoke.
+		Toggle: true
+		Group: rocket
+		Condition: rocket-wp
+		Cooldown: 25
+		Sounds: reload-launcher.ogg
+	ActiveAbility@smoke:
+		OrderName: AbilityRocketSmoke
+		Slot: 4
+		Label: Smoke
+		Description: Load smoke rockets.
+		Toggle: true
+		Group: rocket
+		Condition: rocket-smoke
+		Cooldown: 25
+		Sounds: reload-launcher.ogg
+
+medic:
+	ActiveAbility@stim:
+		OrderName: AbilityStim
+		Slot: 1
+		Label: Stim
+		Description: Stim the marines around you: 30% faster and slowly healing for 6 s.
+		Aim: Self
+		Cooldown: 900
+		AuraRange: 3c0
+		AuraCondition: stim
+		AuraDuration: 150
+		Ring: 60FF80
+		Sounds: hypospray.ogg
+		AiRange: 4c0
+		AiWoundedPercent: 60
+
+engineer:
+	ActiveAbility@cade:
+		OrderName: AbilityBuildCade
+		Slot: 1
+		Label: Cade
+		Description: Put up a barricade on the cell you click.
+		Aim: Target
+		Range: 3c0
+		Spawn: cade
+		Cooldown: 900
+		Sounds: repair.ogg
+		AiRange: 0c0
+
+synth:
+	ActiveAbility@repairburst:
+		OrderName: AbilityRepairBurst
+		Slot: 1
+		Label: Mend
+		Description: Mend every friendly unit and building within 3 cells.
+		Aim: Self
+		Weapon: TGMCRepairBurst
+		Cooldown: 750
+		Ring: 40FF60
+		AiRange: 3c0
+		AiWoundedPercent: 70
+
+sniper:
+	ActiveAbility@aimedshot:
+		OrderName: AbilityAimedShot
+		Slot: 1
+		Label: Aimed
+		Description: One careful, heavy shot at the unit you click.
+		Aim: TargetActor
+		Range: 14c0
+		Weapon: TGMCAimedShot
+		Cooldown: 600
+		Sounds: sniper-fire-1.ogg, sniper-fire-2.ogg
+		AiRange: 12c0
+
+smartgunner:
+	ActiveAbility@overdrive:
+		OrderName: AbilityOverdrive
+		Slot: 1
+		Label: Overdrive
+		Description: Run the smartgun hot: 40% faster fire for 6 s.
+		Aim: Self
+		Condition: overdrive
+		Duration: 150
+		Cooldown: 750
+		Sounds: reload-mg.ogg
+		AiRange: 7c0
+		AiMinTargets: 3
+	ReloadDelayMultiplier@overdrive:
+		RequiresCondition: overdrive
+		Modifier: 60
+	StatusLabel@overdrive:
+		RequiresCondition: overdrive
+		Text: OVERDRIVE
+		Color: FF8040
+		Height: 1250
+
+# Deployed on its bipod: it hardly walks, but it reaches further and fires faster.
+^DeployGun:
+	ActiveAbility@deploy:
+		OrderName: AbilityDeploy
+		Slot: 1
+		Label: Deploy
+		Description: Set up the gun: slower, but more reach and faster fire. Press again to pack it up.
+		Toggle: true
+		Condition: deployed
+		Cooldown: 50
+		Sounds: reload-mg.ogg
+	SpeedMultiplier@deployed:
+		RequiresCondition: deployed
+		Modifier: 25
+	RangeMultiplier@deployed:
+		RequiresCondition: deployed
+		Modifier: 125
+	ReloadDelayMultiplier@deployed:
+		RequiresCondition: deployed
+		Modifier: 75
+	StatusLabel@deployed:
+		RequiresCondition: deployed
+		Text: DEPLOYED
+		Color: C0C0C0
+		Height: 1250
+
+machinegunner:
+	Inherits@deploy: ^DeployGun
+
+heavygunner:
+	Inherits@deploy: ^DeployGun
+
+flamer:
+	ActiveAbility@firewall:
+		OrderName: AbilityFireWall
+		Slot: 1
+		Label: Fire wall
+		Description: Set a wide patch of ground on fire where you click.
+		Aim: Target
+		Range: 5c0
+		Weapon: TGMCFireWall
+		Cooldown: 750
+		AiRange: 5c0
+		AiMinTargets: 3
+
+blademan:
+	ActiveAbility@lunge:
+		OrderName: AbilityLunge
+		Slot: 1
+		Label: Lunge
+		Description: Dash 4 cells toward where you click, cutting the enemies beside the path.
+		Aim: Target
+		Range: 4c0
+		ChargeDistance: 4c0
+		ChargeTicks: 8
+		Weapon: TGMCLunge
+		Cooldown: 400
+		Sounds: slam-1.ogg, slam-2.ogg
+		EffectImage: fx-dirt-puff
+		EffectSequence: idle
+		AiRange: 4c0
+
+skirmisher:
+	ActiveAbility@sprint:
+		OrderName: AbilitySprint
+		Slot: 1
+		Label: Sprint
+		Description: Run 50% faster for 5 s.
+		Aim: Self
+		Condition: sprint
+		Duration: 125
+		Cooldown: 600
+		AiRange: 5c0
+	SpeedMultiplier@sprint:
+		RequiresCondition: sprint
+		Modifier: 150
+
+demolitionist:
+	ActiveAbility@charge:
+		OrderName: AbilityPlantCharge
+		Slot: 1
+		Label: Charge
+		Description: Walk up to the building or unit you click and blow a demolition charge on it.
+		Aim: TargetActor
+		Range: 1c512
+		Weapon: TGMCPlantedCharge
+		Cooldown: 900
+		AiRange: 2c0
+
+# The mech (TGMC's greyscale mech and its modules): boost, armour burst, cloak, shield, leg overload, smoke and the rocket pod.
+mech:
+	ActiveAbility@overboost:
+		OrderName: AbilityOverboost
+		Slot: 1
+		Label: Boost
+		Description: Overboost: dash 4 cells toward where you click.
+		Aim: Target
+		Range: 4c0
+		ChargeDistance: 4c0
+		ChargeTicks: 10
+		Cooldown: 450
+		Sounds: overboost.ogg
+		EffectImage: fx-spark
+		EffectSequence: idle
+		AiRange: 0c0
+	ActiveAbility@assaultarmor:
+		OrderName: AbilityAssaultArmor
+		Slot: 2
+		Label: Assault
+		Description: Assault Armor: a burst of energy that hurts every enemy within 2.5 cells.
+		Aim: Self
+		Weapon: TGMCAssaultArmor
+		Cooldown: 900
+		Ring: 80C0FF
+		Sounds: lightning-charge.ogg
+		AiRange: 2c512
+		AiMinTargets: 2
+	ActiveAbility@cloak:
+		OrderName: AbilityMechCloak
+		Slot: 3
+		Label: Cloak
+		Description: Turn nearly invisible until you fire or switch it off.
+		Toggle: true
+		Condition: mech-cloak
+		Cooldown: 250
+		Sounds: cloak-on.ogg
+	Cloak@ability:
+		RequiresCondition: mech-cloak
+		InitialDelay: 0
+		CloakDelay: 50
+		UncloakOn: Attack
+		CloakSound: cloak-on.ogg
+		UncloakSound: cloak-off.ogg
+		CloakedAlpha: 0.25
+	ActiveAbility@pulsearmor:
+		OrderName: AbilityPulseArmor
+		Slot: 4
+		Label: Shield
+		Description: Pulse Armor: take 70% less damage for 3 s.
+		Aim: Self
+		Condition: pulse-armor
+		Duration: 75
+		Cooldown: 750
+		Sounds: shield-up.ogg
+		AiRange: 6c0
+		AiMinTargets: 3
+	DamageMultiplier@pulsearmor:
+		RequiresCondition: pulse-armor
+		Modifier: 30
+	WithColoredOverlay@pulsearmor:
+		RequiresCondition: pulse-armor
+		Color: 604080FF
+	ActiveAbility@overload:
+		OrderName: AbilityLegOverload
+		Slot: 5
+		Label: Overload
+		Description: Overload the legs: 40% faster, but the mech slowly breaks itself. Press again to stop.
+		Toggle: true
+		Condition: leg-overload
+		Cooldown: 50
+		Sounds: overload-start.ogg
+	SpeedMultiplier@overload:
+		RequiresCondition: leg-overload
+		Modifier: 140
+	ChangesHealth@overload:
+		RequiresCondition: leg-overload
+		PercentageStep: -1
+		Delay: 25
+	StatusLabel@overload:
+		RequiresCondition: leg-overload
+		Text: OVERLOAD
+		Color: FF4040
+		Height: 1700
+	ActiveAbility@smoke:
+		OrderName: AbilityMechSmoke
+		Slot: 6
+		Label: Smoke
+		Description: Pop a smoke screen around the mech.
+		Aim: Self
+		Weapon: TGMCSmokeScreen
+		Spawn: smoke-shell-cloud
+		Cooldown: 1200
+		Sounds: smoke-bomb.ogg
+		AiRange: 6c0
+		AiMinTargets: 4
+	ActiveAbility@barrage:
+		OrderName: AbilityBarrage
+		Slot: 7
+		Label: Barrage
+		Description: Empty the rocket pod on the spot you click.
+		Aim: Target
+		Range: 10c0
+		Launch: true
+		Weapon: TGMCMechBarrage
+		Cooldown: 900
+		AiRange: 10c0
+		AiMinTargets: 3
+
+# A smoke cloud from a shell, rocket or grenade: it hangs for about 16 seconds.
+smoke-shell-cloud:
+	Inherits: smoke-screen
+	KillsSelf:
+		Delay: 400
+
+# A flare's light: it shows the ground around it for 12 seconds.
+flare-light:
+	Inherits: sensor-ping
+	Expires:
+		Ticks: 300
+	RevealsShroud:
+		Range: 8c0
+	-DetectCloaked:
+
+# Xenos (TGMC's caste abilities). Plasma costs are TGMC's, scaled to the mod's plasma of 100.
+
+runner:
+	ActiveAbility@evasion:
+		OrderName: AbilityEvasion
+		Slot: 1
+		Label: Evasion
+		Description: Dodge for 3 s: half the damage, and faster.
+		Aim: Self
+		Condition: evading
+		Duration: 75
+		Cooldown: 500
+		PlasmaCost: 35
+		Sounds: xeno-hiss-1.ogg
+		AiRange: 5c0
+		AiMinTargets: 2
+	ActiveAbility@pounce:
+		OrderName: AbilityRunnerPounce
+		Slot: 2
+		Label: Pounce
+		Description: Leap 5 cells toward where you click, stunning the marines you land beside.
+		Aim: Target
+		Range: 5c0
+		ChargeDistance: 5c0
+		ChargeTicks: 10
+		ChargeHeight: 512
+		Weapon: TGMCPounce
+		Cooldown: 300
+		PlasmaCost: 10
+		Sounds: xeno-pounce-1.ogg, xeno-pounce-2.ogg
+		AiRange: 5c0
+	ActiveAbility@missile:
+		OrderName: AbilityAcidMissile
+		Slot: 3
+		Label: Missile
+		Description: Lob a glob of acid at the spot you click: it leaves a pool.
+		Aim: Target
+		Range: 7c0
+		Launch: true
+		Weapon: TGMCAcidMissile
+		Cooldown: 600
+		PlasmaCost: 50
+		Sounds: acid-spit-1.ogg, acid-spit-2.ogg
+		AiRange: 7c0
+		AiMinTargets: 2
+
+hunter:
+	# Stealth is a switch now: on by default as before, off to stay seen (and fight without the delay).
+	Cloak@stealth:
+		RequiresCondition: stealth-mode
+	ActiveAbility@stealth:
+		OrderName: AbilityStealth
+		Slot: 1
+		Label: Stealth
+		Description: Switch stealth on or off. On, the hunter fades from sight when it stands still.
+		Toggle: true
+		StartOn: true
+		Condition: stealth-mode
+		Cooldown: 50
+		PlasmaCost: 5
+		Sounds: scout-cloak-on.ogg
+	ActiveAbility@pounce:
+		OrderName: AbilityHunterPounce
+		Slot: 2
+		Label: Pounce
+		Description: Leap 5 cells toward where you click, stunning the marines you land beside.
+		Aim: Target
+		Range: 5c0
+		ChargeDistance: 5c0
+		ChargeTicks: 10
+		ChargeHeight: 512
+		Weapon: TGMCPounce
+		Cooldown: 300
+		PlasmaCost: 10
+		Sounds: xeno-pounce-1.ogg, xeno-pounce-2.ogg
+		AiRange: 5c0
+	ActiveAbility@mark:
+		OrderName: AbilityHuntersMark
+		Slot: 3
+		Label: Mark
+		Description: Hunter's Mark: the marine you click is seen by your hive for 24 s.
+		Aim: TargetActor
+		Range: 10c0
+		Weapon: TGMCMarkTarget
+		Cooldown: 900
+		PlasmaCost: 12
+		AiRange: 10c0
+	ActiveAbility@silence:
+		OrderName: AbilitySilence
+		Slot: 4
+		Label: Silence
+		Description: A psychic hush where you click: marines there fight slower for 5 s.
+		Aim: Target
+		Range: 8c0
+		Weapon: TGMCSilence
+		Cooldown: 900
+		PlasmaCost: 25
+		AiRange: 8c0
+		AiMinTargets: 3
+
+drone:
+	ActiveAbility@salve:
+		OrderName: AbilitySalve
+		Slot: 1
+		Label: Salve
+		Description: Acidic Salve: mend the xeno you click.
+		Aim: TargetActor
+		TargetRelationships: Ally
+		Range: 3c0
+		Weapon: TGMCSalve
+		Cooldown: 300
+		PlasmaCost: 15
+		Sounds: heal.ogg
+		AiRange: 6c0
+		AiWoundedPercent: 60
+	ActiveAbility@enhance:
+		OrderName: AbilityEnhance
+		Slot: 2
+		Label: Enhance
+		Description: Enhancement: the xeno you click hits harder and moves faster for 10 s.
+		Aim: TargetActor
+		TargetRelationships: Ally
+		Range: 3c0
+		Weapon: TGMCEnhance
+		Cooldown: 600
+		PlasmaCost: 5
+		AiRange: 0c0
+	ActiveAbility@weednode:
+		OrderName: AbilityPlantWeeds
+		Slot: 3
+		Label: Weeds
+		Description: Plant a weed node beside you.
+		Aim: Self
+		Spawn: weed-node
+		SpawnSeek: 0
+		Cooldown: 600
+		PlasmaCost: 10
+		Sounds: resin-build.ogg
+		AiRange: 0c0
+
+boiler:
+	ActiveAbility@bombardacid:
+		OrderName: AbilityBombardAcid
+		RequiresCondition: bombard-acid
+		Slot: 1
+		Label: Bombard
+		Description: Lob an acid glob at the spot you click, up to 22 cells away.
+		Aim: Target
+		Range: 22c0
+		Launch: true
+		Weapon: TGMCBombardAcid
+		Cooldown: 400
+		PlasmaCost: 20
+		AiRange: 18c0
+		AiMinTargets: 2
+	ActiveAbility@bombardneuro:
+		OrderName: AbilityBombardNeuro
+		RequiresCondition: bombard-neuro
+		Slot: 1
+		Label: Bombard
+		Description: Lob a neurotoxin glob at the spot you click, up to 22 cells away.
+		Aim: Target
+		Range: 22c0
+		Launch: true
+		Weapon: TGMCBombardNeuro
+		Cooldown: 400
+		PlasmaCost: 20
+		AiRange: 18c0
+		AiMinTargets: 2
+	ActiveAbility@acid:
+		OrderName: AbilityGlobAcid
+		Slot: 2
+		Label: Acid
+		Description: Load acid globs.
+		Toggle: true
+		Group: glob
+		StartOn: true
+		Condition: bombard-acid
+		Cooldown: 25
+		Sounds: xeno-hiss-2.ogg
+	ActiveAbility@neuro:
+		OrderName: AbilityGlobNeuro
+		Slot: 3
+		Label: Neuro
+		Description: Load neurotoxin globs: a choking cloud that slows.
+		Toggle: true
+		Group: glob
+		Condition: bombard-neuro
+		Cooldown: 25
+		Sounds: xeno-hiss-2.ogg
+	ActiveAbility@shroud:
+		OrderName: AbilityAcidShroud
+		Slot: 4
+		Label: Shroud
+		Description: Acid Shroud: wrap yourself in acid gas.
+		Aim: Self
+		Weapon: TGMCAcidShroud
+		Cooldown: 900
+		PlasmaCost: 20
+		AiRange: 3c0
+		AiMinTargets: 2
+
+bull:
+	ActiveAbility@plow:
+		OrderName: AbilityPlowCharge
+		Slot: 1
+		Label: Plow
+		Description: Charge 6 cells toward where you click, throwing the marines beside you aside.
+		Aim: Target
+		Range: 6c0
+		ChargeDistance: 6c0
+		ChargeTicks: 12
+		ChargeHitThrow: 2c0
+		Weapon: TGMCPlow
+		Cooldown: 400
+		PlasmaCost: 20
+		Sounds: xeno-charge.ogg
+		AiRange: 6c0
+		AiMinTargets: 2
+	ActiveAbility@headbutt:
+		OrderName: AbilityHeadbuttCharge
+		Slot: 2
+		Label: Headbutt
+		Description: Charge 6 cells and butt the marines beside you, throwing them back.
+		Aim: Target
+		Range: 6c0
+		ChargeDistance: 6c0
+		ChargeTicks: 12
+		Weapon: TGMCCharge
+		Cooldown: 400
+		PlasmaCost: 20
+		Sounds: xeno-charge.ogg
+		AiRange: 6c0
+	ActiveAbility@gore:
+		OrderName: AbilityGoreCharge
+		Slot: 3
+		Label: Gore
+		Description: Charge 6 cells and gore the marines beside you.
+		Aim: Target
+		Range: 6c0
+		ChargeDistance: 6c0
+		ChargeTicks: 12
+		Weapon: TGMCGore
+		Cooldown: 400
+		PlasmaCost: 20
+		Sounds: xeno-charge.ogg
+		AiRange: 6c0
+
+sentinel:
+	ActiveAbility@toxicgrenade:
+		OrderName: AbilityToxicGrenade
+		Slot: 2
+		Label: Toxic
+		Description: Toss a toxic grenade at the spot you click: a cloud that slows and chokes.
+		Aim: Target
+		Range: 6c0
+		Launch: true
+		Weapon: TGMCToxicGrenade
+		Cooldown: 600
+		PlasmaCost: 15
+		AiRange: 6c0
+		AiMinTargets: 2
+
+warrior:
+	ActiveAbility@lunge:
+		OrderName: AbilityWarriorLunge
+		Slot: 3
+		Label: Lunge
+		Description: Lunge 4 cells toward where you click, grabbing at the marines beside you.
+		Aim: Target
+		Range: 4c0
+		ChargeDistance: 4c0
+		ChargeTicks: 8
+		Weapon: TGMCLunge
+		Cooldown: 400
+		PlasmaCost: 20
+		Sounds: tail-swipe.ogg
+		AiRange: 4c0
+	ActiveAbility@agility:
+		OrderName: AbilityAgility
+		Slot: 4
+		Label: Agility
+		Description: Run on all fours: 35% faster, but 20% more damage taken. Press again to stand.
+		Toggle: true
+		Condition: agility
+		Cooldown: 50
+		PlasmaCost: 10
+		Sounds: xeno-hiss-3.ogg
+	SpeedMultiplier@agility:
+		RequiresCondition: agility
+		Modifier: 135
+	DamageMultiplier@agility:
+		RequiresCondition: agility
+		Modifier: 120
+
+spitter:
+	ActiveAbility@acidgrenade:
+		OrderName: AbilityAcidGrenade
+		Slot: 2
+		Label: Grenade
+		Description: Toss an acid grenade at the spot you click: a pool and a cloud of acid.
+		Aim: Target
+		Range: 6c0
+		Launch: true
+		Weapon: TGMCAcidGrenade
+		Cooldown: 600
+		PlasmaCost: 10
+		AiRange: 6c0
+		AiMinTargets: 2
+	ActiveAbility@acidmine:
+		OrderName: AbilityAcidMine
+		Slot: 3
+		Label: Mine
+		Description: Leave a pool of acid on the cell you click.
+		Aim: Target
+		Range: 2c0
+		Spawn: acid-pool
+		Cooldown: 450
+		PlasmaCost: 10
+		AiRange: 0c0
+
+queen:
+	ActiveAbility@heal:
+		OrderName: AbilityQueenHeal
+		Slot: 3
+		Label: Heal
+		Description: Mend the xeno you click.
+		Aim: TargetActor
+		TargetRelationships: Ally
+		Range: 4c0
+		Weapon: TGMCQueenHeal
+		Cooldown: 450
+		PlasmaCost: 10
+		Sounds: heal.ogg
+		AiRange: 6c0
+		AiWoundedPercent: 50
+	ActiveAbility@giveplasma:
+		OrderName: AbilityGivePlasma
+		Slot: 4
+		Label: Plasma
+		Description: Give half a pool of plasma to the xeno you click.
+		Aim: TargetActor
+		TargetRelationships: Ally
+		Range: 4c0
+		Weapon: TGMCGivePlasma
+		Cooldown: 450
+		PlasmaCost: 10
+		AiRange: 0c0
+	ActiveAbility@healscreech:
+		OrderName: AbilityHealScreech
+		Slot: 5
+		Label: Heal scr.
+		Description: Healing Screech: every xeno within 7 cells mends for 10 s.
+		Aim: Self
+		Weapon: TGMCScreechFx
+		Cooldown: 1200
+		PlasmaCost: 20
+		AuraRange: 7c0
+		AuraCondition: screech-heal
+		AuraDuration: 250
+		Ring: 40FF60
+		AiRange: 7c0
+		AiWoundedPercent: 50
+	ActiveAbility@frenzyscreech:
+		OrderName: AbilityFrenzyScreech
+		Slot: 6
+		Label: Frenzy
+		Description: Frenzy Screech: every xeno within 7 cells hits 20% harder for 10 s.
+		Aim: Self
+		Weapon: TGMCScreechFx
+		Cooldown: 1200
+		PlasmaCost: 20
+		AuraRange: 7c0
+		AuraCondition: screech-frenzy
+		AuraDuration: 250
+		Ring: FF4020
+		AiRange: 7c0
+		AiMinTargets: 4
+
+facehugger:
+	ActiveAbility@leap:
+		OrderName: AbilityLeap
+		Slot: 1
+		Label: Leap
+		Description: Leap 4 cells toward where you click, latching on to a marine beside you.
+		Aim: Target
+		Range: 4c0
+		ChargeDistance: 4c0
+		ChargeTicks: 8
+		ChargeHeight: 512
+		Weapon: TGMCHug
+		Cooldown: 300
+		Sounds: xeno-pounce-1.ogg
+		AiRange: 4c0
+
+# SOM. Most SOM units are their marine counterpart (Inherits) and so carry its kit; these are the ones that are not, or differ.
+
+som_trooper:
+	ActiveAbility@frag:
+		OrderName: AbilityFrag
+		Slot: 1
+		Label: Frag
+		Description: Throw a frag grenade where you click.
+		Aim: Target
+		Range: 6c0
+		Launch: true
+		Weapon: TGMCGrenade
+		Cooldown: 500
+		Sounds: marine-m-grenadethrow-1.ogg, marine-m-grenadethrow-2.ogg
+		AiRange: 6c0
+		AiMinTargets: 2
+
+^Sprint:
+	ActiveAbility@sprint:
+		OrderName: AbilitySprint
+		Slot: 1
+		Label: Sprint
+		Description: Run 40% faster for 4 s.
+		Aim: Self
+		Condition: sprint
+		Duration: 100
+		Cooldown: 600
+		AiRange: 5c0
+	SpeedMultiplier@sprint:
+		RequiresCondition: sprint
+		Modifier: 140
+
+som_veteran:
+	Inherits@sprint: ^Sprint
+
+som_assault:
+	Inherits@sprint: ^Sprint
+	ActiveAbility@frag:
+		OrderName: AbilityFrag
+		Slot: 2
+		Label: Frag
+		Description: Throw a frag grenade where you click.
+		Aim: Target
+		Range: 6c0
+		Launch: true
+		Weapon: TGMCGrenade
+		Cooldown: 500
+		AiRange: 6c0
+		AiMinTargets: 2
+
+# The SOM scout: a sniper with a cloak.
+som_scout:
+	ActiveAbility@cloak:
+		OrderName: AbilityScoutCloak
+		Slot: 2
+		Label: Cloak
+		Description: Turn nearly invisible until you fire or switch it off.
+		Toggle: true
+		Condition: scout-cloak
+		Cooldown: 250
+		Sounds: scout-cloak-on.ogg
+	Cloak@ability:
+		RequiresCondition: scout-cloak
+		InitialDelay: 0
+		CloakDelay: 50
+		UncloakOn: Attack
+		CloakSound: scout-cloak-on.ogg
+		UncloakSound: scout-cloak-off.ogg
+		CloakedAlpha: 0.25
+
+# SOM rockets: HEAT, thermobaric and radiation instead of the SADAR's AP, white phosphorus and smoke.
+som_rocketeer:
+	Armament@AP:
+		Weapon: TGMCSomThermobaric
+	Armament@WP:
+		Weapon: TGMCSomRadiation
+	-Armament@SMOKE:
+	-ActiveAbility@smoke:
+	ActiveAbility@ap:
+		Label: Thermo
+		Description: Load thermobaric rockets: a wide, burning blast.
+	ActiveAbility@wp:
+		Label: Rad
+		Description: Load radiation rockets: a sickening cloud that slows and hurts.

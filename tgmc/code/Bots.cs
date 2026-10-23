@@ -563,9 +563,48 @@ namespace OpenRA.Mods.TGMC.Traits
 				else
 					count = near.Count(a => player.RelationshipWith(a.Owner) == PlayerRelationship.Enemy && a.Info.HasTraitInfo<MobileInfo>() && a.CanBeViewedByPlayer(player));
 
-				if (count >= ability.Info.AiMinTargets)
+				// Shell types and other switches are the player's choice: the AI leaves them as they start.
+				if (ability.Info.Toggle || count < ability.Info.AiMinTargets)
+					continue;
+
+				if (!ability.IsAimed)
+				{
 					bot.QueueOrder(new Order(ability.Info.OrderName, unit, false));
+					continue;
+				}
+
+				var target = AimFor(unit, ability, near);
+				if (target.Type != TargetType.Invalid)
+					bot.QueueOrder(new Order(ability.Info.OrderName, unit, target, false));
 			}
+		}
+
+		// Where an aimed ability goes: a heal on the most hurt ally, a unit-aimed attack on the nearest enemy, a spot-aimed one
+		// on the enemy with the most other enemies around it.
+		Target AimFor(Actor unit, ActiveAbility ability, List<Actor> near)
+		{
+			if (ability.Info.AiWoundedPercent > 0)
+			{
+				var hurt = near.Append(unit)
+					.Where(a => ability.Info.TargetRelationships.HasRelationship(player.RelationshipWith(a.Owner)) && a.TraitOrDefault<IHealth>() != null)
+					.MinByOrDefault(a => a.Trait<IHealth>().HP * 100 / a.Trait<IHealth>().MaxHP);
+				return hurt != null ? Target.FromActor(hurt) : Target.Invalid;
+			}
+
+			var enemies = near.Where(a => player.RelationshipWith(a.Owner) == PlayerRelationship.Enemy && a.Info.HasTraitInfo<MobileInfo>() && a.CanBeViewedByPlayer(player)).ToList();
+			if (enemies.Count == 0)
+				return Target.Invalid;
+
+			if (ability.Info.Aim == AbilityAim.TargetActor)
+				return Target.FromActor(enemies.MinBy(a => (a.CenterPosition - unit.CenterPosition).LengthSquared));
+
+			// Blasts hurt friends too: skip a spot with one of our own units close to it, the thrower included.
+			var two = new WDist(2048).LengthSquared;
+			var own = world.FindActorsInCircle(unit.CenterPosition, ability.Info.AiRange + new WDist(2048))
+				.Where(a => a.Owner == player && a.Info.HasTraitInfo<MobileInfo>()).ToList();
+			var densest = enemies.Where(e => !own.Any(o => (o.CenterPosition - e.CenterPosition).LengthSquared <= two))
+				.MaxByOrDefault(a => enemies.Count(b => (b.CenterPosition - a.CenterPosition).LengthSquared <= two));
+			return densest != null ? Target.FromCell(world, densest.Location) : Target.Invalid;
 		}
 	}
 

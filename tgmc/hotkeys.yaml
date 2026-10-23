@@ -54,6 +54,36 @@ TgmcAbility2: T
 	Types: World
 	Contexts: player
 
+TgmcAbility3: E
+	Description: hotkey-description-tgmcability3
+	Types: World
+	Contexts: player
+
+TgmcAbility4: G
+	Description: hotkey-description-tgmcability4
+	Types: World
+	Contexts: player
+
+TgmcAbility5: X
+	Description: hotkey-description-tgmcability5
+	Types: World
+	Contexts: player
+
+TgmcAbility6: J
+	Description: hotkey-description-tgmcability6
+	Types: World
+	Contexts: player
+
+TgmcAbility7: K
+	Description: hotkey-description-tgmcability7
+	Types: World
+	Contexts: player
+
+TgmcAbility8: L
+	Description: hotkey-description-tgmcability8
+	Types: World
+	Contexts: player
+
 TgmcSelectIdle: I
 	Description: hotkey-description-tgmcselectidle
 	Types: World

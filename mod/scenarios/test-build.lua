@@ -15,6 +15,8 @@ end
 WorldLoaded = function()
 	local marines = Player.GetPlayer("Marines")
 	local xenos = Player.GetPlayer("Xenos")
+	-- The engineer's shotgun would shoot the Weed Node this test counts the income of.
+	marines.GetActorsByType("engineer")[1].Stance = "HoldFire"
 
 	Trigger.AfterDelay(10, function()
 		if marines.HasPrerequisites({ "armory" }) or marines.HasPrerequisites({ "ordnance-depot" }) then

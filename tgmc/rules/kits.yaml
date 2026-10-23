@@ -733,7 +733,7 @@ runner:
 		ChargeTicks: 10
 		ChargeHeight: 512
 		Weapon: TGMCPounce
-		Cooldown: 300
+		Cooldown: 450
 		PlasmaCost: 10
 		Sounds: xeno-pounce-1.ogg, xeno-pounce-2.ogg
 		AiRange: 5c0
@@ -746,7 +746,7 @@ runner:
 		Range: 7c0
 		Launch: true
 		Weapon: TGMCAcidMissile
-		Cooldown: 600
+		Cooldown: 750
 		PlasmaCost: 50
 		Sounds: acid-spit-1.ogg, acid-spit-2.ogg
 		AiRange: 7c0

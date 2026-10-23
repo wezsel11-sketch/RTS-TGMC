@@ -1278,8 +1278,11 @@ SCENARIOS = {
     # The marine AI calls a drop pod by itself (see scenarios/test-ai-pod.lua): squads removed, units hold fire, the pod ready at once.
     "scenario-ai-pod": {"scripts": ("test-ai-pod",), "marine_bot": "skirmish", "drop_conquest": True, "size": (48, 32),
                         "extra_rules": "Player:\n\t-SquadManagerBotModule@marines-easy:\n\t-SquadManagerBotModule@marines-normal:\n\t-SquadManagerBotModule@marines-hard:\n^Infantry:\n\tAutoTarget:\n\t\tInitialStance: HoldFire\ncryo-pod:\n\tDropPodPower@droppod:\n\t\tChargeInterval: 60\n", "actors": [
-        ("cryo-pod", "Marines", 6, 6, 0), ("rifleman", "Marines", 17, 22, 512),
-        ("hunter", "Xenos", 22, 22, 0), ("hunter", "Xenos", 23, 23, 0), ("hunter", "Xenos", 22, 24, 0), ("resin-silo", "Xenos", 44, 28, 0),
+        # The rifleman watches the hunters from 7 cells: close enough to see them, outside the 6 cells in which the AI's pod
+        # counts its own infantry against the spot.
+        ("cryo-pod", "Marines", 6, 6, 0), ("rifleman", "Marines", 15, 22, 512),
+        ("hunter", "Xenos", 22, 22, 0), ("hunter", "Xenos", 23, 23, 0), ("hunter", "Xenos", 22, 24, 0), ("hunter", "Xenos", 23, 22, 0),
+        ("hunter", "Xenos", 21, 23, 0), ("resin-silo", "Xenos", 44, 28, 0),
     ]},
     # Plasma pays for abilities (see scenarios/test-plasma.lua): a ravager that starts nearly empty.
     "scenario-plasma": {"scripts": ("test-plasma",), "size": (32, 24), "drop_conquest": True, "extra_rules": "ravager:\n\tPlasma:\n\t\tStartPercent: 10\n", "actors": [

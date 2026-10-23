@@ -53,6 +53,9 @@ Player:
 			som_mech: 6
 			medic: 15
 			engineer: 15
+			# The leaders' yelled orders buff the squad around them (tgmc/rules/kits.yaml).
+			squad_leader: 8
+			field_commander: 4
 			synth: 8
 			smartgunner: 25
 			grenadier: 20

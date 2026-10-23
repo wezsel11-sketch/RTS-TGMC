@@ -146,6 +146,16 @@ def load(tgmc, spec):
     return rows, cell(spec["marines"]), cell(spec["xenos"])
 
 
+# Window spawners become the loot TGMC most often picks (see misc_structure.dm); longest prefix first so /colonyspawn wins over its parent.
+WINDOW_SPAWNERS = (
+    ("/obj/effect/spawner/random/misc/structure/broken_reinforced_window/colonyspawn", "/obj/structure/window/framed/colony/reinforced"),
+    ("/obj/effect/spawner/random/misc/structure/broken_reinforced_window", "/obj/structure/window_frame/colony/reinforced/weakened"),
+    ("/obj/effect/spawner/random/misc/structure/broken_window/colonyspawn", "/obj/structure/window/framed/colony"),
+    ("/obj/effect/spawner/random/misc/structure/broken_window", "/obj/structure/window_frame/colony"),
+    ("/obj/effect/spawner/random/misc/structure/broken_prison_window", "/obj/structure/window/framed/prison"),
+)
+
+
 def parse_objects(path):
     """Every object on the first z level of a .dmm: (width, height, cells) where cells[x][y] is a list of (object path, {var: value}) for the
     /obj/ and /mob/ atoms of the cell, in the map's order (bottom first). Values are the raw DM text (`"name"` keeps its quotes)."""
@@ -165,7 +175,12 @@ def parse_objects(path):
                     if "=" in item:
                         k, v = item.split("=", 1)
                         vars_[k.strip()] = v.strip().rstrip(",")
-            entries.append((e.group(1), vars_))
+            p = e.group(1)
+            for spawner, window in WINDOW_SPAWNERS:
+                if p.startswith(spawner):
+                    p, vars_ = window, {}
+                    break
+            entries.append((p, vars_))
         defs[m.group(1)] = entries
     width, height, columns = 0, 0, {}
     block = None

@@ -37,7 +37,7 @@ def paths():
     # A trailing slash is a whole directory.
     found.update(['icons/turf/', 'code/game/turfs/', 'icons/misc/beach.dmi'])
     # The objects on the maps (tgmc_objects.py): the DM code that names their pictures, and the picture sheets.
-    found.update(['icons/obj/', 'icons/effects/', 'icons/Xeno/'])
+    found.update(['icons/obj/', 'icons/effects/', 'icons/Xeno/', 'icons/mecha/', 'icons/mob/robots.dmi'])
     found.update(d + "/" for d in tgmc_objects.OBJECT_DIRS)
     # The room templates that fill TGMC's modular map slots (see tgmc_modular.py), and the code that lists them.
     found.update(['code/modules/mapping/modular_mapping.dm', 'code/game/objects/effects/spawners/modularmappingspawner.dm', '_maps/modularmaps/big_red/', '_maps/modularmaps/lv624/', '_maps/modularmaps/fiorina/', '_maps/modularmaps/corsatdome/', '_maps/modularmaps/prison/', '_maps/modularmaps/EORG/', '_maps/modularmaps/jungle_outpost/', '_maps/modularmaps/oscaroutpost/'])

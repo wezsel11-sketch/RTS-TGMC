@@ -138,6 +138,13 @@ def cell_tile(grid, x, y, states):
             return icon, guess
     if not icon or not state:
         return None
+    m = re.match(r"^(snow_\d)_\d+$", state)
+    if m:
+        # Snow picks one of its eight variants when the turf is created (snow.dm Initialize); spread them by cell.
+        names = states(icon)
+        variants = [f"{m.group(1)}_{n}" for n in range(1, 9) if f"{m.group(1)}_{n}" in names]
+        if variants:
+            return icon, variants[(x * 7 + y * 13) % len(variants)]
     if "SMOOTH_BITMASK" in r.get("smoothing_flags", ""):
         base = _string(r.get("base_icon_state")) or re.sub(r"-\d+$|-icon$", "", state)
         if solid(turf):

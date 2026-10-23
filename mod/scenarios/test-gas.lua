@@ -1,4 +1,4 @@
--- Scenario test: the defiler's canister leaves a gas cloud that hurts and slows the marine standing in it.
+-- Scenario test: the defiler emits gas as he walks up to a marine; the clouds hurt the marine standing in them.
 -- Prints "TEST gas PASS" or "TEST gas FAIL".
 WorldLoaded = function()
 	local marines = Player.GetPlayer("Marines")
@@ -6,7 +6,9 @@ WorldLoaded = function()
 	local target = marines.GetActorsByType("rifleman")[1]
 	local h0 = target.Health
 	local clouds = 0
-	xenos.GetActorsByType("defiler")[1].Attack(target, true, true)
+	local defiler = xenos.GetActorsByType("defiler")[1]
+	defiler.UseAbility(1)
+	defiler.Move(CPos.New(target.Location.X - 1, target.Location.Y))
 
 	local function poll(ticks)
 		clouds = math.max(clouds, #xenos.GetActorsByType("gas-cloud"))

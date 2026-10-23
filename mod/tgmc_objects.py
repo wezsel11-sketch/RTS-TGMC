@@ -17,8 +17,25 @@ SKIP = ("/obj/effect/landmark", "/obj/effect/ai_node", "/obj/effect/spawner", "/
         "/obj/structure/disposalpipe", "/obj/machinery/miner", "/obj/effect/step_trigger", "/obj/effect/forcefield",
         "/mob/", "/obj/effect/alien", "/obj/structure/xeno", "/obj/effect/temp", "/obj/machinery/camera", "/obj/machinery/power/apc",
         "/obj/effect/abstract",
-        # The poddoors that wall in the landing zone (TGMC opens them on a timer); the RTS has no use for them.
-        "/obj/machinery/door/poddoor/timed_late/containment/landing_zone")
+        # The poddoors that wall in the landing zone (TGMC opens them on a timer) and their buttons; the RTS has no use for them.
+        "/obj/machinery/door/poddoor/timed_late/containment/landing_zone", "/obj/machinery/button/door/open_only/landing_zone")
+
+FALLBACK = (
+    ("/obj/item/shard/shrapnel", ("icons/obj/items/shards.dmi", "shrapnelmedium")),
+    ("/obj/item/shard", ("icons/obj/items/shards.dmi", "medium")),
+    ("/obj/machinery/iv_drip", ("icons/obj/iv_drip.dmi", "hooked")),
+    ("/obj/effect/turf_decal/medical_decals/triage", ("icons/effects/medical_decals.dmi", "triagedecal")),
+    ("/obj/structure/shuttle/engine/propulsion/burst/left", ("icons/turf/shuttle.dmi", "burst_l")),
+    ("/obj/structure/shuttle/engine/propulsion/burst/right", ("icons/turf/shuttle.dmi", "burst_r")),
+    ("/obj/structure/shuttle/engine/propulsion", ("icons/turf/shuttle.dmi", "propulsion")),
+    ("/obj/structure/shuttle/engine/heater", ("icons/obj/factory/factory_machines.dmi", "heater")),
+    ("/obj/item/clothing/mask/facehugger/dead", ("icons/Xeno/Effects.dmi", "facehugger_dead")),
+    ("/obj/item/mmi", ("icons/obj/items/assemblies.dmi", "mmi_full")),
+    ("/obj/item/evidencebag", ("icons/obj/items/storage/misc.dmi", "evidence")),
+    ("/obj/item/assembly/igniter", ("icons/obj/assemblies/new_assemblies.dmi", "igniter")),
+    ("/obj/item/instrument/guitar", ("icons/obj/musician.dmi", "guitar")),
+    ("/obj/structure/musician/piano", ("icons/obj/musician.dmi", "piano")),
+)
 
 DIR_INDEX = {2: 0, 1: 1, 4: 2, 8: 3}  # BYOND SOUTH, NORTH, EAST, WEST -> the order tgmc_dmi.DIRS4 uses (S, N, E, W)
 
@@ -96,6 +113,12 @@ def layers(path, vars_, states, near):
     icon = _first_string(vars_.get("icon")) or _first_string(r.get("icon"))
     state = _first_string(vars_.get("icon_state")) or _first_string(r.get("icon_state"))
     if not icon or not state:
+        # TGMC sets these in code (an empty icon_state, or one chosen at runtime): a picture of the usual look.
+        for prefix, pic in FALLBACK:
+            if path.startswith(prefix):
+                icon, state = pic
+                break
+    if not icon or not state:
         return []
     names = states(icon)
     if icon.endswith("decals_arrow.dmi") and state not in names:
@@ -164,6 +187,8 @@ DESTROYABLE = (
 
 def destroyable(path):
     """(hit points, blocks, cover) for an object that can be destroyed, or None."""
+    if path.startswith("/obj/structure/window_frame"):
+        return None  # an empty frame (a broken window): passable and no cover, only its picture
     for prefix, hp, blocks, cover in DESTROYABLE:
         if path.startswith(prefix):
             return hp, blocks, cover

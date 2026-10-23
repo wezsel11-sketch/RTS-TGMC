@@ -119,7 +119,7 @@ def prepare(tgmc, out, names):
             for x in range(x0, x1):
                 turf = grid[x][y]
                 kind = tgmc_dmm.terrain(turf)
-                if turf.startswith("/turf/open/space"):
+                if turf.startswith(("/turf/open/space", "/turf/template_noop")):
                     key = "void"
                 else:
                     key = tgmc_turfs.cell_tile(grid, x, y, states)

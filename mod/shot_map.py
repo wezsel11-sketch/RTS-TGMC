@@ -19,7 +19,8 @@ def main(name, x, y):
     shutil.rmtree(dst, ignore_errors=True)
     shutil.copytree(src, dst)
     with open(os.path.join(dst, "shotcam.lua"), "w", encoding="utf-8", newline="\n") as f:
-        f.write(f"WorldLoaded = function()\n\tCamera.Position = Map.CenterOfCell(CPos.New({x}, {y}))\nend\n")
+        # The game overrides a camera set once at load, so the position is set again every few ticks.
+        f.write(f"look = function()\n\tCamera.Position = Map.CenterOfCell(CPos.New({x}, {y}))\n\tTrigger.AfterDelay(3, look)\nend\nWorldLoaded = function()\n\tlook()\nend\n")
     # A map with its own rules (a faction start, scripts) keeps them: the shot rules are appended to them.
     old_rules = ""
     if os.path.exists(os.path.join(dst, "rules.yaml")):

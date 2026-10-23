@@ -298,8 +298,12 @@ namespace OpenRA.Mods.TGMC.Traits
 			var owner = self.Owner;
 			foreach (var type in Info.Spawn)
 			{
-				var mobile = world.Map.Rules.Actors[type].TraitInfoOrDefault<MobileInfo>();
-				var cell = cells.FirstOrDefault(c => c != self.Location && !used.Contains(c) && (mobile == null || mobile.CanEnterCell(world, null, c)));
+				var actorInfo = world.Map.Rules.Actors[type];
+				var mobile = actorInfo.TraitInfoOrDefault<MobileInfo>();
+				var building = actorInfo.TraitInfoOrDefault<BuildingInfo>();
+				// A structure (an egg) goes where it could be placed, ignoring the build area; a unit where it can stand.
+				var cell = cells.FirstOrDefault(c => c != self.Location && !used.Contains(c) && world.Map.Contains(c)
+					&& (mobile != null ? mobile.CanEnterCell(world, null, c) : building == null || world.CanPlaceBuilding(c, actorInfo, building, null)));
 				if (cell == default)
 					continue;
 

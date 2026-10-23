@@ -77,7 +77,8 @@ Player:
 			ravager: 10
 			defiler: 8
 			boiler: 10
-			carrier: 10
+			carrier: 20
+			facehugger: 20
 			warlock: 8
 			shrike: 8
 			widow: 8
@@ -88,6 +89,7 @@ Player:
 		UnitLimits:
 			queen: 1
 			drone: 4
+			facehugger: 6
 	# The stock unit builder queues one unit at a time; this fills the other production slots from the same list (see ParallelBuildBotModule in Bots.cs).
 	# Marine bot: while ore fields lie unclaimed it builds a couple of engineers to claim them, for the miners' income (see FieldWorkerBotModule in Bots.cs).
 	FieldWorkerBotModule@marines:
@@ -138,6 +140,7 @@ Player:
 			artillery-emplacement: 6
 			forward-hive: 10
 			resin-trap: 12
+			egg: 10
 			cade: 25
 		BuildingLimits:
 			miner: 6
@@ -157,6 +160,7 @@ Player:
 			artillery-emplacement: 1
 			forward-hive: 3
 			resin-trap: 6
+			egg: 6
 			cade: 10
 		BuildingDelays:
 			armory: 1500
@@ -614,7 +618,7 @@ Player:
 		Counters:
 			infantry:
 				Enemies: rifleman, smartgunner, medic, engineer, blademan, flamer
-				Units: runner, hunter, warrior, ravager
+				Units: runner, hunter, warrior, ravager, facehugger
 				Bonus: 150
 			heavy:
 				Enemies: mech, heavygunner, demolitionist, rocketeer, grenadier

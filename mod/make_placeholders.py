@@ -824,6 +824,10 @@ SCENARIOS = {
         ("resin-silo", "Xenos", 19, 19, 0),
     ]},
     # Explosives, heavy marines and the pounce (see scenarios/test-explosive.lua, test-heavy.lua, test-pounce.lua).
+    # A carrier lays a hugger egg off the weeds with its Lay Egg ability (see scenarios/test-egg-lay.lua).
+    "scenario-egg-lay": {"scripts": ("test-egg-lay",), "drop_conquest": True, "size": (32, 24), "actors": [
+        ("carrier", "Xenos", 10, 10, 0), ("rifleman", "Marines", 14, 10, 512), ("cryo-pod", "Marines", 4, 18, 0), ("resin-silo", "Xenos", 28, 20, 0),
+    ]},
     "scenario-egg": {"scripts": ("test-egg",), "actors": [
         ("egg", "Xenos", 10, 10, 0),
         ("rifleman", "Marines", 12, 10, 512),

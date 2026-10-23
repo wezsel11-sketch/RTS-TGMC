@@ -61,7 +61,9 @@ namespace OpenRA.Mods.TGMC.Warheads
 				return;
 			}
 
-			foreach (var victim in firedBy.World.FindActorsInCircle(target.CenterPosition, Spread).ToList())
+			// An earlier warhead of the same weapon can kill the target actor, which leaves the target invalid: use the impact point.
+			var at = target.Type == TargetType.Invalid ? args.ImpactPosition : target.CenterPosition;
+			foreach (var victim in firedBy.World.FindActorsInCircle(at, Spread).ToList())
 				Hit(victim, firedBy, from);
 		}
 

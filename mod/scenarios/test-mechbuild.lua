@@ -1,10 +1,11 @@
--- Scenario test: the workshop builds a mech from the production queue and the mech leaves the workshop. Prints "TEST mechbuild PASS" or "TEST mechbuild FAIL".
+-- Scenario test: the workshop builds a mech and the mech leaves the workshop. Prints "TEST mechbuild PASS" or "TEST mechbuild FAIL".
 WorldLoaded = function()
 	local marines = Player.GetPlayer("Marines")
 	marines.Cash = 5000
 	local workshop = marines.GetActorsByType("workshop")[1]
 	Trigger.AfterDelay(10, function()
-		marines.Build({ "mech" }, function() end)
+		-- Lua's Player.Build only drives stock ClassicProductionQueues, not the mod's MultiProductionQueue, so the workshop makes it directly.
+		workshop.Produce("mech")
 	end)
 	Trigger.AfterDelay(1800, function()
 		local mechs = #marines.GetActorsByType("mech")

@@ -381,6 +381,8 @@ engineer:
 	AutoTargetPriority@GUN:
 		ValidTargets: Ground
 		Priority: 0
+		# Only enemies: a dormant ore field is Ground too, and the repair tool would claim it.
+		ValidRelationships: Enemy
 	Health:
 		HP: 110
 	Armament@PRIMARY:
@@ -395,6 +397,7 @@ engineer:
 		ScanRadius: 5
 	AutoTargetPriority@DEFAULT:
 		ValidTargets: Structure
+		ValidRelationships: Ally
 	Production:
 		Produces: MarineBuild, MarineDefense
 	GivesBuildableArea:
@@ -448,9 +451,12 @@ synth:
 		Priority: 10
 	AutoTargetPriority@REPAIR:
 		ValidTargets: Structure
+		ValidRelationships: Ally
 	AutoTargetPriority@MELEE:
 		ValidTargets: Ground
 		Priority: 0
+		# Only enemies: a dormant ore field is Ground too, and the repair tool would claim it.
+		ValidRelationships: Enemy
 	Production:
 		Produces: MarineBuild, MarineDefense
 	GivesBuildableArea:
@@ -1721,6 +1727,18 @@ queen:
 		AiRange: 8c0
 		AiMinTargets: 3
 		Sounds: xeno-roar-1.ogg
+	# Command card ability: lay a hugger egg on a free cell beside her, anywhere, even off the weeds. Two at a time, another every 36 seconds.
+	ActiveAbility@egg:
+		OrderName: AbilityEgg
+		Slot: 2
+		Label: Lay Egg
+		Cooldown: 100
+		Charges: 2
+		ChargeRegen: 900
+		Spawn: egg
+		SpawnSeek: 0
+		AiRange: 7c0
+		Sounds: egg-burst.ogg
 	Voiced:
 		VoiceSet: QueenVoice
 	Health:
@@ -2054,6 +2072,18 @@ carrier:
 		SpawnSeek: 9c0
 		AiRange: 8c0
 		Sounds: chestburst-2.ogg
+	# Command card ability: lay a hugger egg on a free cell beside it, anywhere, even off the weeds. Two at a time, another every 36 seconds.
+	ActiveAbility@egg:
+		OrderName: AbilityEgg
+		Slot: 2
+		Label: Lay Egg
+		Cooldown: 100
+		Charges: 2
+		ChargeRegen: 900
+		Spawn: egg
+		SpawnSeek: 0
+		AiRange: 7c0
+		Sounds: egg-burst.ogg
 	Evolves:
 		Next: warlock
 	Voiced:

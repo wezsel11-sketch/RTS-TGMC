@@ -35,6 +35,26 @@ FALLBACK = (
     ("/obj/item/assembly/igniter", ("icons/obj/assemblies/new_assemblies.dmi", "igniter")),
     ("/obj/item/instrument/guitar", ("icons/obj/musician.dmi", "guitar")),
     ("/obj/structure/musician/piano", ("icons/obj/musician.dmi", "piano")),
+    ("/obj/item/ammo_magazine/rifle/mpi_km/plum", ("icons/obj/items/ammo/rifle.dmi", "ak_40_plum")),
+    ("/obj/item/ammo_magazine/rifle/mpi_km", ("icons/obj/items/ammo/rifle.dmi", "ak_40")),
+    ("/obj/item/ammo_magazine/rifle/tx11", ("icons/obj/items/ammo/rifle.dmi", "tx11")),
+    ("/obj/item/ammo_magazine/rifle/m16", ("icons/obj/items/ammo/rifle.dmi", "m16")),
+    ("/obj/item/alien_embryo", ("icons/Xeno/castes/larva.dmi", "Embryo")),
+    ("/obj/item/reagent_containers/glass/rag", ("icons/obj/janitor.dmi", "rag")),
+    ("/obj/item/assembly/signaler", ("icons/obj/assemblies/new_assemblies.dmi", "signaller")),
+    ("/obj/item/assembly/voice", ("icons/obj/assemblies/new_assemblies.dmi", "voice")),
+    ("/obj/item/assembly/infra", ("icons/obj/assemblies/new_assemblies.dmi", "infrared")),
+    ("/obj/item/assembly/timer", ("icons/obj/assemblies/new_assemblies.dmi", "timer")),
+    ("/obj/item/assembly/prox_sensor", ("icons/obj/assemblies/new_assemblies.dmi", "prox")),
+    ("/obj/item/limb/head", ("icons/mob/human_races/r_human.dmi", "head_m")),
+    ("/obj/item/limb/r_hand", ("icons/mob/human_races/r_human.dmi", "r_hand")),
+    ("/obj/item/limb/l_hand", ("icons/mob/human_races/r_human.dmi", "l_hand")),
+    ("/obj/item/limb/r_foot", ("icons/mob/human_races/r_human.dmi", "r_foot")),
+    ("/obj/item/limb/l_foot", ("icons/mob/human_races/r_human.dmi", "l_foot")),
+    ("/obj/item/limb/r_leg", ("icons/mob/human_races/r_human.dmi", "r_leg")),
+    ("/obj/item/limb/l_leg", ("icons/mob/human_races/r_human.dmi", "l_leg")),
+    ("/obj/item/limb/r_arm", ("icons/mob/human_races/r_human.dmi", "r_arm")),
+    ("/obj/item/limb/l_arm", ("icons/mob/human_races/r_human.dmi", "l_arm")),
 )
 
 DIR_INDEX = {2: 0, 1: 1, 4: 2, 8: 3}  # BYOND SOUTH, NORTH, EAST, WEST -> the order tgmc_dmi.DIRS4 uses (S, N, E, W)
@@ -112,8 +132,8 @@ def layers(path, vars_, states, near):
     r = resolve(path)
     icon = _first_string(vars_.get("icon")) or _first_string(r.get("icon"))
     state = _first_string(vars_.get("icon_state")) or _first_string(r.get("icon_state"))
-    if not icon or not state:
-        # TGMC sets these in code (an empty icon_state, or one chosen at runtime): a picture of the usual look.
+    if not icon or not state or state not in states(icon):
+        # TGMC sets these in code (an empty icon_state, or one chosen at runtime), or the state lives on another sheet: a picture of the usual look.
         for prefix, pic in FALLBACK:
             if path.startswith(prefix):
                 icon, state = pic

@@ -4,7 +4,7 @@ local reported = false
 
 WorldLoaded = function()
 	local xenos = Player.GetPlayer("Xenos")
-	local army = { "runner", "hunter", "sentinel" }
+	local army = { "runner", "hunter", "sentinel", "facehugger" }
 
 	local function poll(ticks)
 		if reported then

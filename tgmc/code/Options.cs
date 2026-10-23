@@ -30,8 +30,22 @@ namespace OpenRA.Mods.TGMC
 
 		public static bool Enabled(World world, string id, bool defaultValue)
 		{
+			// The map's own default (TgmcOptions in its rules) wins over the caller's, so a scenario launched without a lobby
+			// screen, whose settings never got the option, still gets what its map asks for.
+			var info = world.Map.Rules.Actors[SystemActors.World].TraitInfoOrDefault<Traits.TgmcOptionsInfo>();
+			if (info != null)
+				defaultValue = id switch
+				{
+					FriendlyFire => info.FriendlyFireDefault,
+					Infestation => info.InfestationDefault,
+					Maturity => info.MaturityDefault,
+					TileStep => info.TileStepDefault,
+					FloatingText => info.FloatingTextDefault,
+					_ => defaultValue
+				};
+
 			// Scenario and editor worlds have no lobby; use the default there.
-			return world.LobbyInfo == null || world.LobbyInfo.GlobalSettings.OptionOrDefault(id, defaultValue);
+			return world.LobbyInfo == null ? defaultValue : world.LobbyInfo.GlobalSettings.OptionOrDefault(id, defaultValue);
 		}
 	}
 }

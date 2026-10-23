@@ -86,6 +86,9 @@ def prepare(tgmc, out, names):
     def states(icon):
         if icon not in sheets:
             path = os.path.join(tgmc, icon)
+            if not os.path.exists(path) and os.path.isdir(os.path.dirname(path)):
+                # BYOND paths ignore case: 'Doorresearch.dmi' in code is doorresearch.dmi on disk.
+                path = next((os.path.join(os.path.dirname(path), f) for f in os.listdir(os.path.dirname(path)) if f.lower() == os.path.basename(path).lower()), path)
             sheets[icon] = tgmc_dmi.Dmi(path) if os.path.exists(path) else None
         return {s["name"] for s in sheets[icon].states} if sheets[icon] else set()
 

@@ -260,6 +260,7 @@ SOUNDS = {
     "scout-cloak-off": (f"{EF}/cloak_scout_off.ogg", "fx"),
     "overboost": ("sound/mecha/overboost_chargeup.ogg", "fx"),
     "overload-start": ("sound/mecha/overload_start.ogg", "fx"),
+    "mech-step": ("sound/mecha/mechstep.ogg", "fx", 1.0),
     "hypospray": ("sound/items/hypospray.ogg", "fx"),
     "bang": (f"{EF}/bang.ogg", "fx"),
     "lightning-charge": ("sound/magic/lightning_chargeup.ogg", "fx", 2.0),

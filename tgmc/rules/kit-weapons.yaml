@@ -247,7 +247,7 @@ TGMCAcidMissile:
 	Warhead@3Pool: SpawnActor
 		Actor: acid-pool
 
-# Hunter's Silence: a psychic hush on a spot; marines there fight slower for a few seconds.
+# Hunter's Silence: a psychic hush on a spot; marines there cannot use abilities and fire slower for a few seconds.
 TGMCSilence:
 	Range: 8c0
 	Projectile: InstantHit

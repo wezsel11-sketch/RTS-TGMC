@@ -1,6 +1,8 @@
 -- Scenario test: the Skirmish AI on the xeno side builds a mix of castes, not runners alone. It polls and passes once the xeno army
 -- holds at least three different castes. Prints "TEST ai-mix PASS" or "TEST ai-mix FAIL".
 local reported = false
+-- The widest mix seen so far: a match can end with the xenos wiped out.
+local best = {}
 local castes = { "runner", "hunter", "sentinel", "warrior", "queen", "spitter", "praetorian", "crusher", "ravager", "boiler", "drone" }
 
 WorldLoaded = function()
@@ -22,6 +24,9 @@ WorldLoaded = function()
 			return
 		end
 		local list = kinds()
+		if #list > #best then
+			best = list
+		end
 		if ticks % 500 == 0 then
 			print("STAT tick " .. ticks .. " castes " .. table.concat(list, ",") .. " cash " .. xenos.Cash)
 		end
@@ -36,4 +41,15 @@ WorldLoaded = function()
 		end
 	end
 	Trigger.AfterDelay(100, function() poll(100) end)
+
+	-- A match that ends (one side wiped out) pauses the world: judge the mix then, or the test would wait for ticks that never come.
+	local function onEnd()
+		if reported then
+			return
+		end
+		reported = true
+		print("TEST ai-mix " .. (#best >= 3 and "PASS" or "FAIL") .. " (match ended at tick " .. DateTime.GameTime .. ", castes " .. table.concat(best, ",") .. ")")
+	end
+	Trigger.OnPlayerLost(xenos, onEnd)
+	Trigger.OnPlayerLost(Player.GetPlayer("Marines"), onEnd)
 end

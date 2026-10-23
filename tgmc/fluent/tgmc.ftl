@@ -409,6 +409,7 @@ hotkey-description-tgmcability5 = Use the selected units' fifth ability
 hotkey-description-tgmcability6 = Use the selected units' sixth ability
 hotkey-description-tgmcability7 = Use the selected units' seventh ability
 hotkey-description-tgmcability8 = Use the selected units' eighth ability
+hotkey-description-tgmcnextcardtype = Show the next unit type of a mixed selection on the command card
 hotkey-description-tgmcselectidle = Select all idle combat units
 hotkey-description-tgmcselectwounded = Select all wounded or infected units
 hotkey-description-tgmcselectalloftype = Select every unit of the selected type, anywhere on the map

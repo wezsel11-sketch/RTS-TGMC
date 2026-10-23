@@ -1089,6 +1089,16 @@ SCENARIOS = {
         ("boiler", "Xenos", 8, 10, 256), ("bull", "Xenos", 12, 8, 256), ("rifleman", "Marines", 16, 11, 768), ("rifleman", "Marines", 17, 12, 768),
         ("rifleman", "Marines", 16, 13, 768), ("cryo-pod", "Marines", 22, 22, 0), ("resin-silo", "Xenos", 3, 3, 0),
     ]},
+    # A mixed selection, stepped once to the next unit type (Not a test).
+    "shot-card-mixed": {"scripts": ("shot",), "extra_rules": "World:\n\tScreenshotAt:\n\t\tTick: 80\n\t\tClickTick: 60\n\t\tSelect: squad_leader, rifleman, medic\n\t\tClick: CMD_NEXTTYPE\n", "actors": [
+        ("squad_leader", "Marines", 15, 12, 512), ("rifleman", "Marines", 16, 13, 512), ("rifleman", "Marines", 14, 13, 512), ("medic", "Marines", 13, 12, 512),
+        ("resin-silo", "Xenos", 22, 22, 0),
+    ]},
+    # The mech's walking dust, gun smoke and hit sparks (Not a test).
+    "shot-mech-fx": {"scripts": ("shot-mech-fx",), "size": (32, 24), "extra_rules": "World:\n\tScreenshotAt:\n\t\tTick: 70\n", "actors": [
+        ("mech", "Marines", 10, 12, 256), ("hunter", "Xenos", 17, 11, 768), ("hunter", "Xenos", 17, 13, 768), ("hunter", "Xenos", 18, 12, 768),
+        ("cryo-pod", "Marines", 3, 3, 0), ("resin-silo", "Xenos", 28, 22, 0),
+    ]},
     "shot-medic": {"scripts": ("shot-medic",), "extra_rules": "World:\n\tScreenshotAt:\n\t\tTick: 160\n\t\tClickTick: 20\n\t\tSelect: rifleman\n\t\tClick: CMD_SLOT2\n", "actors": [
         ("medbay", "Marines", 6, 8, 0),
         ("rifleman", "Marines", 15, 12, 512),
@@ -1273,7 +1283,7 @@ SCENARIOS = {
     ]},
     # Plasma pays for abilities (see scenarios/test-plasma.lua): a ravager that starts nearly empty.
     "scenario-plasma": {"scripts": ("test-plasma",), "size": (32, 24), "drop_conquest": True, "extra_rules": "ravager:\n\tPlasma:\n\t\tStartPercent: 10\n", "actors": [
-        ("ravager", "Xenos", 8, 10, 0), ("resin-silo", "Xenos", 28, 20, 0), ("rifleman", "Marines", 4, 4, 0),
+        ("ravager", "Xenos", 8, 10, 0), ("resin-silo", "Xenos", 28, 20, 0), ("rifleman", "Marines", 4, 4, 0), ("sentinel", "Xenos", 26, 4, 0),
     ]},
     # A wall stops rifle bullets (see scenarios/test-cover.lua): the wall of the walls ground at x 14 to 16, y 8 to 15.
     "scenario-cover": {"scripts": ("test-cover",), "size": (32, 24), "drop_conquest": True, "ground": "walls",
@@ -1393,6 +1403,9 @@ SCENARIOS = {
         ("rifleman", "Marines", 15, 11, 256), ("rifleman", "Marines", 15, 13, 256), ("blademan", "Marines", 16, 12, 256),
         ("bull", "Xenos", 21, 12, 768), ("runner", "Xenos", 20, 11, 768), ("runner", "Xenos", 20, 13, 768), ("runner", "Xenos", 22, 11, 768),
         ("cryo-pod", "Marines", 3, 3, 0), ("resin-silo", "Xenos", 36, 24, 0),
+    ]},
+    "scenario-ability-silence": {"scripts": ("test-ability-silence",), "drop_conquest": True, "size": (32, 24), "extra_rules": "^Xeno:\n\tPlasma:\n\t\tStartPercent: 100\n", "actors": [
+        ("squad_leader", "Marines", 10, 10, 256), ("hunter", "Xenos", 15, 10, 768), ("cryo-pod", "Marines", 2, 2, 0), ("resin-silo", "Xenos", 28, 20, 0),
     ]},
     "scenario-engineer-autorepair": {"scripts": ("test-engineer-autorepair",), "drop_conquest": True, "size": (32, 24), "actors": [
         ("engineer", "Marines", 8, 10, 256), ("miner-field", "Neutral", 10, 10, 0), ("resin-silo", "Xenos", 28, 20, 0),

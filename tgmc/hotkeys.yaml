@@ -84,6 +84,11 @@ TgmcAbility8: L
 	Types: World
 	Contexts: player
 
+TgmcNextCardType: BACKQUOTE
+	Description: hotkey-description-tgmcnextcardtype
+	Types: World
+	Contexts: player
+
 TgmcSelectIdle: I
 	Description: hotkey-description-tgmcselectidle
 	Types: World

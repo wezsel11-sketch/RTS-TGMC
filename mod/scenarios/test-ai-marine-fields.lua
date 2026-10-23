@@ -131,4 +131,13 @@ WorldLoaded = function()
 	end
 	Trigger.AfterDelay(1000, function() status(1000) end)
 	Trigger.AfterDelay(25, function() poll(25) end)
+
+	-- A match that ends (one side wiped out) pauses the world: report then, or the test would wait for ticks that never come.
+	local function onEnd()
+		if not reported then
+			finish(DateTime.GameTime)
+		end
+	end
+	Trigger.OnPlayerLost(marines, onEnd)
+	Trigger.OnPlayerLost(xenos, onEnd)
 end

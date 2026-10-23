@@ -206,6 +206,8 @@ namespace OpenRA.Mods.TGMC.Widgets.Logic
 		sealed class Entry
 		{
 			public string Text;
+			public string Status;
+			public string Icon;
 			public string Tooltip;
 			public bool Disabled;
 			public bool Highlighted;
@@ -221,6 +223,11 @@ namespace OpenRA.Mods.TGMC.Widgets.Logic
 		readonly World world;
 		Entry[] entries = new Entry[Slots];
 		int entriesTick = -1;
+
+		// Which unit type of a mixed selection the card shows (Warcraft's Tab): an offset into the types by count, reset when the
+		// selection's types change.
+		int typeOffset;
+		string typesKey = "";
 
 		[ObjectCreator.UseCtor]
 		public CommandCardLogic(Widget widget, World world)
@@ -271,6 +278,23 @@ namespace OpenRA.Mods.TGMC.Widgets.Logic
 			if (retreatKey != null)
 				retreatKey.OnClick = Retreat;
 
+			var next = widget.GetOrNull<ButtonWidget>("CMD_NEXTTYPE");
+			if (next != null)
+			{
+				next.IsVisible = () => Types().Count > 1;
+				next.GetText = () =>
+				{
+					var types = Types();
+					return types.Count > 1 ? $"{TypeName(types[typeOffset % types.Count].Key)} {typeOffset % types.Count + 1}/{types.Count} >" : "";
+				};
+				next.GetTooltipText = () => "Show the next unit type of the selection" + (next.Key.GetValue().IsValid() ? $" [{next.Key.GetValue().DisplayString()}]" : "");
+				next.OnClick = () =>
+				{
+					typeOffset++;
+					entriesTick = -1;
+				};
+			}
+
 			for (var i = 0; i < Slots; i++)
 			{
 				var button = widget.Get<ButtonWidget>("CMD_SLOT" + (i + 1));
@@ -280,7 +304,18 @@ namespace OpenRA.Mods.TGMC.Widgets.Logic
 				button.IsDisabled = () => Entries()[n]?.Disabled ?? true;
 				button.IsHighlighted = () => Entries()[n]?.Highlighted ?? false;
 				// The hotkey goes in the tooltip, not on the button, to keep the buttons small.
-				button.GetText = () => Entries()[n]?.Text ?? "";
+				// With a picture the button shows it and a small line over it with what changes (cooldown, charges, on); without one the
+				// button says its name.
+				button.GetText = () => Entries()[n] is { } e && e.Icon == null ? e.Text : "";
+				var status = widget.GetOrNull<LabelWidget>("CMD_SLOT" + (i + 1) + "_STATUS");
+				if (status != null)
+					status.GetText = () => Entries()[n] is { } e && e.Icon != null ? e.Status : "";
+				var icon = widget.GetOrNull<ImageWidget>("CMD_SLOT" + (i + 1) + "_ICON");
+				if (icon != null)
+				{
+					icon.IsVisible = () => Entries()[n]?.Icon != null;
+					icon.GetImageName = () => Entries()[n]?.Icon;
+				}
 				button.GetTooltipText = () => Entries()[n]?.Tooltip + (key.GetValue().IsValid() ? $" [{key.GetValue().DisplayString()}]" : "");
 				button.OnClick = () => Entries()[n]?.Click();
 			}
@@ -296,10 +331,13 @@ namespace OpenRA.Mods.TGMC.Widgets.Logic
 			entries = new Entry[Slots];
 			var selected = Selected();
 
-			// The card shows the unit type with the most units selected; ties go to the one selected first.
-			var units = selected.GroupBy(a => a.Info.Name).OrderByDescending(g => g.Count()).FirstOrDefault()?.ToList();
-			if (units == null)
+			// The card shows the unit type with the most units selected (ties: the one selected first), or the one the next-type
+			// button stepped to.
+			var types = Types();
+			if (types.Count == 0)
 				return entries;
+
+			var units = types[typeOffset % types.Count].ToList();
 
 			foreach (var ability in units[0].TraitsImplementing<ActiveAbility>().Where(x => !x.IsTraitDisabled))
 			{
@@ -312,9 +350,12 @@ namespace OpenRA.Mods.TGMC.Widgets.Logic
 					.Select(u => (Unit: u, Ability: u.TraitsImplementing<ActiveAbility>().FirstOrDefault(x => x.Info.OrderName == order && !x.IsTraitDisabled)))
 					.Where(x => x.Ability != null).ToList();
 				var shown = mine.Select(x => x.Ability).FirstOrDefault(x => x.Ready) ?? ability;
+				var iconName = ability.Info.Icon ?? order;
 				entries[slot] = new Entry
 				{
 					Text = AbilityLabel(shown),
+					Status = AbilityStatus(shown),
+					Icon = ChromeProvider.TryGetImage("ability-icons", iconName) != null ? iconName : null,
 					Tooltip = (ability.Info.Description ?? ability.Info.Label) + $" (cooldown {(ability.Info.Cooldown + 24) / 25} s)",
 					Disabled = !mine.Any(x => x.Ability.Ready),
 					Highlighted = mine.Any(x => x.Ability.Active)
@@ -355,6 +396,25 @@ namespace OpenRA.Mods.TGMC.Widgets.Logic
 			return entries;
 		}
 
+		List<IGrouping<string, Actor>> Types()
+		{
+			var types = Selected().GroupBy(a => a.Info.Name).OrderByDescending(g => g.Count()).ToList();
+			var key = string.Join(",", types.Select(t => t.Key).OrderBy(k => k));
+			if (key != typesKey)
+			{
+				typesKey = key;
+				typeOffset = 0;
+			}
+
+			return types;
+		}
+
+		string TypeName(string actor)
+		{
+			var tooltip = world.Map.Rules.Actors[actor].TraitInfoOrDefault<TooltipInfo>();
+			return tooltip != null ? FluentProvider.GetMessage(tooltip.Name) : actor;
+		}
+
 		// A side button takes the first free slot; with none free it is left off the card.
 		void AddSide(string text, string tooltip, Action click)
 		{
@@ -390,6 +450,14 @@ namespace OpenRA.Mods.TGMC.Widgets.Logic
 		void SetStance(UnitStance stance)
 		{
 			Issue(a => a.TraitOrDefault<AutoTarget>() != null, a => new Order("SetUnitStance", a, false) { ExtraData = (uint)stance });
+		}
+
+		// What changes on an ability's button: charges, on, the cooldown or its plasma price. Empty when it is simply ready.
+		static string AbilityStatus(ActiveAbility a)
+		{
+			var label = AbilityLabel(a);
+			var cut = label.IndexOf('\n');
+			return cut < 0 ? "" : label[(cut + 1)..];
 		}
 
 		static string AbilityLabel(ActiveAbility a)

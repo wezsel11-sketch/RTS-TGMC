@@ -138,7 +138,10 @@ def layers(path, vars_, states, near):
             if path.startswith(prefix):
                 icon, state = pic
                 break
-    if not icon or not state:
+    if icon and (not state or state not in states(icon)) and "" in states(icon):
+        # What BYOND itself does: an unset or missing icon_state draws the sheet's unnamed state.
+        state = ""
+    if not icon or state is None:
         return []
     names = states(icon)
     if icon.endswith("decals_arrow.dmi") and state not in names:

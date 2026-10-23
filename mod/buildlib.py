@@ -110,6 +110,7 @@ def build_mod():
     py("build_tileset.py", "--tgmc", TGMC, "--out", MOD_OUT)
     py("make_placeholders.py", "--tgmc", TGMC, "--out", MOD_OUT)
     py("make_chrome.py", "--out", MOD_OUT)
+    py("build_icons.py", "--tgmc", TGMC, "--out", MOD_OUT)
     link_mod()
     print("built", MOD_OUT)
 

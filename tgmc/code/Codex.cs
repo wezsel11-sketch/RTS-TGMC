@@ -120,8 +120,10 @@ namespace OpenRA.Mods.TGMC.Widgets.Logic
 			}
 
 			var buildable = ai.TraitInfoOrDefault<BuildableInfo>();
-			if (buildable != null && buildable.Prerequisites.Length > 0)
-				lines.Add("Needs: " + string.Join(", ", buildable.Prerequisites.Select(p => world.Map.Rules.Actors.TryGetValue(p, out var pa) ? Title(pa) : p)));
+			// "~faction-marines" and the like are hidden prerequisites (which side may build it), not something to build first.
+			var needs = buildable?.Prerequisites.Where(p => !p.StartsWith('~')).ToList() ?? [];
+			if (needs.Count > 0)
+				lines.Add("Needs: " + string.Join(", ", needs.Select(p => world.Map.Rules.Actors.TryGetValue(p, out var pa) ? Title(pa) : p)));
 
 			// What this building unlocks: everything buildable that lists it as a prerequisite.
 			var unlocks = world.Map.Rules.Actors.Values
@@ -130,6 +132,12 @@ namespace OpenRA.Mods.TGMC.Widgets.Logic
 				.Select(Title).Distinct().OrderBy(t => t).ToList();
 			if (unlocks.Count > 0)
 				lines.Add("Unlocks: " + string.Join(", ", unlocks));
+
+			// The unit's command card abilities, as its slot buttons show them.
+			var abilities = ai.TraitInfos<ActiveAbilityInfo>().OrderBy(a => a.Slot).ToList();
+			if (abilities.Count > 0)
+				lines.Add("Abilities:\n" + string.Join("\n", abilities.Select(a => $"  {a.Label}: {a.Description ?? ""}"
+					+ (a.Cooldown > 0 ? $" ({(a.Cooldown + 24) / 25} s)" : "") + (a.PlasmaCost > 0 ? $" [{a.PlasmaCost} plasma]" : ""))));
 
 			var evolves = ai.TraitInfoOrDefault<EvolvesInfo>();
 			if (evolves != null && (evolves.Next != null || evolves.Previous != null))

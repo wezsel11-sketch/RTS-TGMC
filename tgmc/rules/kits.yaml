@@ -302,6 +302,7 @@ artillery-emplacement:
 		Name: shell
 		Turret: primary
 	ActiveAbility@he:
+		Icon: HowitzerHE
 		OrderName: AbilityShellHE
 		Slot: 1
 		Label: HE
@@ -313,6 +314,7 @@ artillery-emplacement:
 		Cooldown: 25
 		Sounds: reload-mortar.ogg
 	ActiveAbility@incendiary:
+		Icon: HowitzerIncendiary
 		OrderName: AbilityShellIncendiary
 		Slot: 2
 		Label: Incend.
@@ -333,6 +335,7 @@ artillery-emplacement:
 		Cooldown: 25
 		Sounds: reload-mortar.ogg
 	ActiveAbility@plasma:
+		Icon: HowitzerPlasma
 		OrderName: AbilityShellPlasma
 		Slot: 4
 		Label: Plasma
@@ -571,6 +574,16 @@ demolitionist:
 
 # The mech (TGMC's greyscale mech and its modules): boost, armour burst, cloak, shield, leg overload, smoke and the rocket pod.
 mech:
+	# What TGMC's mech shows: dust under each foot and a heavy step, smoke at the guns, sparks when it is hit.
+	StepEffect:
+		Interval: 10
+		FootSpread: 0c384
+		Sounds: mech-step.ogg
+	FireSmoke:
+		Offset: 0, -640, 512
+	HitSparks:
+		MinDamage: 10
+		Sounds: spark-1.ogg, spark-2.ogg
 	ActiveAbility@overboost:
 		OrderName: AbilityOverboost
 		Slot: 1
@@ -784,7 +797,7 @@ hunter:
 		OrderName: AbilitySilence
 		Slot: 4
 		Label: Silence
-		Description: A psychic hush where you click: marines there fight slower for 5 s.
+		Description: A psychic hush where you click: for 5 s marines there cannot use abilities and fire slower.
 		Aim: Target
 		Range: 8c0
 		Weapon: TGMCSilence
@@ -1167,8 +1180,10 @@ som_rocketeer:
 	-Armament@SMOKE:
 	-ActiveAbility@smoke:
 	ActiveAbility@ap:
+		Icon: SomThermobaric
 		Label: Thermo
 		Description: Load thermobaric rockets: a wide, burning blast.
 	ActiveAbility@wp:
+		Icon: SomRadiation
 		Label: Rad
 		Description: Load radiation rockets: a sickening cloud that slows and hurts.

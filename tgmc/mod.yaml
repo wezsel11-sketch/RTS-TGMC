@@ -186,6 +186,7 @@ Cursors:
 
 Chrome:
 	tgmc|chrome.yaml
+	tgmc|ability-icons.yaml
 
 Assemblies: OpenRA.Mods.Common.dll, Tgmc.dll
 

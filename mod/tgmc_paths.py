@@ -1,6 +1,6 @@
 """Print every TGMC file the converters read, one repo-relative path per line.
 
-The list is derived from build_sprites.UNITS, build_sounds.SOUNDS, build_tileset.TILES and tgmc_dmm.MAPS, so a new sprite, sound
+The list is derived from build_sprites.UNITS, build_icons.ICONS, build_sounds.SOUNDS, build_tileset.TILES and tgmc_dmm.MAPS, so a new sprite, sound
 or tile cannot be left out of the sparse checkout that setup.sh makes. Use it with
 `git sparse-checkout set --no-cone --stdin`.
 """
@@ -9,6 +9,7 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
+import build_icons  # noqa: E402
 import build_sounds  # noqa: E402
 import build_sprites  # noqa: E402
 import build_tileset  # noqa: E402
@@ -33,11 +34,12 @@ def paths():
         found.add(entry[0])
     found.update(tgmc_dmm.paths())
     found.update(build_sprites.CONDOR_FILES)
+    found.update(build_icons.paths())
     # The converted maps' floor and wall pictures: every turf sheet, and the DM code that says which turf shows which picture (tgmc_turfs.py).
     # A trailing slash is a whole directory.
     found.update(['icons/turf/', 'code/game/turfs/', 'icons/misc/beach.dmi'])
     # The objects on the maps (tgmc_objects.py): the DM code that names their pictures, and the picture sheets.
-    found.update(['icons/obj/', 'icons/effects/', 'icons/Xeno/', 'icons/mecha/', 'icons/mob/robots.dmi', 'icons/mob/human_races/r_human.dmi'])
+    found.update(['icons/obj/', 'icons/effects/', 'icons/Xeno/', 'icons/mecha/', 'icons/mob/robots.dmi', 'icons/mob/human_races/r_human.dmi', 'icons/mob/alien.dmi', 'icons/mob/modular/'])
     found.update(d + "/" for d in tgmc_objects.OBJECT_DIRS)
     # The room templates that fill TGMC's modular map slots (see tgmc_modular.py), and the code that lists them.
     found.update(['code/modules/mapping/modular_mapping.dm', 'code/game/objects/effects/spawners/modularmappingspawner.dm', '_maps/modularmaps/big_red/', '_maps/modularmaps/lv624/', '_maps/modularmaps/fiorina/', '_maps/modularmaps/corsatdome/', '_maps/modularmaps/prison/', '_maps/modularmaps/EORG/', '_maps/modularmaps/jungle_outpost/', '_maps/modularmaps/oscaroutpost/'])

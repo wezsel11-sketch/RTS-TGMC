@@ -549,8 +549,8 @@ Container@PLAYER_WIDGETS:
 					X: WINDOW_WIDTH - 190
 					Y: 44
 					Width: 180
-					# Ends above the command card.
-					Height: WINDOW_HEIGHT - 196
+					# Ends above the command card and its next-type button.
+					Height: WINDOW_HEIGHT - 218
 					Background: tgui-window
 					Logic: RepeatBuildLogic
 					Children:
@@ -1039,6 +1039,16 @@ Container@PLAYER_WIDGETS:
 							Width: 259
 							Height: 136
 							Children:
+								Button@CMD_NEXTTYPE:
+									X: PARENT_WIDTH - 130
+									Y: -20
+									Width: 130
+									Height: 18
+									Background: sidebar-button
+									Font: TinyBold
+									Key: TgmcNextCardType
+									TooltipContainer: TOOLTIP_CONTAINER
+									TooltipTemplate: SIMPLE_TOOLTIP
 								Button@CMD_ATTACK:
 									X: 5
 									Y: 5
@@ -1158,6 +1168,134 @@ Container@PLAYER_WIDGETS:
 									Key: TgmcAbility8
 									TooltipContainer: TOOLTIP_CONTAINER
 									TooltipTemplate: SIMPLE_TOOLTIP
+								Image@CMD_SLOT1_ICON:
+									X: 19
+									Y: 52
+									Width: 32
+									Height: 32
+									ImageCollection: ability-icons
+									IgnoreMouseOver: true
+								Image@CMD_SLOT2_ICON:
+									X: 82
+									Y: 52
+									Width: 32
+									Height: 32
+									ImageCollection: ability-icons
+									IgnoreMouseOver: true
+								Image@CMD_SLOT3_ICON:
+									X: 145
+									Y: 52
+									Width: 32
+									Height: 32
+									ImageCollection: ability-icons
+									IgnoreMouseOver: true
+								Image@CMD_SLOT4_ICON:
+									X: 208
+									Y: 52
+									Width: 32
+									Height: 32
+									ImageCollection: ability-icons
+									IgnoreMouseOver: true
+								Image@CMD_SLOT5_ICON:
+									X: 19
+									Y: 95
+									Width: 32
+									Height: 32
+									ImageCollection: ability-icons
+									IgnoreMouseOver: true
+								Image@CMD_SLOT6_ICON:
+									X: 82
+									Y: 95
+									Width: 32
+									Height: 32
+									ImageCollection: ability-icons
+									IgnoreMouseOver: true
+								Image@CMD_SLOT7_ICON:
+									X: 145
+									Y: 95
+									Width: 32
+									Height: 32
+									ImageCollection: ability-icons
+									IgnoreMouseOver: true
+								Image@CMD_SLOT8_ICON:
+									X: 208
+									Y: 95
+									Width: 32
+									Height: 32
+									ImageCollection: ability-icons
+									IgnoreMouseOver: true
+								Label@CMD_SLOT1_STATUS:
+									X: 7
+									Y: 74
+									Width: 56
+									Height: 12
+									Font: TinyBold
+									Align: Center
+									Contrast: true
+									IgnoreMouseOver: true
+								Label@CMD_SLOT2_STATUS:
+									X: 70
+									Y: 74
+									Width: 56
+									Height: 12
+									Font: TinyBold
+									Align: Center
+									Contrast: true
+									IgnoreMouseOver: true
+								Label@CMD_SLOT3_STATUS:
+									X: 133
+									Y: 74
+									Width: 56
+									Height: 12
+									Font: TinyBold
+									Align: Center
+									Contrast: true
+									IgnoreMouseOver: true
+								Label@CMD_SLOT4_STATUS:
+									X: 196
+									Y: 74
+									Width: 56
+									Height: 12
+									Font: TinyBold
+									Align: Center
+									Contrast: true
+									IgnoreMouseOver: true
+								Label@CMD_SLOT5_STATUS:
+									X: 7
+									Y: 117
+									Width: 56
+									Height: 12
+									Font: TinyBold
+									Align: Center
+									Contrast: true
+									IgnoreMouseOver: true
+								Label@CMD_SLOT6_STATUS:
+									X: 70
+									Y: 117
+									Width: 56
+									Height: 12
+									Font: TinyBold
+									Align: Center
+									Contrast: true
+									IgnoreMouseOver: true
+								Label@CMD_SLOT7_STATUS:
+									X: 133
+									Y: 117
+									Width: 56
+									Height: 12
+									Font: TinyBold
+									Align: Center
+									Contrast: true
+									IgnoreMouseOver: true
+								Label@CMD_SLOT8_STATUS:
+									X: 196
+									Y: 117
+									Width: 56
+									Height: 12
+									Font: TinyBold
+									Align: Center
+									Contrast: true
+									IgnoreMouseOver: true
 								Button@CMD_AGGRESSIVE:
 									Width: 0
 									Height: 0

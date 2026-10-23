@@ -31,10 +31,15 @@ fi
 "$PY" -I "$HERE/build_tileset.py" --tgmc "$TGMC" --out "$OUT"
 "$PY" -I "$HERE/make_placeholders.py" --tgmc "$TGMC" --out "$OUT"
 "$PY" -I "$HERE/make_chrome.py" --out "$OUT"
+"$PY" -I "$HERE/build_icons.py" --tgmc "$TGMC" --out "$OUT"
 
 if [ -n "${OPENRA_DIR:-}" ]; then
 	mkdir -p "$OPENRA_DIR/mods"
 	ln -sfn "$OUT" "$OPENRA_DIR/mods/tgmc"
 	echo "linked $OPENRA_DIR/mods/tgmc -> $OUT"
+	# A sound OpenRA's own Ogg reader cannot finish freezes any game that plays it: decode them all once, the way the game does.
+	if [ -d "$OPENRA_DIR/bin" ] && command -v dotnet >/dev/null 2>&1; then
+		(cd "$OPENRA_DIR" && sh utility.sh tgmc --check-sounds "$OUT/audio") | tail -n 5
+	fi
 fi
 echo "built $OUT"

@@ -8,8 +8,16 @@ WorldLoaded = function()
 	Trigger.AfterDelay(10, function()
 		early = ravager.UseAbility(1)
 	end)
+	-- A sentinel with no marine in reach: its Neurotoxin is refused and must not cost plasma.
+	local sentinel = Player.GetPlayer("Xenos").GetActorsByType("sentinel")[1]
+	local kept
+	Trigger.AfterDelay(20, function()
+		local before = sentinel.Plasma
+		sentinel.UseAbility(1)
+		kept = sentinel.Plasma >= before
+	end)
 	Trigger.AfterDelay(400, function()
 		late = ravager.UseAbility(1)
-		print("TEST plasma " .. ((early == false and late == true) and "PASS" or "FAIL") .. " (early " .. tostring(early) .. ", late " .. tostring(late) .. ")")
+		print("TEST plasma " .. ((early == false and late == true and kept) and "PASS" or "FAIL") .. " (early " .. tostring(early) .. ", late " .. tostring(late) .. ", refused use kept plasma " .. tostring(kept) .. ")")
 	end)
 end

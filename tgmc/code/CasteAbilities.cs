@@ -48,8 +48,14 @@ namespace OpenRA.Mods.TGMC.Traits
 		[Desc("Short name on the button.")]
 		public readonly string Label = "Ability";
 
+		[Desc("While the unit has this condition no ability of it can be used (a hunter's Silence). Not a lint reference: buildings never get it.")]
+		public readonly string SilencedCondition = "silenced";
+
 		[Desc("One line for the button's tooltip. The Label is used if empty.")]
 		public readonly string Description = null;
+
+		[Desc("Picture on the button, from the ability-icons collection (mod/build_icons.py). Defaults to the OrderName.")]
+		public readonly string Icon = null;
 
 		[Desc("Ticks before the ability can be used again.")]
 		public readonly int Cooldown = 300;
@@ -195,7 +201,9 @@ namespace OpenRA.Mods.TGMC.Traits
 		public bool IsAimed => Info.Aim == AbilityAim.Target || Info.Aim == AbilityAim.TargetActor;
 		public int ChargesLeft => charges;
 		public bool Active => buffToken != Actor.InvalidConditionToken;
-		public bool Ready => !IsTraitDisabled && cooldown == 0 && charges > 0 && (Info.PlasmaCost == 0 || (plasma ??= self.TraitOrDefault<Plasma>())?.Has(Info.PlasmaCost) != false);
+		bool silenced;
+
+		public bool Ready => !IsTraitDisabled && !silenced && cooldown == 0 && charges > 0 && (Info.PlasmaCost == 0 || (plasma ??= self.TraitOrDefault<Plasma>())?.Has(Info.PlasmaCost) != false);
 
 		float ISelectionBar.GetValue()
 		{
@@ -238,6 +246,16 @@ namespace OpenRA.Mods.TGMC.Traits
 				self.QueueActivity(true, new UseAbilityActivity(this));
 			else
 				Use(self);
+		}
+
+		public override IEnumerable<VariableObserver> GetVariableObservers()
+		{
+			foreach (var observer in base.GetVariableObservers())
+				yield return observer;
+
+			if (!string.IsNullOrEmpty(Info.SilencedCondition))
+				yield return new VariableObserver((self, conditions) => silenced = conditions.TryGetValue(Info.SilencedCondition, out var n) && n > 0,
+					[Info.SilencedCondition]);
 		}
 
 		protected override void Created(Actor self)
@@ -293,6 +311,10 @@ namespace OpenRA.Mods.TGMC.Traits
 				|| !Info.TargetRelationships.HasRelationship(self.Owner.RelationshipWith(target.Actor.Owner))))
 				return false;
 
+			// A dash only takes its direction from the click; one aimed at the unit's own cell has none.
+			if (Info.ChargeDistance.Length > 0 && self.World.Map.CellContaining(target.CenterPosition) == self.Location)
+				return false;
+
 			if (!queued && (InReach(self, target) || Info.ChargeDistance.Length > 0))
 				return Use(self, target);
 
@@ -326,9 +348,6 @@ namespace OpenRA.Mods.TGMC.Traits
 			if (Info.TeleportDistance.Length > 0 && !Teleport(self))
 				return false;
 
-			if (Info.PlasmaCost > 0)
-				(plasma ??= self.TraitOrDefault<Plasma>())?.Spend(Info.PlasmaCost);
-
 			Target aim = Target.Invalid;
 			if (Info.Weapon != null || Info.ChargeDistance.Length > 0)
 			{
@@ -354,6 +373,10 @@ namespace OpenRA.Mods.TGMC.Traits
 						break;
 				}
 			}
+
+			// Paid only now that the ability has found what it hits: a refused use costs nothing.
+			if (Info.PlasmaCost > 0)
+				(plasma ??= self.TraitOrDefault<Plasma>())?.Spend(Info.PlasmaCost);
 
 			if (Info.Charges > 1)
 			{
@@ -623,6 +646,16 @@ namespace OpenRA.Mods.TGMC.Traits
 
 		[Desc("How many times this aura buff is on the unit: 0 or 1, since a second one only refreshes the first.")]
 		public int AuraStacks(string condition) { return Self.Trait<AuraReceiver>().Has(condition) ? 1 : 0; }
+	}
+
+	[ScriptPropertyGroup("Abilities")]
+	public class PlasmaProperties : ScriptActorProperties, Requires<PlasmaInfo>
+	{
+		public PlasmaProperties(ScriptContext context, Actor self)
+			: base(context, self) { }
+
+		[Desc("The plasma this xeno has now.")]
+		public int Plasma => Self.Trait<Plasma>().Value;
 	}
 
 	[Desc("A xeno's plasma: the fuel of its abilities (ActiveAbility.PlasmaCost). It builds up slowly, and faster while the xeno stands on weeds. A purple bar shows it.")]

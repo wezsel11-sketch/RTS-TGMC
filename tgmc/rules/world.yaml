@@ -112,6 +112,8 @@ World:
 	Inherits: ^BaseWorld
 	# Full light by day. The lobby's Night option darkens the ground; NightLight actors and gunfire and blasts light it again (tgmc/code/Lights.cs).
 	NightLighting:
+	# Does nothing unless TGMC_FAST=1 is set (mod/test_scenarios.sh, mod/balance.sh): then the sim runs flat out and draws nothing.
+	HeadlessTestSpeed:
 
 # Map editor and lobby marker for a starting position. Actors of this type are read by MapStartingLocations.
 mpspawn:

@@ -13,7 +13,7 @@ import argparse
 import os
 import sys
 
-from PIL import Image
+from PIL import Image, ImageOps
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import tgmc_dmi  # noqa: E402
@@ -153,6 +153,12 @@ def main():
             icon = icon.resize((SIZE, SIZE), Image.NEAREST)
         icons.append((name, icon))
 
+    # A greyed, darker copy the card shows while the ability cannot be used (cooldown, no plasma, silenced).
+    for name, icon in list(icons):
+        grey = ImageOps.grayscale(icon).point(lambda v: v * 45 // 100).convert("RGBA")
+        grey.putalpha(icon.getchannel("A"))
+        icons.append((f"{name}-off", grey))
+
     # OpenRA sheets must be a power of two on each side.
     rows = (len(icons) + COLS - 1) // COLS
     height = 1
@@ -171,7 +177,7 @@ def main():
 
     for m in missing:
         print(f"build_icons: no icon for {m}")
-    print(f"build_icons: {len(icons)} icons")
+    print(f"build_icons: {len(icons) // 2} icons")
 
 
 if __name__ == "__main__":

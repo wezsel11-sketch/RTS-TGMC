@@ -33,17 +33,27 @@ WorldLoaded = function()
 		check(not marines.QueueUnit("synth"), "a synth could be bought without a medbay")
 	end)
 
-	Trigger.AfterDelay(400, function()
-		check(rifleman.Health > manHealth, "the synth did not heal the rifleman")
-		check(armory.Health > armoryHealth, "the synth did not repair the armory")
-		check(runner.IsDead or runner.Health < runnerMax, "the synth did not hit the runner next to it")
-		if not reported then
-			reported = true
-			if #problems == 0 then
-				print("TEST synth PASS")
-			else
-				print("TEST synth FAIL (" .. table.concat(problems, "; ") .. ")")
+	-- The synth heals, fights and repairs one after another, in an order the game's dice pick: poll until all three are seen.
+	local healed, repaired, hit = false, false, false
+	local function poll(ticks)
+		healed = healed or rifleman.Health > manHealth
+		repaired = repaired or armory.Health > armoryHealth
+		hit = hit or runner.IsDead or runner.Health < runnerMax
+		if reported or (ticks < 1000 and not (healed and repaired and hit)) then
+			if not reported then
+				Trigger.AfterDelay(20, function() poll(ticks + 20) end)
 			end
+			return
 		end
-	end)
+		check(healed, "the synth did not heal the rifleman")
+		check(repaired, "the synth did not repair the armory")
+		check(hit, "the synth did not hit the runner next to it")
+		reported = true
+		if #problems == 0 then
+			print("TEST synth PASS (by tick " .. ticks .. ")")
+		else
+			print("TEST synth FAIL (" .. table.concat(problems, "; ") .. ")")
+		end
+	end
+	Trigger.AfterDelay(80, function() poll(80) end)
 end

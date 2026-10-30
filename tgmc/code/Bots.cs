@@ -548,63 +548,13 @@ namespace OpenRA.Mods.TGMC.Traits
 			countdown = Info.Interval;
 			foreach (var pair in world.ActorsWithTrait<ActiveAbility>().Where(x => x.Actor.Owner == player && x.Actor.IsInWorld && !x.Actor.IsDead && x.Trait.Ready))
 			{
-				var unit = pair.Actor;
-				var ability = pair.Trait;
-				var near = world.FindActorsInCircle(unit.CenterPosition, ability.Info.AiRange).Where(a => !a.IsDead && a.IsInWorld && a != unit).ToList();
-
-				int count;
-				if (ability.Info.AiWoundedPercent > 0)
-				{
-					count = near.Count(a => player.RelationshipWith(a.Owner) == PlayerRelationship.Ally && a.Info.HasTraitInfo<MobileInfo>()
-						&& a.TraitOrDefault<IHealth>() is { } h && h.HP * 100 < h.MaxHP * ability.Info.AiWoundedPercent);
-					if (unit.TraitOrDefault<IHealth>() is { } own && own.HP * 100 < own.MaxHP * ability.Info.AiWoundedPercent)
-						count++;
-				}
-				else
-					count = near.Count(a => player.RelationshipWith(a.Owner) == PlayerRelationship.Enemy && a.Info.HasTraitInfo<MobileInfo>() && a.CanBeViewedByPlayer(player));
-
-				// Shell types and other switches are the player's choice: the AI leaves them as they start.
-				if (ability.Info.Toggle || count < ability.Info.AiMinTargets)
-					continue;
-
-				if (!ability.IsAimed)
-				{
-					bot.QueueOrder(new Order(ability.Info.OrderName, unit, false));
-					continue;
-				}
-
-				var target = AimFor(unit, ability, near);
-				if (target.Type != TargetType.Invalid)
-					bot.QueueOrder(new Order(ability.Info.OrderName, unit, target, false));
+				// Shell types and other switches are the player's choice: AutoTarget leaves them as they start.
+				var target = pair.Trait.AutoTarget(pair.Actor);
+				if (target is { } t)
+					bot.QueueOrder(t.Type == TargetType.Invalid
+						? new Order(pair.Trait.Info.OrderName, pair.Actor, false)
+						: new Order(pair.Trait.Info.OrderName, pair.Actor, t, false));
 			}
-		}
-
-		// Where an aimed ability goes: a heal on the most hurt ally, a unit-aimed attack on the nearest enemy, a spot-aimed one
-		// on the enemy with the most other enemies around it.
-		Target AimFor(Actor unit, ActiveAbility ability, List<Actor> near)
-		{
-			if (ability.Info.AiWoundedPercent > 0)
-			{
-				var hurt = near.Append(unit)
-					.Where(a => ability.Info.TargetRelationships.HasRelationship(player.RelationshipWith(a.Owner)) && a.TraitOrDefault<IHealth>() != null)
-					.MinByOrDefault(a => a.Trait<IHealth>().HP * 100 / a.Trait<IHealth>().MaxHP);
-				return hurt != null ? Target.FromActor(hurt) : Target.Invalid;
-			}
-
-			var enemies = near.Where(a => player.RelationshipWith(a.Owner) == PlayerRelationship.Enemy && a.Info.HasTraitInfo<MobileInfo>() && a.CanBeViewedByPlayer(player)).ToList();
-			if (enemies.Count == 0)
-				return Target.Invalid;
-
-			if (ability.Info.Aim == AbilityAim.TargetActor)
-				return Target.FromActor(enemies.MinBy(a => (a.CenterPosition - unit.CenterPosition).LengthSquared));
-
-			// Blasts hurt friends too: skip a spot with one of our own units close to it, the thrower included.
-			var two = new WDist(2048).LengthSquared;
-			var own = world.FindActorsInCircle(unit.CenterPosition, ability.Info.AiRange + new WDist(2048))
-				.Where(a => a.Owner == player && a.Info.HasTraitInfo<MobileInfo>()).ToList();
-			var densest = enemies.Where(e => !own.Any(o => (o.CenterPosition - e.CenterPosition).LengthSquared <= two))
-				.MaxByOrDefault(a => enemies.Count(b => (b.CenterPosition - a.CenterPosition).LengthSquared <= two));
-			return densest != null ? Target.FromCell(world, densest.Location) : Target.Invalid;
 		}
 	}
 

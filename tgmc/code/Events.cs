@@ -212,7 +212,12 @@ namespace OpenRA.Mods.TGMC.Widgets.Logic
 			public bool Disabled;
 			public bool Highlighted;
 			public Action Click;
+			public Action RightClick;
+			public string Order;
 		}
+
+		// The slot the mouse is over, for the range preview; -1 for none.
+		int hovered = -1;
 
 		const int Slots = 8;
 		static readonly (UnitStance Stance, string Name)[] Stances =
@@ -233,6 +238,7 @@ namespace OpenRA.Mods.TGMC.Widgets.Logic
 		public CommandCardLogic(Widget widget, World world)
 		{
 			this.world = world;
+			ActiveAbility.Previewed = null;
 
 			// Row one shows its keys in the tooltip too.
 			static string Keyed(string text, string hotkey)
@@ -314,10 +320,20 @@ namespace OpenRA.Mods.TGMC.Widgets.Logic
 				if (icon != null)
 				{
 					icon.IsVisible = () => Entries()[n]?.Icon != null;
-					icon.GetImageName = () => Entries()[n]?.Icon;
+					// The build makes a greyed "-off" copy of each icon for while the ability cannot be used.
+					icon.GetImageName = () => Entries()[n] is { } e && e.Disabled ? e.Icon + "-off" : Entries()[n]?.Icon;
 				}
 				button.GetTooltipText = () => Entries()[n]?.Tooltip + (key.GetValue().IsValid() ? $" [{key.GetValue().DisplayString()}]" : "");
 				button.OnClick = () => Entries()[n]?.Click();
+				if (button is AbilityButtonWidget ability)
+				{
+					ability.OnRightClick = () => Entries()[n]?.RightClick?.Invoke();
+					ability.OnHover = over =>
+					{
+						hovered = over ? n : hovered == n ? -1 : hovered;
+						ActiveAbility.Previewed = hovered >= 0 ? Entries()[hovered]?.Order : null;
+					};
+				}
 			}
 		}
 
@@ -351,12 +367,21 @@ namespace OpenRA.Mods.TGMC.Widgets.Logic
 					.Where(x => x.Ability != null).ToList();
 				var shown = mine.Select(x => x.Ability).FirstOrDefault(x => x.Ready) ?? ability;
 				var iconName = ability.Info.Icon ?? order;
+				var auto = mine.Any(x => x.Ability.AutoCast);
 				entries[slot] = new Entry
 				{
-					Text = AbilityLabel(shown),
-					Status = AbilityStatus(shown),
+					Order = order,
+					Text = AbilityLabel(shown) + (auto ? "\nAUTO" : ""),
+					Status = auto ? ("AUTO " + AbilityStatus(shown)).Trim() : AbilityStatus(shown),
 					Icon = ChromeProvider.TryGetImage("ability-icons", iconName) != null ? iconName : null,
-					Tooltip = (ability.Info.Description ?? ability.Info.Label) + $" (cooldown {(ability.Info.Cooldown + 24) / 25} s)",
+					Tooltip = (ability.Info.Description ?? ability.Info.Label) + $" (cooldown {(ability.Info.Cooldown + 24) / 25} s)"
+						+ (ability.CanAutoCast ? (auto ? " Right-click: stop casting it by itself." : " Right-click: cast it by itself.") : ""),
+					// Right click: autocast on for all of them, or off if any had it on.
+					RightClick = !ability.CanAutoCast ? null : () =>
+					{
+						foreach (var x in mine.Where(x => x.Ability.CanAutoCast))
+							world.IssueOrder(new Order(ActiveAbility.AutoCastOrder, x.Unit, false) { ExtraData = (uint)(ability.Info.Slot * 2 + (auto ? 0 : 1)) });
+					},
 					Disabled = !mine.Any(x => x.Ability.Ready),
 					Highlighted = mine.Any(x => x.Ability.Active)
 						|| (world.OrderGenerator is AbilityOrderGenerator g && g.OrderName == order),
@@ -565,6 +590,50 @@ namespace OpenRA.Mods.TGMC.Widgets
 			}
 
 			return false;
+		}
+	}
+
+	[Desc("A command card button that also takes a right click (autocast, Warcraft-style) and says when the mouse is over it (the range preview).")]
+	public class AbilityButtonWidget : ButtonWidget
+	{
+		public Action OnRightClick = () => { };
+		public Action<bool> OnHover = _ => { };
+
+		[ObjectCreator.UseCtor]
+		public AbilityButtonWidget(ModData modData)
+			: base(modData) { }
+
+		protected AbilityButtonWidget(AbilityButtonWidget other)
+			: base(other)
+		{
+			OnRightClick = other.OnRightClick;
+			OnHover = other.OnHover;
+		}
+
+		public override ButtonWidget Clone() { return new AbilityButtonWidget(this); }
+
+		// The right click works while the ability cools down too: autocast is set for later.
+		public override bool HandleMouseInput(MouseInput mi)
+		{
+			if (mi.Button == MouseButton.Right && mi.Event == MouseInputEvent.Down && IsVisible())
+			{
+				OnRightClick();
+				return true;
+			}
+
+			return base.HandleMouseInput(mi);
+		}
+
+		public override void MouseEntered()
+		{
+			base.MouseEntered();
+			OnHover(true);
+		}
+
+		public override void MouseExited()
+		{
+			base.MouseExited();
+			OnHover(false);
 		}
 	}
 }

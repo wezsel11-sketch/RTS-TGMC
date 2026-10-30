@@ -110,9 +110,8 @@
 
 World:
 	Inherits: ^BaseWorld
-	# Terrain lighting: the level of the open ground (1 = full light). Dark-mode maps lower it; light sources add light on top (see TerrainLightSource).
-	TerrainLighting:
-		Intensity: 1
+	# Full light by day. The lobby's Night option darkens the ground; NightLight actors and gunfire and blasts light it again (tgmc/code/Lights.cs).
+	NightLighting:
 
 # Map editor and lobby marker for a starting position. Actors of this type are read by MapStartingLocations.
 mpspawn:

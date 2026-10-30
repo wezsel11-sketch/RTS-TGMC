@@ -11,6 +11,7 @@ using OpenRA.Effects;
 using OpenRA.GameRules;
 using OpenRA.Graphics;
 using OpenRA.Mods.Common;
+using OpenRA.Mods.Common.Graphics;
 using OpenRA.Mods.Common.Traits;
 using OpenRA.Primitives;
 using OpenRA.Scripting;
@@ -180,8 +181,28 @@ namespace OpenRA.Mods.TGMC.Traits
 		}
 	}
 
-	public class ActiveAbility : ConditionalTrait<ActiveAbilityInfo>, IResolveOrder, ITick, ISelectionBar
+	public class ActiveAbility : ConditionalTrait<ActiveAbilityInfo>, IResolveOrder, ITick, ISelectionBar, IRenderAnnotationsWhenSelected
 	{
+		// The ability whose card button the mouse is over (its OrderName), set by the card: each selected unit with it shows its range.
+		// Only drawing reads it, never the game, so one shared value for the local player is safe.
+		public static string Previewed;
+
+		// How far the ability reaches, for the preview: the aim's reach, an aura's spread, a dash's length. None for a buff on the unit itself.
+		public WDist PreviewRange => IsAimed ? Info.Range
+			: Info.AuraRange.Length > 0 ? Info.AuraRange
+			: Info.ChargeDistance.Length > 0 ? Info.ChargeDistance
+			: Info.Aim switch { AbilityAim.Self => WDist.Zero, AbilityAim.Forward => Info.ForwardDistance, _ => Info.Range };
+
+		bool IRenderAnnotationsWhenSelected.SpatiallyPartitionable => false;
+
+		IEnumerable<IRenderable> IRenderAnnotationsWhenSelected.RenderAnnotations(Actor self, WorldRenderer wr)
+		{
+			if (Previewed != Info.OrderName || IsTraitDisabled || self.Owner != self.World.LocalPlayer || PreviewRange.Length == 0)
+				yield break;
+
+			yield return new RangeCircleAnnotationRenderable(self.CenterPosition, PreviewRange, 0, Color.FromArgb(160, 255, 208, 64), 1, Color.FromArgb(96, 0, 0, 0), 3);
+		}
+
 		readonly Actor self;
 		int cooldown;
 		int charges;
@@ -196,6 +217,15 @@ namespace OpenRA.Mods.TGMC.Traits
 			this.self = self;
 			charges = info.Charges;
 		}
+
+		// The order the card sends on a right-click: ExtraData is the slot times 2, plus 1 to switch autocast on.
+		public const string AutoCastOrder = "AbilityAutoCast";
+
+		// Autocast: the unit uses the ability by itself wherever the AI would (AutoTarget). Switches have nothing to cast.
+		public bool AutoCast { get; private set; }
+		public bool CanAutoCast => !Info.Toggle;
+
+		public void SetAutoCast(bool on) { AutoCast = on && CanAutoCast; }
 
 		public int CooldownRemaining => cooldown;
 		public bool IsAimed => Info.Aim == AbilityAim.Target || Info.Aim == AbilityAim.TargetActor;
@@ -229,10 +259,82 @@ namespace OpenRA.Mods.TGMC.Traits
 
 			if (!Info.Toggle && buffToken != Actor.InvalidConditionToken && --buffLeft <= 0)
 				buffToken = self.RevokeCondition(buffToken);
+
+			// Autocast looks every 10 ticks, staggered by unit. An aimed one only fires within reach: it never walks the unit off its orders.
+			if (AutoCast && (self.World.WorldTick + self.ActorID) % 10 == 0 && Ready && self.IsInWorld
+				&& AutoTarget(self) is { } target && (!IsAimed || InReach(self, target)))
+				Use(self, target);
+		}
+
+		/// <summary>Where the ability would do good now, as the AI and autocast judge it: enough enemies (or hurt allies, for a heal) within AiRange.
+		/// Null when it would not; Target.Invalid for an ability that needs no aim. Switches are never judged.</summary>
+		public Target? AutoTarget(Actor self)
+		{
+			if (Info.Toggle)
+				return null;
+
+			var player = self.Owner;
+			var near = self.World.FindActorsInCircle(self.CenterPosition, Info.AiRange).Where(a => !a.IsDead && a.IsInWorld && a != self).ToList();
+			int count;
+			if (Info.AiWoundedPercent > 0)
+			{
+				count = near.Count(a => player.RelationshipWith(a.Owner) == PlayerRelationship.Ally && a.Info.HasTraitInfo<MobileInfo>()
+					&& a.TraitOrDefault<IHealth>() is { } h && h.HP * 100 < h.MaxHP * Info.AiWoundedPercent);
+				if (self.TraitOrDefault<IHealth>() is { } own && own.HP * 100 < own.MaxHP * Info.AiWoundedPercent)
+					count++;
+			}
+			else
+				count = near.Count(a => player.RelationshipWith(a.Owner) == PlayerRelationship.Enemy && a.Info.HasTraitInfo<MobileInfo>() && a.CanBeViewedByPlayer(player));
+
+			if (count < Info.AiMinTargets)
+				return null;
+
+			if (!IsAimed)
+				return Target.Invalid;
+
+			var target = AimFor(self, near);
+			return target.Type == TargetType.Invalid ? null : target;
+		}
+
+		// Where an aimed ability goes: a heal on the most hurt ally, a unit-aimed attack on the nearest enemy, a spot-aimed one
+		// on the enemy with the most other enemies around it.
+		Target AimFor(Actor self, List<Actor> near)
+		{
+			var player = self.Owner;
+			if (Info.AiWoundedPercent > 0)
+			{
+				var hurt = near.Append(self)
+					.Where(a => Info.TargetRelationships.HasRelationship(player.RelationshipWith(a.Owner)) && a.TraitOrDefault<IHealth>() != null)
+					.MinByOrDefault(a => a.Trait<IHealth>().HP * 100 / a.Trait<IHealth>().MaxHP);
+				return hurt != null ? Target.FromActor(hurt) : Target.Invalid;
+			}
+
+			var enemies = near.Where(a => player.RelationshipWith(a.Owner) == PlayerRelationship.Enemy && a.Info.HasTraitInfo<MobileInfo>() && a.CanBeViewedByPlayer(player)).ToList();
+			if (enemies.Count == 0)
+				return Target.Invalid;
+
+			if (Info.Aim == AbilityAim.TargetActor)
+				return Target.FromActor(enemies.MinBy(a => (a.CenterPosition - self.CenterPosition).LengthSquared));
+
+			// Blasts hurt friends too: skip a spot with one of our own units close to it, the thrower included.
+			var two = new WDist(2048).LengthSquared;
+			var own = self.World.FindActorsInCircle(self.CenterPosition, Info.AiRange + new WDist(2048))
+				.Where(a => a.Owner == player && a.Info.HasTraitInfo<MobileInfo>()).ToList();
+			var densest = enemies.Where(e => !own.Any(o => (o.CenterPosition - e.CenterPosition).LengthSquared <= two))
+				.MaxByOrDefault(a => enemies.Count(b => (b.CenterPosition - a.CenterPosition).LengthSquared <= two));
+			return densest != null ? Target.FromCell(self.World, densest.Location) : Target.Invalid;
 		}
 
 		void IResolveOrder.ResolveOrder(Actor self, Order order)
 		{
+			if (order.OrderString == AutoCastOrder)
+			{
+				if (order.ExtraData >> 1 == Info.Slot)
+					SetAutoCast((order.ExtraData & 1) != 0);
+
+				return;
+			}
+
 			if (order.OrderString != Info.OrderName)
 				return;
 
@@ -772,6 +874,19 @@ namespace OpenRA.Mods.TGMC.Scripting
 		public bool AbilityActive(int slot)
 		{
 			return Self.TraitsImplementing<ActiveAbility>().Any(a => a.Info.Slot == slot && a.Active);
+		}
+
+		[Desc("Switch autocast on or off for the ability in the given slot, as a right-click on its button does.")]
+		public void AbilityAutoCast(int slot, bool on)
+		{
+			foreach (var a in Self.TraitsImplementing<ActiveAbility>().Where(a => a.Info.Slot == slot))
+				a.SetAutoCast(on);
+		}
+
+		[Desc("True if the ability in the given slot casts itself.")]
+		public bool AbilityAutoCasting(int slot)
+		{
+			return InSlot(slot)?.AutoCast ?? false;
 		}
 
 		[Desc("True if the ability in the given slot is ready to use now.")]

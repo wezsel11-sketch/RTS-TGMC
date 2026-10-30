@@ -1642,12 +1642,13 @@ def save_sheet(sheet_cells, cell_size, path):
 
 
 ICON_W, ICON_H = 62, 46   # the production palette's cell
-CAMEO_TONES = {"marine": ((64, 72, 48), (30, 35, 23)), "xeno": ((72, 44, 84), (28, 16, 36))}
+# Marine cards wear the HUD's tgui charcoal (see make_chrome.py); xeno cards stay purple.
+CAMEO_TONES = {"marine": ((58, 62, 70), (26, 27, 30)), "xeno": ((72, 44, 84), (28, 16, 36))}
 
 
 def cameo(img, tone="marine", bust=False):
     """A palette icon: the sprite trimmed, scaled up in whole steps (crisp pixel art) or smoothly down, outlined so it stands out,
-    on a dark card with a vignette and the olive frame. bust keeps only the top of a standing figure (head and shoulders)."""
+    on a dark card with a vignette and the HUD's charcoal frame. bust keeps only the top of a standing figure (head and shoulders)."""
     img = img.convert("RGBA")
     box = img.getchannel("A").point(lambda a: 255 if a > 40 else 0).getbbox()
     if box:
@@ -1670,7 +1671,7 @@ def cameo(img, tone="marine", bust=False):
     vignette = Image.new("L", (ICON_W, ICON_H), 0)
     ImageDraw.Draw(vignette).ellipse([-ICON_W // 4, -ICON_H // 4, ICON_W * 5 // 4, ICON_H * 5 // 4], fill=255)
     vignette = vignette.filter(ImageFilter.GaussianBlur(10))
-    card = Image.composite(card, Image.new("RGBA", card.size, (12, 14, 9, 255)), vignette)
+    card = Image.composite(card, Image.new("RGBA", card.size, (14, 14, 16, 255)), vignette)
     x, y = (ICON_W - img.width) // 2, (ICON_H - img.height) // 2
     shadow = Image.new("RGBA", card.size, (0, 0, 0, 0))
     mask = img.getchannel("A").point(lambda a: 255 if a > 40 else 0)
@@ -1681,8 +1682,8 @@ def cameo(img, tone="marine", bust=False):
     card.alpha_composite(shadow)
     card.alpha_composite(img, (x, y))
     d = ImageDraw.Draw(card)
-    d.rectangle([1, 1, ICON_W - 2, ICON_H - 2], outline=(94, 101, 70, 255))
-    d.rectangle([0, 0, ICON_W - 1, ICON_H - 1], outline=(31, 34, 22, 255))
+    d.rectangle([1, 1, ICON_W - 2, ICON_H - 2], outline=(70, 74, 82, 255))
+    d.rectangle([0, 0, ICON_W - 1, ICON_H - 1], outline=(16, 16, 16, 255))
     return card
 
 

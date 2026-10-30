@@ -378,6 +378,10 @@ weather-clear = Clear
 weather-rain = Rain
 weather-dust = Dust storm
 
+checkbox-tgmc-night =
+    .label = Night
+    .description = The fight happens at night: the ground is dark, and only flashlights, base lamps, fires, gunfire and blasts light it. Only a picture; sight ranges stay the same.
+
 support-cure =
     .name = Psychic Cure
     .description = Heals every xeno in a nine by nine cell area over ten seconds. Granted by the Evolution Tower. Recharges in one minute and a half.

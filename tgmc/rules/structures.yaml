@@ -60,6 +60,13 @@
 # Where a structure may be placed: within Adjacent cells of an actor with GivesBuildableArea of the same type.
 # Marines build almost anywhere: 24 cells from any marine structure (an engineer's area is no longer needed).
 ^MarineBuildable:
+	# Base lamps at night (the lobby's Night option): a wide cool-white pool around every marine and SOM structure except cades.
+	NightLight:
+		Range: 5c0
+		Intensity: 0.7
+		RedTint: 0.95
+		GreenTint: 1
+		BlueTint: 1.05
 	RequiresBuildableArea:
 		AreaTypes: marine-build
 		Adjacent: 24
@@ -76,6 +83,13 @@
 		Adjacent: 5
 
 ^XenoMajorBuildable:
+	# Resin glows a faint purple at night (the lobby's Night option).
+	NightLight:
+		Range: 3c0
+		Intensity: 0.4
+		RedTint: 0.75
+		GreenTint: 0.35
+		BlueTint: 1
 	RequiresBuildableArea:
 		AreaTypes: xeno-major
 		Adjacent: 5
@@ -214,6 +228,13 @@ mini-silo:
 		Amount: 3
 
 weed-node:
+	# Resin glows a faint purple at night (the lobby's Night option).
+	NightLight:
+		Range: 3c0
+		Intensity: 0.4
+		RedTint: 0.75
+		GreenTint: 0.35
+		BlueTint: 1
 	Inherits: ^Structure
 	Inherits@build: ^XenoMinorBuildable
 	Buildable:
@@ -471,6 +492,13 @@ maturity-tower:
 # build area for major structures around it, trains xenos, sees a long way and brings in a little requisition. Marines do not
 # have to destroy it to win.
 forward-hive:
+	# Resin glows a faint purple at night (the lobby's Night option).
+	NightLight:
+		Range: 3c0
+		Intensity: 0.4
+		RedTint: 0.75
+		GreenTint: 0.35
+		BlueTint: 1
 	ReturnPoint:
 	Inherits: ^Structure
 	Inherits@build: ^XenoMinorBuildable
@@ -608,6 +636,7 @@ miner:
 cade:
 	Inherits: ^Wall
 	Inherits@build: ^MarineBuildable
+	-NightLight:
 	# The cade shows the side that faces away from the base (TGMC draws a barricade from four sides).
 	FacesOutward:
 	-WithSpriteBody:

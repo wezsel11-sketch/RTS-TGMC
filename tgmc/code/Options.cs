@@ -21,6 +21,7 @@ namespace OpenRA.Mods.TGMC
 		public const string BurstTime = "tgmc-bursttime";
 		public const string FloatingText = "tgmc-floatingtext";
 		public const string Weather = "tgmc-weather";
+		public const string Night = "tgmc-night";
 
 		/// <summary>A dropdown option's value, or the default when there is no lobby.</summary>
 		public static string Value(World world, string id, string defaultValue)
@@ -41,6 +42,7 @@ namespace OpenRA.Mods.TGMC
 					Maturity => info.MaturityDefault,
 					TileStep => info.TileStepDefault,
 					FloatingText => info.FloatingTextDefault,
+					Night => info.NightDefault,
 					_ => defaultValue
 				};
 
@@ -62,6 +64,7 @@ namespace OpenRA.Mods.TGMC.Traits
 		public readonly bool MaturityDefault = true;
 		public readonly bool TileStepDefault = false;
 		public readonly bool FloatingTextDefault = true;
+		public readonly bool NightDefault = false;
 
 		[Desc("Weather when there is no lobby, and the lobby's default: clear, rain or dust.")]
 		public readonly string WeatherDefault = "clear";
@@ -102,6 +105,9 @@ namespace OpenRA.Mods.TGMC.Traits
 				{
 					{ "clear", "weather-clear" }, { "rain", "weather-rain" }, { "dust", "weather-dust" }
 				}, WeatherDefault, false);
+
+			yield return new LobbyBooleanOption(map, Options.Night,
+				"checkbox-tgmc-night.label", "checkbox-tgmc-night.description", true, 17, NightDefault, false);
 
 			yield return new LobbyBooleanOption(map, Options.TileStep,
 				"checkbox-tgmc-tilestep.label", "checkbox-tgmc-tilestep.description", true, 13, TileStepDefault, false);

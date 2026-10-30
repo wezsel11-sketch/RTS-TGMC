@@ -794,7 +794,9 @@ SCENARIOS = {
         ("rifleman", "Marines", 3, 3, 512),
         ("resin-silo", "Xenos", 16, 16, 0),
     ]},
-    "scenario-ai-mix": {"scripts": ("test-ai-mix",), "xeno_bot": "skirmish", "size": (48, 48), "spawns": [(4, 4), (40, 40)], "actors": [
+    # The lone rifleman only keeps the marines in the match: tough enough that the xenos' first squad cannot end it before they tech up.
+    "scenario-ai-mix": {"scripts": ("test-ai-mix",), "xeno_bot": "skirmish", "size": (48, 48), "spawns": [(4, 4), (40, 40)],
+                        "extra_rules": "rifleman:\n\tHealth:\n\t\tHP: 50000\n", "actors": [
         ("rifleman", "Marines", 4, 4, 512),
         ("resin-silo", "Xenos", 40, 40, 0),
     ]},
@@ -1074,6 +1076,11 @@ SCENARIOS = {
         ("resin-silo", "Xenos", 19, 19, 0),
     ]},
     # The command card with a squad leader selected (Not a test: a screenshot of the ability slots).
+    # The card with frag autocast on (right-clicked) and the mouse over it: the AUTO line and the range circle.
+    "shot-card-auto": {"scripts": ("shot-card-auto",), "size": (32, 24), "extra_rules": "World:\n\tScreenshotAt:\n\t\tTick: 80\n\t\tClickTick: 60\n\t\tSelect: rifleman\n\t\tRightClick: CMD_SLOT1\n\t\tHover: CMD_SLOT1\n", "actors": [
+        ("rifleman", "Marines", 15, 12, 512),
+        ("resin-silo", "Xenos", 28, 22, 0),
+    ]},
     "shot-card": {"scripts": ("shot",), "extra_rules": "World:\n\tScreenshotAt:\n\t\tTick: 80\n\t\tSelect: squad_leader\n", "actors": [
         ("squad_leader", "Marines", 15, 12, 512),
         ("rifleman", "Marines", 16, 13, 512),
@@ -1328,9 +1335,12 @@ SCENARIOS = {
     "scenario-bomber": {"scripts": ("test-bomber",), "drop_conquest": True, "size": (32, 24), "extra_rules": "hunter:\n\tHealth:\n\t\tHP: 3000\n", "actors": [
         ("bomber", "Marines", 10, 10, 0), ("hunter", "Xenos", 12, 10, 0), ("hunter", "Xenos", 12, 11, 0), ("resin-silo", "Xenos", 28, 20, 0),
     ]},
-    # Not a test: dark-mode look. The ground is dim and each marine's flashlight lights a pool around him (see TerrainLighting in world.yaml).
-    "shot-lighting": {"scripts": ("shot-facing",), "drop_conquest": True, "size": (32, 24), "extra_rules": "World:\n\tTerrainLighting:\n\t\tIntensity: 0.25\n\tScreenshotAt:\n\t\tTick: 45\n", "actors": [
-        ("rifleman", "Marines", 10, 10, 0), ("rifleman", "Marines", 22, 14, 0), ("resin-silo", "Xenos", 28, 20, 0),
+    # Not a test: the lobby's Night option. Dark ground, flashlights that walk with the marines, base lamps, mech headlights, flamer fire,
+    # gunfire flashes and the resin silo's purple glow (see NightLighting in tgmc/code/Lights.cs).
+    "shot-lighting": {"scripts": ("shot-card-auto",), "drop_conquest": True, "size": (32, 24),
+                      "extra_rules": "World:\n\tTgmcOptions:\n\t\tNightDefault: true\n\tScreenshotAt:\n\t\tTick: 110\n", "actors": [
+        ("rifleman", "Marines", 15, 12, 256), ("flamer", "Marines", 14, 13, 256), ("armory", "Marines", 8, 8, 0), ("mech", "Marines", 10, 15, 256),
+        ("runner", "Xenos", 20, 12, 768), ("runner", "Xenos", 20, 13, 768), ("resin-silo", "Xenos", 21, 7, 0),
     ]},
     # The squad leader's Mirage decoy and Mark (see scenarios/test-squadgear.lua).
     "scenario-squadgear": {"scripts": ("test-squadgear",), "drop_conquest": True, "size": (32, 24), "actors": [
@@ -1389,6 +1399,16 @@ SCENARIOS = {
     "scenario-ability-dash": {"scripts": ("test-ability-dash",), "drop_conquest": True, "size": (32, 24), "extra_rules": "rifleman:\n\tActiveAbility@testdash:\n\t\tOrderName: AbilityTestDash\n\t\tSlot: 8\n\t\tLabel: Dash\n\t\tAim: Target\n\t\tRange: 6c0\n\t\tCooldown: 50\n\t\tChargeDistance: 5c0\n\t\tChargeTicks: 10\n\t\tWeapon: TGMCPunch\n", "actors": [
         ("rifleman", "Marines", 4, 4, 256), ("runner", "Xenos", 6, 5, 768), ("rifleman", "Marines", 4, 10, 256), ("cade", "Marines", 7, 10, 0),
         ("rifleman", "Marines", 27, 16, 256), ("cryo-pod", "Marines", 2, 20, 0), ("resin-silo", "Xenos", 20, 21, 0),
+    ]},
+    # Autocast (see scenarios/test-ability-autocast.lua): a rifleman throws its frag by itself only once autocast is on. Everyone holds fire.
+    "scenario-ability-autocast": {"scripts": ("test-ability-autocast",), "drop_conquest": True, "size": (32, 24), "actors": [
+        ("rifleman", "Marines", 6, 10, 768), ("hunter", "Xenos", 11, 10, 0), ("hunter", "Xenos", 11, 11, 0), ("hunter", "Xenos", 12, 10, 0),
+        ("cryo-pod", "Marines", 2, 20, 0), ("resin-silo", "Xenos", 28, 21, 0),
+    ]},
+    # Veterancy (see scenarios/test-veterancy.lua): a rifleman kills three weak runners, worth 150, and ranks up to Veteran (100).
+    "scenario-veterancy": {"scripts": ("test-veterancy",), "drop_conquest": True, "size": (32, 24), "actors": [
+        ("rifleman", "Marines", 6, 10, 768), ("runner", "Xenos", 9, 10, 0), ("runner", "Xenos", 9, 11, 0), ("runner", "Xenos", 9, 9, 0),
+        ("cryo-pod", "Marines", 2, 20, 0), ("resin-silo", "Xenos", 28, 21, 0),
     ]},
     "scenario-kits-marines": {"scripts": ("test-kits-marines",), "drop_conquest": True, "size": (48, 32), "extra_rules": "runner:\n\tHealth:\n\t\tHP: 50000\n", "actors": [
         ("rifleman", "Marines", 6, 10, 512), ("medic", "Marines", 9, 10, 512), ("engineer", "Marines", 12, 10, 512), ("synth", "Marines", 15, 10, 512), ("skirmisher", "Marines", 18, 10, 512), ("smartgunner", "Marines", 21, 10, 512), ("sniper", "Marines", 24, 10, 512), ("rocketeer", "Marines", 27, 10, 512), ("blademan", "Marines", 30, 10, 512), ("mortarman", "Marines", 33, 10, 512), ("flamer", "Marines", 6, 13, 512), ("machinegunner", "Marines", 9, 13, 512), ("bomber", "Marines", 12, 13, 512), ("squad_leader", "Marines", 15, 13, 512), ("field_commander", "Marines", 18, 13, 512), ("grenadier", "Marines", 21, 13, 512), ("mech", "Marines", 24, 13, 512), ("heavygunner", "Marines", 27, 13, 512), ("demolitionist", "Marines", 30, 13, 512), ("mortar-emplacement", "Marines", 8, 20, 0), ("artillery-emplacement", "Marines", 14, 20, 0), ("runner", "Xenos", 8, 16, 0), ("runner", "Xenos", 12, 16, 0), ("runner", "Xenos", 16, 16, 0), ("runner", "Xenos", 20, 16, 0), ("runner", "Xenos", 24, 16, 0), ("runner", "Xenos", 28, 16, 0), ("cryo-pod", "Marines", 3, 3, 0), ("resin-silo", "Xenos", 44, 28, 0),

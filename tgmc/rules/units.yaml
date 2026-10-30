@@ -4,6 +4,8 @@
 ^Unit:
 	Retreat:
 	AlertOnDamage:
+	# Killing a unit earns its cost as experience for the killer (marines and SOM rank up with it: see GainsExperience on ^Infantry).
+	GivesExperience:
 	Health:
 		HP: 120
 	TgmcMobile:
@@ -159,18 +161,58 @@
 
 ^Infantry:
 	Inherits: ^Unit
-	# A flashlight: a small pool of light around the marine (see TerrainLighting in world.yaml). Off (0) on normal maps, where the ground is
-	# already at full light and the pool would only blow the ground out; a dark-mode map turns it up (shot-lighting uses 0.6).
-	TerrainLightSource:
+	# A flashlight: a pool of light that walks with the marine. Only at night (the lobby's Night option, see NightLighting in world.yaml).
+	NightLight:
 		Range: 4c0
-		Intensity: 0
-		# The tint is added to the ground's own tint even at intensity 0, so it stays 0 here (a dark map sets all four together).
-		RedTint: 0
-		GreenTint: 0
-		BlueTint: 0
+		Intensity: 0.6
 	# Balance: marines were losing every AI-vs-AI match, so each marine takes more hits (was 120).
 	Health:
 		HP: 170
+	# Veterancy: kills worth 1x, 2.5x and 5x the marine's own cost make it a Veteran, Hardened and Elite. Each rank adds to the last: 10% more
+	# damage dealt and 8% less taken. Xenos rank up by maturity instead (see ^Xeno).
+	GainsExperience:
+		Conditions:
+			100: rank-veteran
+			250: rank-hardened
+			500: rank-elite
+		LevelUpImage: fx-shockwave
+		LevelUpSequence: ring
+	FirepowerMultiplier@veteran:
+		RequiresCondition: rank-veteran
+		Modifier: 110
+	FirepowerMultiplier@hardened:
+		RequiresCondition: rank-hardened
+		Modifier: 110
+	FirepowerMultiplier@elite:
+		RequiresCondition: rank-elite
+		Modifier: 110
+	DamageMultiplier@veteran:
+		RequiresCondition: rank-veteran
+		Modifier: 92
+	DamageMultiplier@hardened:
+		RequiresCondition: rank-hardened
+		Modifier: 92
+	DamageMultiplier@elite:
+		RequiresCondition: rank-elite
+		Modifier: 92
+	StatusLabel@veteran:
+		RequiresCondition: rank-veteran && !rank-hardened
+		Text: VETERAN
+		Color: C0C0C0
+		Line: 3
+		OnlyWhenSelected: true
+	StatusLabel@hardened:
+		RequiresCondition: rank-hardened && !rank-elite
+		Text: HARDENED
+		Color: E0C060
+		Line: 3
+		OnlyWhenSelected: true
+	StatusLabel@elite:
+		RequiresCondition: rank-elite
+		Text: ELITE
+		Color: FFD040
+		Line: 3
+		OnlyWhenSelected: true
 	# Marines see further than xenos do (the rest of the army sees 7 cells).
 	# Marines see only what a clear line reaches: rock and walls hide what is behind them (see TgmcSight in tgmc/code/Sight.cs).
 	# ^Unit already gave the unit a plain circle of sight; this replaces it, so marines never see through walls.
@@ -1160,6 +1202,13 @@ grenadier:
 
 # The mech: TGMC's Durand. Slow and very tough, with an autocannon and a rocket pod. Built at a Workshop.
 mech:
+	# Headlights at night (the lobby's Night option).
+	NightLight:
+		Range: 6c0
+		Intensity: 0.8
+		RedTint: 0.95
+		GreenTint: 1
+		BlueTint: 1.1
 	Inherits: ^Unit
 	StatusLabel@stunned:
 		RequiresCondition: stunned
@@ -2479,6 +2528,13 @@ plasma-gas:
 
 # The acid a dead xeno leaves behind. It owns itself for a few seconds and hurts enemy infantry standing in it.
 acid-pool:
+	# The acid glows green at night (the lobby's Night option).
+	NightLight:
+		Range: 2c512
+		Intensity: 0.45
+		RedTint: 0.45
+		GreenTint: 1
+		BlueTint: 0.3
 	RevealsShroud:
 		Range: 3c0
 		Type: GroundPosition
@@ -2509,6 +2565,13 @@ acid-pool:
 
 # Burning ground left by the flamer: it hurts every unit standing in it (marine or xeno) until it burns out.
 flame-patch:
+	# The fire lights the ground around it at night (the lobby's Night option).
+	NightLight:
+		Range: 4c0
+		Intensity: 1
+		RedTint: 1
+		GreenTint: 0.6
+		BlueTint: 0.3
 	RevealsShroud:
 		Range: 3c0
 		Type: GroundPosition
@@ -2539,6 +2602,13 @@ flame-patch:
 
 # The flame patch X-Napalm leaves: blue fire, burning longer and hotter.
 flame-patch-blue:
+	# The blue fire lights the ground around it at night (the lobby's Night option).
+	NightLight:
+		Range: 4c0
+		Intensity: 1
+		RedTint: 0.5
+		GreenTint: 0.7
+		BlueTint: 1.2
 	RevealsShroud:
 		Range: 3c0
 		Type: GroundPosition

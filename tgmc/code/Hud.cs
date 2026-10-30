@@ -251,6 +251,10 @@ namespace OpenRA.Mods.TGMC.Traits
 		[Desc("Buttons to click just before the shot, by widget id (for example HELP_BUTTON).")]
 		public readonly string[] Click = [];
 
+		[Desc("Command card buttons to right-click (autocast) and to hold the mouse over (the range preview), at the click tick.")]
+		public readonly string[] RightClick = [];
+		public readonly string[] Hover = [];
+
 		[Desc("Tick to click the buttons on. 0 means five ticks before the shot.")]
 		public readonly int ClickTick = 0;
 
@@ -312,8 +316,14 @@ namespace OpenRA.Mods.TGMC.Traits
 			}
 
 			if (ticks == (info.ClickTick > 0 ? info.ClickTick : info.Tick - 5))
+			{
 				foreach (var id in info.Click)
 					OpenRA.Widgets.Ui.Root.GetOrNull<OpenRA.Mods.Common.Widgets.ButtonWidget>(id)?.OnClick();
+				foreach (var id in info.RightClick)
+					OpenRA.Widgets.Ui.Root.GetOrNull<OpenRA.Mods.TGMC.Widgets.AbilityButtonWidget>(id)?.OnRightClick();
+				foreach (var id in info.Hover)
+					OpenRA.Widgets.Ui.Root.GetOrNull<OpenRA.Mods.TGMC.Widgets.AbilityButtonWidget>(id)?.OnHover(true);
+			}
 
 			if (info.Place != null && ticks == (info.ClickTick > 0 ? info.ClickTick : info.Tick - 5))
 				placeNow = true;

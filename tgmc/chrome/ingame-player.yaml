@@ -1088,7 +1088,7 @@ Container@PLAYER_WIDGETS:
 									Font: TinyBold
 									TooltipContainer: TOOLTIP_CONTAINER
 									TooltipTemplate: SIMPLE_TOOLTIP
-								Button@CMD_SLOT1:
+								AbilityButton@CMD_SLOT1:
 									X: 5
 									Y: 48
 									Width: 60
@@ -1098,7 +1098,7 @@ Container@PLAYER_WIDGETS:
 									Key: TgmcAbility1
 									TooltipContainer: TOOLTIP_CONTAINER
 									TooltipTemplate: SIMPLE_TOOLTIP
-								Button@CMD_SLOT2:
+								AbilityButton@CMD_SLOT2:
 									X: 68
 									Y: 48
 									Width: 60
@@ -1108,7 +1108,7 @@ Container@PLAYER_WIDGETS:
 									Key: TgmcAbility2
 									TooltipContainer: TOOLTIP_CONTAINER
 									TooltipTemplate: SIMPLE_TOOLTIP
-								Button@CMD_SLOT3:
+								AbilityButton@CMD_SLOT3:
 									X: 131
 									Y: 48
 									Width: 60
@@ -1118,7 +1118,7 @@ Container@PLAYER_WIDGETS:
 									Key: TgmcAbility3
 									TooltipContainer: TOOLTIP_CONTAINER
 									TooltipTemplate: SIMPLE_TOOLTIP
-								Button@CMD_SLOT4:
+								AbilityButton@CMD_SLOT4:
 									X: 194
 									Y: 48
 									Width: 60
@@ -1128,7 +1128,7 @@ Container@PLAYER_WIDGETS:
 									Key: TgmcAbility4
 									TooltipContainer: TOOLTIP_CONTAINER
 									TooltipTemplate: SIMPLE_TOOLTIP
-								Button@CMD_SLOT5:
+								AbilityButton@CMD_SLOT5:
 									X: 5
 									Y: 91
 									Width: 60
@@ -1138,7 +1138,7 @@ Container@PLAYER_WIDGETS:
 									Key: TgmcAbility5
 									TooltipContainer: TOOLTIP_CONTAINER
 									TooltipTemplate: SIMPLE_TOOLTIP
-								Button@CMD_SLOT6:
+								AbilityButton@CMD_SLOT6:
 									X: 68
 									Y: 91
 									Width: 60
@@ -1148,7 +1148,7 @@ Container@PLAYER_WIDGETS:
 									Key: TgmcAbility6
 									TooltipContainer: TOOLTIP_CONTAINER
 									TooltipTemplate: SIMPLE_TOOLTIP
-								Button@CMD_SLOT7:
+								AbilityButton@CMD_SLOT7:
 									X: 131
 									Y: 91
 									Width: 60
@@ -1158,7 +1158,7 @@ Container@PLAYER_WIDGETS:
 									Key: TgmcAbility7
 									TooltipContainer: TOOLTIP_CONTAINER
 									TooltipTemplate: SIMPLE_TOOLTIP
-								Button@CMD_SLOT8:
+								AbilityButton@CMD_SLOT8:
 									X: 194
 									Y: 91
 									Width: 60

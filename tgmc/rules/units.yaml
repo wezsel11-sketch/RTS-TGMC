@@ -6,6 +6,8 @@
 	AlertOnDamage:
 	# Killing a unit earns its cost as experience for the killer (marines and SOM rank up with it: see GainsExperience on ^Infantry).
 	GivesExperience:
+	# Kills so far, shown on the selection card.
+	KillCount:
 	Health:
 		HP: 120
 	TgmcMobile:
@@ -213,6 +215,25 @@
 		Color: FFD040
 		Line: 3
 		OnlyWhenSelected: true
+	# Rank chevrons at the unit's foot, shown to everyone: one for Veteran, two for Hardened, three for Elite.
+	WithDecoration@veteran:
+		RequiresCondition: rank-veteran && !rank-hardened
+		Image: rank
+		Sequence: veteran
+		Position: BottomRight
+		ValidRelationships: Ally, Neutral, Enemy
+	WithDecoration@hardened:
+		RequiresCondition: rank-hardened && !rank-elite
+		Image: rank
+		Sequence: hardened
+		Position: BottomRight
+		ValidRelationships: Ally, Neutral, Enemy
+	WithDecoration@elite:
+		RequiresCondition: rank-elite
+		Image: rank
+		Sequence: elite
+		Position: BottomRight
+		ValidRelationships: Ally, Neutral, Enemy
 	# Marines see further than xenos do (the rest of the army sees 7 cells).
 	# Marines see only what a clear line reaches: rock and walls hide what is behind them (see TgmcSight in tgmc/code/Sight.cs).
 	# ^Unit already gave the unit a plain circle of sight; this replaces it, so marines never see through walls.

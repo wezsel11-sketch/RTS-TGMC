@@ -586,6 +586,28 @@ def write_repair_fx(out):
         img.save(os.path.join(out, f"{name}.png"), pnginfo=meta)
 
 
+def write_rank_chevrons(out):
+    """rank.png: the veterancy chevrons shown at a ranked marine's foot (WithDecoration in units.yaml), three 16x16 frames:
+    one silver chevron (Veteran), two gold (Hardened), three bright gold (Elite). Drawn here, no TGMC art."""
+    size = 16
+    colours = ((196, 200, 206, 255), (224, 184, 80, 255), (255, 214, 72, 255))
+    outline = (20, 18, 12, 255)
+    sheet = Image.new("RGBA", (size * 3, size), (0, 0, 0, 0))
+    for rank, colour in enumerate(colours):
+        frame = Image.new("RGBA", (size, size), (0, 0, 0, 0))
+        d = ImageDraw.Draw(frame)
+        # Chevrons point up, stacked from the bottom, 4 px apart: a dark outline line under a coloured one.
+        for k in range(rank + 1):
+            y = 13 - 4 * k
+            for width, fill in ((4, outline), (2, colour)):
+                d.line([(2, y), (8, y - 4), (14, y)], fill=fill, width=width, joint="curve")
+        sheet.paste(frame, (size * rank, 0))
+    meta = PngImagePlugin.PngInfo()
+    meta.add_text("FrameSize", f"{size},{size}")
+    meta.add_text("FrameAmount", "3")
+    sheet.save(os.path.join(out, "rank.png"), pnginfo=meta)
+
+
 def draw_miner(spin=0, broken=False, glow=(120, 230, 100, 255), ring=None):
     """One drill seen from above, 128 px (scaled down by the caller). spin turns the bit (0-3); broken leaves it out of line and dark."""
     S = 128
@@ -1084,6 +1106,12 @@ SCENARIOS = {
     "shot-card": {"scripts": ("shot",), "extra_rules": "World:\n\tScreenshotAt:\n\t\tTick: 80\n\t\tSelect: squad_leader\n", "actors": [
         ("squad_leader", "Marines", 15, 12, 512),
         ("rifleman", "Marines", 16, 13, 512),
+        ("resin-silo", "Xenos", 22, 22, 0),
+    ]},
+    # Veterancy on show (Not a test): riflemen at each rank with their stars, and the selected squad leader's rank line and bar.
+    "shot-ranks": {"scripts": ("shot-ranks",), "extra_rules": "World:\n\tScreenshotAt:\n\t\tTick: 60\n\t\tSelect: squad_leader\n", "actors": [
+        ("squad_leader", "Marines", 15, 12, 512),
+        ("rifleman", "Marines", 13, 13, 512), ("rifleman", "Marines", 15, 14, 512), ("rifleman", "Marines", 17, 13, 512),
         ("resin-silo", "Xenos", 22, 22, 0),
     ]},
     # The squad leader's MOVE! yell: the shout, the ring and the buff labels (Not a test).
@@ -1892,6 +1920,7 @@ def main():
     write_overlay(args.out)
     write_acid_pool(args.out)
     write_repair_fx(args.out)
+    write_rank_chevrons(args.out)
     write_miner_art(args.out)
     if args.tgmc:
         write_tgmc_miner_art(args.out, args.tgmc)

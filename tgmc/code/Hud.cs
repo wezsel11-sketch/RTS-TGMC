@@ -11,6 +11,7 @@ using OpenRA.Mods.Common.Traits;
 using OpenRA.Mods.Common.Widgets;
 using OpenRA.Mods.Common.Widgets.Logic;
 using OpenRA.Mods.TGMC.Traits;
+using OpenRA.Primitives;
 using OpenRA.Traits;
 using OpenRA.Widgets;
 
@@ -43,6 +44,38 @@ namespace OpenRA.Mods.TGMC.Widgets.Logic
 					var max = healths.Sum(x => x.MaxHP);
 					return HealthTint.Apply(hpBar, max == 0 ? 0 : 100 * healths.Sum(x => x.HP) / max);
 				};
+			}
+
+			// The right half of the card for one unit: its rank (or a xeno's maturity) with a bar to the next, what it fights with, and its record.
+			bool One() => Selected().Count == 1;
+			if (widget.GetOrNull<LabelWidget>("SEL_RANK") is { } rank)
+			{
+				rank.IsVisible = One;
+				rank.GetText = () => Rank(out _, out _).Text;
+				rank.GetColor = () => Rank(out _, out _).Color;
+			}
+
+			if (widget.GetOrNull<ProgressBarWidget>("SEL_XPBAR") is { } xp)
+			{
+				xp.IsVisible = () => One() && Rank(out _, out _).Progress >= 0;
+				xp.GetPercentage = () =>
+				{
+					var r = Rank(out var maturity, out _);
+					xp.Bar = maturity ? "progressbar-thumb-maturity" : "progressbar-thumb-xp";
+					return r.Progress;
+				};
+			}
+
+			if (widget.GetOrNull<LabelWidget>("SEL_WEAPON") is { } weapon)
+			{
+				weapon.IsVisible = One;
+				weapon.GetText = Weapons;
+			}
+
+			if (widget.GetOrNull<LabelWidget>("SEL_RECORD") is { } record)
+			{
+				record.IsVisible = One;
+				record.GetText = Record;
 			}
 
 			var portrait = widget.GetOrNull<SpriteWidget>("SEL_PORTRAIT");
@@ -106,6 +139,107 @@ namespace OpenRA.Mods.TGMC.Widgets.Logic
 			return $"Health {healths.Sum(h => h.HP)} / {healths.Sum(h => h.MaxHP)}";
 		}
 
+		static readonly Color Unranked = Color.FromArgb(150, 150, 150);
+		static readonly Dictionary<string, Color> RankColors = new()
+		{
+			{ "veteran", Color.FromArgb(192, 192, 192) }, { "hardened", Color.FromArgb(224, 192, 96) }, { "elite", Color.FromArgb(255, 208, 64) }
+		};
+
+		// The selected unit's rank line: marines by experience (GainsExperience), xenos by maturity. Progress is the share of the way to
+		// the next rank, or -1 when there is no bar to show (top rank, or a unit that does neither).
+		(string Text, Color Color, int Progress) Rank(out bool maturity, out int level)
+		{
+			maturity = false;
+			level = 0;
+			var selected = Selected();
+			if (selected.Count != 1)
+				return ("", Unranked, -1);
+
+			var a = selected[0];
+			var gains = a.TraitOrDefault<GainsExperience>();
+			if (gains != null)
+			{
+				var info = a.Info.TraitInfo<GainsExperienceInfo>();
+				var scale = info.ExperienceModifier < 0 ? (a.Info.TraitInfoOrDefault<ValuedInfo>()?.Cost ?? 1) : info.ExperienceModifier;
+				var steps = info.Conditions.OrderBy(kv => kv.Key).ToList();
+				level = gains.Level;
+				var name = level == 0 ? "Recruit" : Capitalise(steps[level - 1].Value.Replace("rank-", ""));
+				var colour = level == 0 ? Unranked : RankColors.GetValueOrDefault(steps[level - 1].Value.Replace("rank-", ""), Color.White);
+				if (level >= steps.Count)
+					return ($"{name.ToUpperInvariant()}   top rank", colour, -1);
+
+				// Experience is in hundredths of the unit's cost: show it as requisition worth of kills.
+				var from = level == 0 ? 0 : steps[level - 1].Key * scale;
+				var to = steps[level].Key * scale;
+				var progress = 100 * (gains.Experience - from) / System.Math.Max(1, to - from);
+				return ($"{name.ToUpperInvariant()}   {gains.Experience / 100} / {to / 100} to {Capitalise(steps[level].Value.Replace("rank-", ""))}", colour, progress);
+			}
+
+			var ripe = a.TraitOrDefault<Maturity>();
+			if (ripe != null && !ripe.IsTraitDisabled)
+			{
+				maturity = true;
+				level = ripe.Tier;
+				var tiers = ripe.Info.Conditions.Length;
+				var colour = Color.FromArgb(200, 140, 235);
+				if (level >= tiers)
+					return ($"{Tiers[level].ToUpperInvariant()}   fully grown", colour, -1);
+
+				var progress = (int)(100 * ((ISelectionBar)ripe).GetValue());
+				return ($"{Tiers[level].ToUpperInvariant()}   {progress}% to {Tiers[level + 1]}", colour, progress);
+			}
+
+			return ("", Unranked, -1);
+		}
+
+		static string Capitalise(string s) { return s.Length == 0 ? s : char.ToUpperInvariant(s[0]) + s[1..]; }
+
+		// The weapons the unit fights with now (a mech's loadout or a toggled shell type switches some off): name, damage, reach, rate.
+		string Weapons()
+		{
+			var selected = Selected();
+			if (selected.Count != 1)
+				return "";
+
+			var lines = selected[0].TraitsImplementing<Armament>()
+				.Where(arm => !arm.IsTraitDisabled && arm.Weapon.Warheads.OfType<Mods.Common.Warheads.DamageWarhead>().Any())
+				.GroupBy(arm => arm.Info.Weapon)
+				// The main gun first: the one that reaches furthest, then a melee or side weapon.
+				.OrderByDescending(g => g.First().Weapon.Range.Length)
+				.Take(2)
+				.Select(g =>
+				{
+					var w = g.First().Weapon;
+					var damage = w.Warheads.OfType<Mods.Common.Warheads.DamageWarhead>().First().Damage;
+					var cycle = w.ReloadDelay + w.BurstDelays.Take(System.Math.Max(0, w.Burst - 1)).Sum();
+					var perSecond = cycle > 0 ? System.Math.Abs(damage) * w.Burst * 25 / cycle : 0;
+					var reach = w.Range.Length < 1536 ? "melee" : $"{w.Range.Length / 1024f:0.#} cells";
+					return $"{g.Key.Replace("TGMC", "")}  {System.Math.Abs(damage)}x{w.Burst}  {reach}  {perSecond}/s" + (damage < 0 ? " heal" : "");
+				});
+			return string.Join("     ", lines);
+		}
+
+		// Armour, speed and the unit's kills so far.
+		string Record()
+		{
+			var selected = Selected();
+			if (selected.Count != 1)
+				return "";
+
+			var a = selected[0];
+			var parts = new List<string>();
+			if (a.Info.TraitInfoOrDefault<ArmorInfo>()?.Type is { } armour)
+				parts.Add($"Armour {armour}");
+
+			if (a.TraitOrDefault<IMove>() != null && a.Info.TraitInfoOrDefault<MobileInfo>() is { } mobile)
+				parts.Add($"Speed {mobile.Speed}");
+
+			if (a.TraitOrDefault<KillCount>() is { } kills)
+				parts.Add(kills.Kills == 1 ? "1 kill" : $"{kills.Kills} kills");
+
+			return string.Join("   ", parts);
+		}
+
 		string Ammo()
 		{
 			var selected = Selected();
@@ -161,6 +295,24 @@ namespace OpenRA.Mods.TGMC.Traits
 {
 	using System;
 	using OpenRA.Primitives;
+
+	[Desc("Counts the enemies this actor has killed, for the selection card.")]
+	public class KillCountInfo : TraitInfo
+	{
+		public override object Create(ActorInitializer init) { return new KillCount(); }
+	}
+
+	public class KillCount : INotifyAppliedDamage
+	{
+		public int Kills { get; private set; }
+
+		void INotifyAppliedDamage.AppliedDamage(Actor self, Actor damaged, AttackInfo e)
+		{
+			if (e.DamageState == DamageState.Dead && e.PreviousDamageState != DamageState.Dead
+				&& self.Owner.RelationshipWith(damaged.Owner) == PlayerRelationship.Enemy)
+				Kills++;
+		}
+	}
 
 	[Desc("A bar under a selected unit showing how much of its magazine is left.")]
 	public class AmmoBarInfo : TraitInfo, Requires<AmmoPoolInfo>

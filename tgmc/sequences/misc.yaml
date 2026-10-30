@@ -24,6 +24,18 @@ rallypoint:
 		Tick: 160
 		ZOffset: 2047
 
+# Veterancy chevrons at a ranked marine's foot (WithDecoration in units.yaml): one, two and three. Drawn by mod/make_placeholders.py.
+rank:
+	veteran:
+		Filename: rank.png
+		Start: 0
+	hardened:
+		Filename: rank.png
+		Start: 1
+	elite:
+		Filename: rank.png
+		Start: 2
+
 # Medic and engineer signals: a heal's three green crosses and a repair's rocking wrench. Both sheets are drawn by
 # mod/make_placeholders.py (no TGMC art). The weapons in weapons.yaml name these actors as their effect Image.
 heal-plus:

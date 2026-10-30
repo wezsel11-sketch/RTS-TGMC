@@ -735,6 +735,30 @@ Container@PLAYER_WIDGETS:
 									Height: 16
 									Font: TinyBold
 									Align: Left
+								Label@SEL_RANK:
+									X: 210
+									Y: 8
+									Width: 262
+									Height: 16
+									Font: TinyBold
+								ProgressBar@SEL_XPBAR:
+									X: 210
+									Y: 26
+									Width: 252
+									Height: 5
+									BarMargin: 1, 1
+								Label@SEL_WEAPON:
+									X: 210
+									Y: 38
+									Width: 262
+									Height: 16
+									Font: Tiny
+								Label@SEL_RECORD:
+									X: 210
+									Y: 56
+									Width: 262
+									Height: 16
+									Font: Tiny
 						Background@GROUP_PANEL:
 							Logic: GroupGridLogic
 							X: 410

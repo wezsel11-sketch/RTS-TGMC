@@ -5,6 +5,8 @@
 
 ^Structure:
 	FadesInOnBuild:
+	# Kills so far (turrets), shown on the selection card.
+	KillCount:
 	Health:
 		HP: 600
 	Building:

@@ -50,6 +50,8 @@ PANEL_COLLECTIONS = [
     "term-window", "term-titlebar",
     # States and panels the stock settings, music, lobby and observer widgets look up by name.
     "scrollitem", "scrollitem-nohover", "scrollitem-nohover-highlighted", "progressbar-bg", "progressbar-thumb", "progressbar-thumb-mid", "progressbar-thumb-low",
+    # The selection card's rank (gold) and maturity (purple) bars.
+    "progressbar-thumb-xp", "progressbar-thumb-maturity",
     "panel-bg", "panel-header", "panel-rule", "panel-thinborder", "panel-thinborder-light",
     "textfield-hover", "textfield-focused", "textfield-disabled",
 ]
@@ -191,6 +193,10 @@ def style_for(name):
         return (219, 40, 40, 255), (255, 120, 120, 255)
     if name == "progressbar-thumb":
         return (91, 170, 39, 255), (150, 220, 110, 255)
+    if name == "progressbar-thumb-xp":
+        return (214, 168, 52, 255), (255, 214, 120, 255)
+    if name == "progressbar-thumb-maturity":
+        return (176, 102, 220, 255), (214, 160, 245, 255)
     if name == "progressbar-bg":
         return TGUI_TRACK, TGUI_EDGE
     if name == "tgui-window":

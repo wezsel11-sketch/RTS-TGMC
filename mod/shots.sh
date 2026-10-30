@@ -38,6 +38,7 @@ if [ "${1:-}" = "--one" ]; then
 			break
 		fi
 		kill -0 "$runner" 2>/dev/null || { echo "FAIL  $name: the game quit before the shot (see $support/game.log)"; break; }
+		grep -q "Fatal Lua Error" "$support/game.log" 2>/dev/null && { echo "FAIL  $name: $(grep -m1 "Fatal Lua Error" "$support/game.log")"; break; }
 		sleep 1
 		waited=$((waited + 1))
 	done

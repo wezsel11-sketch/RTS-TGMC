@@ -434,6 +434,28 @@ namespace OpenRA.Mods.TGMC.Traits
 
 		public bool Use(Actor self) { return Use(self, Target.Invalid); }
 
+		/// <summary>WeaponInfo.Impact for a weapon fired straight from an ability. A unit target that one warhead kills becomes its last
+		/// position for the warheads after it (and for delayed ones), so a later one (a screen shake) never asks a dead target where it is.</summary>
+		static void Impact(World world, WeaponInfo weapon, Target target, WarheadArgs args)
+		{
+			var last = target.CenterPosition;
+			foreach (var warhead in weapon.Warheads)
+			{
+				if (target.Type == TargetType.Invalid)
+					target = Target.FromPos(last);
+				else
+					last = target.CenterPosition;
+
+				if (warhead.Delay > 0)
+				{
+					var later = Target.FromPos(last);
+					world.AddFrameEndTask(w => w.Add(new DelayedImpact(warhead.Delay, warhead, later, args)));
+				}
+				else
+					warhead.DoImpact(target, args);
+			}
+		}
+
 		public bool Use(Actor self, in Target target)
 		{
 			if (!Ready || self.IsDead)
@@ -543,7 +565,7 @@ namespace OpenRA.Mods.TGMC.Traits
 				}
 				else
 				{
-					weapon.Impact(aim, args);
+					Impact(world, weapon, aim, args);
 					if (Info.SelfDestruct)
 						self.Kill(self);
 				}
@@ -599,9 +621,9 @@ namespace OpenRA.Mods.TGMC.Traits
 				var weapon = world.Map.Rules.Weapons[Info.Weapon.ToLowerInvariant()];
 				var hit = path.SelectMany(p => world.FindActorsInCircle(p, new WDist(1280))).Distinct()
 					.Where(a => a != self && !a.IsDead && self.Owner.RelationshipWith(a.Owner) == PlayerRelationship.Enemy).ToList();
-				foreach (var victim in hit)
+				foreach (var victim in hit.Where(v => !v.IsDead && v.IsInWorld))
 				{
-					weapon.Impact(Target.FromActor(victim), new WarheadArgs
+					Impact(world, weapon, Target.FromActor(victim), new WarheadArgs
 					{
 						Weapon = weapon,
 						SourceActor = self,

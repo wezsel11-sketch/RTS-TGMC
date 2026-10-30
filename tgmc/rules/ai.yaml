@@ -223,7 +223,8 @@ Player:
 		ConstructionYardTypes: cryo-pod, resin-silo, forward-hive
 		ProtectionTypes: cryo-pod, vendor, resin-silo, mini-silo, sentry-turret, resin-turret, miner, weed-node, armory, ordnance-depot, evolution-tower, maturity-tower, workshop, mortar-emplacement, artillery-emplacement, forward-hive, cade
 	# Calls in CAS (marines) or the hive powers (xenos) when the strike is ready and a cluster of enemies is in sight. A friendly unit in the blast counts against the spot.
-	SupportPowerBotModule:
+	# Same Decisions as the stock module; it looks for targets around each seen actor, not on a fixed grid (see Bots.cs).
+	TgmcSupportPowerBotModule:
 		RequiresCondition: enable-skirmish-ai && !enable-easy-ai
 		Decisions:
 			bombrun:

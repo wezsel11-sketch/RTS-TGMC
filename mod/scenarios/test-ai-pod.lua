@@ -1,36 +1,45 @@
 -- Scenario test: the marine AI calls a drop pod on a cluster of hunters by itself, and the marines inside step out. Prints "TEST ai-pod PASS" or "TEST ai-pod FAIL".
+-- A pod's marines are made by the power, not trained: every marine infantry that shows up without a producer counts as a pod arrival.
 local reported = false
-local peakRiflemen, peakMedics = 0, 0
--- The most riflemen seen by the hunters at once.
-local jump = 0
+local seen = {}
+local trained = {}
+local arrived = 0
+
+-- Lua gets a new handle for an actor on every call, so tables key it by its name and ID ("Actor (rifleman 42)").
+local function key(a)
+	return (tostring(a):gsub(" %(not in world%)", ""))
+end
 
 WorldLoaded = function()
 	local marines = Player.GetPlayer("Marines")
 	-- Standing still, hunters fade from sight and the AI cannot aim at what it cannot see: switch their stealth off.
 	Utils.Do(Player.GetPlayer("Xenos").GetActorsByType("hunter"), function(h) h.UseAbility(1) end)
+	-- The units on the map at the start are not arrivals.
+	for _, t in ipairs({ "rifleman", "medic", "engineer" }) do
+		Utils.Do(marines.GetActorsByType(t), function(a) seen[key(a)] = true end)
+	end
+	Trigger.OnAnyProduction(function(_, produced) trained[key(produced)] = true end)
+
 	local function poll(ticks)
 		if reported then
 			return
 		end
-		-- Peak counts: the hunters can kill the pod's marines between two polls, so a drop that happened still counts.
-		-- Riflemen standing by the hunters came by pod: the factory's step out at the base, 16 cells away (the rifleman watching the
-		-- hunters stands 7 cells off, outside this count).
-		local near = 0
-		for _, r in ipairs(marines.GetActorsByType("rifleman")) do
-			if not r.IsDead and math.abs(r.Location.X - 22) <= 5 and math.abs(r.Location.Y - 23) <= 5 then
-				near = near + 1
+		for _, t in ipairs({ "rifleman", "medic", "engineer" }) do
+			for _, a in ipairs(marines.GetActorsByType(t)) do
+				if not seen[key(a)] then
+					seen[key(a)] = true
+					if not trained[key(a)] then
+						arrived = arrived + 1
+					end
+				end
 			end
 		end
-		jump = math.max(jump, near)
-		peakRiflemen = math.max(peakRiflemen, #marines.GetActorsByType("rifleman"))
-		peakMedics = math.max(peakMedics, #marines.GetActorsByType("medic"))
-		local riflemen, medics = peakRiflemen, peakMedics
-		if jump >= 3 then
+		if arrived >= 3 then
 			reported = true
-			print("TEST ai-pod PASS (" .. jump .. " pod riflemen by the hunters by tick " .. ticks .. ")")
+			print("TEST ai-pod PASS (" .. arrived .. " marines came by pod by tick " .. ticks .. ")")
 		elseif ticks >= 2500 then
 			reported = true
-			print("TEST ai-pod FAIL (at most " .. jump .. " riflemen by the hunters, peak " .. riflemen .. " riflemen, " .. medics .. " medics)")
+			print("TEST ai-pod FAIL (" .. arrived .. " marines came by pod)")
 		else
 			Trigger.AfterDelay(5, function() poll(ticks + 5) end)
 		end

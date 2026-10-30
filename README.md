@@ -301,8 +301,11 @@ mod/                        converters and build script (Python 3, Pillow, ffmpe
   tgmc_dmm.py               reads TGMC .dmm maps and converts them to terrain for the four converted skirmish maps
   lint_static.py            cross-reference check (sounds, weapons, voice sets, Fluent keys, sequences); build_mod.sh runs it
   smoke.sh                  launches the built mod headless on a map, screenshots it, fails on an engine exception
-  test_scenarios.sh         runs the scripted scenario maps (heal, repair, mend, victory, combat, fx, waves, ai, rally, build) and checks each prints PASS; test-aivai and test-holdline run through balance.sh, and test-sounds plays every sound to listen to
-  balance.sh                runs several AI-vs-AI matches (balance-aivai) in parallel and prints who won and when
+  test_scenarios.sh         runs the scripted scenario maps (build/dev-maps/scenario-*) and checks each prints PASS; `mod/test_scenarios.sh 150 ability ai-pod` runs only
+                            the maps whose names contain those words. TGMC_FAST=1 (its default) runs the sim flat out without drawing: the whole suite takes about five minutes
+  balance.sh                runs many AI-vs-AI matches (balance-aivai, balance-holdline or any aimap-*) and prints the marines' win rate with a 95% interval;
+                            extra rules files are arms of their own, set against the plain map (`mod/balance.sh 40 400 balance-aivai tweak.yaml`)
+  shots.sh                  takes the screenshots of the shot-* dev maps (HUD, card, codex, effects) into build/shots: `mod/shots.sh card hud`
   scenarios/                the Lua scripts those maps run (copied into each map by make_placeholders.py)
   check_mod.sh              runs OpenRA's own lint (--check-yaml, --check-missing-sprites) on the built mod and map
   make_chrome.py            TGUI-style UI atlas (olive, slate, amber) and chrome.yaml: windows, tabs, panels, icons, logo (no TGMC art)

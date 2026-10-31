@@ -234,8 +234,16 @@ namespace OpenRA.Mods.TGMC.Widgets.Logic
 			if (a.TraitOrDefault<IMove>() != null && a.Info.TraitInfoOrDefault<MobileInfo>() is { } mobile)
 				parts.Add($"Speed {mobile.Speed}");
 
-			if (a.TraitOrDefault<KillCount>() is { } kills)
+			if (a.TraitOrDefault<KillCount>() is { } kills && (kills.Kills > 0 || a.TraitOrDefault<AttackBase>() != null))
 				parts.Add(kills.Kills == 1 ? "1 kill" : $"{kills.Kills} kills");
+
+			// A building that earns: what it pays now. A disabled miner's trickle is switched off: say so, and how to bring it back.
+			var trickles = a.TraitsImplementing<CashTrickler>().ToList();
+			if (trickles.Count > 0)
+			{
+				var paying = trickles.Where(t => !t.IsTraitDisabled && !t.IsTraitPaused).Sum(t => t.Info.Amount * 1500 / System.Math.Max(1, t.Info.Interval));
+				parts.Add(paying > 0 ? $"Income +{paying}/min" : a.TraitOrDefault<MinerField>() != null ? "DISABLED: repair it to earn again" : "Earns nothing now");
+			}
 
 			return string.Join("   ", parts);
 		}

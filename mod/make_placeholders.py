@@ -1115,6 +1115,11 @@ SCENARIOS = {
         ("rifleman", "Marines", 13, 13, 512), ("rifleman", "Marines", 15, 14, 512), ("rifleman", "Marines", 17, 13, 512),
         ("resin-silo", "Xenos", 22, 22, 0),
     ]},
+    # A miner selected (Not a test): the card's income line.
+    "shot-miner": {"scripts": ("shot-card-auto",), "extra_rules": "World:\n\tScreenshotAt:\n\t\tTick: 60\n\t\tSelect: miner\n", "actors": [
+        ("miner", "Marines", 15, 12, 0), ("rifleman", "Marines", 13, 13, 512),
+        ("resin-silo", "Xenos", 22, 22, 0),
+    ]},
     # The squad leader's MOVE! yell: the shout, the ring and the buff labels (Not a test).
     "shot-yell": {"scripts": ("shot-yell",), "extra_rules": "World:\n\tScreenshotAt:\n\t\tTick: 72\n\t\tSelect: squad_leader\n", "actors": [
         ("squad_leader", "Marines", 15, 12, 512), ("rifleman", "Marines", 16, 13, 512), ("rifleman", "Marines", 14, 13, 512),

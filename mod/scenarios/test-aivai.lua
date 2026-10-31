@@ -35,8 +35,11 @@ end
 WorldLoaded = function()
 	local marines = Player.GetPlayer("Marines")
 	local xenos = Player.GetPlayer("Xenos")
-	local marineArmy = { "rifleman", "medic", "engineer", "smartgunner", "grenadier" }
-	local xenoArmy = { "runner", "hunter", "sentinel", "warrior", "drone" }
+	-- Every unit the AIs can build (ai.yaml's UnitsToBuild), so the STAT lines count the whole army.
+	local marineArmy = { "rifleman", "medic", "engineer", "smartgunner", "grenadier", "squad_leader", "field_commander", "synth", "skirmisher",
+		"sniper", "rocketeer", "blademan", "mortarman", "flamer", "machinegunner", "heavygunner", "demolitionist", "mech" }
+	local xenoArmy = { "runner", "hunter", "sentinel", "warrior", "drone", "spitter", "praetorian", "crusher", "ravager", "defiler", "boiler",
+		"carrier", "facehugger", "warlock", "shrike", "widow", "wraith", "bull", "behemoth", "queen" }
 	local structures = { "cryo-pod", "vendor", "sentry-turret", "resin-silo", "mini-silo", "resin-turret",
 		"miner", "armory", "ordnance-depot", "weed-node", "evolution-tower", "maturity-tower" }
 

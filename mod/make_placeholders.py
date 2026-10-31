@@ -890,10 +890,11 @@ SCENARIOS = {
         ("rifleman", "Marines", 20, 20, 0),
         ("resin-silo", "Xenos", 19, 19, 0),
     ]},
+    # The hunters face the mech: their sight is a forward cone (see scenarios/test-mech.lua).
     "scenario-mech": {"scripts": ("test-mech",), "actors": [
         ("mech", "Marines", 10, 10, 512),
-        ("hunter", "Xenos", 15, 9, 0),
-        ("hunter", "Xenos", 15, 11, 0),
+        ("hunter", "Xenos", 15, 9, 256),
+        ("hunter", "Xenos", 15, 11, 256),
         ("resin-silo", "Xenos", 19, 19, 0),
     ]},
     "scenario-cas-ammo": {"scripts": ("test-cas-ammo",), "size": (88, 48), "spawns": [(6, 40), (84, 44)], "actors": [

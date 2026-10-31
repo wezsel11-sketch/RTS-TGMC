@@ -20,6 +20,14 @@ AfterStart = function()
 		end
 	end)
 
+	-- A lost match pauses the world, so the timeout below would never come: report the loss itself.
+	Trigger.OnPlayerLost(Marines, function()
+		if not reported then
+			reported = true
+			print("TEST waves FAIL (marines lost after " .. WavesSent .. " waves)")
+		end
+	end)
+
 	Trigger.AfterDelay(1500, function()
 		if not reported then
 			reported = true

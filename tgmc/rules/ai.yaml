@@ -99,9 +99,10 @@ Player:
 		RequiresCondition: enable-skirmish-ai && !faction-xenos
 		Workers: engineer, som_engineer
 	# Marine and xeno bots: buy upgrades from the Upgrades tab, the marines their guns and the xenos their carapace, claws and speed (see UpgradeBotModule
-	# in Bots.cs). Easy bots stay on their starting kit.
+	# in Bots.cs), once they field ten fighting units: an upgrade is paid ahead of the units and would stop the army growing. Easy bots stay on their starting kit.
 	UpgradeBotModule@skirmish:
 		RequiresCondition: enable-skirmish-ai && !enable-easy-ai
+		MinArmy: 10
 	ParallelBuildBotModule@skirmish:
 		RequiresCondition: enable-skirmish-ai && !enable-easy-ai
 		MinCash: 300

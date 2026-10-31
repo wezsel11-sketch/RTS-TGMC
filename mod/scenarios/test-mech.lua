@@ -5,6 +5,9 @@ WorldLoaded = function()
 	local mech = marines.GetActorsByType("mech")[1]
 	local hunters = xenos.GetActorsByType("hunter")
 	local mechMax = mech.MaxHealth
+	-- The mech's loadout is random, and the flamer one cannot reach hunters five cells off, while idle hunters only go for what is in claw
+	-- reach: send them at it, so every loadout gets its fight. Not at load: the xenos' sight is worked out after WorldLoaded.
+	Trigger.AfterDelay(10, function() Utils.Do(hunters, function(h) h.Attack(mech) end) end)
 	Trigger.AfterDelay(500, function()
 		local dead = 0
 		for _, h in ipairs(hunters) do

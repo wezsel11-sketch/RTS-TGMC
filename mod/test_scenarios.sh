@@ -7,7 +7,8 @@
 # Each scenario is a map built by make_placeholders.py (into build/dev-maps, out of the game's menus) with a Lua script from
 # mod/scenarios. TGMC_FAST=1 (the default here) runs the sim as fast as the CPU allows and draws nothing; TGMC_FAST=0 runs it at
 # game speed (25 ticks a second at best). Each run stops once it prints PASS or FAIL, or at the ceiling in seconds (default 150).
-# Uses xvfb-run when installed, else SDL's offscreen driver. SCENARIO_JOBS (default 4) caps how many run at once.
+# Uses xvfb-run when installed, else SDL's offscreen driver. SCENARIO_JOBS (default 4) caps how many run at once. DEV_MAPS points at
+# another dev-maps folder (default build/dev-maps).
 # The slow AI-vs-AI match is balance-aivai, run by mod/balance.sh instead.
 set -u
 
@@ -15,7 +16,7 @@ HERE=$(cd "$(dirname "$0")" && pwd)
 ROOT=$(cd "$HERE/.." && pwd)
 OPENRA_DIR=${OPENRA_DIR:?set OPENRA_DIR to a built OpenRA checkout}
 OUT=${SMOKE_OUT:-"$ROOT/build/scenarios"}
-MAPS="$ROOT/build/dev-maps"
+MAPS=${DEV_MAPS:-"$ROOT/build/dev-maps"}
 export LIBGL_ALWAYS_SOFTWARE=1 SDL_AUDIODRIVER=dummy TGMC_FAST=${TGMC_FAST:-1}
 [ -d "$ROOT/build/tools/dotnet" ] && export PATH="$ROOT/build/tools/dotnet:$PATH" DOTNET_ROOT="$ROOT/build/tools/dotnet"
 export DOTNET_CLI_TELEMETRY_OPTOUT=1

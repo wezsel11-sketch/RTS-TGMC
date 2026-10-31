@@ -12,6 +12,30 @@
 	Interactable:
 	ProvidesPrerequisite:
 
+# Economy upgrades (see miner in structures.yaml): deep-core drills make each miner pay half as much again; reinforced housings make a miner
+# take a third less damage, so the xenos need longer to disable it. First in the palette, so the bot buys them before its guns.
+upgrade-miner-drills:
+	Inherits: ^Upgrade
+	Buildable:
+		Prerequisites: armory, ~faction-marines
+		BuildPaletteOrder: 5
+		Description: actor-upgrade-miner-drills.description
+	Tooltip:
+		Name: actor-upgrade-miner-drills.name
+	Valued:
+		Cost: 400
+
+upgrade-miner-housing:
+	Inherits: ^Upgrade
+	Buildable:
+		Prerequisites: armory, ~faction-marines
+		BuildPaletteOrder: 6
+		Description: actor-upgrade-miner-housing.description
+	Tooltip:
+		Name: actor-upgrade-miner-housing.name
+	Valued:
+		Cost: 300
+
 # The rifleman ladder: he starts with the T-18 carbine, then the T-12, then the M412 (see rifleman in units.yaml).
 upgrade-rifle-t12:
 	Inherits: ^Upgrade

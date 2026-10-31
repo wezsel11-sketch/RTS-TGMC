@@ -673,6 +673,24 @@ def write_tgmc_miner_art(out, tgmc):
     icon.save(os.path.join(out, "miner-icon.png"))
 
 
+def write_miner_upgrade_icons(out):
+    """The miner upgrades' palette icons (tgmc/sequences/miner.yaml): the miner on the same dark card as the other upgrades (build_sprites.cameo),
+    with a gold plus in the corner for the deep-core drills and a blue shield for the reinforced housings."""
+    from build_sprites import cameo
+    dark = (16, 16, 16, 255)
+    plus = cameo(Image.open(os.path.join(out, "miner-icon.png")))
+    d = ImageDraw.Draw(plus)
+    for off, fill in ((1, dark), (0, (255, 206, 64, 255))):
+        d.rectangle([46 - off, 32 - off, 58 + off, 36 + off], fill=fill)
+        d.rectangle([50 - off, 28 - off, 54 + off, 40 + off], fill=fill)
+    plus.save(os.path.join(out, "upgrade-miner-drills.png"))
+    shield = cameo(Image.open(os.path.join(out, "miner-icon.png")))
+    d = ImageDraw.Draw(shield)
+    d.polygon([(45, 27), (59, 27), (59, 35), (52, 42), (45, 35)], fill=dark)
+    d.polygon([(47, 29), (57, 29), (57, 34), (52, 39), (47, 34)], fill=(84, 140, 214, 255))
+    shield.save(os.path.join(out, "upgrade-miner-housing.png"))
+
+
 def write_miner_art(out):
     """The marine miner and the ore field, drawn here rather than cut from TGMC's 32x48 drill (too tall for a cell). Both are one cell
     (32 px) and the miner's icon is 44 px. miner.png: 4 frames of the spinning bit. miner-icon.png: the sidebar picture.
@@ -890,11 +908,10 @@ SCENARIOS = {
         ("rifleman", "Marines", 20, 20, 0),
         ("resin-silo", "Xenos", 19, 19, 0),
     ]},
-    # The hunters face the mech: their sight is a forward cone (see scenarios/test-mech.lua).
     "scenario-mech": {"scripts": ("test-mech",), "actors": [
         ("mech", "Marines", 10, 10, 512),
-        ("hunter", "Xenos", 15, 9, 256),
-        ("hunter", "Xenos", 15, 11, 256),
+        ("hunter", "Xenos", 15, 9, 0),
+        ("hunter", "Xenos", 15, 11, 0),
         ("resin-silo", "Xenos", 19, 19, 0),
     ]},
     "scenario-cas-ammo": {"scripts": ("test-cas-ammo",), "size": (88, 48), "spawns": [(6, 40), (84, 44)], "actors": [
@@ -1471,6 +1488,10 @@ SCENARIOS = {
     "scenario-miner-income": {"scripts": ("test-miner-income",), "drop_conquest": True, "size": (32, 24), "actors": [
         ("miner", "Marines", 8, 10, 0), ("resin-silo", "Xenos", 28, 20, 0),
     ]},
+    # The economy upgrades (see scenarios/test-miner-upgrades.lua): a miner and the Armory they need.
+    "scenario-miner-upgrades": {"scripts": ("test-miner-upgrades",), "drop_conquest": True, "size": (32, 24), "actors": [
+        ("miner", "Marines", 8, 10, 0), ("armory", "Marines", 4, 4, 0), ("resin-silo", "Xenos", 28, 20, 0),
+    ]},
     # Stances and retreat for SOM and the xenos, and three command-layer edge cases (see scenarios/test-stance-factions.lua,
     # test-retreat-factions.lua and test-command-edges.lua).
     # Rows are 14 cells apart so a rifle (range 9) cannot reach the next row. The xeno rows start the runner next to its target (melee).
@@ -1930,6 +1951,7 @@ def main():
     write_miner_art(args.out)
     if args.tgmc:
         write_tgmc_miner_art(args.out, args.tgmc)
+    write_miner_upgrade_icons(args.out)
     write_map(os.path.join(args.out, "maps", "test-field"), "TGMC test field", 24, 24, TEST_FIELD, "Lobby, Shellmap", [(10, 12), (14, 12)])
     write_map(os.path.join(args.out, "maps", "landing-zone"), "Landing Zone", 40, 28, LANDING_ZONE, "Lobby", [(6, 14), (33, 13)],
               ground=landing_zone_ground, category="Conquest", faction_start=True)

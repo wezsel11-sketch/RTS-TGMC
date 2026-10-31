@@ -634,6 +634,22 @@ miner:
 		Amount: 12
 		# A disabled miner (at its floor, see MinerField) pays nothing until a marine repairs it.
 		RequiresCondition: !miner-disabled
+	# Deep-core drills (upgrades.yaml): half as much again, silently (the main trickle already shows the payout).
+	GrantConditionOnPrerequisite@drills:
+		Condition: miner-drills
+		Prerequisites: upgrade-miner-drills
+	CashTrickler@drills:
+		Interval: 50
+		Amount: 6
+		ShowTicks: false
+		RequiresCondition: miner-drills && !miner-disabled
+	# Reinforced housings (upgrades.yaml): a third less damage, so it takes the xenos longer to disable the miner.
+	GrantConditionOnPrerequisite@housing:
+		Condition: miner-housing
+		Prerequisites: upgrade-miner-housing
+	DamageMultiplier@housing:
+		RequiresCondition: miner-housing
+		Modifier: 67
 
 cade:
 	Inherits: ^Wall

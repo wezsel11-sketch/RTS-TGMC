@@ -596,6 +596,42 @@ namespace OpenRA.Mods.TGMC.Widgets.Logic
 		}
 	}
 
+	// A thin bar along the bottom of each production tab button: green for how far the first item in that tab's queues has come, full
+	// gold when something there is done and waiting (a building to place). So an upgrade or a building shows its progress from any tab.
+	public class ProductionTabProgressLogic : ChromeLogic
+	{
+		[ObjectCreator.UseCtor]
+		public ProductionTabProgressLogic(Widget widget, World world)
+		{
+			foreach (var button in widget.Children.OfType<ProductionTypeButtonWidget>())
+			{
+				var bar = button.GetOrNull<ProgressBarWidget>("PROGRESS");
+				if (bar == null)
+					continue;
+
+				var group = button.ProductionGroup;
+				IEnumerable<ProductionItem> Items() => world.LocalPlayer == null ? [] : world.LocalPlayer.PlayerActor.TraitsImplementing<ProductionQueue>()
+					.Where(q => q.Enabled && (q.Info.Group ?? q.Info.Type) == group)
+					.SelectMany(q => q.AllQueued());
+
+				bar.IsVisible = () => Items().Any(i => i.Started);
+				bar.GetPercentage = () =>
+				{
+					var items = Items().ToList();
+					if (items.Any(i => i.Done))
+					{
+						bar.Bar = "progressbar-thumb-xp";
+						return 100;
+					}
+
+					bar.Bar = "progressbar-thumb";
+					var first = items.FirstOrDefault(i => i.Started && !i.Paused);
+					return first == null || first.TotalTime == 0 ? 0 : 100 - 100 * first.RemainingTime / first.TotalTime;
+				};
+			}
+		}
+	}
+
 	// Above the selection card: when several units are selected, a small icon for each with a health bar. Click one to select
 	// only that unit; Shift-click drops it from the selection.
 	public class GroupGridLogic : ChromeLogic

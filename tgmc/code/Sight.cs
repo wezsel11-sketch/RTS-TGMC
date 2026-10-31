@@ -37,38 +37,6 @@ namespace OpenRA.Mods.TGMC.Traits
 			sightInfo = info;
 		}
 
-		IFacing facing;
-		int facingStep = int.MinValue;
-		bool nudge;
-
-		protected override void Created(Actor self)
-		{
-			facing = self.TraitOrDefault<IFacing>();
-			base.Created(self);
-		}
-
-		// The engine works the seen cells out again when the unit changes cell or its range changes, not when it turns on the spot, so a
-		// cone stayed pointing where the unit last moved. Each time the unit turns past another 22.5 degree step the range reads one unit
-		// (1/1024 cell) longer or shorter, which no one can see and which makes the engine work the cone out again.
-		public override WDist Range
-		{
-			get
-			{
-				var range = base.Range;
-				if (sightInfo.Cone >= 360 || facing == null || range == WDist.Zero)
-					return range;
-
-				var step = facing.Facing.Angle / 64;
-				if (step != facingStep)
-				{
-					facingStep = step;
-					nudge = !nudge;
-				}
-
-				return nudge ? range + new WDist(1) : range;
-			}
-		}
-
 		protected override void AddCellsToPlayerShroud(Actor self, Player p, PPos[] uv)
 		{
 			var map = self.World.Map;

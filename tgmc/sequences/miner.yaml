@@ -15,3 +15,17 @@ miner-field:
 		Length: 2
 		Tick: 250
 		Offset: 0, -8
+
+# The miner upgrades' palette icons (tgmc/rules/upgrades.yaml): the miner's icon with a gold plus (drills) or a blue shield (housings),
+# drawn by mod/make_placeholders.py. The idle frame is only there because an actor's image needs a main sequence.
+upgrade-miner-drills:
+	idle:
+		Filename: upgrade-miner-drills.png
+	icon:
+		Filename: upgrade-miner-drills.png
+
+upgrade-miner-housing:
+	idle:
+		Filename: upgrade-miner-housing.png
+	icon:
+		Filename: upgrade-miner-housing.png

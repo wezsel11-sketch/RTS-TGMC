@@ -599,6 +599,7 @@ Container@PLAYER_WIDGETS:
 									HotkeyCount: 24
 									SelectProductionBuildingHotkey: SelectProductionBuilding
 								Container@PRODUCTION_TYPES:
+									Logic: ProductionTabProgressLogic
 									X: 2
 									Width: 28
 									Height: 124
@@ -614,6 +615,12 @@ Container@PLAYER_WIDGETS:
 													X: 4
 													Y: 4
 													ImageCollection: production-icons
+												ProgressBar@PROGRESS:
+													X: 2
+													Y: 24
+													Width: 24
+													Height: 3
+													BarMargin: 0, 0
 										ProductionTypeButton@XENO:
 											Y: 31
 											Width: 28
@@ -626,6 +633,12 @@ Container@PLAYER_WIDGETS:
 													X: 4
 													Y: 4
 													ImageCollection: production-icons
+												ProgressBar@PROGRESS:
+													X: 2
+													Y: 24
+													Width: 24
+													Height: 3
+													BarMargin: 0, 0
 										ProductionTypeButton@BUILD:
 											Y: 62
 											Width: 28
@@ -638,6 +651,12 @@ Container@PLAYER_WIDGETS:
 													X: 4
 													Y: 4
 													ImageCollection: production-icons
+												ProgressBar@PROGRESS:
+													X: 2
+													Y: 24
+													Width: 24
+													Height: 3
+													BarMargin: 0, 0
 										ProductionTypeButton@UPGRADE:
 											Y: 93
 											Width: 28
@@ -650,6 +669,12 @@ Container@PLAYER_WIDGETS:
 													X: 4
 													Y: 4
 													ImageCollection: production-icons
+												ProgressBar@PROGRESS:
+													X: 2
+													Y: 24
+													Width: 24
+													Height: 3
+													BarMargin: 0, 0
 						Label@BUILD_HINT:
 							X: 8
 							Y: PARENT_HEIGHT - 34

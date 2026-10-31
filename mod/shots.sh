@@ -12,7 +12,7 @@ HERE=$(cd "$(dirname "$0")" && pwd)
 ROOT=$(cd "$HERE/.." && pwd)
 OPENRA_DIR=${OPENRA_DIR:?set OPENRA_DIR to a built OpenRA checkout}
 OUT="$ROOT/build/shots"
-MAPS="$ROOT/build/dev-maps"
+MAPS=${DEV_MAPS:-"$ROOT/build/dev-maps"}
 export LIBGL_ALWAYS_SOFTWARE=1 SDL_AUDIODRIVER=dummy SDL_VIDEODRIVER=offscreen TGMC_FAST=0
 [ -d "$ROOT/build/tools/dotnet" ] && export PATH="$ROOT/build/tools/dotnet:$PATH" DOTNET_ROOT="$ROOT/build/tools/dotnet"
 export DOTNET_CLI_TELEMETRY_OPTOUT=1

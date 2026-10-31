@@ -11,6 +11,7 @@
 #
 # TGMC_FAST=1 (the default here) runs each match as fast as the CPU allows, drawing nothing. BALANCE_JOBS (default 4) caps how many
 # run at once: each match takes a core. Per-run logs, with a STAT line every 500 or 1000 ticks, go to $BALANCE_OUT (default build/balance).
+# DEV_MAPS points at another dev-maps folder (default build/dev-maps).
 set -u
 
 HERE=$(cd "$(dirname "$0")" && pwd)
@@ -28,7 +29,7 @@ if [ "${1:-}" = "--one" ]; then
 	support="$dir/support"
 	copy="$support/maps/tgmc/{DEV_VERSION}/$map"
 	mkdir -p "$(dirname "$copy")"
-	cp -r "$ROOT/build/dev-maps/$map" "$copy"
+	cp -r "${DEV_MAPS:-$ROOT/build/dev-maps}/$map" "$copy"
 	[ -n "$rules" ] && { printf '\n'; cat "$rules"; } >> "$copy/rules.yaml"
 	uid=$(cd "$OPENRA_DIR" && sh utility.sh tgmc --map-hash "$copy" | tail -1)
 	sh -c "cd '$OPENRA_DIR' && exec dotnet bin/OpenRA.dll Engine.EngineDir=.. Engine.SupportDir='$support' Game.Mod=tgmc Launch.Map=$uid" \
@@ -51,7 +52,8 @@ RUNS=${1:-8}
 CEILING=${2:-400}
 MAP=${3:-balance-aivai}
 [ $# -gt 3 ] && shift 3 || set --
-[ -d "$ROOT/build/dev-maps/$MAP" ] || { echo "no dev map $MAP: run mod/build_mod.sh first"; exit 1; }
+MAPS=${DEV_MAPS:-"$ROOT/build/dev-maps"}
+[ -d "$MAPS/$MAP" ] || { echo "no dev map $MAP in $MAPS: run mod/build_mod.sh first"; exit 1; }
 for f in "$@"; do [ -f "$f" ] || { echo "no rules file $f"; exit 1; }; done
 
 rm -rf "$OUT"

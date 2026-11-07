@@ -177,6 +177,7 @@ Sequences:
 	tgmc|sequences/fx-casing.yaml
 	tgmc|sequences/fx-infest.yaml
 	tgmc|sequences/condor.yaml
+	tgmc|sequences/alamo.yaml
 
 TileSets:
 	tgmc|tilesets/ground.yaml

@@ -1,6 +1,7 @@
 -- Scenario test: the marine bot keeps fighters beside a miner far from its base (MinerGuardBotModule in Bots.cs). Five idle
 -- riflemen start at the base and a marine miner stands 30 cells away. Prints "TEST ai-guards PASS" if at least two riflemen
 -- reach the miner by tick 1500 and at least two are still beside it at tick 2500, else "TEST ai-guards FAIL".
+-- scenario-ai-guards-busy runs it with only two riflemen and the hard bot, whose scout must not take one of the two guards.
 local reported = false
 
 WorldLoaded = function()

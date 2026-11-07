@@ -384,7 +384,7 @@ namespace OpenRA.Mods.TGMC.Traits
 				scout = null;
 				foreach (var type in Info.Scouts)
 				{
-					scout = world.Actors.FirstOrDefault(a => a.Owner == player && a.IsInWorld && !a.IsDead && a.IsIdle && a.Info.Name == type);
+					scout = world.Actors.FirstOrDefault(a => a.Owner == player && a.IsInWorld && !a.IsDead && a.IsIdle && a.Info.Name == type && !BotUnits.Claimed(a));
 					if (scout != null)
 						break;
 				}
@@ -608,9 +608,8 @@ namespace OpenRA.Mods.TGMC.Traits
 			if (fields.Count == 0)
 				return;
 
-			// Miner guards (MinerGuardBotModule) stay at their miner.
-			var guards = player.PlayerActor.TraitsImplementing<MinerGuardBotModule>().ToList();
-			foreach (var attacker in world.Actors.Where(a => a.Owner == player && a.IsInWorld && !a.IsDead && a.IsIdle && Info.Attackers.Contains(a.Info.Name) && !guards.Any(g => g.IsGuard(a))))
+			// Units another module holds (miner guards, defenders, raiders) stay with it.
+			foreach (var attacker in world.Actors.Where(a => a.Owner == player && a.IsInWorld && !a.IsDead && a.IsIdle && Info.Attackers.Contains(a.Info.Name) && !BotUnits.Claimed(a)))
 			{
 				var nearest = fields.OrderBy(f => (f.Location - attacker.Location).LengthSquared);
 				// Spread the units out: each goes for the nearest target no other unit got this round. With more units than targets they share.
@@ -960,6 +959,7 @@ namespace OpenRA.Mods.TGMC.Traits
 		readonly Player player;
 		readonly Dictionary<Actor, Actor> minerOf = [];
 		readonly List<Actor> released = [];
+		List<Actor> farMiners = [];
 		int countdown;
 
 		public MinerGuardBotModule(Actor self, MinerGuardBotModuleInfo info)
@@ -980,10 +980,8 @@ namespace OpenRA.Mods.TGMC.Traits
 			idleUnits.AddRange(released.Where(a => !a.IsDead));
 			released.Clear();
 
-			var bases = world.Actors.Where(a => a.Owner == player && a.IsInWorld && !a.IsDead && Info.BaseTypes.Contains(a.Info.Name)).ToList();
-
-			foreach (var miner in world.Actors.Where(a => a.Owner == player && a.IsInWorld && !a.IsDead && a.Info.Name == Info.Miner
-				&& !bases.Any(b => (a.Location - b.Location).LengthSquared <= Info.BaseRadius * Info.BaseRadius)))
+			// The squad manager calls this every tick: the map scan for far miners runs in BotTick, once per Interval.
+			foreach (var miner in farMiners.Where(m => !m.IsDead && m.IsInWorld && m.Owner == player))
 			{
 				for (var have = minerOf.Values.Count(m => m == miner); have < Info.GuardsPerMiner; have++)
 				{
@@ -1004,9 +1002,12 @@ namespace OpenRA.Mods.TGMC.Traits
 				return;
 
 			countdown = Info.Interval;
+			var bases = world.Actors.Where(a => a.Owner == player && a.IsInWorld && !a.IsDead && Info.BaseTypes.Contains(a.Info.Name)).ToList();
+			farMiners = world.Actors.Where(a => a.Owner == player && a.IsInWorld && !a.IsDead && a.Info.Name == Info.Miner
+				&& !bases.Any(b => (a.Location - b.Location).LengthSquared <= Info.BaseRadius * Info.BaseRadius)).ToList();
 			foreach (var (guard, miner) in minerOf.ToList())
 			{
-				if (guard.IsDead)
+				if (guard.IsDead || guard.Owner != player)
 					minerOf.Remove(guard);
 				else if (miner.IsDead || miner.Owner != player)
 				{
@@ -1023,6 +1024,15 @@ namespace OpenRA.Mods.TGMC.Traits
 	static class BotUnits
 	{
 		public static int Value(Actor a) { return a.Info.TraitInfoOrDefault<ValuedInfo>()?.Cost ?? 0; }
+
+		// True when one of the owner's bot modules holds this unit (a miner guard, a defender or a raider): other modules leave it be.
+		public static bool Claimed(Actor a)
+		{
+			var p = a.Owner.PlayerActor;
+			return p.TraitsImplementing<MinerGuardBotModule>().Any(m => m.IsGuard(a))
+				|| p.TraitsImplementing<DefendBotModule>().Any(m => m.IsBusy(a))
+				|| p.TraitsImplementing<RaidBotModule>().Any(m => m.IsRaider(a));
+		}
 
 		// A unit handed back to the squad manager walks to the nearest of its owner's base actors, so it idles where the squads gather.
 		public static void SendHome(IBot bot, Actor unit, string[] baseTypes)
@@ -1135,23 +1145,25 @@ namespace OpenRA.Mods.TGMC.Traits
 			countdown = Info.Interval;
 			// An attack counts for an outpost when the outpost itself is hit, or one of the bot's units standing beside it (its guards).
 			var outposts = world.Actors.Where(a => Alive(a) && Info.Protect.Contains(a.Info.Name)).ToList();
-			var attacked = memory.RecentAttacks
+			var hits = memory.RecentAttacks
 				.Select(r => (Victim: Info.Protect.Contains(r.Victim.Info.Name) ? r.Victim
 					: outposts.Where(o => Near(r.Victim, o.Location)).MinByOrDefault(o => (o.Location - r.Victim.Location).LengthSquared), r.Attacker, r.Tick))
 				.Where(r => r.Victim != null && r.Victim.Owner == player)
-				.GroupBy(r => r.Victim)
-				.Select(g => g.MaxBy(r => r.Tick))
 				.ToList();
+			var attacked = hits.GroupBy(r => r.Victim).Select(g => g.MaxBy(r => r.Tick)).ToList();
 
 			need.Clear();
 			foreach (var (victim, _, _) in attacked)
 			{
-				// Size against the distinct enemies in sight around the outpost; the grid (which may hold a moving group more than once)
-				// only when none are in sight.
-				var inSight = world.FindActorsInCircle(victim.CenterPosition, WDist.FromCells(Info.Radius))
+				// Size against the distinct enemies: those in sight around the outpost, plus whoever hit it lately from further off (a rifle
+				// reaches 9 cells, beyond Radius). The grid (which may hold a moving group more than once) only when there are none.
+				var enemies = world.FindActorsInCircle(victim.CenterPosition, WDist.FromCells(Info.Radius))
 					.Where(a => !a.IsDead && player.RelationshipWith(a.Owner) == PlayerRelationship.Enemy && a.CanBeViewedByPlayer(player))
+					.Concat(hits.Where(h => h.Victim == victim && !h.Attacker.IsDead && h.Attacker.IsInWorld
+						&& player.RelationshipWith(h.Attacker.Owner) == PlayerRelationship.Enemy).Select(h => h.Attacker))
+					.Distinct()
 					.Sum(BotUnits.Value);
-				var threat = (inSight > 0 ? inSight : memory.StrengthNear(victim.Location, Info.Radius)) * Info.OvermatchPercent / 100;
+				var threat = (enemies > 0 ? enemies : memory.StrengthNear(victim.Location, Info.Radius)) * Info.OvermatchPercent / 100;
 				var there = world.Actors.Where(a => Alive(a) && Info.Defenders.Contains(a.Info.Name) && Near(a, victim.Location))
 					.Concat(victimOf.Where(kv => kv.Value == victim && Alive(kv.Key)).Select(kv => kv.Key))
 					.Distinct()
@@ -1217,6 +1229,7 @@ namespace OpenRA.Mods.TGMC.Traits
 		MinerGuardBotModule[] guards = [];
 		DefendBotModule[] defenders = [];
 		List<CPos> route = [];
+		List<(CPos Cell, int Value)> candidates = [];
 		CPos target;
 		int leg;
 		bool homeward;
@@ -1273,7 +1286,7 @@ namespace OpenRA.Mods.TGMC.Traits
 				return;
 
 			var value = free.Sum(BotUnits.Value);
-			var options = Candidates().Where(c => memory.DefenceNear(c.Cell, c.Value, Info.Radius) * 100 <= value * Info.MaxThreatPercent).ToList();
+			var options = candidates.Where(c => memory.DefenceNear(c.Cell, c.Value, Info.Radius) * 100 <= value * Info.MaxThreatPercent).ToList();
 			if (options.Count == 0)
 				return;
 
@@ -1296,9 +1309,13 @@ namespace OpenRA.Mods.TGMC.Traits
 				return;
 
 			countdown = Info.Interval;
-			raid.RemoveAll(a => a.IsDead || !a.IsInWorld);
+			raid.RemoveAll(a => a.IsDead || !a.IsInWorld || a.Owner != player);
 			if (raid.Count == 0)
+			{
+				// The squad manager hands over its idle units every tick: the scan for targets runs here, once per Interval.
+				candidates = Candidates().ToList();
 				return;
+			}
 
 			var centre = new CPos((int)raid.Average(a => a.Location.X), (int)raid.Average(a => a.Location.Y));
 			if (homeward)

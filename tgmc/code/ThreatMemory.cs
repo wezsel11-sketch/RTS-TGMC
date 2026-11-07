@@ -46,7 +46,7 @@ namespace OpenRA.Mods.TGMC.Traits
 		readonly Player player;
 		readonly int cols, rows;
 		readonly float[,] grid;
-		readonly Dictionary<Actor, (Actor Attacker, int Tick)> attacks = [];
+		readonly Dictionary<(Actor Victim, Actor Attacker), int> attacks = [];
 		int countdown;
 
 		public ThreatMemory(Actor self, ThreatMemoryInfo info)
@@ -113,9 +113,9 @@ namespace OpenRA.Mods.TGMC.Traits
 				for (var y = 0; y < rows; y++)
 					grid[x, y] = Info.FullVision || SquareVisible(x, y) ? now[x, y] : Math.Max(grid[x, y] * Info.FadePercent / 100f, now[x, y]);
 
-			foreach (var victim in attacks.Keys.ToList())
-				if (victim.IsDead || world.WorldTick - attacks[victim].Tick > Info.AttackMemory)
-					attacks.Remove(victim);
+			foreach (var key in attacks.Keys.ToList())
+				if (key.Victim.IsDead || world.WorldTick - attacks[key] > Info.AttackMemory)
+					attacks.Remove(key);
 		}
 
 		/// <summary>One of this player's actors was hit. Being hit also reveals roughly where the attacker stands.</summary>
@@ -124,7 +124,7 @@ namespace OpenRA.Mods.TGMC.Traits
 			if (IsTraitDisabled || attacker == null || attacker.IsDead || !attacker.IsInWorld || victim.Owner != player || !IsEnemy(attacker.Owner))
 				return;
 
-			attacks[victim] = (attacker, world.WorldTick);
+			attacks[(victim, attacker)] = world.WorldTick;
 
 			// Some attackers have no place on the map (the firer of a drop pod's shockwave, for one): nothing to mark.
 			if (attacker.OccupiesSpace == null)
@@ -147,11 +147,11 @@ namespace OpenRA.Mods.TGMC.Traits
 			return (int)sum;
 		}
 
-		/// <summary>Attacks on this player's actors within AttackMemory ticks, newest first. Dead victims are left out.</summary>
+		/// <summary>Attacks on this player's actors within AttackMemory ticks, one per victim and attacker, newest first. Dead victims are left out.</summary>
 		public IEnumerable<(Actor Victim, Actor Attacker, int Tick)> RecentAttacks =>
-			attacks.Where(kv => !kv.Key.IsDead && kv.Key.IsInWorld && world.WorldTick - kv.Value.Tick <= Info.AttackMemory)
-				.OrderByDescending(kv => kv.Value.Tick)
-				.Select(kv => (kv.Key, kv.Value.Attacker, kv.Value.Tick));
+			attacks.Where(kv => !kv.Key.Victim.IsDead && kv.Key.Victim.IsInWorld && world.WorldTick - kv.Value <= Info.AttackMemory)
+				.OrderByDescending(kv => kv.Value)
+				.Select(kv => (kv.Key.Victim, kv.Key.Attacker, kv.Value));
 
 		public bool FullVision => Info.FullVision;
 

@@ -1342,6 +1342,18 @@ SCENARIOS = {
         ("mini-silo", "Xenos", 28, 4, 0), ("resin-turret", "Xenos", 26, 6, 0), ("resin-turret", "Xenos", 30, 6, 0),
         ("resin-silo", "Xenos", 60, 20, 0), ("resin-turret", "Xenos", 58, 18, 0), ("resin-turret", "Xenos", 58, 22, 0), ("resin-turret", "Xenos", 61, 23, 0),
     ]},
+    # Two riflemen, both miner guards, with the hard bot's scout on: the scout must not take a guard (see scenarios/test-ai-guards.lua).
+    "scenario-ai-guards-busy": {"scripts": ("test-ai-guards",), "marine_bot": "hard", "drop_conquest": True, "size": (64, 32),
+                           "extra_rules": "^Infantry:\n\tAutoTarget:\n\t\tInitialStance: HoldFire\n", "actors": [
+        ("cryo-pod", "Marines", 6, 6, 0), ("rifleman", "Marines", 9, 8, 0), ("rifleman", "Marines", 10, 8, 0),
+        ("miner-field", "Neutral", 40, 20, 0), ("miner", "Marines", 40, 20, 0), ("resin-silo", "Xenos", 58, 28, 0),
+    ]},
+    # Marine riflemen shoot a xeno mini-silo from rifle range, beyond DefendBotModule's Radius: the xenos still answer (see scenarios/test-ai-defend-ranged.lua).
+    "scenario-ai-defend-ranged": {"scripts": ("test-ai-defend-ranged",), "xeno_bot": "easy", "drop_conquest": True, "size": (64, 40),
+        "extra_rules": "Player:\n\t-ScoutBotModule@xenos:\n\t-FieldBotModule@xenos:\n", "actors": [
+        ("cryo-pod", "Marines", 4, 36, 0), ("resin-silo", "Xenos", 58, 20, 0), ("runner", "Xenos", 54, 19, 0), ("runner", "Xenos", 54, 21, 0), ("runner", "Xenos", 55, 19, 0), ("runner", "Xenos", 55, 21, 0), ("runner", "Xenos", 56, 19, 0), ("runner", "Xenos", 56, 21, 0), ("runner", "Xenos", 57, 19, 0), ("runner", "Xenos", 57, 21, 0),
+        ("mini-silo", "Xenos", 24, 20, 0),
+    ]},
     "scenario-ai-medic": {"scripts": ("test-ai-medic",), "marine_bot": "skirmish", "drop_conquest": True, "size": (48, 32),
                           "extra_rules": "Player:\n\t-SquadManagerBotModule@marines-easy:\n\t-SquadManagerBotModule@marines-normal:\n\t-SquadManagerBotModule@marines-hard:\n^Infantry:\n\tAutoTarget:\n\t\tInitialStance: HoldFire\n", "actors": [
         ("cryo-pod", "Marines", 6, 6, 0), ("medic", "Marines", 8, 10, 0), ("rifleman", "Marines", 28, 12, 0),

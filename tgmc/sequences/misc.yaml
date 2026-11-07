@@ -128,6 +128,10 @@ hive-icon:
 		Filename: hive-icon.png
 		Start: 2
 		Length: 1
+	bell:
+		Filename: hive-icon.png
+		Start: 3
+		Length: 1
 
 # Drawn by mod/make_placeholders.py: a green puddle that pulses.
 acid-pool:
@@ -270,4 +274,8 @@ support-icon:
 	mech:
 		Filename: support-icon.png
 		Start: 6
+		Length: 1
+	bell:
+		Filename: support-icon.png
+		Start: 7
 		Length: 1

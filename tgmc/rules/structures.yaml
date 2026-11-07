@@ -150,6 +150,19 @@ resin-turret:
 		ValidTargets: Ground
 
 resin-silo:
+	# The town bell: units within 10 cells of the chosen spot run to the nearest base building (see RecallPower in Recall.cs).
+	RecallPower@bell:
+		OrderName: RecallOrder
+		Name: support-recall.name
+		Description: support-recall.description
+		IconImage: hive-icon
+		Icon: bell
+		ChargeInterval: 750
+		Radius: 10
+		BaseTypes: resin-silo, forward-hive
+		Sounds: xeno-roar-1.ogg
+		BeginChargeSound: ui-ping.ogg
+		EndChargeSound: ui-confirm.ogg
 	ReturnPoint:
 	Inherits: ^Structure
 	Inherits@build: ^XenoMajorBuildable
@@ -727,6 +740,19 @@ vendor:
 		Cost: 200
 
 cryo-pod:
+	# The town bell: units within 10 cells of the chosen spot run to the nearest base building (see RecallPower in Recall.cs).
+	RecallPower@bell:
+		OrderName: RecallOrder
+		Name: support-recall.name
+		Description: support-recall.description
+		IconImage: support-icon
+		Icon: bell
+		ChargeInterval: 750
+		Radius: 10
+		BaseTypes: cryo-pod, vendor
+		Sounds: ui-ping.ogg
+		BeginChargeSound: ui-ping.ogg
+		EndChargeSound: ui-confirm.ogg
 	ReturnPoint:
 	Inherits: ^Structure
 	Inherits@build: ^MarineBuildable

@@ -339,7 +339,15 @@ def write_cas_icon(out):
     img.save(os.path.join(out, "cas-icon.png"), pnginfo=meta)
 
 
-HIVE_ICONS = ["cure", "burrowed", "rage"]
+def draw_bell(d, cx, cy, body, clapper):
+    """The town bell (Recall power): a bell with its clapper and two ring lines."""
+    d.polygon([(cx - 4, cy - 12), (cx + 4, cy - 12), (cx + 10, cy + 6), (cx - 10, cy + 6)], fill=body)
+    d.ellipse([cx - 3, cy + 5, cx + 3, cy + 11], fill=clapper)
+    d.arc([cx - 18, cy - 14, cx - 8, cy + 4], 120, 240, fill=clapper, width=2)
+    d.arc([cx + 8, cy - 14, cx + 18, cy + 4], -60, 60, fill=clapper, width=2)
+
+
+HIVE_ICONS = ["cure", "burrowed", "rage", "bell"]
 
 
 def write_hive_icon(out):
@@ -348,7 +356,7 @@ def write_hive_icon(out):
     img = Image.new("RGBA", (w * len(HIVE_ICONS), h), (0, 0, 0, 0))
     d = ImageDraw.Draw(img)
     green, red, amber, white = (110, 230, 90, 255), (240, 70, 60, 255), (255, 170, 40, 255), (240, 240, 230, 255)
-    labels = ["CURE", "BURROW", "RAGE"]
+    labels = ["CURE", "BURROW", "RAGE", "RECALL"]
     for i, name in enumerate(HIVE_ICONS):
         ox = w * i
         d.rectangle([ox, 0, ox + w - 1, h - 1], fill=(22, 28, 24, 255), outline=(90, 110, 96, 255))
@@ -364,6 +372,8 @@ def write_hive_icon(out):
             for dx in (-8, 0, 8):
                 d.polygon([(cx + dx, cy - 12), (cx + dx - 3, cy + 10), (cx + dx + 3, cy + 10)], fill=red)
             d.line([cx - 14, cy + 11, cx + 14, cy + 11], fill=amber, width=2)
+        elif name == "bell":
+            draw_bell(d, cx, cy, amber, white)
         d.text((ox + 31 - 3 * len(labels[i]), 33), labels[i], fill=white)
     meta = PngImagePlugin.PngInfo()
     meta.add_text("FrameSize", f"{w},{h}")
@@ -435,7 +445,7 @@ def write_pod_icon(out):
     img.save(os.path.join(out, "pod-icon.png"), pnginfo=meta)
 
 
-SUPPORT_ICONS = ["supply", "sensor", "smoke", "orbital", "sentry", "mortar", "mech"]
+SUPPORT_ICONS = ["supply", "sensor", "smoke", "orbital", "sentry", "mortar", "mech", "bell"]
 
 
 def write_support_icons(out):
@@ -445,7 +455,7 @@ def write_support_icons(out):
     img = Image.new("RGBA", (w * len(SUPPORT_ICONS), h), (0, 0, 0, 0))
     d = ImageDraw.Draw(img)
     white, blue, amber, red, grey = (240, 240, 230, 255), (110, 150, 255, 255), (255, 170, 40, 255), (240, 80, 60, 255), (170, 176, 186, 255)
-    labels = ["SUPPLY", "SENSOR", "SMOKE", "ORBIT", "SENTRY", "MORTAR", "MECH"]
+    labels = ["SUPPLY", "SENSOR", "SMOKE", "ORBIT", "SENTRY", "MORTAR", "MECH", "RECALL"]
     for i, name in enumerate(SUPPORT_ICONS):
         ox = w * i
         d.rectangle([ox, 0, ox + w - 1, h - 1], fill=(24, 28, 36, 255), outline=(90, 110, 140, 255))
@@ -481,6 +491,8 @@ def write_support_icons(out):
             d.rectangle([cx - 4, cy + 6, cx - 1, cy + 11], fill=grey)
             d.rectangle([cx + 1, cy + 6, cx + 4, cy + 11], fill=grey)
             d.rectangle([cx + 6, cy - 12, cx + 12, cy - 9], fill=red)
+        elif name == "bell":
+            draw_bell(d, cx, cy, amber, white)
         d.text((ox + 31 - 3 * len(labels[i]), 33), labels[i], fill=white)
     meta = PngImagePlugin.PngInfo()
     meta.add_text("FrameSize", f"{w},{h}")
@@ -798,6 +810,12 @@ SCENARIOS = {
     "scenario-raid-warning": {"scripts": ("test-raid-warning",), "drop_conquest": True, "extra_rules": "miner:\n\tHealth:\n\t\tHP: 3000\n", "actors": [
         ("miner-field", "Neutral", 10, 10, 0), ("miner", "Marines", 10, 10, 0), ("runner", "Xenos", 13, 10, 0),
         ("cryo-pod", "Marines", 3, 19, 0), ("resin-silo", "Xenos", 19, 19, 0),
+    ]},
+    # The town bell (see scenarios/test-recall.lua): units near a far miner run home; one outside the radius stays.
+    "scenario-recall": {"scripts": ("test-recall",), "drop_conquest": True, "size": (64, 40), "actors": [
+        ("cryo-pod", "Marines", 6, 20, 0), ("miner-field", "Neutral", 40, 20, 0), ("miner", "Marines", 40, 20, 0),
+        ("rifleman", "Marines", 41, 21, 0), ("rifleman", "Marines", 39, 21, 0), ("engineer", "Marines", 41, 19, 0),
+        ("rifleman", "Marines", 40, 5, 0), ("resin-silo", "Xenos", 60, 36, 0),
     ]},
     "scenario-alert": {"scripts": ("test-alert",), "extra_rules": "rifleman:\n\tHealth:\n\t\tHP: 3000\n", "actors": [
         ("rifleman", "Marines", 10, 10, 512),

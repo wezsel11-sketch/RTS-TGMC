@@ -253,7 +253,7 @@ the commits this mod was tested against (see the top of `mod/bootstrap.py`), so 
   sixth wave and lose when your units are gone.
 
 What to try and report: whether the sounds are the right loudness and mix (this is the first time anyone hears them), whether
-a match feels fair from either side (the AI-vs-AI tests say the marines win easily), and anything that looks or behaves oddly.
+a match feels fair from either side (the AI-vs-AI tests of 2026-11-07 say the xeno bot wins about five matches in six), and anything that looks or behaves oddly.
 Logs and replays are in OpenRA's support directory (`~/.config/OpenRA` on Linux, `~/Library/Application Support/OpenRA` on macOS).
 
 ## Inputs

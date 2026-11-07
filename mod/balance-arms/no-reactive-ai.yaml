@@ -1,0 +1,23 @@
+# Balance arm: the bots as they were before the reactive AI (docs/superpowers/plans/2026-11-07-reactive-ai.md).
+# Removes ThreatMemory and the five modules built on it, and gives the stock squads back every protection type.
+Player:
+	-ThreatMemory:
+	-MinerGuardBotModule@marines:
+	-DefendBotModule@marines:
+	-DefendBotModule@xenos:
+	-RaidBotModule@marines:
+	-RaidBotModule@xenos:
+	-AttackTargetBotModule@marines:
+	-AttackTargetBotModule@xenos:
+	SquadManagerBotModule@marines-easy:
+		ProtectionTypes: cryo-pod, vendor, resin-silo, mini-silo, sentry-turret, resin-turret, miner, weed-node, armory, ordnance-depot, evolution-tower, maturity-tower, workshop, mortar-emplacement, artillery-emplacement, forward-hive, cade
+	SquadManagerBotModule@xenos-easy:
+		ProtectionTypes: cryo-pod, vendor, resin-silo, mini-silo, sentry-turret, resin-turret, miner, weed-node, armory, ordnance-depot, evolution-tower, maturity-tower, workshop, mortar-emplacement, artillery-emplacement, forward-hive, cade
+	SquadManagerBotModule@marines-normal:
+		ProtectionTypes: cryo-pod, vendor, resin-silo, mini-silo, sentry-turret, resin-turret, miner, weed-node, armory, ordnance-depot, evolution-tower, maturity-tower, workshop, mortar-emplacement, artillery-emplacement, forward-hive, cade
+	SquadManagerBotModule@xenos-normal:
+		ProtectionTypes: cryo-pod, vendor, resin-silo, mini-silo, sentry-turret, resin-turret, miner, weed-node, armory, ordnance-depot, evolution-tower, maturity-tower, workshop, mortar-emplacement, artillery-emplacement, forward-hive, cade
+	SquadManagerBotModule@marines-hard:
+		ProtectionTypes: cryo-pod, vendor, resin-silo, mini-silo, sentry-turret, resin-turret, miner, weed-node, armory, ordnance-depot, evolution-tower, maturity-tower, workshop, mortar-emplacement, artillery-emplacement, forward-hive, cade
+	SquadManagerBotModule@xenos-hard:
+		ProtectionTypes: cryo-pod, vendor, resin-silo, mini-silo, sentry-turret, resin-turret, miner, weed-node, armory, ordnance-depot, evolution-tower, maturity-tower, workshop, mortar-emplacement, artillery-emplacement, forward-hive, cade

@@ -794,6 +794,11 @@ SCENARIOS = {
     "scenario-queued-ability": _scenario("test-queued-ability", [
         ("squad_leader", "Marines", 4, 10, 256),
     ]),
+    # A raided miner warns its owner once (see scenarios/test-raid-warning.lua).
+    "scenario-raid-warning": {"scripts": ("test-raid-warning",), "drop_conquest": True, "extra_rules": "miner:\n\tHealth:\n\t\tHP: 3000\n", "actors": [
+        ("miner-field", "Neutral", 10, 10, 0), ("miner", "Marines", 10, 10, 0), ("runner", "Xenos", 13, 10, 0),
+        ("cryo-pod", "Marines", 3, 19, 0), ("resin-silo", "Xenos", 19, 19, 0),
+    ]},
     "scenario-alert": {"scripts": ("test-alert",), "extra_rules": "rifleman:\n\tHealth:\n\t\tHP: 3000\n", "actors": [
         ("rifleman", "Marines", 10, 10, 512),
         ("runner", "Xenos", 13, 10, 0),

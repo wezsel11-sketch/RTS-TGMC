@@ -198,6 +198,10 @@ resin-silo:
 		ProductionType: Xeno
 
 mini-silo:
+	# Outlying weeds warn the hive when raided (a ping and an event), like a marine miner does.
+	AlertOnDamage:
+		Event: event-outpost-under-attack
+		PingColor: C040FF
 	Inherits: ^Structure
 	Inherits@build: ^XenoMajorBuildable
 	Buildable:
@@ -232,6 +236,10 @@ mini-silo:
 		Amount: 3
 
 weed-node:
+	# Outlying weeds warn the hive when raided (a ping and an event), like a marine miner does.
+	AlertOnDamage:
+		Event: event-outpost-under-attack
+		PingColor: C040FF
 	# Resin glows a faint purple at night (the lobby's Night option).
 	NightLight:
 		Range: 3c0
@@ -609,6 +617,10 @@ tunnel:
 # ---------------------------------------------------------------- marines
 
 miner:
+	# A raided miner warns its owner with its own message and a red ping, apart from the general under-attack alert.
+	AlertOnDamage:
+		Event: event-miner-under-attack
+		PingColor: FF3030
 	Inherits: ^Structure
 	Inherits@build: ^MarineBuildable
 	Buildable:

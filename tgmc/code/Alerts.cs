@@ -11,6 +11,12 @@ namespace OpenRA.Mods.TGMC.Traits
 	{
 		public readonly int CooldownTicks = 250;
 
+		[Desc("Fluent key of the event posted. Each key has its own cooldown, so a raid on a miner still warns during a fight at the base.")]
+		public readonly string Event = "event-under-attack";
+
+		[Desc("Colour of the radar ping.")]
+		public readonly Color PingColor = Color.FromArgb(255, 160, 60);
+
 		public override object Create(ActorInitializer init) { return new AlertOnDamage(this); }
 	}
 
@@ -25,11 +31,11 @@ namespace OpenRA.Mods.TGMC.Traits
 			if (e.Damage.Value <= 0 || e.Attacker == null || e.Attacker.IsDead || self.Owner.IsAlliedWith(e.Attacker.Owner))
 				return;
 
-			if (!TgmcEventLog.PostLimited(self.World, self.Owner, "event-under-attack", self.CenterPosition, info.CooldownTicks))
+			if (!TgmcEventLog.PostLimited(self.World, self.Owner, info.Event, self.CenterPosition, info.CooldownTicks))
 				return;
 
 			self.World.WorldActor.TraitOrDefault<RadarPings>()?.Add(
-				() => self.Owner.IsAlliedWith(self.World.RenderPlayer), self.CenterPosition, Color.FromArgb(255, 160, 60), 60);
+				() => self.Owner.IsAlliedWith(self.World.RenderPlayer), self.CenterPosition, info.PingColor, 60);
 		}
 	}
 }

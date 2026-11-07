@@ -1319,6 +1319,14 @@ SCENARIOS = {
         ("sentinel", "Xenos", 30, 24, 0), ("sentinel", "Xenos", 31, 24, 0), ("sentinel", "Xenos", 30, 25, 0),
         ("resin-silo", "Xenos", 58, 42, 0),
     ]},
+    # Bot personality rusher (see scenarios/test-ai-personality.lua): eight riflemen at home, no money.
+    "scenario-ai-rusher": {"scripts": ("test-ai-personality", "personality-case-rusher"), "marine_bot": "rusher", "extra_rules": "Player:\n\tPlayerResources:\n\t\tDefaultCash: 0\n", "drop_conquest": True, "size": (64, 40), "actors": [
+        ("cryo-pod", "Marines", 6, 20, 0), ("resin-silo", "Xenos", 60, 36, 0), ("rifleman", "Marines", 8, 18, 0), ("rifleman", "Marines", 9, 18, 0), ("rifleman", "Marines", 10, 18, 0), ("rifleman", "Marines", 8, 19, 0), ("rifleman", "Marines", 9, 19, 0), ("rifleman", "Marines", 10, 19, 0), ("rifleman", "Marines", 8, 17, 0), ("rifleman", "Marines", 9, 17, 0),
+    ]},
+    # Bot personality turtle (see scenarios/test-ai-personality.lua): eight riflemen at home, no money.
+    "scenario-ai-turtle": {"scripts": ("test-ai-personality", "personality-case-turtle"), "marine_bot": "turtle", "extra_rules": "Player:\n\tPlayerResources:\n\t\tDefaultCash: 0\n", "drop_conquest": True, "size": (64, 40), "actors": [
+        ("cryo-pod", "Marines", 6, 20, 0), ("resin-silo", "Xenos", 60, 36, 0), ("rifleman", "Marines", 8, 18, 0), ("rifleman", "Marines", 9, 18, 0), ("rifleman", "Marines", 10, 18, 0), ("rifleman", "Marines", 8, 19, 0), ("rifleman", "Marines", 9, 19, 0), ("rifleman", "Marines", 10, 19, 0), ("rifleman", "Marines", 8, 17, 0), ("rifleman", "Marines", 9, 17, 0),
+    ]},
     # DefendBotModule: xenos hit a marine sentry (on HoldFire) far from the base; the bot sends riflemen, enough but not all (see scenarios/test-ai-defend.lua).
     "scenario-ai-defend": {"scripts": ("test-ai-defend", "defend-case-help"), "marine_bot": "easy", "extra_rules": "Player:\n\t-ScoutBotModule@marines:\n\t-FieldBotModule@sweep:\n", "drop_conquest": True, "size": (64, 40), "actors": [
         ("cryo-pod", "Marines", 6, 20, 0), ("sentry-turret", "Marines", 40, 20, 0), ("resin-silo", "Xenos", 60, 36, 0), ("rifleman", "Marines", 8, 18, 0), ("rifleman", "Marines", 9, 18, 0), ("rifleman", "Marines", 10, 18, 0),

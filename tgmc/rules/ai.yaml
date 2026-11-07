@@ -15,9 +15,30 @@ Player:
 	ModularBot@HardAI:
 		Name: bot-hard-ai.name
 		Type: hard
+	# Personalities: Normal-strength bots that play differently, set by the numbers of the same modules (see the @rusher, @turtle and
+	# @raider instances below). Rusher attacks early in small squads; Turtle masses a big army at home, guards its miners heavily and
+	# never raids; Raider sends more and bigger raids at weak spots.
+	ModularBot@RusherAI:
+		Name: bot-rusher-ai.name
+		Type: rusher
+	ModularBot@TurtleAI:
+		Name: bot-turtle-ai.name
+		Type: turtle
+	ModularBot@RaiderAI:
+		Name: bot-raider-ai.name
+		Type: raider
 	GrantConditionOnBotOwner@skirmish:
 		Condition: enable-skirmish-ai
-		Bots: easy, skirmish, hard
+		Bots: easy, skirmish, hard, rusher, turtle, raider
+	GrantConditionOnBotOwner@rusher:
+		Condition: enable-rusher-ai
+		Bots: rusher
+	GrantConditionOnBotOwner@turtle:
+		Condition: enable-turtle-ai
+		Bots: turtle
+	GrantConditionOnBotOwner@raider:
+		Condition: enable-raider-ai
+		Bots: raider
 	GrantConditionOnBotOwner@easy:
 		Condition: enable-easy-ai
 		Bots: easy
@@ -198,14 +219,14 @@ Player:
 		ConstructionYardTypes: cryo-pod, resin-silo, forward-hive
 		ProtectionTypes: cryo-pod, vendor, resin-silo, armory, ordnance-depot, evolution-tower, maturity-tower, workshop
 	SquadManagerBotModule@marines-normal:
-		RequiresCondition: enable-skirmish-ai && !faction-xenos && !enable-easy-ai && !enable-hard-ai
+		RequiresCondition: enable-skirmish-ai && !faction-xenos && !enable-easy-ai && !enable-hard-ai && !enable-rusher-ai && !enable-turtle-ai
 		SquadSize: 8
 		SquadSizeRandomBonus: 20
 		ExcludeFromSquadsTypes: medic, engineer, synth, drone, queen
 		ConstructionYardTypes: cryo-pod, resin-silo, forward-hive
 		ProtectionTypes: cryo-pod, vendor, resin-silo, armory, ordnance-depot, evolution-tower, maturity-tower, workshop
 	SquadManagerBotModule@xenos-normal:
-		RequiresCondition: enable-skirmish-ai && faction-xenos && !enable-easy-ai && !enable-hard-ai
+		RequiresCondition: enable-skirmish-ai && faction-xenos && !enable-easy-ai && !enable-hard-ai && !enable-rusher-ai && !enable-turtle-ai
 		SquadSize: 24
 		SquadSizeRandomBonus: 20
 		ExcludeFromSquadsTypes: medic, engineer, synth, drone, queen
@@ -221,6 +242,34 @@ Player:
 	SquadManagerBotModule@xenos-hard:
 		RequiresCondition: enable-skirmish-ai && faction-xenos && enable-hard-ai
 		SquadSize: 18
+		SquadSizeRandomBonus: 20
+		ExcludeFromSquadsTypes: medic, engineer, synth, drone, queen
+		ConstructionYardTypes: cryo-pod, resin-silo, forward-hive
+		ProtectionTypes: cryo-pod, vendor, resin-silo, armory, ordnance-depot, evolution-tower, maturity-tower, workshop
+	SquadManagerBotModule@marines-rusher:
+		RequiresCondition: enable-skirmish-ai && !faction-xenos && enable-rusher-ai
+		SquadSize: 4
+		SquadSizeRandomBonus: 20
+		ExcludeFromSquadsTypes: medic, engineer, synth, drone, queen
+		ConstructionYardTypes: cryo-pod, resin-silo, forward-hive
+		ProtectionTypes: cryo-pod, vendor, resin-silo, armory, ordnance-depot, evolution-tower, maturity-tower, workshop
+	SquadManagerBotModule@xenos-rusher:
+		RequiresCondition: enable-skirmish-ai && faction-xenos && enable-rusher-ai
+		SquadSize: 10
+		SquadSizeRandomBonus: 20
+		ExcludeFromSquadsTypes: medic, engineer, synth, drone, queen
+		ConstructionYardTypes: cryo-pod, resin-silo, forward-hive
+		ProtectionTypes: cryo-pod, vendor, resin-silo, armory, ordnance-depot, evolution-tower, maturity-tower, workshop
+	SquadManagerBotModule@marines-turtle:
+		RequiresCondition: enable-skirmish-ai && !faction-xenos && enable-turtle-ai
+		SquadSize: 14
+		SquadSizeRandomBonus: 20
+		ExcludeFromSquadsTypes: medic, engineer, synth, drone, queen
+		ConstructionYardTypes: cryo-pod, resin-silo, forward-hive
+		ProtectionTypes: cryo-pod, vendor, resin-silo, armory, ordnance-depot, evolution-tower, maturity-tower, workshop
+	SquadManagerBotModule@xenos-turtle:
+		RequiresCondition: enable-skirmish-ai && faction-xenos && enable-turtle-ai
+		SquadSize: 36
 		SquadSizeRandomBonus: 20
 		ExcludeFromSquadsTypes: medic, engineer, synth, drone, queen
 		ConstructionYardTypes: cryo-pod, resin-silo, forward-hive
@@ -673,30 +722,62 @@ Player:
 		RequiresCondition: enable-skirmish-ai && !faction-xenos
 	# Marine bot: two fighters stand beside each miner, so a raid meets rifles at once (see MinerGuardBotModule in Bots.cs).
 	MinerGuardBotModule@marines:
-		RequiresCondition: enable-skirmish-ai && !faction-xenos
+		RequiresCondition: enable-skirmish-ai && !faction-xenos && !enable-turtle-ai
 		Guards: rifleman, smartgunner, machinegunner, grenadier, flamer, som_machinegunner
+	MinerGuardBotModule@marines-turtle:
+		RequiresCondition: enable-skirmish-ai && !faction-xenos && enable-turtle-ai
+		Guards: rifleman, smartgunner, machinegunner, grenadier, flamer, som_machinegunner
+		GuardsPerMiner: 3
 	# Both bots send fighters to an attacked outpost, sized to the attacker; the squad manager keeps the base buildings (see DefendBotModule in Bots.cs).
 	DefendBotModule@marines:
-		RequiresCondition: enable-skirmish-ai && !faction-xenos
+		RequiresCondition: enable-skirmish-ai && !faction-xenos && !enable-turtle-ai
 		Protect: miner, sentry-turret, cade, mortar-emplacement, artillery-emplacement
 		Defenders: rifleman, smartgunner, machinegunner, grenadier, flamer, som_machinegunner, blademan, som_blademan
 		BaseTypes: cryo-pod
+	DefendBotModule@marines-turtle:
+		RequiresCondition: enable-skirmish-ai && !faction-xenos && enable-turtle-ai
+		Protect: miner, sentry-turret, cade, mortar-emplacement, artillery-emplacement
+		Defenders: rifleman, smartgunner, machinegunner, grenadier, flamer, som_machinegunner, blademan, som_blademan
+		BaseTypes: cryo-pod
+		OvermatchPercent: 250
 	DefendBotModule@xenos:
-		RequiresCondition: enable-skirmish-ai && faction-xenos
+		RequiresCondition: enable-skirmish-ai && faction-xenos && !enable-turtle-ai
 		Protect: mini-silo, weed-node, resin-turret, forward-hive
 		Defenders: runner, hunter, sentinel, warrior, spitter, defender, praetorian, ravager, crusher
 		BaseTypes: resin-silo
+	DefendBotModule@xenos-turtle:
+		RequiresCondition: enable-skirmish-ai && faction-xenos && enable-turtle-ai
+		Protect: mini-silo, weed-node, resin-turret, forward-hive
+		Defenders: runner, hunter, sentinel, warrior, spitter, defender, praetorian, ravager, crusher
+		BaseTypes: resin-silo
+		OvermatchPercent: 250
 	# Both bots send a few fast units at the enemy's least defended outpost, round known defences, and turn back when outmatched (see RaidBotModule in Bots.cs).
 	RaidBotModule@marines:
-		RequiresCondition: enable-skirmish-ai && !faction-xenos
+		RequiresCondition: enable-skirmish-ai && !faction-xenos && !enable-turtle-ai && !enable-raider-ai
 		Raiders: rifleman, blademan, som_blademan
 		Targets: mini-silo, weed-node, forward-hive
 		BaseTypes: cryo-pod
+	RaidBotModule@marines-raider:
+		RequiresCondition: enable-skirmish-ai && !faction-xenos && enable-raider-ai
+		Raiders: rifleman, blademan, som_blademan
+		Targets: mini-silo, weed-node, forward-hive
+		BaseTypes: cryo-pod
+		Interval: 25
+		Size: 6
+		MaxThreatPercent: 100
 	RaidBotModule@xenos:
-		RequiresCondition: enable-skirmish-ai && faction-xenos
+		RequiresCondition: enable-skirmish-ai && faction-xenos && !enable-turtle-ai && !enable-raider-ai
 		Raiders: runner, hunter
 		Targets: miner, engineer
 		BaseTypes: resin-silo
+	RaidBotModule@xenos-raider:
+		RequiresCondition: enable-skirmish-ai && faction-xenos && enable-raider-ai
+		Raiders: runner, hunter
+		Targets: miner, engineer
+		BaseTypes: resin-silo
+		Interval: 25
+		Size: 6
+		MaxThreatPercent: 100
 	# Both bots aim attack squads at the weakest valuable enemy structure they outmatch (see AttackTargetBotModule in Bots.cs).
 	AttackTargetBotModule@marines:
 		RequiresCondition: enable-skirmish-ai && !faction-xenos

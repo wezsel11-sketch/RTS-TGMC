@@ -79,3 +79,53 @@ miner-field:
 	FrozenUnderFog:
 	MinerField:
 		IntoActor: miner
+
+# The Alamo, the dropship that lands for the Evac mission (mod/scenarios/mission-evac.lua): 11 by 21 cells, drawn from TGMC's own
+# layout with its side hatches, rear ramp and cockpit hatch (mod/build_sprites.py compose_alamo). Units walk onto it; the mission
+# script boards every marine that steps on. The doors follow the conditions the script grants (doors-opening, then doors-open; doors-
+# closing on take-off). Deploy (F) on the selected ship launches it early: the launch condition removes it, which the script reads.
+alamo:
+	ScriptTriggers:
+	Tooltip:
+		Name: actor-alamo.name
+	Selectable:
+		Bounds: 11264, 21504
+		Priority: 10
+	SelectionDecorations:
+	Immobile:
+		OccupiesSpace: false
+	RenderSprites:
+		Image: alamo
+		Palette: effect
+	BodyOrientation:
+		QuantizedFacings: 1
+	WithSpriteBody:
+	WithIdleOverlay@closed:
+		Sequence: doors-closed
+		Palette: effect
+		RequiresCondition: !doors-opening && !doors-open && !doors-closing
+	WithIdleOverlay@opening:
+		Sequence: doors-opening
+		Palette: effect
+		RequiresCondition: doors-opening
+	WithIdleOverlay@open:
+		Sequence: doors-open
+		Palette: effect
+		RequiresCondition: doors-open && !doors-closing
+	WithIdleOverlay@closing:
+		Sequence: doors-closing
+		Palette: effect
+		RequiresCondition: doors-closing
+	ExternalCondition@opening:
+		Condition: doors-opening
+	ExternalCondition@open:
+		Condition: doors-open
+	ExternalCondition@closing:
+		Condition: doors-closing
+	ExternalCondition@launch:
+		Condition: launch
+	GrantConditionOnDeploy:
+		DeployedCondition: launch
+	KillsSelf:
+		RequiresCondition: launch
+		RemoveInstead: true

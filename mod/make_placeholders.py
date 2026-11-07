@@ -112,6 +112,20 @@ def landing_zone_ground(x, y):
     return flat_ground(x, y)
 
 
+def evac_ground(x, y):
+    """64x48. Evac: a road from the marine base in the west to the landing zone (dirt, x 38 to 50, y 13 to 35) in the east, two rock
+    outcrops that funnel the north and south approaches, and a pond in the middle."""
+    if 38 <= x <= 50 and 13 <= y <= 35:
+        return DIRT, 0
+    if (y == 24 and 8 <= x <= 38) or (x == 16 and 14 <= y <= 34):
+        return DIRT, 0
+    if _ellipse(x, y, 26, 12, 4, 2) or _ellipse(x, y, 26, 36, 4, 2):
+        return ROCK, 0
+    if _ellipse(x, y, 30, 24, 2, 3) and y != 24:
+        return WATER, 0
+    return GRASS, 0
+
+
 def _ellipse(x, y, cx, cy, rx, ry):
     return ((x - cx) / rx) ** 2 + ((y - cy) / ry) ** 2 <= 1
 
@@ -759,6 +773,22 @@ HOLD_THE_LINE = [a for a in LANDING_ZONE if a[1] == "Marines"] + [
     ("rifleman", "Marines", 8, 11, 256),
 ]
 
+# Evac (mission-evac.lua): the marine base in the west, two ore fields inside its sentries and two out in the open. The landing
+# zone is the dirt square in the east; the Alamo lands on it.
+EVAC = [
+    ("cryo-pod", "Marines", 7, 24, 512), ("vendor", "Marines", 10, 22, 512), ("vendor", "Marines", 10, 26, 512),
+    ("sentry-turret", "Marines", 15, 20, 256), ("sentry-turret", "Marines", 15, 28, 256),
+    ("cade", "Marines", 17, 22, 0), ("cade", "Marines", 17, 23, 0), ("cade", "Marines", 17, 25, 0), ("cade", "Marines", 17, 26, 0),
+    ("miner-field", "Neutral", 12, 16, 0), ("miner-field", "Neutral", 12, 32, 0),
+    ("miner-field", "Neutral", 30, 6, 0), ("miner-field", "Neutral", 30, 42, 0),
+    ("rifleman", "Marines", 12, 23, 256), ("rifleman", "Marines", 12, 25, 256), ("rifleman", "Marines", 13, 22, 256),
+    ("rifleman", "Marines", 13, 26, 256), ("medic", "Marines", 11, 24, 256), ("engineer", "Marines", 10, 24, 256),
+    ("engineer", "Marines", 9, 24, 256), ("resin-silo", "Xenos", 62, 46, 0),
+]
+# The xenos see the whole marine base (the agreed exception to fair fog), so each wave can pick the weak spot.
+EVAC_RULES = "Player:\n\tThreatMemory:\n\t\tFullVision: true\n"
+
+
 def _skirmish_actors(xeno_dx, dy):
     """Landing Zone's two bases, the xeno one moved by xeno_dx and both by dy."""
     return [(n, o, x + (xeno_dx if o == "Xenos" else 0), y + dy, f) for n, o, x, y, f in LANDING_ZONE]
@@ -806,6 +836,29 @@ SCENARIOS = {
     "scenario-queued-ability": _scenario("test-queued-ability", [
         ("squad_leader", "Marines", 4, 10, 256),
     ]),
+    # Evac (see scenarios/test-evac.lua): one case per map, set by an evac-case-*.lua beside the test.
+    "scenario-evac-target": {"scripts": ("mission-evac", "test-evac", "evac-case-target"), "drop_conquest": True, "size": (64, 48), "ground": "evac",
+                          "extra_rules": EVAC_RULES, "actors": [
+        ("cryo-pod", "Marines", 7, 24, 512), ("resin-silo", "Xenos", 62, 46, 0), ("sentry-turret", "Marines", 9, 21, 0), ("sentry-turret", "Marines", 9, 27, 0), ("sentry-turret", "Marines", 5, 24, 0), ("miner-field", "Neutral", 30, 8, 0), ("miner", "Marines", 30, 8, 0), ("miner-field", "Neutral", 30, 40, 0), ("miner", "Marines", 30, 40, 0), ("sentry-turret", "Marines", 28, 39, 0), ("sentry-turret", "Marines", 32, 39, 0), ("sentry-turret", "Marines", 30, 37, 0)
+    ]},
+    "scenario-evac-payout": {"scripts": ("mission-evac", "test-evac", "evac-case-payout"), "drop_conquest": True, "size": (64, 48), "ground": "evac",
+                          "extra_rules": EVAC_RULES, "actors": [
+        ("cryo-pod", "Marines", 7, 24, 512), ("resin-silo", "Xenos", 62, 46, 0), 
+    ]},
+    "scenario-evac-board": {"scripts": ("mission-evac", "test-evac", "evac-case-board"), "drop_conquest": True, "size": (64, 48), "ground": "evac",
+                          "extra_rules": EVAC_RULES, "actors": [
+        ("cryo-pod", "Marines", 7, 24, 512), ("resin-silo", "Xenos", 62, 46, 0), ("rifleman", "Marines", 36, 24, 256)
+    ]},
+    "scenario-evac-empty": {"scripts": ("mission-evac", "test-evac", "evac-case-empty"), "drop_conquest": True, "size": (64, 48), "ground": "evac",
+                          "extra_rules": EVAC_RULES, "actors": [
+        ("cryo-pod", "Marines", 7, 24, 512), ("resin-silo", "Xenos", 62, 46, 0), 
+    ]},
+    "scenario-evac-early": {"scripts": ("mission-evac", "test-evac", "evac-case-early"), "drop_conquest": True, "size": (64, 48), "ground": "evac",
+                          "extra_rules": EVAC_RULES, "actors": [
+        ("cryo-pod", "Marines", 7, 24, 512), ("resin-silo", "Xenos", 62, 46, 0), ("rifleman", "Marines", 36, 24, 256)
+    ]},
+    "scenario-evac-full": {"scripts": ("mission-evac", "test-evac", "evac-case-full"), "drop_conquest": True, "size": (64, 48), "ground": "evac",
+                           "extra_rules": EVAC_RULES + "cryo-pod:\n\tHealth:\n\t\tHP: 1000000\nvendor:\n\tHealth:\n\t\tHP: 1000000\n", "actors": EVAC},
     # A raided miner warns its owner once (see scenarios/test-raid-warning.lua).
     "scenario-raid-warning": {"scripts": ("test-raid-warning",), "drop_conquest": True, "extra_rules": "miner:\n\tHealth:\n\t\tHP: 3000\n", "actors": [
         ("miner-field", "Neutral", 10, 10, 0), ("miner", "Marines", 10, 10, 0), ("runner", "Xenos", 13, 10, 0),
@@ -2099,7 +2152,7 @@ def main():
                   drop_conquest=sc.get("drop_conquest", False), xeno_bot=sc.get("xeno_bot"),
                   marine_bot=sc.get("marine_bot"), fast=sc.get("fast", True),
                   extra_rules=sc.get("extra_rules", ""),
-                  ground={"landing_zone": landing_zone_ground, "walls": walls_ground, "doorline": doorline_ground}.get(sc.get("ground"), flat_ground))
+                  ground={"landing_zone": landing_zone_ground, "walls": walls_ground, "doorline": doorline_ground, "evac": evac_ground}.get(sc.get("ground"), flat_ground))
     write_map(os.path.join(args.out, "maps", "hold-the-line"), "Hold the Line", 40, 28, HOLD_THE_LINE, "Lobby, MissionSelector",
               [(6, 14), (33, 13)], scripts=("wave-survival",), ground=landing_zone_ground, category="Survival",
               drop_conquest=True, music=True)
@@ -2112,6 +2165,9 @@ def main():
     write_map(os.path.join(args.out, "maps", "the-hundred"), "The Hundred", 40, 28, HOLD_THE_LINE, "Lobby, MissionSelector",
               [(6, 14), (33, 13)], scripts=("wave-survival", "mission-hundred"), ground=landing_zone_ground, category="Survival",
               drop_conquest=True, music=True)
+    write_map(os.path.join(args.out, "maps", "evac"), "Evac", 64, 48, EVAC, "Lobby, MissionSelector",
+              [(7, 24), (62, 46)], scripts=("mission-evac",), ground=evac_ground, category="Survival",
+              drop_conquest=True, music=True, extra_rules=EVAC_RULES)
     print(f"placeholders written to {args.out}")
 
 

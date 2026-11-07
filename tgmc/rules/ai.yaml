@@ -125,11 +125,13 @@ Player:
 		MaxBaseRadius: 14
 		ProductionMinCashRequirement: 150
 		# The xeno hive guards its silo with resin turrets: the weight and the limit are high enough that up to ten go up around it, not the odd one.
+		# Vendors are the marines' answer to weed nodes: each pays 6 and adds a production slot. At 3 the marine bot starved and won 12% of
+		# balance-aivai; at 8 it won 42% (30 runs each, 2026-11-07).
 		# Marines fight with cades and sentries: they are built often and up to a good number, so the miners and the bases get guarded.
 		BuildingFractions:
 			miner: 25
 			weed-node: 25
-			vendor: 8
+			vendor: 20
 			cryo-pod: 6
 			mini-silo: 8
 			armory: 8
@@ -149,7 +151,7 @@ Player:
 		BuildingLimits:
 			miner: 6
 			weed-node: 24
-			vendor: 3
+			vendor: 8
 			cryo-pod: 4
 			mini-silo: 3
 			armory: 1

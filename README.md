@@ -137,6 +137,15 @@ the commits this mod was tested against (see the top of `mod/bootstrap.py`), so 
     on its own units). *Hard* adds a scout that explores the map and sends smaller squads sooner. Defences, emplacements, traps and the
     Forward Hive are placed toward the nearest enemy, and a Forward Hive becomes a base the bot builds around.
   - **Xeno AI.** The skirmish bot hatches the Queen early, builds its Evolution Tower sooner and mixes castes, not runners alone.
+  - **Reactive AI.** Both bots remember where they saw enemy strength (`ThreatMemory`, a fading grid; squares in sight hold only what is
+    there now). They keep two fighters at each miner far from their base, send a force sized to the attacker to any outpost that is hit
+    (miners, turrets, cades, weed nodes, mini silos; the base buildings stay with the stock Protection squad), raid the enemy's least
+    defended outpost with four fast units along a way round known turrets (an A* over the grid), and turn back when outmatched. Attack
+    squads are pointed at the weakest valuable target they beat by 30%, though the stock squad logic still overrides that now and then.
+    Balance, 2026-11-07 (`mod/balance.sh` with `mod/balance-arms/no-reactive-ai.yaml` as the old bots): marine win rate 16% (95% 7-30%)
+    against 14% (6-29%) on balance-aivai, 40 runs each; 15% against 20% on aimap-canyon-run, 20 each; 100% against 100% on
+    balance-holdline. No measurable shift either way, and on these maps the xeno bot now wins most AI-vs-AI matches.
+    Known limit: after loading a skirmish save, units held as guards, defenders or raiders stand idle.
   - **Bodies.** Fallen units lie where they fell for 20 seconds and then fade away (`WithLingeringCorpse`).
   - **Left and right.** OpenRA's facing angle grows counter-clockwise while the sprite sheets are drawn clockwise, so the generator
     now writes `Facings: -8` and `-16`. Marines face and aim the right way, and the Condor's nose points along its path.

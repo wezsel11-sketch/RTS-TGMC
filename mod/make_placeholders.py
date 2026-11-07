@@ -1424,6 +1424,13 @@ SCENARIOS = {
         ("rifleman", "Marines", 12, 12, 256), ("hunter", "Xenos", 17, 12, 0),
         ("rifleman", "Marines", 12, 4, 256), ("hunter", "Xenos", 17, 4, 0), ("resin-silo", "Xenos", 28, 20, 0),
     ]},
+    # Melee xenos claw down marine structures (see scenarios/test-xeno-structures.lua): a hunter and a runner against a cade, then a sentry.
+    "scenario-xeno-structures": {"scripts": ("test-xeno-structures",), "size": (32, 24), "drop_conquest": True,
+                                 "extra_rules": "hunter:\n\tHealth:\n\t\tHP: 3000\nrunner:\n\tHealth:\n\t\tHP: 3000\n", "actors": [
+        ("cade", "Marines", 10, 4, 0), ("hunter", "Xenos", 14, 4, 768), ("cade", "Marines", 10, 8, 0), ("runner", "Xenos", 14, 8, 768),
+        ("sentry-turret", "Marines", 10, 12, 0), ("hunter", "Xenos", 14, 12, 768), ("sentry-turret", "Marines", 10, 16, 0), ("runner", "Xenos", 14, 16, 768),
+        ("cryo-pod", "Marines", 3, 20, 0), ("resin-silo", "Xenos", 28, 20, 0),
+    ]},
     # A barricade covers only the side it faces (see scenarios/test-cade.lua): one faces the rifleman in the north, one faces the hunter in the south.
     "scenario-cade": {"scripts": ("test-cade",), "size": (32, 24), "drop_conquest": True,
                       "extra_rules": "hunter:\n\tHealth:\n\t\tHP: 3000\ncade-w:\n\tInherits: ^MapObjectCover\n\tHealth:\n\t\tHP: 3000\n\tWithSpriteBody:\n\t\tSequence: o0\n\tBlocksBullets:\n\t\tFaceX: -1\n\t\tFaceY: 0\ncade-e:\n\tInherits: cade-w\n\tBlocksBullets:\n\t\tFaceX: 1\n\t\tFaceY: 0\n", "actors": [

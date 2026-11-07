@@ -176,6 +176,12 @@ The uncommitted `MinerGuardBotModule` (`tgmc/code/Bots.cs`, `tgmc/rules/ai.yaml`
   - `int MaxThreatPercent = 60`: only targets whose `StrengthNear` is ≤ 60 % of the raid's value
   - `int BackOffPercent = 120`: the raid turns home when `StrengthNear(raid centre, 4)` exceeds 120 % of its remaining value
 - Candidates are enemy actors of `Targets` types that are visible now or in the frozen-actor layer.
+- **Threat-aware route** (added 2026-11-07 at the user's request, from the influence-map-in-A* idea in the RTS AI guides):
+  the raid walks through waypoints from `ThreatMemory.SafePath(CPos from, CPos to) -> List<CPos>`. That is an A* over the coarse
+  grid squares, where a step costs 1 + the square's strength / `StepCostValue` (Info field on ThreatMemory, default 100), and the
+  result is the cell centres of the squares, with the last one replaced by `to`. Test, in `ai-raid-route`: a sentry wall stands on
+  the straight line from silo to miner and an open way goes round it. PASS if no raider comes within 3 cells of a sentry before
+  reaching the miner.
 - At most one raid is out at a time. Its units go back to the idle list on arrival home, or when all targets near it are dead.
 
 - [ ] **Step 1: Write the failing tests.**
@@ -200,9 +206,11 @@ The uncommitted `MinerGuardBotModule` (`tgmc/code/Bots.cs`, `tgmc/rules/ai.yaml`
 **Interfaces:**
 - Consumes: `ThreatMemory.WeakestTarget`. Also the stock `SquadManagerBotModule.Squads` (public `List<Squad>`),
   `Squad.Type`, `Squad.IsValid`, `Squad.CenterUnit()`, `Squad.SetActorToTarget((Actor, WVec))`.
-- Info fields: `int Interval = 150` and `string[] Targets` (enemy structures worth attacking). Nothing else.
+- Info fields: `int Interval = 150`, `string[] Targets` (enemy structures worth attacking) and `int OutmatchPercent = 130`.
 - Each interval, for each valid `Assault` or `Rush` squad, it sets the target to the `WeakestTarget` among the candidates
-  (visible or frozen enemy `Targets`). With no candidate it leaves the squad alone.
+  (visible or frozen enemy `Targets`) whose `StrengthNear(cell, 6)` is at most the squad's value × 100 / `OutmatchPercent`
+  (added 2026-11-07, from the AoE "attack when stronger" rule in the guides). With no such candidate it leaves the squad alone.
+  Test: `ai-attack-weak` also gets a group C with defences worth more than the squad, nearer than A and B; the squad must not go there.
 
 - [ ] **Step 1: Write the failing test.**
   - `ai-attack-weak`: the marine bot, with a squad of 8 riflemen given at start.

@@ -4,6 +4,8 @@
 # Maps pre-place the starting base. The skirmish AI has no builder to walk, so its cryo pod and silo give the area too.
 
 ^Structure:
+	# Tells the owner's ThreatMemory who hit it.
+	ReportsThreatOnDamage:
 	FadesInOnBuild:
 	# Kills so far (turrets), shown on the selection card.
 	KillCount:

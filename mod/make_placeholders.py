@@ -1289,6 +1289,13 @@ SCENARIOS = {
         ("rifleman", "Marines", 9, 9, 0), ("rifleman", "Marines", 10, 9, 0), ("rifleman", "Marines", 11, 9, 0),
         ("miner-field", "Neutral", 40, 20, 0), ("miner", "Marines", 40, 20, 0), ("resin-silo", "Xenos", 58, 28, 0),
     ]},
+    # ThreatMemory: what the marines saw of three xenos is remembered, then fades (see scenarios/test-ai-threat.lua).
+    "scenario-ai-threat": {"scripts": ("test-ai-threat",), "drop_conquest": True, "size": (64, 48),
+                           "extra_rules": "^Unit:\n\tAutoTarget:\n\t\tInitialStance: HoldFire\n", "actors": [
+        ("cryo-pod", "Marines", 6, 6, 0), ("rifleman", "Marines", 8, 8, 0),
+        ("sentinel", "Xenos", 30, 24, 0), ("sentinel", "Xenos", 31, 24, 0), ("sentinel", "Xenos", 30, 25, 0),
+        ("resin-silo", "Xenos", 58, 42, 0),
+    ]},
     "scenario-ai-medic": {"scripts": ("test-ai-medic",), "marine_bot": "skirmish", "drop_conquest": True, "size": (48, 32),
                           "extra_rules": "Player:\n\t-SquadManagerBotModule@marines-easy:\n\t-SquadManagerBotModule@marines-normal:\n\t-SquadManagerBotModule@marines-hard:\n^Infantry:\n\tAutoTarget:\n\t\tInitialStance: HoldFire\n", "actors": [
         ("cryo-pod", "Marines", 6, 6, 0), ("medic", "Marines", 8, 10, 0), ("rifleman", "Marines", 28, 12, 0),

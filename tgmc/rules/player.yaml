@@ -4,6 +4,9 @@
 
 Player:
 	Inherits: ^BasePlayer
+	# Where this player has seen enemy strength, faded over time, and its actors hit lately (tgmc/code/ThreatMemory.cs). Bots and mission scripts read it.
+	ThreatMemory:
+		Defences: sentry-turret, cade, resin-turret, mortar-emplacement, artillery-emplacement
 	PlayerResources:
 		SelectableCash: 500, 1000, 2500, 5000
 		DefaultCash: 1000

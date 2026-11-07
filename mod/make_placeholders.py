@@ -1282,6 +1282,13 @@ SCENARIOS = {
         ("hunter", "Xenos", 22, 22, 0), ("hunter", "Xenos", 23, 23, 0), ("hunter", "Xenos", 22, 24, 0),
         ("hunter", "Xenos", 24, 22, 0), ("hunter", "Xenos", 23, 21, 0), ("hunter", "Xenos", 24, 24, 0),
     ]},
+    # The marine bot's idle riflemen go and stand beside a miner far from its base, and stay (see scenarios/test-ai-guards.lua).
+    "scenario-ai-guards": {"scripts": ("test-ai-guards",), "marine_bot": "easy", "drop_conquest": True, "size": (64, 32),
+                           "extra_rules": "^Infantry:\n\tAutoTarget:\n\t\tInitialStance: HoldFire\n", "actors": [
+        ("cryo-pod", "Marines", 6, 6, 0), ("rifleman", "Marines", 9, 8, 0), ("rifleman", "Marines", 10, 8, 0),
+        ("rifleman", "Marines", 9, 9, 0), ("rifleman", "Marines", 10, 9, 0), ("rifleman", "Marines", 11, 9, 0),
+        ("miner-field", "Neutral", 40, 20, 0), ("miner", "Marines", 40, 20, 0), ("resin-silo", "Xenos", 58, 28, 0),
+    ]},
     "scenario-ai-medic": {"scripts": ("test-ai-medic",), "marine_bot": "skirmish", "drop_conquest": True, "size": (48, 32),
                           "extra_rules": "Player:\n\t-SquadManagerBotModule@marines-easy:\n\t-SquadManagerBotModule@marines-normal:\n\t-SquadManagerBotModule@marines-hard:\n^Infantry:\n\tAutoTarget:\n\t\tInitialStance: HoldFire\n", "actors": [
         ("cryo-pod", "Marines", 6, 6, 0), ("medic", "Marines", 8, 10, 0), ("rifleman", "Marines", 28, 12, 0),

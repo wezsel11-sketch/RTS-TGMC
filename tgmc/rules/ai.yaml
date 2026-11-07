@@ -669,6 +669,10 @@ Player:
 	# Marine bot: every miner gets sentry turrets beside it (see FieldDefenseBotModule in Bots.cs).
 	FieldDefenseBotModule@marines:
 		RequiresCondition: enable-skirmish-ai && !faction-xenos
+	# Marine bot: two fighters stand beside each miner, so a raid meets rifles at once (see MinerGuardBotModule in Bots.cs).
+	MinerGuardBotModule@marines:
+		RequiresCondition: enable-skirmish-ai && !faction-xenos
+		Guards: rifleman, smartgunner, machinegunner, grenadier, flamer, som_machinegunner
 	# Marine bot: idle engineers go to the ore fields the xenos have not disabled yet and repair them (see FieldBotModule in Bots.cs).
 	FieldBotModule@marines:
 		RequiresCondition: enable-skirmish-ai && !faction-xenos

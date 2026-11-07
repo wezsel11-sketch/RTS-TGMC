@@ -684,6 +684,17 @@ Player:
 		Protect: mini-silo, weed-node, resin-turret, forward-hive
 		Defenders: runner, hunter, sentinel, warrior, spitter, defender, praetorian, ravager, crusher
 		BaseTypes: resin-silo
+	# Both bots send a few fast units at the enemy's least defended outpost, round known defences, and turn back when outmatched (see RaidBotModule in Bots.cs).
+	RaidBotModule@marines:
+		RequiresCondition: enable-skirmish-ai && !faction-xenos
+		Raiders: rifleman, blademan, som_blademan
+		Targets: mini-silo, weed-node, forward-hive
+		BaseTypes: cryo-pod
+	RaidBotModule@xenos:
+		RequiresCondition: enable-skirmish-ai && faction-xenos
+		Raiders: runner, hunter
+		Targets: miner, engineer
+		BaseTypes: resin-silo
 	# Marine bot: idle engineers go to the ore fields the xenos have not disabled yet and repair them (see FieldBotModule in Bots.cs).
 	FieldBotModule@marines:
 		RequiresCondition: enable-skirmish-ai && !faction-xenos

@@ -1132,12 +1132,25 @@ namespace OpenRA.Mods.TGMC.Traits
 				return;
 
 			countdown = Info.Interval;
-			var attacked = memory.RecentAttacks.Where(r => Info.Protect.Contains(r.Victim.Info.Name) && r.Victim.Owner == player).ToList();
+			// An attack counts for an outpost when the outpost itself is hit, or one of the bot's units standing beside it (its guards).
+			var outposts = world.Actors.Where(a => Alive(a) && Info.Protect.Contains(a.Info.Name)).ToList();
+			var attacked = memory.RecentAttacks
+				.Select(r => (Victim: Info.Protect.Contains(r.Victim.Info.Name) ? r.Victim
+					: outposts.Where(o => Near(r.Victim, o.Location)).MinByOrDefault(o => (o.Location - r.Victim.Location).LengthSquared), r.Attacker, r.Tick))
+				.Where(r => r.Victim != null && r.Victim.Owner == player)
+				.GroupBy(r => r.Victim)
+				.Select(g => g.MaxBy(r => r.Tick))
+				.ToList();
 
 			need.Clear();
 			foreach (var (victim, _, _) in attacked)
 			{
-				var threat = memory.StrengthNear(victim.Location, Info.Radius) * Info.OvermatchPercent / 100;
+				// Size against the distinct enemies in sight around the outpost; the grid (which may hold a moving group more than once)
+				// only when none are in sight.
+				var inSight = world.FindActorsInCircle(victim.CenterPosition, WDist.FromCells(Info.Radius))
+					.Where(a => !a.IsDead && player.RelationshipWith(a.Owner) == PlayerRelationship.Enemy && a.CanBeViewedByPlayer(player))
+					.Sum(BotUnits.Value);
+				var threat = (inSight > 0 ? inSight : memory.StrengthNear(victim.Location, Info.Radius)) * Info.OvermatchPercent / 100;
 				var there = world.Actors.Where(a => Alive(a) && Info.Defenders.Contains(a.Info.Name) && Near(a, victim.Location))
 					.Concat(victimOf.Where(kv => kv.Value == victim && Alive(kv.Key)).Select(kv => kv.Key))
 					.Distinct()
@@ -1158,6 +1171,172 @@ namespace OpenRA.Mods.TGMC.Traits
 				}
 				else if (d.IsIdle && (d.Location - victim.Location).LengthSquared > 9)
 					bot.QueueOrder(new Order("AttackMove", d, Target.FromCell(world, victim.Location), false));
+			}
+		}
+	}
+
+	[TraitLocation(SystemActors.Player)]
+	[Desc("Sends a small group of fast units at the enemy's most valuable, least defended outpost (a lone miner, an outlying field) " +
+		"by a way round the defences ThreatMemory knows of, and turns it home when it meets more than it can beat. One raid at a time.")]
+	public class RaidBotModuleInfo : ConditionalTraitInfo
+	{
+		public readonly int Interval = 50;
+
+		[Desc("Fast unit types that raid.")]
+		public readonly string[] Raiders = [];
+
+		[Desc("Units in a raid. No raid sets off with fewer.")]
+		public readonly int Size = 4;
+
+		[Desc("Enemy actor types worth raiding.")]
+		public readonly string[] Targets = [];
+
+		[Desc("Only targets whose remembered defence is at most this percent of the raid's value.")]
+		public readonly int MaxThreatPercent = 60;
+
+		[Desc("The raid turns home when the strength around it passes this percent of its remaining value.")]
+		public readonly int BackOffPercent = 120;
+
+		[Desc("Cells around a target, or around the raid, counted for defence.")]
+		public readonly int Radius = 4;
+
+		[Desc("The bot's own actors that mark its base: the raid comes home to the nearest.")]
+		public readonly string[] BaseTypes = ["resin-silo"];
+
+		public override object Create(ActorInitializer init) { return new RaidBotModule(init.Self, this); }
+	}
+
+	public class RaidBotModule : ConditionalTrait<RaidBotModuleInfo>, IBotTick, IBotNotifyIdleBaseUnits
+	{
+		readonly World world;
+		readonly Player player;
+		readonly List<Actor> raid = [];
+		readonly List<Actor> released = [];
+		ThreatMemory memory;
+		MinerGuardBotModule[] guards = [];
+		DefendBotModule[] defenders = [];
+		List<CPos> route = [];
+		CPos target;
+		int leg;
+		bool homeward;
+		bool ordered;
+		int countdown;
+
+		public RaidBotModule(Actor self, RaidBotModuleInfo info)
+			: base(info)
+		{
+			world = self.World;
+			player = self.Owner;
+		}
+
+		protected override void Created(Actor self)
+		{
+			base.Created(self);
+			memory = self.TraitOrDefault<ThreatMemory>();
+			guards = self.TraitsImplementing<MinerGuardBotModule>().ToArray();
+			defenders = self.TraitsImplementing<DefendBotModule>().ToArray();
+		}
+
+		public bool IsRaider(Actor a) { return !IsTraitDisabled && raid.Contains(a); }
+
+		bool Free(Actor a)
+		{
+			return !a.IsDead && a.IsInWorld && a.Owner == player && Info.Raiders.Contains(a.Info.Name)
+				&& !guards.Any(g => g.IsGuard(a)) && !defenders.Any(d => d.IsBusy(a));
+		}
+
+		// Enemy actors of the Targets types this player knows of: in sight now, or remembered as frozen (or all, with FullVision).
+		IEnumerable<(CPos Cell, int Value)> Candidates()
+		{
+			var seen = world.Actors.Where(a => a.IsInWorld && !a.IsDead && Info.Targets.Contains(a.Info.Name)
+					&& player.RelationshipWith(a.Owner) == PlayerRelationship.Enemy && (memory.FullVision || a.CanBeViewedByPlayer(player)))
+				.Select(a => (a.Location, BotUnits.Value(a)));
+			var frozen = player.FrozenActorLayer?.FrozenActorsInRegion(world.Map.AllCells)
+				.Where(f => f.IsValid && f.Visible && Info.Targets.Contains(f.Info.Name) && player.RelationshipWith(f.Owner) == PlayerRelationship.Enemy)
+				.Select(f => (world.Map.CellContaining(f.CenterPosition), f.Info.TraitInfoOrDefault<ValuedInfo>()?.Cost ?? 0)) ?? [];
+			return seen.Concat(frozen);
+		}
+
+		void IBotNotifyIdleBaseUnits.UpdatedIdleBaseUnits(List<Actor> idleUnits)
+		{
+			if (IsTraitDisabled || memory == null)
+				return;
+
+			idleUnits.AddRange(released.Where(a => !a.IsDead && a.IsInWorld));
+			released.Clear();
+			if (raid.Count > 0)
+				return;
+
+			var free = idleUnits.Where(Free).Take(Info.Size).ToList();
+			if (free.Count < Info.Size)
+				return;
+
+			var value = free.Sum(BotUnits.Value);
+			var options = Candidates().Where(c => memory.DefenceNear(c.Cell, c.Value, Info.Radius) * 100 <= value * Info.MaxThreatPercent).ToList();
+			if (options.Count == 0)
+				return;
+
+			var best = memory.WeakestTarget(options, c => c.Cell, c => c.Value, Info.Radius);
+			target = best.Cell;
+			var centre = free[0].Location;
+			route = memory.SafePath(centre, target);
+			leg = 0;
+			homeward = false;
+			ordered = false;
+			foreach (var a in free)
+				idleUnits.Remove(a);
+
+			raid.AddRange(free);
+		}
+
+		void IBotTick.BotTick(IBot bot)
+		{
+			if (IsTraitDisabled || memory == null || --countdown > 0)
+				return;
+
+			countdown = Info.Interval;
+			raid.RemoveAll(a => a.IsDead || !a.IsInWorld);
+			if (raid.Count == 0)
+				return;
+
+			var centre = new CPos((int)raid.Average(a => a.Location.X), (int)raid.Average(a => a.Location.Y));
+			if (homeward)
+			{
+				if (raid.All(a => a.IsIdle))
+				{
+					released.AddRange(raid);
+					raid.Clear();
+				}
+
+				return;
+			}
+
+			var value = raid.Sum(BotUnits.Value);
+			var atEnd = leg >= route.Count - 1;
+			if (memory.StrengthNear(centre, Info.Radius) * 100 > value * Info.BackOffPercent || (atEnd && ordered && raid.All(a => a.IsIdle)))
+			{
+				// Outmatched, or done: nothing left to hit at the target.
+				homeward = true;
+				foreach (var a in raid)
+					BotUnits.SendHome(bot, a, Info.BaseTypes);
+
+				return;
+			}
+
+			if (ordered && !atEnd && ((centre - route[leg]).LengthSquared <= 9 || raid.All(a => a.IsIdle)))
+			{
+				leg++;
+				ordered = false;
+			}
+
+			if (!ordered)
+			{
+				// Walk the way round (a plain move, so the raid does not stop to fight what it passes); attack only on the last leg.
+				var order = leg >= route.Count - 1 ? "AttackMove" : "Move";
+				foreach (var a in raid)
+					bot.QueueOrder(new Order(order, a, Target.FromCell(world, route[leg]), false));
+
+				ordered = true;
 			}
 		}
 	}

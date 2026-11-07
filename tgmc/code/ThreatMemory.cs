@@ -34,6 +34,9 @@ namespace OpenRA.Mods.TGMC.Traits
 		[Desc("Ticks an attack on one of this player's actors stays recent.")]
 		public readonly int AttackMemory = 250;
 
+		[Desc("SafePath: remembered strength (near a square, within two squares) that doubles the cost of walking through it.")]
+		public readonly int StepCostValue = 50;
+
 		public override object Create(ActorInitializer init) { return new ThreatMemory(init.Self, this); }
 	}
 
@@ -150,10 +153,92 @@ namespace OpenRA.Mods.TGMC.Traits
 				.OrderByDescending(kv => kv.Value.Tick)
 				.Select(kv => (kv.Key, kv.Value.Attacker, kv.Value.Tick));
 
+		public bool FullVision => Info.FullVision;
+
+		// Strength within two squares: a turret's reach (9 cells) spans about that far, so a path keeps out of range, not just off its square.
+		float Danger(int x, int y)
+		{
+			var sum = 0f;
+			for (var i = Math.Max(0, x - 2); i <= Math.Min(cols - 1, x + 2); i++)
+				for (var j = Math.Max(0, y - 2); j <= Math.Min(rows - 1, y + 2); j++)
+					sum += grid[i, j];
+
+			return sum;
+		}
+
+		/// <summary>
+		/// Waypoints from one cell to another that keep away from remembered enemy strength: an A* over the grid squares, where a step
+		/// costs its length times 1 + Danger / StepCostValue. Returns the centre cells of the squares on the way, the last replaced by
+		/// the goal, or just the goal when no way is found.
+		/// </summary>
+		public List<CPos> SafePath(CPos from, CPos to)
+		{
+			var start = Square(from);
+			var goal = Square(to);
+			var cost = new float[cols, rows];
+			var prev = new (int X, int Y)?[cols, rows];
+			for (var x = 0; x < cols; x++)
+				for (var y = 0; y < rows; y++)
+					cost[x, y] = float.MaxValue;
+
+			float H((int X, int Y) n)
+			{
+				var dx = Math.Abs(n.X - goal.X);
+				var dy = Math.Abs(n.Y - goal.Y);
+				return Math.Max(dx, dy) + 0.414f * Math.Min(dx, dy);
+			}
+
+			var open = new PriorityQueue<(int X, int Y), float>();
+			cost[start.X, start.Y] = 0;
+			open.Enqueue(start, H(start));
+			while (open.TryDequeue(out var cur, out _))
+			{
+				if (cur == goal)
+					break;
+
+				for (var dx = -1; dx <= 1; dx++)
+				{
+					for (var dy = -1; dy <= 1; dy++)
+					{
+						var n = (X: cur.X + dx, Y: cur.Y + dy);
+						if ((dx == 0 && dy == 0) || n.X < 0 || n.Y < 0 || n.X >= cols || n.Y >= rows)
+							continue;
+
+						var step = (dx != 0 && dy != 0 ? 1.414f : 1f) * (1 + Danger(n.X, n.Y) / Info.StepCostValue);
+						var c = cost[cur.X, cur.Y] + step;
+						if (c < cost[n.X, n.Y])
+						{
+							cost[n.X, n.Y] = c;
+							prev[n.X, n.Y] = cur;
+							open.Enqueue(n, c + H(n));
+						}
+					}
+				}
+			}
+
+			var path = new List<CPos>();
+			if (start == goal || prev[goal.X, goal.Y] == null)
+				return [to];
+
+			for (var at = goal; at != start; at = prev[at.X, at.Y].Value)
+				path.Add(new CPos(Math.Min(at.X * Info.CellSize + Info.CellSize / 2, world.Map.MapSize.Width - 1),
+					Math.Min(at.Y * Info.CellSize + Info.CellSize / 2, world.Map.MapSize.Height - 1)));
+
+			path.Reverse();
+			path[^1] = to;
+			return path;
+		}
+
+		/// <summary>Remembered strength around a target, less the target's own value: what stands guard over it.</summary>
+		public int DefenceNear(CPos cell, int targetValue, int radiusCells)
+		{
+			return Math.Max(0, StrengthNear(cell, radiusCells) - targetValue);
+		}
+
 		/// <summary>The candidate with the most value for the least remembered defence around it, or default when there are none.</summary>
 		public T WeakestTarget<T>(IEnumerable<T> candidates, Func<T, CPos> cellOf, Func<T, int> valueOf, int radiusCells)
 		{
-			return candidates.Select(c => (Item: c, Score: valueOf(c) / (1f + StrengthNear(cellOf(c), radiusCells))))
+			return candidates.Select(c => (Item: c, Score: valueOf(c) / (1f + DefenceNear(cellOf(c), valueOf(c), radiusCells))))
 				.OrderByDescending(s => s.Score)
 				.Select(s => s.Item)
 				.FirstOrDefault();

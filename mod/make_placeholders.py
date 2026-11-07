@@ -1332,6 +1332,16 @@ SCENARIOS = {
         ("sentry-turret", "Marines", 40, 16, 0), ("sentry-turret", "Marines", 40, 18, 0), ("sentry-turret", "Marines", 40, 20, 0),
         ("sentry-turret", "Marines", 40, 22, 0), ("sentry-turret", "Marines", 40, 24, 0),
     ]},
+    # AttackTargetBotModule: the squad goes for the bare mini-silo B, not the nearer C behind turrets it cannot beat, and not A (one turret)
+    # (see scenarios/test-ai-attack-weak.lua).
+    "scenario-ai-attack-weak": {"scripts": ("test-ai-attack-weak",), "marine_bot": "hard", "drop_conquest": True, "size": (64, 40),
+        "extra_rules": "Player:\n\t-ScoutBotModule@marines:\n\t-FieldBotModule@sweep:\n\t-RaidBotModule@marines:\n\t-TgmcSupportPowerBotModule:\n\tThreatMemory:\n\t\tFullVision: true\n", "actors": [
+        ("cryo-pod", "Marines", 4, 20, 0), ("rifleman", "Marines", 6, 19, 0), ("rifleman", "Marines", 6, 21, 0), ("rifleman", "Marines", 7, 19, 0), ("rifleman", "Marines", 7, 21, 0), ("rifleman", "Marines", 8, 19, 0), ("rifleman", "Marines", 8, 21, 0), ("rifleman", "Marines", 9, 19, 0), ("rifleman", "Marines", 9, 21, 0),
+        ("mini-silo", "Xenos", 44, 6, 0), ("resin-turret", "Xenos", 46, 8, 0),
+        ("mini-silo", "Xenos", 44, 34, 0),
+        ("mini-silo", "Xenos", 28, 4, 0), ("resin-turret", "Xenos", 26, 6, 0), ("resin-turret", "Xenos", 30, 6, 0),
+        ("resin-silo", "Xenos", 60, 20, 0), ("resin-turret", "Xenos", 58, 18, 0), ("resin-turret", "Xenos", 58, 22, 0), ("resin-turret", "Xenos", 61, 23, 0),
+    ]},
     "scenario-ai-medic": {"scripts": ("test-ai-medic",), "marine_bot": "skirmish", "drop_conquest": True, "size": (48, 32),
                           "extra_rules": "Player:\n\t-SquadManagerBotModule@marines-easy:\n\t-SquadManagerBotModule@marines-normal:\n\t-SquadManagerBotModule@marines-hard:\n^Infantry:\n\tAutoTarget:\n\t\tInitialStance: HoldFire\n", "actors": [
         ("cryo-pod", "Marines", 6, 6, 0), ("medic", "Marines", 8, 10, 0), ("rifleman", "Marines", 28, 12, 0),

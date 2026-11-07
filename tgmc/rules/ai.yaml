@@ -695,6 +695,13 @@ Player:
 		Raiders: runner, hunter
 		Targets: miner, engineer
 		BaseTypes: resin-silo
+	# Both bots aim attack squads at the weakest valuable enemy structure they outmatch (see AttackTargetBotModule in Bots.cs).
+	AttackTargetBotModule@marines:
+		RequiresCondition: enable-skirmish-ai && !faction-xenos
+		Targets: resin-silo, mini-silo, weed-node, resin-turret, evolution-tower, maturity-tower, forward-hive
+	AttackTargetBotModule@xenos:
+		RequiresCondition: enable-skirmish-ai && faction-xenos
+		Targets: cryo-pod, vendor, armory, medbay, workshop, ordnance-depot, miner, sentry-turret, mortar-emplacement, artillery-emplacement
 	# Marine bot: idle engineers go to the ore fields the xenos have not disabled yet and repair them (see FieldBotModule in Bots.cs).
 	FieldBotModule@marines:
 		RequiresCondition: enable-skirmish-ai && !faction-xenos

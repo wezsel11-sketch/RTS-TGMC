@@ -135,6 +135,7 @@ Spawn = function(types, from, to)
 end
 
 Pay = function(amount)
+	if amount <= 0 then return end
 	Marines.Cash = Marines.Cash + amount
 	Media.DisplayMessage("Wave survived: " .. amount .. " requisition", "Command")
 end

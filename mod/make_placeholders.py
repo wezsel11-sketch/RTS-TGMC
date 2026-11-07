@@ -1547,6 +1547,9 @@ SCENARIOS = {
         ("rifleman", "Marines", 10, 11, 0), ("mapdoor-0", "Neutral", 14, 11, 0), ("resin-silo", "Xenos", 28, 20, 0),
     ]},
     # Not a test: a door opening for a marine, to see the animation.
+    # The Alamo down on the Evac landing zone, doors open, marines on the way (see scenarios/shot-evac.lua).
+    "shot-evac": {"scripts": ("mission-evac", "shot-evac"), "drop_conquest": True, "size": (64, 48), "ground": "evac",
+                  "extra_rules": EVAC_RULES + "World:\n\tScreenshotAt:\n\t\tTick: 260\n", "actors": EVAC},
     "shot-door": {"scripts": ("shot-door",), "drop_conquest": True, "size": (32, 24), "ground": "doorline", "extra_rules": "World:\n\tScreenshotAt:\n\t\tTick: 75\n", "actors": [
         ("rifleman", "Marines", 12, 11, 0), ("mapdoor-0", "Neutral", 14, 11, 0), ("resin-silo", "Xenos", 28, 20, 0),
     ]},

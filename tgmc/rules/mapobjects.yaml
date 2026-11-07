@@ -94,6 +94,10 @@ alamo:
 	SelectionDecorations:
 	Immobile:
 		OccupiesSpace: false
+	# The landing lights up the zone: the player sees the ship and what comes for it.
+	RevealsShroud:
+		Range: 14c0
+		Type: CenterPosition
 	RenderSprites:
 		Image: alamo
 		Palette: effect

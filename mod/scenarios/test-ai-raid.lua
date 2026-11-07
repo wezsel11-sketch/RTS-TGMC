@@ -6,6 +6,8 @@
 --            is alive and every living runner is nearer the silo than the miner.
 --   route:   a sentry wall (x 40, y 16-24) stands on the straight line from the silo to the miner (20,20), with open ground round
 --            it. A runner reaches the miner (4 cells) by tick 2500, and no runner came within 3 cells of a sentry before that.
+--   rich:    one bare miner worth more than the raid (map rules set its cost to 400). The target's own value is not defence: the
+--            raid stays and brings the miner down to its floor (30% or less) by tick 2500.
 -- Prints "TEST ai-raid-<case> PASS" or "TEST ai-raid-<case> FAIL".
 local reported = false
 
@@ -73,6 +75,13 @@ WorldLoaded = function()
 					if dist(r.Location, silo) >= dist(r.Location, miner) then home = false end
 				end
 				report(spawned and #alive > 0 and home, "sentries spawned " .. tostring(spawned) .. ", " .. #alive .. " runners alive, all nearer the silo " .. tostring(home))
+			end
+		elseif RaidCase == "rich" then
+			local m = marines.GetActorsByType("miner")[1]
+			if m.Health * 100 <= m.MaxHealth * 30 then
+				report(true, "miner brought down by tick " .. ticks)
+			elseif ticks >= 2500 then
+				report(false, "miner at " .. m.Health .. " of " .. m.MaxHealth .. " at tick 2500")
 			end
 		elseif RaidCase == "route" then
 			for _, t in ipairs(marines.GetActorsByType("sentry-turret")) do

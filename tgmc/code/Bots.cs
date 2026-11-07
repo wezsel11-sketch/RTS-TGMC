@@ -357,7 +357,7 @@ namespace OpenRA.Mods.TGMC.Traits
 		public override object Create(ActorInitializer init) { return new ScoutBotModule(init.Self, this); }
 	}
 
-	public class ScoutBotModule : ConditionalTrait<ScoutBotModuleInfo>, IBotTick
+	public class ScoutBotModule : ConditionalTrait<ScoutBotModuleInfo>, IBotTick, IBotNotifyIdleBaseUnits
 	{
 		readonly World world;
 		readonly Player player;
@@ -371,17 +371,32 @@ namespace OpenRA.Mods.TGMC.Traits
 			player = self.Owner;
 		}
 
+		Actor Scout()
+		{
+			var scout = scoutId != 0 ? world.GetActorById(scoutId) : null;
+			return scout != null && !scout.IsDead && scout.IsInWorld && scout.Owner == player ? scout : null;
+		}
+
+		public bool IsScout(Actor a) { return !IsTraitDisabled && scoutId != 0 && a.ActorID == scoutId; }
+
+		// The scout is the scout's: take it out of the squad manager's idle base units, so no squad grabs it between scouting trips.
+		void IBotNotifyIdleBaseUnits.UpdatedIdleBaseUnits(List<Actor> idleUnits)
+		{
+			var scout = IsTraitDisabled ? null : Scout();
+			if (scout != null)
+				idleUnits.Remove(scout);
+		}
+
 		void IBotTick.BotTick(IBot bot)
 		{
 			if (IsTraitDisabled || --countdown > 0)
 				return;
 
 			countdown = Info.Interval;
-			var scout = scoutId != 0 ? world.GetActorById(scoutId) : null;
-			if (scout == null || scout.IsDead || !scout.IsInWorld)
+			var scout = Scout();
+			if (scout == null)
 			{
 				scoutId = 0;
-				scout = null;
 				foreach (var type in Info.Scouts)
 				{
 					scout = world.Actors.FirstOrDefault(a => a.Owner == player && a.IsInWorld && !a.IsDead && a.IsIdle && a.Info.Name == type && !BotUnits.Claimed(a));
@@ -1031,7 +1046,8 @@ namespace OpenRA.Mods.TGMC.Traits
 			var p = a.Owner.PlayerActor;
 			return p.TraitsImplementing<MinerGuardBotModule>().Any(m => m.IsGuard(a))
 				|| p.TraitsImplementing<DefendBotModule>().Any(m => m.IsBusy(a))
-				|| p.TraitsImplementing<RaidBotModule>().Any(m => m.IsRaider(a));
+				|| p.TraitsImplementing<RaidBotModule>().Any(m => m.IsRaider(a))
+				|| p.TraitsImplementing<ScoutBotModule>().Any(m => m.IsScout(a));
 		}
 
 		// A unit handed back to the squad manager walks to the nearest of its owner's base actors, so it idles where the squads gather.
@@ -1084,7 +1100,6 @@ namespace OpenRA.Mods.TGMC.Traits
 		readonly Dictionary<Actor, int> need = [];
 		readonly List<Actor> released = [];
 		ThreatMemory memory;
-		MinerGuardBotModule[] guards = [];
 		int countdown;
 
 		public DefendBotModule(Actor self, DefendBotModuleInfo info)
@@ -1098,7 +1113,6 @@ namespace OpenRA.Mods.TGMC.Traits
 		{
 			base.Created(self);
 			memory = self.TraitOrDefault<ThreatMemory>();
-			guards = self.TraitsImplementing<MinerGuardBotModule>().ToArray();
 		}
 
 		public bool IsBusy(Actor a) { return !IsTraitDisabled && victimOf.ContainsKey(a); }
@@ -1117,10 +1131,18 @@ namespace OpenRA.Mods.TGMC.Traits
 
 			foreach (var (victim, wanted) in need.ToList())
 			{
+				// The outpost may have fallen since the last look: no help for the dead.
+				if (!Alive(victim))
+				{
+					need.Remove(victim);
+					continue;
+				}
+
 				var left = wanted;
 				while (left > 0)
 				{
-					var d = idleUnits.Where(a => Alive(a) && Info.Defenders.Contains(a.Info.Name) && !guards.Any(g => g.IsGuard(a)))
+					// Guards never reach this list: their module takes them out of it first.
+					var d = idleUnits.Where(a => Alive(a) && Info.Defenders.Contains(a.Info.Name))
 						.MinByOrDefault(a => (a.CenterPosition - victim.CenterPosition).LengthSquared);
 					if (d == null)
 						break;
@@ -1221,6 +1243,7 @@ namespace OpenRA.Mods.TGMC.Traits
 
 	public class RaidBotModule : ConditionalTrait<RaidBotModuleInfo>, IBotTick, IBotNotifyIdleBaseUnits
 	{
+		const int HomewardTimeout = 500;
 		readonly World world;
 		readonly Player player;
 		readonly List<Actor> raid = [];
@@ -1231,8 +1254,10 @@ namespace OpenRA.Mods.TGMC.Traits
 		List<CPos> route = [];
 		List<(CPos Cell, int Value)> candidates = [];
 		CPos target;
+		int targetValue;
 		int leg;
 		bool homeward;
+		int homewardSince;
 		bool ordered;
 		int countdown;
 
@@ -1292,6 +1317,7 @@ namespace OpenRA.Mods.TGMC.Traits
 
 			var best = memory.WeakestTarget(options, c => c.Cell, c => c.Value, Info.Radius);
 			target = best.Cell;
+			targetValue = best.Value;
 			var centre = free[0].Location;
 			route = memory.SafePath(centre, target);
 			leg = 0;
@@ -1320,7 +1346,8 @@ namespace OpenRA.Mods.TGMC.Traits
 			var centre = new CPos((int)raid.Average(a => a.Location.X), (int)raid.Average(a => a.Location.Y));
 			if (homeward)
 			{
-				if (raid.All(a => a.IsIdle))
+				// A raider stuck on the way (blocked, or chasing something) must not hold the next raid back for ever.
+				if (raid.All(a => a.IsIdle) || world.WorldTick - homewardSince > HomewardTimeout)
 				{
 					released.AddRange(raid);
 					raid.Clear();
@@ -1331,10 +1358,14 @@ namespace OpenRA.Mods.TGMC.Traits
 
 			var value = raid.Sum(BotUnits.Value);
 			var atEnd = leg >= route.Count - 1;
-			if (memory.StrengthNear(centre, Info.Radius) * 100 > value * Info.BackOffPercent || (atEnd && ordered && raid.All(a => a.IsIdle)))
+			// The target's own value is not defence: at the target, count only what stands around it.
+			var atTarget = (centre - target).LengthSquared <= Info.Radius * Info.Radius;
+			var around = atTarget ? memory.DefenceNear(centre, targetValue, Info.Radius) : memory.StrengthNear(centre, Info.Radius);
+			if (around * 100 > value * Info.BackOffPercent || (atEnd && ordered && raid.All(a => a.IsIdle)))
 			{
 				// Outmatched, or done: nothing left to hit at the target.
 				homeward = true;
+				homewardSince = world.WorldTick;
 				foreach (var a in raid)
 					BotUnits.SendHome(bot, a, Info.BaseTypes);
 

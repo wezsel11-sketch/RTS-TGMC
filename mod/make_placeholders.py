@@ -1356,6 +1356,11 @@ SCENARIOS = {
         ("miner", "Marines", 30, 6, 0),
     ]},
     # RaidBotModule, a sentry wall on the straight line to the target: the raid walks round it (see scenarios/test-ai-raid.lua).
+    "scenario-ai-raid-rich": {"scripts": ("test-ai-raid", "raid-case-rich"), "xeno_bot": "easy", "drop_conquest": True, "size": (64, 40),
+        "extra_rules": "Player:\n\t-ScoutBotModule@xenos:\n\t-FieldBotModule@xenos:\n\tThreatMemory:\n\t\tFullVision: true\nminer:\n\tValued:\n\t\tCost: 400\n", "actors": [
+        ("cryo-pod", "Marines", 4, 20, 0), ("resin-silo", "Xenos", 58, 20, 0), ("runner", "Xenos", 54, 19, 0), ("runner", "Xenos", 54, 21, 0), ("runner", "Xenos", 55, 19, 0), ("runner", "Xenos", 55, 21, 0), ("runner", "Xenos", 56, 19, 0), ("runner", "Xenos", 56, 21, 0),
+        ("miner", "Marines", 30, 6, 0),
+    ]},
     "scenario-ai-raid-route": {"scripts": ("test-ai-raid", "raid-case-route"), "xeno_bot": "easy", "drop_conquest": True, "size": (64, 40),
         "extra_rules": "Player:\n\t-ScoutBotModule@xenos:\n\t-FieldBotModule@xenos:\n\tThreatMemory:\n\t\tFullVision: true\n", "actors": [
         ("cryo-pod", "Marines", 4, 20, 0), ("resin-silo", "Xenos", 58, 20, 0), ("runner", "Xenos", 54, 19, 0), ("runner", "Xenos", 54, 21, 0), ("runner", "Xenos", 55, 19, 0), ("runner", "Xenos", 55, 21, 0), ("runner", "Xenos", 56, 19, 0), ("runner", "Xenos", 56, 21, 0),

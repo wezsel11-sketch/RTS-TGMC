@@ -80,7 +80,8 @@ namespace OpenRA.Mods.TGMC.Traits
 
 		void ITick.Tick(Actor self)
 		{
-			if (IsTraitDisabled || --countdown > 0)
+			// Neutral and spectator players fight no one: nothing to remember.
+			if (IsTraitDisabled || player.NonCombatant || player.Spectating || --countdown > 0)
 				return;
 
 			countdown = Info.Interval;
@@ -221,12 +222,39 @@ namespace OpenRA.Mods.TGMC.Traits
 				return [to];
 
 			for (var at = goal; at != start; at = prev[at.X, at.Y].Value)
-				path.Add(new CPos(Math.Min(at.X * Info.CellSize + Info.CellSize / 2, world.Map.MapSize.Width - 1),
-					Math.Min(at.Y * Info.CellSize + Info.CellSize / 2, world.Map.MapSize.Height - 1)));
+				path.Add(Walkable(at.X, at.Y));
 
 			path.Reverse();
 			path[^1] = to;
 			return path;
+		}
+
+		// A waypoint in the square: its centre, or the cell nearest the centre that is not rock, wall or water, so units are not sent
+		// at a spot they cannot stand on.
+		CPos Walkable(int x, int y)
+		{
+			var map = world.Map;
+			var centre = new CPos(Math.Min(x * Info.CellSize + Info.CellSize / 2, map.MapSize.Width - 1), Math.Min(y * Info.CellSize + Info.CellSize / 2, map.MapSize.Height - 1));
+			var best = centre;
+			var bestDistance = int.MaxValue;
+			for (var cx = x * Info.CellSize; cx < Math.Min((x + 1) * Info.CellSize, map.MapSize.Width); cx++)
+			{
+				for (var cy = y * Info.CellSize; cy < Math.Min((y + 1) * Info.CellSize, map.MapSize.Height); cy++)
+				{
+					var cell = new CPos(cx, cy);
+					if (!map.Contains(cell) || map.GetTerrainInfo(cell).Type is "Rock" or "Wall" or "ReinforcedWall" or "Water")
+						continue;
+
+					var d = (cell - centre).LengthSquared;
+					if (d < bestDistance)
+					{
+						bestDistance = d;
+						best = cell;
+					}
+				}
+			}
+
+			return best;
 		}
 
 		/// <summary>Remembered strength around a target, less the target's own value: what stands guard over it.</summary>
@@ -273,7 +301,9 @@ namespace OpenRA.Mods.TGMC.Scripting
 		[Desc("Enemy strength this player remembers within radius cells of the cell (the summed cost of what it saw, fading over time).")]
 		public int ThreatNear(CPos cell, int radius)
 		{
-			return Player.PlayerActor.Trait<ThreatMemory>().StrengthNear(cell, radius);
+			// A switched-off memory knows nothing: report no threat rather than what it held when it stopped.
+			var memory = Player.PlayerActor.Trait<ThreatMemory>();
+			return memory.IsTraitDisabled ? 0 : memory.StrengthNear(cell, radius);
 		}
 	}
 }

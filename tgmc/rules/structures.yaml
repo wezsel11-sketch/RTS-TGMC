@@ -157,6 +157,7 @@ resin-silo:
 		Description: support-recall.description
 		IconImage: hive-icon
 		Icon: bell
+		BlockedCursor: move-blocked
 		ChargeInterval: 750
 		Radius: 10
 		BaseTypes: resin-silo, forward-hive
@@ -747,6 +748,7 @@ cryo-pod:
 		Description: support-recall.description
 		IconImage: support-icon
 		Icon: bell
+		BlockedCursor: move-blocked
 		ChargeInterval: 750
 		Radius: 10
 		BaseTypes: cryo-pod, vendor

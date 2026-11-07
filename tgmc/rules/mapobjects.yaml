@@ -130,6 +130,8 @@ alamo:
 		Condition: launch
 	GrantConditionOnDeploy:
 		DeployedCondition: launch
+		DeployCursor: ability
+		DeployBlockedCursor: move-blocked
 	KillsSelf:
 		RequiresCondition: launch
 		RemoveInstead: true

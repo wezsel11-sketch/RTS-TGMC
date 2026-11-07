@@ -67,6 +67,12 @@ namespace OpenRA.Mods.TGMC.Traits
 			return (Math.Clamp(cell.X / Info.CellSize, 0, cols - 1), Math.Clamp(cell.Y / Info.CellSize, 0, rows - 1));
 		}
 
+		bool SquareVisible(int x, int y)
+		{
+			var c = new CPos(Math.Min(x * Info.CellSize + Info.CellSize / 2, world.Map.MapSize.Width - 1), Math.Min(y * Info.CellSize + Info.CellSize / 2, world.Map.MapSize.Height - 1));
+			return player.Shroud.IsVisible(c);
+		}
+
 		bool IsEnemy(Player other) { return other != null && player.RelationshipWith(other) == PlayerRelationship.Enemy; }
 
 		void ITick.Tick(Actor self)
@@ -98,9 +104,11 @@ namespace OpenRA.Mods.TGMC.Traits
 				}
 			}
 
+			// A square the player sees right now holds only what is in it now: memory (and its fade) is for squares out of sight.
+			// Without this, a group walking across squares leaves a trail of copies of itself.
 			for (var x = 0; x < cols; x++)
 				for (var y = 0; y < rows; y++)
-					grid[x, y] = Math.Max(grid[x, y] * Info.FadePercent / 100f, now[x, y]);
+					grid[x, y] = Info.FullVision || SquareVisible(x, y) ? now[x, y] : Math.Max(grid[x, y] * Info.FadePercent / 100f, now[x, y]);
 
 			foreach (var victim in attacks.Keys.ToList())
 				if (victim.IsDead || world.WorldTick - attacks[victim].Tick > Info.AttackMemory)

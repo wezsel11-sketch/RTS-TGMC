@@ -1296,6 +1296,20 @@ SCENARIOS = {
         ("sentinel", "Xenos", 30, 24, 0), ("sentinel", "Xenos", 31, 24, 0), ("sentinel", "Xenos", 30, 25, 0),
         ("resin-silo", "Xenos", 58, 42, 0),
     ]},
+    # DefendBotModule: xenos hit a marine miner far from the base; the bot sends riflemen (see scenarios/test-ai-defend.lua).
+    "scenario-ai-defend": {"scripts": ("test-ai-defend", "defend-case-help"), "marine_bot": "easy", "extra_rules": "Player:\n\t-ScoutBotModule@marines:\n\t-FieldBotModule@sweep:\n", "drop_conquest": True, "size": (64, 40), "actors": [
+        ("cryo-pod", "Marines", 6, 20, 0), ("miner-field", "Neutral", 40, 20, 0), ("miner", "Marines", 40, 20, 0), ("resin-silo", "Xenos", 60, 36, 0), ("rifleman", "Marines", 8, 18, 0), ("rifleman", "Marines", 9, 18, 0), ("rifleman", "Marines", 10, 18, 0),
+        ("rifleman", "Marines", 8, 19, 0), ("rifleman", "Marines", 9, 19, 0), ("rifleman", "Marines", 10, 19, 0), ("rifleman", "Marines", 8, 17, 0), ("rifleman", "Marines", 9, 17, 0),
+    ]},
+    # The same, but the victim is a cade that dies at once: the riflemen are handed back and nothing breaks.
+    "scenario-ai-defend-victim-dies": {"scripts": ("test-ai-defend", "defend-case-dies"), "marine_bot": "easy", "extra_rules": "Player:\n\t-ScoutBotModule@marines:\n\t-FieldBotModule@sweep:\n", "drop_conquest": True, "size": (64, 40), "actors": [
+        ("cryo-pod", "Marines", 6, 20, 0), ("cade", "Marines", 40, 20, 0), ("resin-silo", "Xenos", 60, 36, 0), ("rifleman", "Marines", 8, 18, 0), ("rifleman", "Marines", 9, 18, 0), ("rifleman", "Marines", 10, 18, 0),
+        ("rifleman", "Marines", 8, 19, 0), ("rifleman", "Marines", 9, 19, 0), ("rifleman", "Marines", 10, 19, 0), ("rifleman", "Marines", 8, 17, 0), ("rifleman", "Marines", 9, 17, 0),
+    ]},
+    # The same with no riflemen at all: nothing to send, nothing breaks.
+    "scenario-ai-defend-nobody": {"scripts": ("test-ai-defend", "defend-case-nobody"), "marine_bot": "easy", "extra_rules": "Player:\n\t-ScoutBotModule@marines:\n\t-FieldBotModule@sweep:\n", "drop_conquest": True, "size": (64, 40), "actors": [
+        ("cryo-pod", "Marines", 6, 20, 0), ("miner-field", "Neutral", 40, 20, 0), ("miner", "Marines", 40, 20, 0), ("resin-silo", "Xenos", 60, 36, 0),
+    ]},
     "scenario-ai-medic": {"scripts": ("test-ai-medic",), "marine_bot": "skirmish", "drop_conquest": True, "size": (48, 32),
                           "extra_rules": "Player:\n\t-SquadManagerBotModule@marines-easy:\n\t-SquadManagerBotModule@marines-normal:\n\t-SquadManagerBotModule@marines-hard:\n^Infantry:\n\tAutoTarget:\n\t\tInitialStance: HoldFire\n", "actors": [
         ("cryo-pod", "Marines", 6, 6, 0), ("medic", "Marines", 8, 10, 0), ("rifleman", "Marines", 28, 12, 0),

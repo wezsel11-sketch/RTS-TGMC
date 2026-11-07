@@ -187,42 +187,42 @@ Player:
 		SquadSizeRandomBonus: 20
 		ExcludeFromSquadsTypes: medic, engineer, synth, drone, queen
 		ConstructionYardTypes: cryo-pod, resin-silo, forward-hive
-		ProtectionTypes: cryo-pod, vendor, resin-silo, mini-silo, sentry-turret, resin-turret, miner, weed-node, armory, ordnance-depot, evolution-tower, maturity-tower, workshop, mortar-emplacement, artillery-emplacement, forward-hive, cade
+		ProtectionTypes: cryo-pod, vendor, resin-silo, armory, ordnance-depot, evolution-tower, maturity-tower, workshop
 	SquadManagerBotModule@xenos-easy:
 		RequiresCondition: enable-skirmish-ai && faction-xenos && enable-easy-ai
 		SquadSize: 30
 		SquadSizeRandomBonus: 20
 		ExcludeFromSquadsTypes: medic, engineer, synth, drone, queen
 		ConstructionYardTypes: cryo-pod, resin-silo, forward-hive
-		ProtectionTypes: cryo-pod, vendor, resin-silo, mini-silo, sentry-turret, resin-turret, miner, weed-node, armory, ordnance-depot, evolution-tower, maturity-tower, workshop, mortar-emplacement, artillery-emplacement, forward-hive, cade
+		ProtectionTypes: cryo-pod, vendor, resin-silo, armory, ordnance-depot, evolution-tower, maturity-tower, workshop
 	SquadManagerBotModule@marines-normal:
 		RequiresCondition: enable-skirmish-ai && !faction-xenos && !enable-easy-ai && !enable-hard-ai
 		SquadSize: 8
 		SquadSizeRandomBonus: 20
 		ExcludeFromSquadsTypes: medic, engineer, synth, drone, queen
 		ConstructionYardTypes: cryo-pod, resin-silo, forward-hive
-		ProtectionTypes: cryo-pod, vendor, resin-silo, mini-silo, sentry-turret, resin-turret, miner, weed-node, armory, ordnance-depot, evolution-tower, maturity-tower, workshop, mortar-emplacement, artillery-emplacement, forward-hive, cade
+		ProtectionTypes: cryo-pod, vendor, resin-silo, armory, ordnance-depot, evolution-tower, maturity-tower, workshop
 	SquadManagerBotModule@xenos-normal:
 		RequiresCondition: enable-skirmish-ai && faction-xenos && !enable-easy-ai && !enable-hard-ai
 		SquadSize: 24
 		SquadSizeRandomBonus: 20
 		ExcludeFromSquadsTypes: medic, engineer, synth, drone, queen
 		ConstructionYardTypes: cryo-pod, resin-silo, forward-hive
-		ProtectionTypes: cryo-pod, vendor, resin-silo, mini-silo, sentry-turret, resin-turret, miner, weed-node, armory, ordnance-depot, evolution-tower, maturity-tower, workshop, mortar-emplacement, artillery-emplacement, forward-hive, cade
+		ProtectionTypes: cryo-pod, vendor, resin-silo, armory, ordnance-depot, evolution-tower, maturity-tower, workshop
 	SquadManagerBotModule@marines-hard:
 		RequiresCondition: enable-skirmish-ai && !faction-xenos && enable-hard-ai
 		SquadSize: 6
 		SquadSizeRandomBonus: 20
 		ExcludeFromSquadsTypes: medic, engineer, synth, drone, queen
 		ConstructionYardTypes: cryo-pod, resin-silo, forward-hive
-		ProtectionTypes: cryo-pod, vendor, resin-silo, mini-silo, sentry-turret, resin-turret, miner, weed-node, armory, ordnance-depot, evolution-tower, maturity-tower, workshop, mortar-emplacement, artillery-emplacement, forward-hive, cade
+		ProtectionTypes: cryo-pod, vendor, resin-silo, armory, ordnance-depot, evolution-tower, maturity-tower, workshop
 	SquadManagerBotModule@xenos-hard:
 		RequiresCondition: enable-skirmish-ai && faction-xenos && enable-hard-ai
 		SquadSize: 18
 		SquadSizeRandomBonus: 20
 		ExcludeFromSquadsTypes: medic, engineer, synth, drone, queen
 		ConstructionYardTypes: cryo-pod, resin-silo, forward-hive
-		ProtectionTypes: cryo-pod, vendor, resin-silo, mini-silo, sentry-turret, resin-turret, miner, weed-node, armory, ordnance-depot, evolution-tower, maturity-tower, workshop, mortar-emplacement, artillery-emplacement, forward-hive, cade
+		ProtectionTypes: cryo-pod, vendor, resin-silo, armory, ordnance-depot, evolution-tower, maturity-tower, workshop
 	# Calls in CAS (marines) or the hive powers (xenos) when the strike is ready and a cluster of enemies is in sight. A friendly unit in the blast counts against the spot.
 	# Same Decisions as the stock module; it looks for targets around each seen actor, not on a fixed grid (see Bots.cs).
 	TgmcSupportPowerBotModule:
@@ -673,6 +673,17 @@ Player:
 	MinerGuardBotModule@marines:
 		RequiresCondition: enable-skirmish-ai && !faction-xenos
 		Guards: rifleman, smartgunner, machinegunner, grenadier, flamer, som_machinegunner
+	# Both bots send fighters to an attacked outpost, sized to the attacker; the squad manager keeps the base buildings (see DefendBotModule in Bots.cs).
+	DefendBotModule@marines:
+		RequiresCondition: enable-skirmish-ai && !faction-xenos
+		Protect: miner, sentry-turret, cade, mortar-emplacement, artillery-emplacement
+		Defenders: rifleman, smartgunner, machinegunner, grenadier, flamer, som_machinegunner, blademan, som_blademan
+		BaseTypes: cryo-pod
+	DefendBotModule@xenos:
+		RequiresCondition: enable-skirmish-ai && faction-xenos
+		Protect: mini-silo, weed-node, resin-turret, forward-hive
+		Defenders: runner, hunter, sentinel, warrior, spitter, defender, praetorian, ravager, crusher
+		BaseTypes: resin-silo
 	# Marine bot: idle engineers go to the ore fields the xenos have not disabled yet and repair them (see FieldBotModule in Bots.cs).
 	FieldBotModule@marines:
 		RequiresCondition: enable-skirmish-ai && !faction-xenos

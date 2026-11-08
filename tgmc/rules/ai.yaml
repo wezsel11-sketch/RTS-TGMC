@@ -729,7 +729,7 @@ Player:
 	# Xeno bot: idle attackers go for the marines' miners. Dormant fields are left alone until a marine repairs them (see FieldBotModule in Bots.cs).
 	FieldBotModule@xenos:
 		RequiresCondition: enable-skirmish-ai && faction-xenos
-		Attackers: runner, hunter, sentinel
+		Attackers: runner, hunter, sentinel, warrior, mantis, nymph
 		Target: miner
 		# Raiding the miners at once sends the starting pack at turrets and rifles, and it never comes back: wait until there is a pack to send.
 		MinTick: 3000
@@ -807,6 +807,8 @@ Player:
 		RequiresCondition: enable-skirmish-ai && !faction-xenos
 		Attackers: engineer, som_engineer
 		Order: ForceAttack
+		# A field beside the hive is lost to the first raid: leave it.
+		AvoidNear: resin-silo, forward-hive
 	# Marine bot: weed nodes can only be force-fired, so no squad ever picks one, yet they must fall for a win. Idle marines go and bash them with their rifle butts.
 	FieldBotModule@sweep:
 		RequiresCondition: enable-skirmish-ai && !faction-xenos

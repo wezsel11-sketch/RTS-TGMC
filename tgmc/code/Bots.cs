@@ -595,6 +595,12 @@ namespace OpenRA.Mods.TGMC.Traits
 		[Desc("The order that sends them. ForceAttack works on a dormant field for engineers (their torch repairs it) and on a miner for xenos.")]
 		public readonly string Order = "ForceAttack";
 
+		[Desc("Enemy actors (their base buildings) that make a target too dangerous to go for when one stands within AvoidRadius cells of it: " +
+			"an engineer claiming a field beside the hive loses its miner to the first raid.")]
+		public readonly string[] AvoidNear = [];
+
+		public readonly int AvoidRadius = 12;
+
 		public override object Create(ActorInitializer init) { return new FieldBotModule(init.Self, this); }
 	}
 
@@ -620,6 +626,12 @@ namespace OpenRA.Mods.TGMC.Traits
 			var taken = new HashSet<Actor>();
 			// Dormant fields belong to the Neutral player, which is non-combatant. Miners belong to an enemy player.
 			var fields = world.Actors.Where(a => a.Info.Name == Info.Target && a.IsInWorld && !a.IsDead && (Info.EnemyOnly ? player.RelationshipWith(a.Owner) == PlayerRelationship.Enemy : a.Owner.NonCombatant)).ToList();
+			if (Info.AvoidNear.Length > 0)
+			{
+				var danger = world.Actors.Where(a => a.IsInWorld && !a.IsDead && Info.AvoidNear.Contains(a.Info.Name) && player.RelationshipWith(a.Owner) == PlayerRelationship.Enemy).ToList();
+				fields.RemoveAll(f => danger.Any(d => (d.Location - f.Location).LengthSquared <= Info.AvoidRadius * Info.AvoidRadius));
+			}
+
 			if (fields.Count == 0)
 				return;
 
@@ -1018,8 +1030,10 @@ namespace OpenRA.Mods.TGMC.Traits
 
 			countdown = Info.Interval;
 			var bases = world.Actors.Where(a => a.Owner == player && a.IsInWorld && !a.IsDead && Info.BaseTypes.Contains(a.Info.Name)).ToList();
+			// The furthest from home first: with few fighters, the most exposed miner gets its guards before the safer ones.
 			farMiners = world.Actors.Where(a => a.Owner == player && a.IsInWorld && !a.IsDead && a.Info.Name == Info.Miner
-				&& !bases.Any(b => (a.Location - b.Location).LengthSquared <= Info.BaseRadius * Info.BaseRadius)).ToList();
+				&& !bases.Any(b => (a.Location - b.Location).LengthSquared <= Info.BaseRadius * Info.BaseRadius))
+				.OrderByDescending(a => bases.Count == 0 ? 0 : bases.Min(b => (a.Location - b.Location).LengthSquared)).ToList();
 			foreach (var (guard, miner) in minerOf.ToList())
 			{
 				if (guard.IsDead || guard.Owner != player)

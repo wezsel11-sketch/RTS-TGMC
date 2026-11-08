@@ -94,6 +94,13 @@ the commits this mod was tested against (see the top of `mod/bootstrap.py`), so 
   - **Armour.** Big xeno castes (Warrior, Praetorian, Crusher, Bull, Behemoth) are *Heavy*: rifles and the machine gun do 70 percent, snipers and
     rockets more. The Gungnir heavy gunner (minigun, 320 HP, slow) takes 55 percent from claws and acid. The EOD demolitionist (high-explosive
     launcher) takes 25 percent from blasts and 85 percent from claws. **Explosives hurt friendly units**: grenades, the mortar and SADAR.
+  - **More castes from TGMC.** Nymph (cheap starter), Mantis (hides and ambushes for double damage), Baneling (bursts into acid and gas),
+    Defender (Fortify halves damage and roots it; Tail Sweep), Beetle (armoured charge), Gorger (Feast; a healing aura), Hivelord (the big
+    builder), Puppeteer (raises puppets that fall apart after twenty seconds), Pyrogen (blue-fire fireballs), Scorpion (ranged acid
+    sting), and, with the Queen, one Dragon (fire breath, wing gust) and one King (a stunning roar that enrages the xenos near him).
+  - **Vehicles.** The Workshop builds a marine **Tank** (cannon and chaingun in a turret that fires on the move, two at a time), an
+    **APC** that carries eight marines on foot (right-click it with marines selected; Deploy unloads) and, for the SOM, a **SOM Tank**
+    with a coilgun. Art from TGMC's armoured vehicle sheets.
   - **Facehuggers.** A Facehugger hunts marines. It latches on, the marine drops for four seconds, then the hugger dies. The marine carries
     an embryo: after a minute it bursts, dies, and a xeno **Larva** for the infector's side stands in its place, unless a corpsman heals the marine first.
     Only infantry can be hugged, not turrets or machines.
@@ -146,6 +153,14 @@ the commits this mod was tested against (see the top of `mod/bootstrap.py`), so 
     against 14% (6-29%) on balance-aivai, 40 runs each; 15% against 20% on aimap-canyon-run, 20 each; 100% against 100% on
     balance-holdline. No measurable shift either way, and on these maps the xeno bot now wins most AI-vs-AI matches.
     Known limit: after loading a skirmish save, units held as guards, defenders or raiders stand idle.
+  - **Bot personalities.** Besides Easy, Normal and Hard the lobby offers **Rusher AI** (squads of 4 marines or 10 xenos, early
+    attacks), **Turtle AI** (squads of 14 or 36, three guards per miner, defenders sent at 250% of the threat, no raids) and **Raider AI**
+    (raids of six, twice as often, at targets defended up to the raid's own strength): the same modules with other numbers (`ai.yaml`).
+  - **Marine bot economy.** The marine bot builds up to eight vendors (each pays 6 per 50 ticks and adds a production slot): at three
+    it starved and won 12% of balance-aivai, at eight 42% (30 runs each, 2026-11-07). With the castes added below, 54% (30 runs).
+  - **Raid warning and town bell.** A raided miner posts "Miner under attack" with a red radar ping, raided weeds "Weeds under attack"
+    with a purple one (`AlertOnDamage` with its own event key). The cryo pod and the resin silo have a **Recall** power (the town bell):
+    every own unit within 10 cells of the spot runs to the nearest base building; it recharges in 30 seconds (`Recall.cs`).
   - **Bodies.** Fallen units lie where they fell for 20 seconds and then fade away (`WithLingeringCorpse`).
   - **Left and right.** OpenRA's facing angle grows counter-clockwise while the sprite sheets are drawn clockwise, so the generator
     now writes `Facings: -8` and `-16`. Marines face and aim the right way, and the Condor's nose points along its path.
@@ -180,7 +195,8 @@ the commits this mod was tested against (see the top of `mod/bootstrap.py`), so 
     switches them off.
   - **Lobby options.** Before a match the host can switch Explosive Friendly Fire, Facehugger Infestation and Xeno Maturity off, or
     switch on **Tile-by-Tile Movement**, where a move order walks one cell toward where you click, like stepping in SS13.
-  - **Weather.** A lobby dropdown picks Clear, Rain or a Dust storm: falling rain streaks or wind-blown dust over the map. Only a picture
+  - **Weather.** A lobby dropdown picks Clear, Rain, a Dust storm, an Ash storm, a Snow storm or Acid rain: TGMC's own animated weather
+    tiles over the screen (`TiledWeather` in `GroundFx.cs`), with falling rain streaks or wind-blown dust on top for rain and dust. Only a picture
     (`WeatherOverlay` in `world.yaml`, switched by `TgmcOptions`). Clear weather starts with no particles (`InitialParticlePercentage: 0`).
   - **Shells.** Blasts follow TGMC's tile counts: a mortar shell (70 damage, about 5 cells across, reload 100; the emplacement reloads in 80)
     and the howitzer's shell (150 damage, about 8 cells across, reload 240) are far bigger than before, with a bigger fireball and dust
@@ -453,6 +469,12 @@ On a headless machine, run OpenRA under Xvfb with Mesa software GL
 
 The effect sprites are TGMC art too (`fx-*` images in `build_sprites.py`) and are named by `tgmc/rules/weapons.yaml`:
 
+- **Marks that linger.** Badly hurt marines leave red bootprints and xenos acid-green claw prints (`fluidtracks.dmi`, `LeavesTracks`);
+  bullets punch holes in the structures they hit and acid eats holes in them (`bulletholes.dmi`, `new_acid.dmi`, `DecalWarhead`). All
+  fade after a while.
+- **Ground warnings.** A blinking box where an orbital strike will fall (`telegraph_96x96.dmi`), a pod marker where a drop pod comes
+  down (`supplypod_down_target.dmi`) and a xeno marker under a boiler's glob or a box under a mech barrage (`xeno_target.dmi`).
+- **Heat.** Machine gunners and smartgunners show a heat bar (`overheat.dmi`) during a long burst. A picture only.
 - **Guns spit bullets.** Rifle, smartgun and sentry shots fly as turned tracers (16 facings, the sentry's is heavier).
   Riflemen, smartgunners and the sentry flash at the muzzle (`WithMuzzleOverlay`, sequence `flash` on the unit's own sheet).
   Hits throw sparks on structures and acid-green gore on xenos.

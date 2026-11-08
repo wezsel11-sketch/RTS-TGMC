@@ -878,6 +878,11 @@ SCENARIOS = {
         ("crusher", "Xenos", 10, 3, 768), ("rifleman", "Marines", 11, 3, 256), ("rifleman", "Marines", 11, 4, 256), ("ravager", "Xenos", 10, 8, 768), ("rifleman", "Marines", 11, 8, 256), ("rifleman", "Marines", 11, 9, 256), ("defender", "Xenos", 10, 13, 768), ("rifleman", "Marines", 11, 13, 256), ("rifleman", "Marines", 11, 14, 256), ("warlock", "Xenos", 10, 18, 768), ("rifleman", "Marines", 11, 18, 256), ("rifleman", "Marines", 11, 19, 256), ("pyrogen", "Xenos", 10, 23, 768), ("rifleman", "Marines", 11, 23, 256), ("rifleman", "Marines", 11, 24, 256), ("widow", "Xenos", 10, 28, 768), ("rifleman", "Marines", 11, 28, 256), ("rifleman", "Marines", 11, 29, 256), ("carrier", "Xenos", 10, 33, 768), ("rifleman", "Marines", 11, 33, 256), ("rifleman", "Marines", 11, 34, 256), ("puppeteer", "Xenos", 10, 38, 768), ("rifleman", "Marines", 11, 38, 256), ("rifleman", "Marines", 11, 39, 256),
         ("cryo-pod", "Marines", 28, 42, 0), ("resin-silo", "Xenos", 28, 2, 0),
     ]},
+    # The widow keeps at most five spiderlings (see scenarios/test-spawn-limit.lua): no cooldown or plasma cost here, so only the limit stops her.
+    "scenario-spawn-limit": {"scripts": ("test-spawn-limit",), "size": (32, 24), "drop_conquest": True,
+                             "extra_rules": "widow:\n\tActiveAbility@abilityspiderling:\n\t\tCooldown: 0\n\t\tPlasmaCost: 0\n", "actors": [
+        ("widow", "Xenos", 10, 10, 768), ("cryo-pod", "Marines", 2, 2, 0), ("resin-silo", "Xenos", 28, 20, 0),
+    ]},
     # The vehicles from TGMC: two tanks shoot, a rifleman rides the APC (see scenarios/test-vehicles.lua).
     "scenario-vehicles": {"scripts": ("test-vehicles",), "size": (32, 24), "drop_conquest": True,
                           "extra_rules": "crusher:\n\tHealth:\n\t\tHP: 20000\n", "actors": [

@@ -40,6 +40,17 @@ namespace OpenRA.Mods.TGMC.Traits
 		[Desc("Plasma the ability costs (see the Plasma trait). 0 for none.")]
 		public readonly int PlasmaCost = 0;
 
+		[Desc("Plasma the unit gains when the ability goes off (the puppeteer's Flay takes biomass from its victim).")]
+		public readonly int PlasmaGain = 0;
+
+		[ActorReference]
+		[Desc("Actors around the target that the ability eats when it goes off (the pyrogen's Fire Charge puts out the flames there), " +
+			"each one giving PlasmaPerConsumed.")]
+		public readonly string[] Consume = [];
+
+		public readonly WDist ConsumeRange = new(1536);
+		public readonly int PlasmaPerConsumed = 0;
+
 		[Desc("Order name, unique among the unit's abilities.")]
 		public readonly string OrderName = "Ability";
 
@@ -143,6 +154,9 @@ namespace OpenRA.Mods.TGMC.Traits
 		[Desc("Spawned units appear toward the nearest enemy within this range if there is one.")]
 		public readonly WDist SpawnSeek = new(8 * 1024);
 
+		[Desc("At most this many of the units this ability spawned live at once (the widow's five spiderlings); not ready at the limit. 0 for no limit.")]
+		public readonly int SpawnLimit = 0;
+
 		[Desc("For the AI: it uses the ability when at least AiMinTargets enemy units are within AiRange. If AiWoundedPercent is above 0 it counts hurt " +
 			"allies (below that share of their health) within AiRange instead, which is how it uses a heal.")]
 		public readonly WDist AiRange = new(6 * 1024);
@@ -240,7 +254,21 @@ namespace OpenRA.Mods.TGMC.Traits
 		public bool Active => buffToken != Actor.InvalidConditionToken;
 		bool silenced;
 
-		public bool Ready => !IsTraitDisabled && !silenced && cooldown == 0 && charges > 0 && (Info.PlasmaCost == 0 || (plasma ??= self.TraitOrDefault<Plasma>())?.Has(Info.PlasmaCost) != false);
+		public bool Ready => !IsTraitDisabled && !silenced && cooldown == 0 && charges > 0 && (Info.PlasmaCost == 0 || (plasma ??= self.TraitOrDefault<Plasma>())?.Has(Info.PlasmaCost) != false)
+			&& UnderSpawnLimit();
+
+		// What this ability spawned and still lives, for SpawnLimit; the spawns wait a frame to be created, so they count as pending till then.
+		readonly List<Actor> spawned = [];
+		int pendingSpawns;
+
+		bool UnderSpawnLimit()
+		{
+			if (Info.SpawnLimit == 0)
+				return true;
+
+			spawned.RemoveAll(a => a.IsDead || !a.IsInWorld);
+			return spawned.Count + pendingSpawns + Info.Spawn.Length <= Info.SpawnLimit;
+		}
 
 		float ISelectionBar.GetValue()
 		{
@@ -509,6 +537,20 @@ namespace OpenRA.Mods.TGMC.Traits
 			if (Info.PlasmaCost > 0)
 				(plasma ??= self.TraitOrDefault<Plasma>())?.Spend(Info.PlasmaCost);
 
+			if (Info.PlasmaGain > 0)
+				(plasma ??= self.TraitOrDefault<Plasma>())?.Spend(-Info.PlasmaGain);
+
+			if (Info.Consume.Length > 0)
+			{
+				var at = aim.Type != TargetType.Invalid ? aim.CenterPosition : self.CenterPosition;
+				var eaten = world.FindActorsInCircle(at, Info.ConsumeRange).Where(a => !a.IsDead && Info.Consume.Contains(a.Info.Name)).ToList();
+				foreach (var a in eaten)
+					a.Dispose();
+
+				if (Info.PlasmaPerConsumed > 0)
+					(plasma ??= self.TraitOrDefault<Plasma>())?.Spend(-eaten.Count * Info.PlasmaPerConsumed);
+			}
+
 			if (Info.Charges > 1)
 			{
 				if (charges == Info.Charges)
@@ -710,12 +752,19 @@ namespace OpenRA.Mods.TGMC.Traits
 
 				used.Add(cell);
 				var spawn = type;
-				world.AddFrameEndTask(w => w.CreateActor(spawn, new TypeDictionary
+				pendingSpawns++;
+				world.AddFrameEndTask(w =>
 				{
-					new LocationInit(cell),
-					new OwnerInit(owner),
-					new FactionInit(owner.Faction.InternalName)
-				}));
+					pendingSpawns--;
+					var created = w.CreateActor(spawn, new TypeDictionary
+					{
+						new LocationInit(cell),
+						new OwnerInit(owner),
+						new FactionInit(owner.Faction.InternalName)
+					});
+					if (Info.SpawnLimit > 0)
+						spawned.Add(created);
+				});
 			}
 		}
 	}

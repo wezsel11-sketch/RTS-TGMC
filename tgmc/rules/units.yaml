@@ -2537,6 +2537,7 @@ widow:
 		Description: Birth a spiderling that fights beside you for a minute.
 		Cooldown: 375
 		Spawn: spiderling
+		SpawnLimit: 5
 		AiRange: 8c0
 		AiMinTargets: 1
 		Sounds: xeno-hiss-1.ogg
@@ -3189,9 +3190,10 @@ puppeteer:
 		OrderName: AbilityFlay
 		Slot: 2
 		Label: Flay
-		Description: Tear a chunk of flesh from the marine next to you.
+		Description: Tear a chunk of flesh from the marine next to you: its biomass refills a quarter of your plasma.
 		Cooldown: 500
 		Weapon: TGMCFlay
+		PlasmaGain: 25
 		Aim: Nearest
 		Range: 1c512
 		AiRange: 1c512
@@ -3314,12 +3316,14 @@ pyrogen:
 		PlasmaCost: 20
 		Slot: 4
 		Label: Fire Charge
-		Description: Charge three cells into the nearest marine and claw him.
+		Description: Charge three cells into the nearest marine and claw them. The flames around them go out, and each one gives you plasma back.
 		Cooldown: 300
 		Range: 3c0
 		ChargeDistance: 3c0
 		ChargeTicks: 8
 		Weapon: TGMCPunch
+		Consume: flame-patch, flame-patch-blue
+		PlasmaPerConsumed: 5
 		AiRange: 3c0
 		AiMinTargets: 1
 		Sounds: xeno-roar-1.ogg

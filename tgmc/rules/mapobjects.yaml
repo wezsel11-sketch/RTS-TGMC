@@ -132,6 +132,6 @@ alamo:
 		DeployedCondition: launch
 		DeployCursor: ability
 		DeployBlockedCursor: move-blocked
-	KillsSelf:
+	# Flies in when the mission calls it, and on launch climbs away and is gone (Dropship in Dropship.cs).
+	Dropship:
 		RequiresCondition: launch
-		RemoveInstead: true

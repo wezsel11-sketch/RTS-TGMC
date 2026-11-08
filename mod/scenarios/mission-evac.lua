@@ -173,8 +173,12 @@ ShuttleCells = function()
 	return cells
 end
 
+-- Destroy takes effect at the end of the tick: a marine already on the pad at touchdown is seen by both the sweep and the footprint
+-- trigger, so each is counted once. Keyed by name ("Actor (rifleman 9)"): each Lua handle on an actor is a new object.
+Boarded = {}
 Board = function(actor)
-	if Finished or Shuttle == nil or actor.IsDead or actor.Owner ~= Marines or not Contains(BoardTypes, actor.Type) then return end
+	if Finished or Shuttle == nil or actor.IsDead or Boarded[tostring(actor)] or actor.Owner ~= Marines or not Contains(BoardTypes, actor.Type) then return end
+	Boarded[tostring(actor)] = true
 	Aboard = Aboard + 1
 	actor.Destroy()
 end
@@ -184,7 +188,23 @@ Land = function()
 	Pay(Config.waves[#Config.waves].pay)
 	Shuttle = Actor.Create("alamo", true, { Owner = Marines, Location = Config.shuttleCell })
 	Media.PlaySpeechNotification(Marines, "WaveDistress")
-	Media.DisplayMessage("The Alamo is down at the landing zone. Get your marines aboard!", "Command")
+	Media.DisplayMessage("The Alamo is coming in to the landing zone!", "Command")
+	-- The xenos see it come down: the assault starts now. The doors open and boarding starts once it is down.
+	Assault()
+	local function touchdown()
+		if Finished or Shuttle == nil or not Shuttle.IsInWorld then return end
+		if not Shuttle.Landed then
+			Trigger.AfterDelay(5, touchdown)
+			return
+		end
+		Down()
+	end
+	-- A created actor joins the world at the end of the tick: look from the next one.
+	Trigger.AfterDelay(1, touchdown)
+end
+
+Down = function()
+	Media.DisplayMessage("The Alamo is down. Get your marines aboard!", "Command")
 	Shuttle.GrantCondition("doors-opening", 18)
 	Trigger.AfterDelay(18, function()
 		if Shuttle ~= nil and Shuttle.IsInWorld then Shuttle.GrantCondition("doors-open") end
@@ -200,7 +220,6 @@ Land = function()
 	Trigger.AfterDelay(Config.shuttleWait, function()
 		if Shuttle ~= nil and Shuttle.IsInWorld then Shuttle.GrantCondition("launch") end
 	end)
-	Assault()
 end
 
 -- From landing to take-off the xenos never stop: packs from every edge, all for the landing zone.

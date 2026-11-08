@@ -3,7 +3,8 @@
 --   target: a bare miner in the north, one with three sentries in the south, and the cryo pod with three sentries. The first wave goes for the bare one, from the
 --           edge cell nearest it (32,2).
 --   payout: two waves; when the second comes, the marines' cash has grown by the first wave's pay (the vendors' trickle aside).
---   board:  the Alamo lands; a rifleman walks onto it. When it leaves on its own, the objective is complete with one aboard.
+--   board:  the Alamo flies in (it is not down the moment it appears) and lands; a rifleman walks onto it. When it leaves on its own,
+--           the objective is complete with one aboard.
 --   empty:  the Alamo lands and leaves with no one aboard: the objective fails.
 --   early:  a rifleman boards, then the ship is launched (as Deploy does) long before its time: the objective is complete at once.
 --   full:   the real timings and the full base, nobody playing; the map makes the cryo pod and vendors all but unbreakable, so
@@ -75,12 +76,21 @@ AfterStart = function()
 				if Shuttle ~= nil and Shuttle.IsInWorld then Shuttle.GrantCondition("launch") end
 			end)
 		end
-		local deadline = EvacCase == "early" and 300 or 500
-		Trigger.AfterDelay(deadline, function()
+		-- The ship appears at tick 50 and takes a while to come down, and as long again to climb away once launched.
+		local airborne
+		Trigger.AfterDelay(52, function() airborne = Shuttle ~= nil and not Shuttle.Landed end)
+		-- A won match pauses the world soon after, so the end is caught by polling, as in "full".
+		local deadline = EvacCase == "early" and 400 or 700
+		local function poll(ticks)
 			local done = marines.IsObjectiveCompleted(Objective)
 			local failed = marines.IsObjectiveFailed(Objective)
-			local ok = (EvacCase == "empty") and failed or (done and Aboard == 1)
-			report(ok, "aboard " .. Aboard .. ", completed " .. tostring(done) .. ", failed " .. tostring(failed) .. " by tick " .. deadline)
-		end)
+			if done or failed or ticks >= deadline then
+				local ok = airborne and ((EvacCase == "empty") and failed or (done and Aboard == 1))
+				report(ok, "flew in " .. tostring(airborne) .. ", aboard " .. Aboard .. ", completed " .. tostring(done) .. ", failed " .. tostring(failed) .. " by tick " .. ticks)
+			else
+				Trigger.AfterDelay(5, function() poll(ticks + 5) end)
+			end
+		end
+		poll(0)
 	end
 end

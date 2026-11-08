@@ -164,6 +164,9 @@
 		Cost: 100
 
 ^Infantry:
+	# Marines on foot ride in the APC (Cargo on apc).
+	Passenger:
+		CargoType: Infantry
 	# Badly hurt, a marine leaves bloody bootprints where it walks (fluidtracks.dmi, LeavesTracks in GroundFx.cs).
 	LeavesTracks:
 	Inherits: ^Unit
@@ -3237,3 +3240,123 @@ king:
 		Prerequisites: queen
 		BuildLimit: 1
 		Description: actor-king.description
+
+# ---------------------------------------------------------------- vehicles from TGMC
+# Built at the Workshop, like the mech. Hull and turret come from TGMC's armoured sheets (mod/build_sprites.py); the turret turns
+# on its own and keeps firing while the tank drives.
+^TgmcVehicle:
+	Inherits: ^Unit
+	-Retreat:
+	Armor:
+		Type: Heavy
+	Selectable:
+		Bounds: 2560, 2560, 0, -256
+	SelectionRing:
+		Radius: 1500
+	HitShape:
+		Type: Circle
+			Radius: 1024
+	RenderSprites:
+	QuantizeFacingsFromSequence:
+		Sequence: idle
+	WithFacingSpriteBody:
+		Sequence: idle
+	Turreted:
+		TurnSpeed: 24
+	AttackTurreted:
+	Voiced:
+		VoiceSet: MarineVoice
+	FireWarheadsOnDeath:
+		Weapon: TGMCBlastFxBig
+		EmptyWeapon: TGMCBlastFxBig
+
+# The marine tank: a long-barrelled cannon in the turret and a chaingun beside it. Slow, very tough, hits hard at range.
+tank:
+	Inherits: ^TgmcVehicle
+	Health:
+		HP: 1800
+	TgmcMobile:
+		Speed: 70
+	RevealsShroud:
+		Range: 9c0
+	# The turret's own sheet: build_sprites.py merges tank-turret's sequences into the tank image.
+	WithSpriteTurret:
+		Sequence: turret
+	Armament@PRIMARY:
+		Weapon: TGMCTankCannon
+		LocalOffset: 1200,0,300
+	Armament@SECONDARY:
+		Weapon: TGMCTankChaingun
+		LocalOffset: 600,200,300
+	Tooltip:
+		Name: actor-tank.name
+	Valued:
+		Cost: 900
+	Buildable:
+		Queue: Infantry
+		BuildAtProductionType: Vehicle
+		BuildPaletteOrder: 75
+		Prerequisites: workshop, ~faction-marines
+		BuildLimit: 2
+		Description: actor-tank.description
+
+# The marine APC: carries eight marines on foot under armour, with a light gun on top.
+apc:
+	Inherits: ^TgmcVehicle
+	Health:
+		HP: 1100
+	TgmcMobile:
+		Speed: 100
+	Selectable:
+		Bounds: 2048, 2048, 0, -128
+	WithSpriteTurret:
+		Sequence: turret
+	Armament@PRIMARY:
+		Weapon: TGMCTankChaingun
+		LocalOffset: 400,0,300
+	Cargo:
+		Types: Infantry
+		MaxWeight: 8
+		UnloadVoice: Action
+		UnloadCursor: ability
+		UnloadBlockedCursor: move-blocked
+		LoadingCondition: loading
+	Tooltip:
+		Name: actor-apc.name
+	Valued:
+		Cost: 450
+	Buildable:
+		Queue: Infantry
+		BuildAtProductionType: Vehicle
+		BuildPaletteOrder: 72
+		Prerequisites: workshop, ~faction-marines
+		Description: actor-apc.description
+
+# The SOM tank: a coilgun that punches through anything in a line of fire.
+som-tank:
+	Inherits: ^TgmcVehicle
+	Health:
+		HP: 1700
+	TgmcMobile:
+		Speed: 76
+	Selectable:
+		Bounds: 2816, 2816, 0, -256
+	WithSpriteTurret:
+		Sequence: turret
+	Armament@PRIMARY:
+		Weapon: TGMCCoilgun
+		LocalOffset: 1300,0,300
+	Armament@SECONDARY:
+		Weapon: TGMCTankChaingun
+		LocalOffset: 600,200,300
+	Tooltip:
+		Name: actor-som-tank.name
+	Valued:
+		Cost: 900
+	Buildable:
+		Queue: Infantry
+		BuildAtProductionType: Vehicle
+		BuildPaletteOrder: 75
+		Prerequisites: workshop, ~faction-som
+		BuildLimit: 2
+		Description: actor-som-tank.description

@@ -2212,3 +2212,27 @@ TGMCDragonBreath:
 TGMCKingRoar:
 	Inherits: TGMCStompBig
 	Range: 6c0
+
+# ---------------------------------------------------------------- vehicle weapons (units.yaml, vehicles from TGMC)
+
+# The tank's main gun: a heavy shell with a wide blast, good against armour and structures.
+TGMCTankCannon:
+	Inherits: TGMCSadar
+	Range: 11c0
+	ReloadDelay: 110
+	Warhead@1Dam: SpreadDamage
+		Damage: 160
+		Spread: 1c256
+
+# The coaxial chaingun on the tanks and the APC's gun: the smartgun's bullets from a vehicle.
+TGMCTankChaingun:
+	Inherits: TGMCSmartgun
+	Range: 9c0
+
+# The SOM tank's coilgun: a hard, fast slug.
+TGMCCoilgun:
+	Inherits: TGMCTankCannon
+	ReloadDelay: 90
+	Projectile: Shell
+		Speed: 600
+		Image: fx-laser

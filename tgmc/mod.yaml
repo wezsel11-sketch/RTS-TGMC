@@ -116,6 +116,9 @@ Sequences:
 	tgmc|sequences/shrike.yaml
 	tgmc|sequences/widow.yaml
 	tgmc|sequences/wraith.yaml
+	tgmc|sequences/tank.yaml
+	tgmc|sequences/apc.yaml
+	tgmc|sequences/som-tank.yaml
 	tgmc|sequences/baneling.yaml
 	tgmc|sequences/beetle.yaml
 	tgmc|sequences/defender.yaml

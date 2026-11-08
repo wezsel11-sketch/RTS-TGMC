@@ -590,6 +590,38 @@ UNITS = {
             "icon": "stand:S",
         },
     },
+    # Vehicles from TGMC's armoured sheets (four facings each): the marine tank and APC, and the SOM tank. Hull and turret are
+    # separate images (their sheets have different frame sizes); the turret turns on its own (WithSpriteTurret).
+    "tank": {
+        "sequences": {
+            "idle": [("icons/obj/armored/3x3/tank.dmi", "tank")],
+            "icon": [("icons/obj/armored/3x3/tank.dmi", "tank", None, {"side": "S", "fit": (46, 46)})],
+        },
+    },
+    "tank-turret": {
+        "sequences": {
+            # The cannon only: TGMC's turret-body state is drawn with offsets of its own per facing, and off-centre without them.
+            "turret": [("icons/obj/armored/3x3/tank_gun.dmi", "ltb_cannon")],
+        },
+    },
+    "apc": {
+        "sequences": {
+            "idle": [("icons/obj/armored/2x2/medium_vehicles.dmi", "apc")],
+            "turret": [("icons/obj/armored/2x2/medium_vehicles.dmi", "apc_turret")],
+            "icon": [("icons/obj/armored/2x2/medium_vehicles.dmi", "apc_full", None, {"side": "S", "fit": (46, 46)})],
+        },
+    },
+    "som-tank": {
+        "sequences": {
+            "idle": [("icons/obj/armored/3x4/som_tank.dmi", "tank")],
+            "icon": [("icons/obj/armored/3x4/som_tank.dmi", "tank", None, {"side": "S", "fit": (46, 46)})],
+        },
+    },
+    "som-tank-turret": {
+        "sequences": {
+            "turret": [("icons/obj/armored/3x4/som_tank_gun.dmi", "coilgun")],
+        },
+    },
     "bull": {
         "sequences": {
             "walk": [(BULL, "Bull Walking")],
@@ -2176,6 +2208,21 @@ def build_condor(tgmc, out_dir, scale=0.5, facings=16):
     return {"unit": "condor", "sheet": "sprites/condor.png", "cell": [cell, cell], "cells": len(cells) + len(shadows)}
 
 
+def merge_turret(out_dir, hull, turret):
+    seq_dir = os.path.join(out_dir, "sequences")
+    lines = open(os.path.join(seq_dir, f"{turret}.yaml"), encoding="utf-8").read().splitlines()
+    filename = next(l.split(":", 1)[1].strip() for l in lines if l.strip().startswith("Filename:"))
+    body = []
+    for line in lines[3:]:
+        if line.startswith("\tDefaults:") or line.strip().startswith("Filename:"):
+            continue
+        body.append(line)
+        if line.startswith("\t") and not line.startswith("\t\t") and line.endswith(":"):
+            body.append(f"\t\tFilename: {filename}")
+    with open(os.path.join(seq_dir, f"{hull}.yaml"), "a", encoding="utf-8", newline="\n") as f:
+        f.write("\n".join(body) + "\n")
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--tgmc", required=True, help="path to a terragov-marine-corps checkout")
@@ -2189,6 +2236,10 @@ def main():
                 else build_unit(args.tgmc, unit, UNITS[unit], args.out))
         report.append(info)
         print(f"{unit}: {info['cells']} cells of {info['cell'][0]}x{info['cell'][1]}px -> {info['sheet']}")
+        # A vehicle's turret has its own sheet (another frame size than the hull), but the turret trait reads the hull's image:
+        # copy the turret's sequences into the hull's sequence file, each with its own Filename.
+        if unit.endswith("-turret") and unit[:-len("-turret")] in args.units:
+            merge_turret(args.out, unit[:-len("-turret")], unit)
     with open(os.path.join(args.out, "sprites.json"), "w") as f:
         json.dump(report, f, indent=2)
 

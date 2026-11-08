@@ -90,6 +90,8 @@ Player:
 			heavygunner: 10
 			demolitionist: 8
 			mech: 6
+			tank: 4
+			som-tank: 4
 			runner: 30
 			drone: 14
 			hunter: 40

@@ -865,6 +865,12 @@ SCENARIOS = {
         ("baneling", "Xenos", 10, 3, 256), ("rifleman", "Marines", 12, 3, 768), ("defender", "Xenos", 10, 7, 256), ("rifleman", "Marines", 12, 7, 768), ("beetle", "Xenos", 10, 11, 256), ("rifleman", "Marines", 12, 11, 768), ("gorger", "Xenos", 10, 15, 256), ("rifleman", "Marines", 12, 15, 768), ("puppeteer", "Xenos", 10, 19, 256), ("rifleman", "Marines", 12, 19, 768), ("pyrogen", "Xenos", 10, 23, 256), ("rifleman", "Marines", 12, 23, 768), ("scorpion", "Xenos", 10, 27, 256), ("rifleman", "Marines", 12, 27, 768), ("dragon", "Xenos", 10, 31, 256), ("rifleman", "Marines", 12, 31, 768), ("king", "Xenos", 10, 35, 256), ("rifleman", "Marines", 12, 35, 768), ("nymph", "Xenos", 10, 39, 256), ("mantis", "Xenos", 10, 43, 256), ("hivelord", "Xenos", 10, 47, 256),
         ("cryo-pod", "Marines", 28, 48, 0), ("resin-silo", "Xenos", 28, 2, 0),
     ]},
+    # The vehicles from TGMC: two tanks shoot, a rifleman rides the APC (see scenarios/test-vehicles.lua).
+    "scenario-vehicles": {"scripts": ("test-vehicles",), "size": (32, 24), "drop_conquest": True,
+                          "extra_rules": "crusher:\n\tHealth:\n\t\tHP: 20000\n", "actors": [
+        ("tank", "Marines", 6, 6, 256), ("crusher", "Xenos", 14, 6, 768), ("som-tank", "Marines", 6, 14, 256), ("crusher", "Xenos", 14, 14, 768),
+        ("apc", "Marines", 6, 20, 256), ("rifleman", "Marines", 10, 20, 256), ("cryo-pod", "Marines", 2, 2, 0), ("resin-silo", "Xenos", 28, 2, 0),
+    ]},
     # A raided miner warns its owner once (see scenarios/test-raid-warning.lua).
     "scenario-raid-warning": {"scripts": ("test-raid-warning",), "drop_conquest": True, "extra_rules": "miner:\n\tHealth:\n\t\tHP: 3000\n", "actors": [
         ("miner-field", "Neutral", 10, 10, 0), ("miner", "Marines", 10, 10, 0), ("runner", "Xenos", 13, 10, 0),
@@ -1247,6 +1253,13 @@ SCENARIOS = {
     "shot-castes": {"scripts": ("shot-castes",), "size": (34, 20), "drop_conquest": True,
                     "extra_rules": "World:\n\tScreenshotAt:\n\t\tTick: 40\nPlayer:\n\tShroud:\n\t\tFogCheckboxEnabled: false\n\t\tExploredMapCheckboxEnabled: true\npuppet:\n\t-Expires:\n", "actors": [
         ("nymph", "Xenos", 4, 6, 512), ("mantis", "Xenos", 8, 6, 512), ("baneling", "Xenos", 12, 6, 512), ("defender", "Xenos", 16, 6, 512), ("beetle", "Xenos", 20, 6, 512), ("gorger", "Xenos", 24, 6, 512), ("hivelord", "Xenos", 28, 6, 512), ("puppeteer", "Xenos", 4, 12, 512), ("puppet", "Xenos", 8, 12, 512), ("pyrogen", "Xenos", 12, 12, 512), ("scorpion", "Xenos", 16, 12, 512), ("dragon", "Xenos", 20, 12, 512), ("king", "Xenos", 24, 12, 512), ("cryo-pod", "Marines", 2, 18, 0), ("resin-silo", "Xenos", 30, 17, 0),
+    ]},
+    # The vehicles from TGMC side by side (see scenarios/shot-vehicles.lua).
+    "shot-vehicles": {"scripts": ("shot-vehicles",), "size": (26, 20), "drop_conquest": True,
+                      "extra_rules": "World:\n\tScreenshotAt:\n\t\tTick: 30\n", "actors": [
+        ("tank", "Marines", 6, 8, 256), ("apc", "Marines", 12, 8, 256), ("som-tank", "Marines", 18, 8, 768),
+        ("tank", "Marines", 6, 13, 512), ("apc", "Marines", 12, 13, 512), ("som-tank", "Marines", 18, 13, 512),
+        ("cryo-pod", "Marines", 2, 18, 0), ("resin-silo", "Xenos", 24, 2, 0),
     ]},
     "shot-mech-fx": {"scripts": ("shot-mech-fx",), "size": (32, 24), "extra_rules": "World:\n\tScreenshotAt:\n\t\tTick: 70\n", "actors": [
         ("mech", "Marines", 10, 12, 256), ("hunter", "Xenos", 17, 11, 768), ("hunter", "Xenos", 17, 13, 768), ("hunter", "Xenos", 18, 12, 768),

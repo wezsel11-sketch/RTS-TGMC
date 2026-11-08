@@ -1243,6 +1243,11 @@ SCENARIOS = {
         ("rifleman", "Marines", 12, 15, 768), ("rifleman", "Marines", 12, 17, 768), ("runner", "Xenos", 18, 19, 256),
         ("cryo-pod", "Marines", 3, 20, 0), ("workshop", "Marines", 3, 2, 0), ("resin-silo", "Xenos", 28, 22, 0),
     ]},
+    # The castes added from TGMC side by side (see scenarios/shot-castes.lua).
+    "shot-castes": {"scripts": ("shot-castes",), "size": (34, 20), "drop_conquest": True,
+                    "extra_rules": "World:\n\tScreenshotAt:\n\t\tTick: 40\nPlayer:\n\tShroud:\n\t\tFogCheckboxEnabled: false\n\t\tExploredMapCheckboxEnabled: true\npuppet:\n\t-Expires:\n", "actors": [
+        ("nymph", "Xenos", 4, 6, 512), ("mantis", "Xenos", 8, 6, 512), ("baneling", "Xenos", 12, 6, 512), ("defender", "Xenos", 16, 6, 512), ("beetle", "Xenos", 20, 6, 512), ("gorger", "Xenos", 24, 6, 512), ("hivelord", "Xenos", 28, 6, 512), ("puppeteer", "Xenos", 4, 12, 512), ("puppet", "Xenos", 8, 12, 512), ("pyrogen", "Xenos", 12, 12, 512), ("scorpion", "Xenos", 16, 12, 512), ("dragon", "Xenos", 20, 12, 512), ("king", "Xenos", 24, 12, 512), ("cryo-pod", "Marines", 2, 18, 0), ("resin-silo", "Xenos", 30, 17, 0),
+    ]},
     "shot-mech-fx": {"scripts": ("shot-mech-fx",), "size": (32, 24), "extra_rules": "World:\n\tScreenshotAt:\n\t\tTick: 70\n", "actors": [
         ("mech", "Marines", 10, 12, 256), ("hunter", "Xenos", 17, 11, 768), ("hunter", "Xenos", 17, 13, 768), ("hunter", "Xenos", 18, 12, 768),
         ("cryo-pod", "Marines", 3, 3, 0), ("resin-silo", "Xenos", 28, 22, 0),

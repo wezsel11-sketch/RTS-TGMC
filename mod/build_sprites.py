@@ -2028,7 +2028,7 @@ CONDOR_FILES = ["icons/turf/cas.dmi", "icons/obj/structures/cas_cockpit.dmi", "_
 
 
 # The Alamo, the dropship that lands for the Evac mission: its layout, read like the Condor's (see compose_alamo).
-ALAMO_FILES = ["_maps/shuttles/alamo.dmm"]
+ALAMO_FILES = ["_maps/shuttles/alamo.dmm", "_maps/shuttles/minidropship_standard.dmm"]
 
 
 def compose_condor(tgmc):
@@ -2112,17 +2112,18 @@ def compose_condor(tgmc):
     return canvas.crop(canvas.getbbox())
 
 
-def compose_alamo(tgmc):
-    """The Alamo from TGMC's own layout (_maps/shuttles/alamo.dmm), one map cell per 32 px tile: (hull, doors), where hull is the ship
+def compose_alamo(tgmc, layout=ALAMO_FILES[0]):
+    """A dropship from TGMC's own layout (the Alamo's _maps/shuttles/alamo.dmm by default), one map cell per 32 px tile: (hull, doors), where hull is the ship
     with its doors left out and doors maps each door state (door_closed, door_opening, door_open, door_closing) to a list of frames the
     size of the hull, holding only the side hatches, the rear ramp and the cockpit hatch. The transit shutters are left out: they close
     only in flight."""
     import re
     import tgmc_objects
     tgmc_objects.load(tgmc)
-    text = open(os.path.join(tgmc, ALAMO_FILES[0]), encoding="utf-8").read()
+    text = open(os.path.join(tgmc, layout), encoding="utf-8").read()
     keys = {}
-    for m in re.finditer(r'^"(\w+)" = \(\n(.*?)\)\n(?=")', text + '"', re.S | re.M):
+    # The last key is followed by the grid, not by another key: a blank line ends it.
+    for m in re.finditer(r'^"(\w+)" = \(\n(.*?)\)\n(?="|\n)', text + '"', re.S | re.M):
         items = []
         for e in re.finditer(r"(?m)^(/[\w/]+)(\{.*?\n\t\}|\{[^\n]*\})?", m.group(2), re.S):
             items.append((e.group(1), dict((k, v.strip().rstrip(",;")) for k, v in re.findall(r"(\w+)\s*=\s*([^;\n]+)", e.group(2) or ""))))
@@ -2147,11 +2148,19 @@ def compose_alamo(tgmc):
     skip = ("/area", "/turf/template_noop", "/turf/open/space", "/obj/machinery/telecomms", "/obj/docking_port", "/obj/effect/landmark",
             "/obj/machinery/door/poddoor/shutters/transit")
     hull = Image.new("RGBA", (width * 32, height * 32), (0, 0, 0, 0))
+
+    # A piece may hang off the map's edge (the Tadpole's nose sits 32 px north of its first row): what falls outside is cut.
+    def put(img, px, py):
+        piece = Image.new("RGBA", hull.size, (0, 0, 0, 0))
+        piece.paste(img, (px, py))
+        hull.alpha_composite(piece)
+
     door_states = ("door_closed", "door_opening", "door_open", "door_closing")
     placed_doors = []   # (Dmi, direction index, x, y)
     for x in range(1, width + 1):
         for row, key in enumerate(columns[x]):
-            for typ, attrs in keys.get(key, []):
+            # A map key lists its objects before its turf: the floor goes down first, or it covers the hull pieces standing on it.
+            for typ, attrs in sorted(keys.get(key, []), key=lambda e: not e[0].startswith("/turf")):
                 if typ.startswith(skip):
                     continue
                 r = tgmc_objects.resolve(typ)
@@ -2170,10 +2179,12 @@ def compose_alamo(tgmc):
                     continue
                 dirs = d.state(state)["dirs"]
                 img = d.frames(state)[0][min(index, dirs - 1) if dirs > 1 else 0].convert("RGBA")
-                hull.alpha_composite(img, ((x - 1) * 32, row * 32 + 32 - img.height))
+                px = int(attrs.get("pixel_x") or r.get("pixel_x") or 0)
+                py = int(attrs.get("pixel_y") or r.get("pixel_y") or 0)
+                put(img, (x - 1) * 32 + px, row * 32 + 32 - img.height - py)
 
     doors = {}
-    for st in door_states:
+    for st in door_states if placed_doors else ():   # the Tadpole has no airlocks
         count = max(len(d.frames(st)) for d, _, _, _ in placed_doors)
         frames = []
         for i in range(count):
@@ -2188,25 +2199,25 @@ def compose_alamo(tgmc):
     return hull, doors
 
 
-def build_alamo(tgmc, out_dir):
-    """sprites/alamo.png: the hull, its shadow, then the door frames, each the hull's size. Sequences: idle, shadow, doors-closed,
-    doors-opening, doors-open, doors-closing."""
-    hull, doors = compose_alamo(tgmc)
+def build_alamo(tgmc, out_dir, name="alamo", layout=ALAMO_FILES[0]):
+    """sprites/<name>.png: the hull, its shadow, then the door frames, each the hull's size. Sequences: idle, shadow, doors-closed,
+    doors-opening, doors-open, doors-closing (a ship with no airlocks, the Tadpole, has idle and shadow only)."""
+    hull, doors = compose_alamo(tgmc, layout)
     r, g, b, a = hull.split()
     shadow = Image.merge("RGBA", (r.point(lambda v: 0), g.point(lambda v: 0), b.point(lambda v: 0), a.point(lambda v: round(v * 0.4))))
     cells, starts = [hull, shadow], {}
-    for st in ("door_closed", "door_opening", "door_open", "door_closing"):
+    for st in doors:
         starts[st] = len(cells)
         cells.extend(doors[st])
-    save_sheet(cells, hull.size, os.path.join(out_dir, "sprites", "alamo.png"))
-    lines = ["# Generated by mod/build_sprites.py from TGMC art (_maps/shuttles/alamo.dmm). Do not edit.", "alamo:", "\tDefaults:",
-             "\t\tFilename: sprites/alamo.png", "\tidle:", "\t\tStart: 0", "\tshadow:", "\t\tStart: 1"]
-    for st in ("door_closed", "door_opening", "door_open", "door_closing"):
-        name = st.replace("door_", "doors-")
-        lines += [f"\t{name}:", f"\t\tStart: {starts[st]}", f"\t\tLength: {len(doors[st])}", "\t\tTick: 100"]
-    with open(os.path.join(out_dir, "sequences", "alamo.yaml"), "w", encoding="utf-8", newline="\n") as f:
+    save_sheet(cells, hull.size, os.path.join(out_dir, "sprites", f"{name}.png"))
+    lines = [f"# Generated by mod/build_sprites.py from TGMC art ({layout}). Do not edit.", f"{name}:", "\tDefaults:",
+             f"\t\tFilename: sprites/{name}.png", "\tidle:", "\t\tStart: 0", "\tshadow:", "\t\tStart: 1"]
+    for st in doors:
+        seq = st.replace("door_", "doors-")
+        lines += [f"\t{seq}:", f"\t\tStart: {starts[st]}", f"\t\tLength: {len(doors[st])}", "\t\tTick: 100"]
+    with open(os.path.join(out_dir, "sequences", f"{name}.yaml"), "w", encoding="utf-8", newline="\n") as f:
         f.write("\n".join(lines) + "\n")
-    return {"unit": "alamo", "sheet": "sprites/alamo.png", "cell": list(hull.size), "cells": len(cells)}
+    return {"unit": name, "sheet": f"sprites/{name}.png", "cell": list(hull.size), "cells": len(cells)}
 
 
 def build_condor(tgmc, out_dir, scale=0.5, facings=16):
@@ -2252,12 +2263,13 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--tgmc", required=True, help="path to a terragov-marine-corps checkout")
     ap.add_argument("--out", default=os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "build", "mod", "tgmc"))
-    ap.add_argument("--units", nargs="*", default=sorted(UNITS) + ["condor", "alamo"])
+    ap.add_argument("--units", nargs="*", default=sorted(UNITS) + ["condor", "alamo", "tadpole"])
     args = ap.parse_args()
 
     report = []
     for unit in args.units:
         info = (build_condor(args.tgmc, args.out) if unit == "condor" else build_alamo(args.tgmc, args.out) if unit == "alamo"
+                else build_alamo(args.tgmc, args.out, "tadpole", ALAMO_FILES[1]) if unit == "tadpole"
                 else build_unit(args.tgmc, unit, UNITS[unit], args.out))
         report.append(info)
         print(f"{unit}: {info['cells']} cells of {info['cell'][0]}x{info['cell'][1]}px -> {info['sheet']}")

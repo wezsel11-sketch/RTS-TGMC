@@ -3286,7 +3286,7 @@ pyrogen:
 		TargetTypes: Fireproof
 	ActiveAbility@abilityfirestorm:
 		OrderName: AbilityFirestorm
-		PlasmaCost: 45
+		PlasmaCost: 30
 		Slot: 2
 		Label: Fire Storm
 		Description: Send a line of fire at the nearest marine.
@@ -3299,7 +3299,7 @@ pyrogen:
 		Sounds: xeno-roar-2.ogg
 	ActiveAbility@abilityinferno:
 		OrderName: AbilityInferno
-		PlasmaCost: 40
+		PlasmaCost: 25
 		Slot: 3
 		Label: Inferno
 		Description: Burst into fire: everything around you burns.
@@ -3311,7 +3311,7 @@ pyrogen:
 		Sounds: xeno-roar-3.ogg
 	ActiveAbility@abilityfirecharge:
 		OrderName: AbilityFireCharge
-		PlasmaCost: 30
+		PlasmaCost: 20
 		Slot: 4
 		Label: Fire Charge
 		Description: Charge three cells into the nearest marine and claw him.
@@ -3325,7 +3325,7 @@ pyrogen:
 		Sounds: xeno-roar-1.ogg
 	ActiveAbility@abilityfireball:
 		OrderName: AbilityFireball
-		PlasmaCost: 30
+		PlasmaCost: 25
 		Slot: 1
 		Label: Fireball
 		Cooldown: 300

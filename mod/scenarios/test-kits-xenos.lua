@@ -3,7 +3,8 @@
 -- of a group that is already on counts as used. Marines hold fire and are tough; every xeno starts with full plasma so nothing dies early.
 -- Prints "TEST kits-xenos PASS" or "TEST kits-xenos FAIL (unit:slot ...)".
 Types = { "runner", "hunter", "sentinel", "facehugger", "drone", "warrior", "queen", "spitter", "praetorian", "crusher", "ravager", "defiler",
-	"boiler", "carrier", "warlock", "shrike", "widow", "wraith", "bull", "behemoth" }
+	"boiler", "carrier", "warlock", "shrike", "widow", "wraith", "bull", "behemoth", "mantis", "baneling", "defender", "beetle",
+	"gorger", "hivelord", "puppeteer", "pyrogen", "scorpion", "dragon", "king" }
 
 -- Uses one slot the way its aim needs; true if it went off (or is a toggle already on).
 UseSlot = function(unit, slot, foe, friend)
@@ -39,7 +40,8 @@ WorldLoaded = function()
 			foe.Teleport(unit.Location + CVec.New(1, 0))
 			Trigger.AfterDelay(2, function()
 				local count = 0
-				for slot = 1, 8 do
+				-- Last slot first: the switches sit early in a kit (the defender's Fortify), and one switched on blocks the moves after it.
+				for slot = 8, 1, -1 do
 					local ok, used = pcall(UseSlot, unit, slot, foe, friend)
 					if ok and used ~= nil then
 						count = count + 1

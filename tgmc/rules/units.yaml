@@ -2356,7 +2356,8 @@ carrier:
 		Range: 4c0
 		Spawn: hugger-trap
 		Cooldown: 750
-		AiRange: 0c0
+		# The AI digs it under the marines in reach: it arms while they fight the carrier.
+		AiRange: 4c0
 		Sounds: egg-burst.ogg
 	# Command card ability: throw a facehugger toward the nearest marine. It holds four and grows a new one every 24 seconds.
 	ActiveAbility@hugger:
@@ -2416,7 +2417,8 @@ warlock:
 		Cooldown: 250
 		Duration: 150
 		Condition: psy-shield
-		AiRange: 6c0
+		# The AI raises it only when marines close in: it roots the warlock in place.
+		AiRange: 3c0
 		AiMinTargets: 2
 		Sounds: xeno-hiss-2.ogg
 	ActiveAbility@abilitycrush:

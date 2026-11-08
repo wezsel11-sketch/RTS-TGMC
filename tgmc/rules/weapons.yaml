@@ -601,6 +601,7 @@ TGMCFlamePatch:
 		Falloff: 100, 0
 		ValidRelationships: Enemy, Neutral, Ally
 		ValidTargets: Ground
+		InvalidTargets: Fireproof
 
 # Weapon ladders (upgrades.yaml): the TX-15 cycles faster than the pump shotgun the engineer and skirmisher start with.
 TGMCShotgunTX15:
@@ -2249,6 +2250,87 @@ TGMCInfusion:
 		Duration: 300
 		Range: 0c512
 		ValidRelationships: Ally
+
+# The crusher's crest toss: the marine beside it flies far away.
+TGMCCrestToss:
+	Inherits: TGMCPunch
+	Warhead@1Dam: TargetDamage
+		Damage: 20
+	Warhead@6Throw: Knockback
+		Distance: 4c0
+		Duration: 18
+		Height: 1c512
+	-Warhead@9Stun:
+
+# The ravager's ravage: a wider, harder slash than the mantis's.
+TGMCRavagerRavage:
+	Inherits: TGMCRavage
+	Warhead@1Dam: SpreadDamage
+		Damage: 45
+		Spread: 1c768
+
+# The warlock's psychic crush: the marines at a spot are crushed and stunned.
+TGMCPsychicCrush:
+	Range: 7c0
+	Projectile: InstantHit
+	Warhead@1Dam: SpreadDamage
+		Damage: 40
+		Spread: 1c768
+		ValidRelationships: Neutral, Enemy
+		ValidTargets: Ground
+	Warhead@9Stun: GrantExternalCondition
+		Condition: stunned
+		Duration: 40
+		Range: 1c768
+		ValidRelationships: Enemy
+		ValidTargets: Human
+	Warhead@2Hit: CreateEffect
+		Image: fx-slam-big
+		Explosions: impact
+		ForceDisplayAtGroundLevel: true
+
+# The pyrogen's fire storm: the marine is burnt and a line of blue fire runs back from him toward the pyrogen.
+TGMCFirestorm:
+	Range: 6c0
+	Projectile: InstantHit
+	Warhead@1Dam: SpreadDamage
+		DamageTypes: ExplosionDeath
+		Damage: 25
+		Spread: 1c0
+		ValidRelationships: Neutral, Enemy
+		ValidTargets: Ground
+	Warhead@3Fire: SpawnActor
+		Actor: flame-patch-blue
+		TrailCells: 4
+
+# The pyrogen's inferno: everything around it burns.
+TGMCInferno:
+	Range: 2c512
+	Projectile: InstantHit
+	Warhead@1Dam: SpreadDamage
+		DamageTypes: ExplosionDeath
+		Damage: 35
+		Spread: 2c512
+		Falloff: 100, 100, 50
+		ValidRelationships: Neutral, Enemy
+		ValidTargets: Ground
+	Warhead@3Fire: SpawnActor
+		Actor: flame-patch-blue
+		Radius: 2
+
+# The puppeteer's flay: a tearing swipe at the marine beside it.
+TGMCFlay:
+	Range: 1c512
+	Projectile: InstantHit
+	Warhead@1Dam: TargetDamage
+		Damage: 35
+		ValidRelationships: Neutral, Enemy
+
+# The puppeteer's pincushion: a spine shot from its tail.
+TGMCPincushion:
+	Inherits: TGMCScorpionSting
+	Warhead@1Dam: SpreadDamage
+		Damage: 25
 
 # ---------------------------------------------------------------- vehicle weapons (units.yaml, vehicles from TGMC)
 

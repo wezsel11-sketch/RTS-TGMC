@@ -590,6 +590,18 @@ UNITS = {
             "icon": "stand:S",
         },
     },
+    # The widow's spiderling (Birth Spiderling), from the xeno effects sheet.
+    "spiderling": {
+        "sequences": {
+            "walk": [(XENO_FX, "spiderling Running")],
+            "run": [(XENO_FX, "spiderling Running")],
+            "stand": [(XENO_FX, "spiderling Walking")],
+            "die": [(XENO_FX, "spiderling Dead")],
+            "die-gib": "die",
+            "attack": "stand",
+            "icon": "stand:S",
+        },
+    },
     # Vehicles from TGMC's armoured sheets (four facings each): the marine tank and APC, and the SOM tank. Hull and turret are
     # separate images (their sheets have different frame sizes); the turret turns on its own (WithSpriteTurret).
     "tank": {
@@ -1249,6 +1261,15 @@ UNITS = {
             "open": [(XENO_FX, "egg opening", None, {"tick": 50})],
             "empty": [(XENO_FX, "egg_hugger3")],
             "icon": [(XENO_FX, "egg_hugger2", None, {"fit": (44, 44)})],
+        },
+    },
+    # The carrier's trap: a hole with a hugger in it, empty once sprung.
+    "hugger-trap": {
+        "sequences": {
+            "idle": [(XENO_FX, "traphugger")],
+            "open": [(XENO_FX, "traphugger")],
+            "empty": [(XENO_FX, "trap")],
+            "icon": [(XENO_FX, "traphugger", None, {"fit": (44, 44)})],
         },
     },
     "resin-wall": {

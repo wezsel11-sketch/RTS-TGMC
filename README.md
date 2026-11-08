@@ -97,7 +97,11 @@ the commits this mod was tested against (see the top of `mod/bootstrap.py`), so 
   - **More castes from TGMC.** Nymph (cheap starter), Mantis (fast, Ravage slashes what's in front), Baneling (bursts into acid and gas),
     Defender (Fortify halves damage and roots it; Tail Sweep), Beetle (armoured charge), Gorger (Feast; a healing aura), Hivelord (the big
     builder), Puppeteer (raises puppets that fall apart after twenty seconds), Pyrogen (blue-fire fireballs), Scorpion (ranged acid
-    sting), and, with the Queen, one Dragon (fire breath, wing gust) and one King (a stunning roar that enrages the xenos near him).
+    sting), and, with the Queen, one Dragon (fire breath, wing gust) and one King (a stunning roar that enrages the xenos near him; Petrify).
+  - **Kits follow TGMC's.** Each caste's command card has the abilities its TGMC caste has (strain extras aside): Crusher Crest Toss,
+    Ravager Charge and Ravage, Defender Forward Charge, Warlock Psychic Shield and Psychic Crush, Pyrogen Fire Storm, Inferno and Fire
+    Charge (the Pyrogen and Dragon do not burn), Widow spiderlings, Carrier hidden traps, Puppeteer Flay and Pincushion, Mantis Ravage,
+    Behemoth Landslide and Geocrush, Hivelord Healing Infusion.
   - **Vehicles.** The Workshop builds a marine **Tank** (cannon and chaingun in a turret that fires on the move, two at a time), an
     **APC** that carries eight marines on foot (right-click it with marines selected; Deploy unloads) and, for the SOM, a **SOM Tank**
     with a coilgun. Art from TGMC's armoured vehicle sheets.

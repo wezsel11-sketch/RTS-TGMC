@@ -350,6 +350,35 @@ egg:
 		Height: 500
 		OnlyWhenSelected: true
 
+# The carrier's trap: a hidden hole with a facehugger in it. Not built: the carrier digs it (Place Trap).
+hugger-trap:
+	Inherits: ^Structure
+	Voiced:
+		VoiceSet: XenoStructureVoice
+	RevealsShroud:
+		Range: 2c0
+	StatusLabel@ready:
+		RequiresCondition: hugger-ready
+		Text: READY
+		Color: 70F070
+		Height: 500
+		OnlyWhenSelected: true
+	Health:
+		HP: 30
+	Tooltip:
+		Name: actor-hugger-trap.name
+	Valued:
+		Cost: 0
+	HuggerEgg:
+		Radius: 1c512
+		Cooldown: 1500
+		Sounds: egg-burst.ogg
+	Cloak@hidden:
+		InitialDelay: 0
+		CloakDelay: 0
+		UncloakOn: None
+		CloakedAlpha: 0.4
+
 resin-wall:
 	Inherits: ^Wall
 	Inherits@build: ^XenoMinorBuildable

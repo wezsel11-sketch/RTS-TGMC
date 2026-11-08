@@ -130,6 +130,7 @@ Sequences:
 	tgmc|sequences/nymph.yaml
 	tgmc|sequences/puppeteer.yaml
 	tgmc|sequences/puppet.yaml
+	tgmc|sequences/spiderling.yaml
 	tgmc|sequences/pyrogen.yaml
 	tgmc|sequences/scorpion.yaml
 	tgmc|sequences/bull.yaml
@@ -145,6 +146,7 @@ Sequences:
 	tgmc|sequences/weeds.yaml
 	tgmc|sequences/resin-wall.yaml
 	tgmc|sequences/egg.yaml
+	tgmc|sequences/hugger-trap.yaml
 	tgmc|sequences/evolution-tower.yaml
 	tgmc|sequences/forward-hive.yaml
 	tgmc|sequences/resin-trap.yaml

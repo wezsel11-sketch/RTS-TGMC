@@ -2109,6 +2109,20 @@ praetorian:
 
 crusher:
 	Inherits: ^Xeno
+	# Crest Toss: the marine beside it is flung away over its crest.
+	ActiveAbility@abilitycresttoss:
+		OrderName: AbilityCrestToss
+		PlasmaCost: 35
+		Slot: 2
+		Label: Crest Toss
+		Description: Fling the marine next to you far away, over barricades too.
+		Cooldown: 300
+		Weapon: TGMCCrestToss
+		Aim: Nearest
+		Range: 1c512
+		AiRange: 1c512
+		AiMinTargets: 1
+		Sounds: slam-2.ogg
 	# Command card ability: stomp, stunning the marines around him.
 	ActiveAbility@abilitystomp:
 		OrderName: AbilityStomp
@@ -2162,6 +2176,35 @@ crusher:
 
 ravager:
 	Inherits: ^Xeno
+	# TGMC's ravager: Charge into the nearest marine, Ravage everything just ahead.
+	ActiveAbility@charge:
+		OrderName: AbilityRavagerCharge
+		PlasmaCost: 30
+		Slot: 3
+		Label: Charge
+		Description: Charge into the nearest marine and knock him down.
+		Cooldown: 250
+		Range: 6c0
+		ChargeDistance: 5c0
+		ChargeTicks: 12
+		ChargeHitThrow: 1c512
+		Weapon: TGMCStomp
+		AiRange: 6c0
+		AiMinTargets: 1
+		Sounds: xeno-roar-1.ogg
+	ActiveAbility@ravage:
+		OrderName: AbilityRavage
+		PlasmaCost: 15
+		Slot: 4
+		Label: Ravage
+		Description: Slash and knock back every marine in front of you.
+		Cooldown: 150
+		Weapon: TGMCRavagerRavage
+		Aim: Forward
+		ForwardDistance: 1c0
+		AiRange: 2c0
+		AiMinTargets: 1
+		Sounds: xeno-roar-2.ogg
 	# Command card abilities. Rage: hits harder and runs faster for a while. Endure: takes half damage and mends.
 	ActiveAbility@rage:
 		OrderName: AbilityRage
@@ -2302,6 +2345,19 @@ boiler:
 
 carrier:
 	Inherits: ^Xeno
+	# Place Trap: a hidden hole on the cell clicked. A marine who steps next to it gets a facehugger.
+	ActiveAbility@trap:
+		OrderName: AbilityTrap
+		PlasmaCost: 40
+		Slot: 3
+		Label: Trap
+		Description: Dig a hidden trap on the cell you click: a facehugger jumps at the first marine to come close.
+		Aim: Target
+		Range: 4c0
+		Spawn: hugger-trap
+		Cooldown: 750
+		AiRange: 0c0
+		Sounds: egg-burst.ogg
 	# Command card ability: throw a facehugger toward the nearest marine. It holds four and grows a new one every 24 seconds.
 	ActiveAbility@hugger:
 		OrderName: AbilityHugger
@@ -2350,6 +2406,41 @@ carrier:
 
 warlock:
 	Inherits: ^Xeno
+	# Psychic Shield: stands still behind a shield that stops most of the damage. Psychic Crush: crushes the marines at a spot.
+	ActiveAbility@abilityshield:
+		OrderName: AbilityPsychicShield
+		PlasmaCost: 30
+		Slot: 2
+		Label: Shield
+		Description: Psychic Shield: stand still and take a quarter of the damage for six seconds.
+		Cooldown: 250
+		Duration: 150
+		Condition: psy-shield
+		AiRange: 6c0
+		AiMinTargets: 2
+		Sounds: xeno-hiss-2.ogg
+	ActiveAbility@abilitycrush:
+		OrderName: AbilityPsychicCrush
+		PlasmaCost: 40
+		Slot: 3
+		Label: Crush
+		Description: Psychic Crush: crush and stun the marines at the spot you click.
+		Cooldown: 375
+		Weapon: TGMCPsychicCrush
+		Aim: Target
+		Range: 7c0
+		AiRange: 7c0
+		AiMinTargets: 2
+		Sounds: xeno-roar-2.ogg
+	DamageMultiplier@psyshield:
+		RequiresCondition: psy-shield
+		Modifier: 25
+	SpeedMultiplier@psyshield:
+		RequiresCondition: psy-shield
+		Modifier: 0
+	WithColoredOverlay@psyshield:
+		RequiresCondition: psy-shield
+		Color: B060FF50
 	# Command card ability: a psychic blast at the nearest marine.
 	ActiveAbility@abilityblast:
 		OrderName: AbilityBlast
@@ -2435,6 +2526,18 @@ shrike:
 
 widow:
 	Inherits: ^Xeno
+	# Birth Spiderling: a little spider that fights beside her for a minute.
+	ActiveAbility@abilityspiderling:
+		OrderName: AbilitySpiderling
+		PlasmaCost: 30
+		Slot: 2
+		Label: Spiderling
+		Description: Birth a spiderling that fights beside you for a minute.
+		Cooldown: 375
+		Spawn: spiderling
+		AiRange: 8c0
+		AiMinTargets: 1
+		Sounds: xeno-hiss-1.ogg
 	# Command card ability: web the nearest marine.
 	ActiveAbility@abilityweb:
 		OrderName: AbilityWeb
@@ -2868,6 +2971,23 @@ baneling:
 # Defender: the hive's shield. Fortify roots it to the ground and halves the damage it takes; Tail Sweep knocks marines back.
 defender:
 	Inherits: ^Xeno
+	# Forward Charge: a short armoured rush that throws marines aside. Not while fortified.
+	ActiveAbility@abilitycharge:
+		OrderName: AbilityDefenderCharge
+		RequiresCondition: !fortified
+		PlasmaCost: 30
+		Slot: 3
+		Label: Charge
+		Description: Forward Charge: rush the nearest marine and throw him aside.
+		Cooldown: 250
+		Range: 5c0
+		ChargeDistance: 4c0
+		ChargeTicks: 12
+		ChargeHitThrow: 2c0
+		Weapon: TGMCTailSweep
+		AiRange: 5c0
+		AiMinTargets: 1
+		Sounds: xeno-roar-1.ogg
 	ActiveAbility@abilityfortify:
 		OrderName: AbilityFortify
 		Slot: 1
@@ -3062,6 +3182,33 @@ hivelord:
 # Puppeteer: raises puppets, little husks that rush the enemy and fall apart after twenty seconds.
 puppeteer:
 	Inherits: ^Xeno
+	# Flay tears at the marine beside it; Pincushion shoots a spine from its tail.
+	ActiveAbility@abilityflay:
+		OrderName: AbilityFlay
+		Slot: 2
+		Label: Flay
+		Description: Tear a chunk of flesh from the marine next to you.
+		Cooldown: 500
+		Weapon: TGMCFlay
+		Aim: Nearest
+		Range: 1c512
+		AiRange: 1c512
+		AiMinTargets: 1
+		Sounds: xeno-hiss-3.ogg
+	ActiveAbility@abilitypincushion:
+		OrderName: AbilityPincushion
+		PlasmaCost: 15
+		Slot: 3
+		Label: Pincushion
+		Description: Shoot a spine from your tail at the nearest marine.
+		Cooldown: 125
+		Weapon: TGMCPincushion
+		Aim: Nearest
+		Launch: true
+		Range: 6c0
+		AiRange: 6c0
+		AiMinTargets: 1
+		Sounds: acid-spit-2.ogg
 	ActiveAbility@abilitypuppets:
 		OrderName: AbilityPuppets
 		PlasmaCost: 40
@@ -3109,9 +3256,71 @@ puppet:
 	Valued:
 		Cost: 0
 
+# The widow's spiderling: a little spider that bites beside her and dies after a minute.
+spiderling:
+	Inherits: ^Xeno
+	Targetable@SMALL:
+		TargetTypes: SmallXeno
+	Expires:
+		Ticks: 1500
+	Voiced:
+		VoiceSet: HunterVoice
+	Health:
+		HP: 30
+	Selectable:
+		Bounds: 512, 512, 0, -64
+	TgmcMobile:
+		Speed: 220
+	Tooltip:
+		Name: actor-spiderling.name
+	Valued:
+		Cost: 0
+
 # Pyrogen: a fire xeno. Fireball lobs a ball of blue fire that leaves the ground burning.
 pyrogen:
 	Inherits: ^Xeno
+	# TGMC's pyrogen also has Fire Storm (a line of fire), Inferno (fire all around it) and Fire Charge. It does not burn.
+	Targetable@FIREPROOF:
+		TargetTypes: Fireproof
+	ActiveAbility@abilityfirestorm:
+		OrderName: AbilityFirestorm
+		PlasmaCost: 45
+		Slot: 2
+		Label: Fire Storm
+		Description: Send a line of fire at the nearest marine.
+		Cooldown: 300
+		Weapon: TGMCFirestorm
+		Aim: Nearest
+		Range: 6c0
+		AiRange: 6c0
+		AiMinTargets: 1
+		Sounds: xeno-roar-2.ogg
+	ActiveAbility@abilityinferno:
+		OrderName: AbilityInferno
+		PlasmaCost: 40
+		Slot: 3
+		Label: Inferno
+		Description: Burst into fire: everything around you burns.
+		Cooldown: 450
+		Weapon: TGMCInferno
+		Aim: Self
+		AiRange: 2c512
+		AiMinTargets: 2
+		Sounds: xeno-roar-3.ogg
+	ActiveAbility@abilityfirecharge:
+		OrderName: AbilityFireCharge
+		PlasmaCost: 30
+		Slot: 4
+		Label: Fire Charge
+		Description: Charge three cells into the nearest marine and claw him.
+		Cooldown: 300
+		Range: 3c0
+		ChargeDistance: 3c0
+		ChargeTicks: 8
+		Weapon: TGMCPunch
+		AiRange: 3c0
+		AiMinTargets: 1
+		Sounds: xeno-roar-1.ogg
 	ActiveAbility@abilityfireball:
 		OrderName: AbilityFireball
 		PlasmaCost: 30
@@ -3181,6 +3390,8 @@ scorpion:
 # Dragon: a huge fire-breathing xeno. Fire Breath burns a cone ahead; Wing Gust knocks everyone around it flat. One at a time.
 dragon:
 	Inherits: ^Xeno
+	Targetable@FIREPROOF:
+		TargetTypes: Fireproof
 	Armor:
 		Type: Heavy
 	ActiveAbility@abilitybreath:

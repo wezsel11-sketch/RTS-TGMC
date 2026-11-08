@@ -116,6 +116,19 @@ Sequences:
 	tgmc|sequences/shrike.yaml
 	tgmc|sequences/widow.yaml
 	tgmc|sequences/wraith.yaml
+	tgmc|sequences/baneling.yaml
+	tgmc|sequences/beetle.yaml
+	tgmc|sequences/defender.yaml
+	tgmc|sequences/dragon.yaml
+	tgmc|sequences/gorger.yaml
+	tgmc|sequences/hivelord.yaml
+	tgmc|sequences/king.yaml
+	tgmc|sequences/mantis.yaml
+	tgmc|sequences/nymph.yaml
+	tgmc|sequences/puppeteer.yaml
+	tgmc|sequences/puppet.yaml
+	tgmc|sequences/pyrogen.yaml
+	tgmc|sequences/scorpion.yaml
 	tgmc|sequences/bull.yaml
 	tgmc|sequences/behemoth.yaml
 	tgmc|sequences/queen.yaml
@@ -141,6 +154,12 @@ Sequences:
 	tgmc|sequences/fx-laser.yaml
 	tgmc|sequences/fx-plasma.yaml
 	tgmc|sequences/fx-impact.yaml
+	tgmc|sequences/fx-weather.yaml
+	tgmc|sequences/fx-tracks.yaml
+	tgmc|sequences/fx-hole.yaml
+	tgmc|sequences/fx-telegraph.yaml
+	tgmc|sequences/fx-marker.yaml
+	tgmc|sequences/fx-overheat.yaml
 	tgmc|sequences/fx-blast.yaml
 	tgmc|sequences/fx-blast-big.yaml
 	tgmc|sequences/fx-smoke.yaml

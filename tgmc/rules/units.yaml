@@ -164,6 +164,8 @@
 		Cost: 100
 
 ^Infantry:
+	# Badly hurt, a marine leaves bloody bootprints where it walks (fluidtracks.dmi, LeavesTracks in GroundFx.cs).
+	LeavesTracks:
 	Inherits: ^Unit
 	# A flashlight: a pool of light that walks with the marine. Only at night (the lobby's Night option, see NightLighting in world.yaml).
 	NightLight:
@@ -666,6 +668,19 @@ skirmisher:
 		Description: actor-skirmisher.description
 
 smartgunner:
+	# A long burst heats the gun: a heat bar shows over the gunner while it keeps firing (overheat.dmi). Looks only.
+	GrantConditionOnAttack@overheat:
+		Condition: overheat
+		RequiredShotsPerInstance: 10
+		RevokeDelay: 50
+	WithDecoration@overheat:
+		Image: fx-overheat
+		Sequence: bar
+		Palette: effect
+		Position: Top
+		Margin: 0, -6
+		ValidRelationships: Ally, Neutral, Enemy
+		RequiresCondition: overheat
 	Inherits: ^Infantry
 	Health:
 		HP: 130
@@ -854,6 +869,19 @@ flamer:
 		Description: actor-flamer.description
 
 machinegunner:
+	# A long burst heats the gun: a heat bar shows over the gunner while it keeps firing (overheat.dmi). Looks only.
+	GrantConditionOnAttack@overheat:
+		Condition: overheat
+		RequiredShotsPerInstance: 10
+		RevokeDelay: 50
+	WithDecoration@overheat:
+		Image: fx-overheat
+		Sequence: bar
+		Palette: effect
+		Position: Top
+		Margin: 0, -6
+		ValidRelationships: Ally, Neutral, Enemy
+		RequiresCondition: overheat
 	Inherits: ^Infantry
 	# Heavy weapon: this one stops to shoot.
 	AttackWhileMoving:
@@ -1082,6 +1110,19 @@ som_field_commander:
 
 # SOM higher tiers: the marine roles in SOM black and red, with the same tier prerequisites.
 som_smartgunner:
+	# A long burst heats the gun: a heat bar shows over the gunner while it keeps firing (overheat.dmi). Looks only.
+	GrantConditionOnAttack@overheat:
+		Condition: overheat
+		RequiredShotsPerInstance: 10
+		RevokeDelay: 50
+	WithDecoration@overheat:
+		Image: fx-overheat
+		Sequence: bar
+		Palette: effect
+		Position: Top
+		Margin: 0, -6
+		ValidRelationships: Ally, Neutral, Enemy
+		RequiresCondition: overheat
 	Inherits: smartgunner
 	Buildable:
 		Prerequisites: ~faction-som
@@ -1106,6 +1147,19 @@ som_grenadier:
 		Name: actor-som-grenadier.name
 
 som_machinegunner:
+	# A long burst heats the gun: a heat bar shows over the gunner while it keeps firing (overheat.dmi). Looks only.
+	GrantConditionOnAttack@overheat:
+		Condition: overheat
+		RequiredShotsPerInstance: 10
+		RevokeDelay: 50
+	WithDecoration@overheat:
+		Image: fx-overheat
+		Sequence: bar
+		Palette: effect
+		Position: Top
+		Margin: 0, -6
+		ValidRelationships: Ally, Neutral, Enemy
+		RequiresCondition: overheat
 	Inherits: machinegunner
 	Buildable:
 		Prerequisites: armory, ~faction-som
@@ -1138,6 +1192,19 @@ som_mortarman:
 		Name: actor-som-mortarman.name
 
 som_heavygunner:
+	# A long burst heats the gun: a heat bar shows over the gunner while it keeps firing (overheat.dmi). Looks only.
+	GrantConditionOnAttack@overheat:
+		Condition: overheat
+		RequiredShotsPerInstance: 10
+		RevokeDelay: 50
+	WithDecoration@overheat:
+		Image: fx-overheat
+		Sequence: bar
+		Palette: effect
+		Position: Top
+		Margin: 0, -6
+		ValidRelationships: Ally, Neutral, Enemy
+		RequiresCondition: overheat
 	Inherits: heavygunner
 	Buildable:
 		Prerequisites: ordnance-depot, ~faction-som
@@ -1354,6 +1421,19 @@ mech:
 
 # B18 heavy gunner: juggernaut armour and a minigun. Slow, but fast firing and hard to kill.
 heavygunner:
+	# A long burst heats the gun: a heat bar shows over the gunner while it keeps firing (overheat.dmi). Looks only.
+	GrantConditionOnAttack@overheat:
+		Condition: overheat
+		RequiredShotsPerInstance: 10
+		RevokeDelay: 50
+	WithDecoration@overheat:
+		Image: fx-overheat
+		Sequence: bar
+		Palette: effect
+		Position: Top
+		Margin: 0, -6
+		ValidRelationships: Ally, Neutral, Enemy
+		RequiresCondition: overheat
 	Inherits: ^Infantry
 	Health:
 		HP: 320
@@ -1407,6 +1487,9 @@ demolitionist:
 		Description: actor-demolitionist.description
 
 ^Xeno:
+	# Badly hurt, a xeno leaves a trail of clawed footprints (fluidtracks.dmi, LeavesTracks in GroundFx.cs).
+	LeavesTracks:
+		Sequences: claw1, claw2
 	Inherits: ^Unit
 	# Xenos sense what is in front of them through walls: a cone of 120 degrees, nine cells deep (see TgmcSight in tgmc/code/Sight.cs).
 	TgmcSight@cone:
@@ -2659,3 +2742,498 @@ flame-patch-blue:
 		InitialStance: AttackAnything
 	AutoTargetPriority@DEFAULT:
 		ValidTargets: Ground
+
+# ---------------------------------------------------------------- castes from TGMC
+# Twelve more castes from TGMC's caste sheets, each built from the mod's existing ability parts (ActiveAbility in CasteAbilities.cs).
+# Tier one trains anywhere, tier two needs the Evolution Tower, tier three the Maturity Tower, the two big ones the Queen.
+
+# Nymph: the cheapest xeno, a weak biter to fill the swarm early.
+nymph:
+	Inherits: ^Xeno
+	Targetable@SMALL:
+		TargetTypes: SmallXeno
+	Evolves:
+		Next: runner
+	Voiced:
+		VoiceSet: HunterVoice
+	Health:
+		HP: 60
+	Selectable:
+		Bounds: 768, 768, 0, -128
+	TgmcMobile:
+		Speed: 170
+	Tooltip:
+		Name: actor-nymph.name
+	Valued:
+		Cost: 35
+	Buildable:
+		Queue: Xeno
+		BuildPaletteOrder: 5
+		Description: actor-nymph.description
+
+# Mantis: a fast ambusher. It hides when still, like the hunter, and its claws hit harder from hiding.
+mantis:
+	Inherits: ^Xeno
+	Targetable@SMALL:
+		TargetTypes: SmallXeno
+	Cloak@stealth:
+		InitialDelay: 75
+		CloakDelay: 50
+		UncloakOn: Attack, Damage
+		CloakedCondition: stealthed
+		CloakedAlpha: 0.25
+	FirepowerMultiplier@ambush:
+		RequiresCondition: stealthed
+		Modifier: 200
+	Evolves:
+		Previous: nymph
+	Voiced:
+		VoiceSet: HunterVoice
+	Health:
+		HP: 110
+	Selectable:
+		Bounds: 768, 768, 0, -128
+	TgmcMobile:
+		Speed: 210
+	Tooltip:
+		Name: actor-mantis.name
+	Valued:
+		Cost: 80
+	Buildable:
+		Queue: Xeno
+		BuildPaletteOrder: 22
+		Prerequisites: evolution-tower
+		Description: actor-mantis.description
+
+# Baneling: a rolling sack of acid. It bursts on command (or when it dies), soaking everyone around in acid and gas.
+baneling:
+	Inherits: ^Xeno
+	Targetable@SMALL:
+		TargetTypes: SmallXeno
+	ActiveAbility@abilityburst:
+		OrderName: AbilityBanelingBurst
+		Slot: 1
+		Label: Burst
+		Cooldown: 25
+		Weapon: TGMCBanelingBurst
+		Aim: Self
+		SelfDestruct: true
+		AiRange: 2c0
+		AiMinTargets: 2
+		Sounds: acid-impact.ogg
+	FireWarheadsOnDeath@burst:
+		Weapon: TGMCBanelingBurst
+		EmptyWeapon: TGMCBanelingBurst
+	Voiced:
+		VoiceSet: HunterVoice
+	Health:
+		HP: 70
+	Selectable:
+		Bounds: 768, 768, 0, -128
+	TgmcMobile:
+		Speed: 190
+	Tooltip:
+		Name: actor-baneling.name
+	Valued:
+		Cost: 60
+	Buildable:
+		Queue: Xeno
+		BuildPaletteOrder: 24
+		Description: actor-baneling.description
+
+# Defender: the hive's shield. Fortify roots it to the ground and halves the damage it takes; Tail Sweep knocks marines back.
+defender:
+	Inherits: ^Xeno
+	ActiveAbility@abilityfortify:
+		OrderName: AbilityFortify
+		Slot: 1
+		Label: Fortify
+		Toggle: true
+		Condition: fortified
+		AiRange: 5c0
+		AiMinTargets: 2
+		Sounds: xeno-hiss-1.ogg
+	ActiveAbility@abilitysweep:
+		OrderName: AbilityTailSweep
+		PlasmaCost: 20
+		Slot: 2
+		Label: Tail Sweep
+		Cooldown: 250
+		Weapon: TGMCTailSweep
+		Aim: Self
+		AiRange: 2c0
+		AiMinTargets: 1
+		Sounds: slam-1.ogg
+	DamageMultiplier@fortified:
+		RequiresCondition: fortified
+		Modifier: 50
+	SpeedMultiplier@fortified:
+		RequiresCondition: fortified
+		Modifier: 0
+	Evolves:
+		Next: beetle
+	Voiced:
+		VoiceSet: HunterVoice
+	Health:
+		HP: 200
+	Selectable:
+		Bounds: 768, 768, 0, -128
+	TgmcMobile:
+		Speed: 120
+	Tooltip:
+		Name: actor-defender.name
+	Valued:
+		Cost: 110
+	Buildable:
+		Queue: Xeno
+		BuildPaletteOrder: 26
+		Description: actor-defender.description
+
+# Beetle: an armoured ram. It charges down a line and throws marines aside.
+beetle:
+	Inherits: ^Xeno
+	Armor:
+		Type: Heavy
+	ActiveAbility@abilitycharge:
+		OrderName: AbilityBeetleCharge
+		PlasmaCost: 30
+		Slot: 1
+		Label: Charge
+		Cooldown: 300
+		ChargeDistance: 6c0
+		ChargeTicks: 12
+		ChargeHitThrow: 2c0
+		Weapon: TGMCStomp
+		AiRange: 6c0
+		AiMinTargets: 1
+		Sounds: xeno-roar-1.ogg
+	Evolves:
+		Previous: defender
+	Voiced:
+		VoiceSet: HunterVoice
+	Health:
+		HP: 280
+	Selectable:
+		Bounds: 768, 768, 0, -128
+	TgmcMobile:
+		Speed: 130
+	Tooltip:
+		Name: actor-beetle.name
+	Valued:
+		Cost: 190
+	Buildable:
+		Queue: Xeno
+		BuildPaletteOrder: 72
+		Prerequisites: evolution-tower
+		Description: actor-beetle.description
+
+# Gorger: feeds on the fight. Feast makes it hit harder and heal while it lasts; Rejuvenate heals the xenos around it.
+gorger:
+	Inherits: ^Xeno
+	ActiveAbility@abilityfeast:
+		OrderName: AbilityFeast
+		PlasmaCost: 30
+		Slot: 1
+		Label: Feast
+		Cooldown: 500
+		Condition: feasting
+		Duration: 200
+		AiRange: 3c0
+		AiMinTargets: 1
+		AiWoundedPercent: 60
+		Sounds: xeno-roar-3.ogg
+	ActiveAbility@abilityrejuvenate:
+		OrderName: AbilityRejuvenate
+		PlasmaCost: 40
+		Slot: 2
+		Label: Rejuvenate
+		Cooldown: 600
+		AuraRange: 3c0
+		AuraCondition: psycure
+		AuraDuration: 150
+		Ring: 60D060
+		AiRange: 3c0
+		AiMinTargets: 1
+		Sounds: xeno-hiss-2.ogg
+	FirepowerMultiplier@feast:
+		RequiresCondition: feasting
+		Modifier: 150
+	ChangesHealth@feast:
+		RequiresCondition: feasting
+		Step: 3
+		Delay: 10
+		StartIfBelow: 100
+	Evolves:
+		Previous: warrior
+	Voiced:
+		VoiceSet: HunterVoice
+	Health:
+		HP: 220
+	Selectable:
+		Bounds: 768, 768, 0, -128
+	TgmcMobile:
+		Speed: 140
+	Tooltip:
+		Name: actor-gorger.name
+	Valued:
+		Cost: 180
+	Buildable:
+		Queue: Xeno
+		BuildPaletteOrder: 74
+		Prerequisites: evolution-tower
+		Description: actor-gorger.description
+
+# Hivelord: the big builder. It builds and mends like a drone, gives a wider build area and is tough enough to build under fire.
+hivelord:
+	Inherits: ^Xeno
+	Evolves:
+		Previous: drone
+	Voiced:
+		VoiceSet: DroneVoice
+	Health:
+		HP: 200
+	Selectable:
+		Bounds: 768, 768, 0, -128
+	TgmcMobile:
+		Speed: 120
+	Armament@PRIMARY:
+		Weapon: TGMCMend
+		Cursor: repair
+		OutsideRangeCursor: repair-blocked
+		TargetRelationships: Ally
+		ForceTargetRelationships: None
+	AutoTarget:
+		ScanRadius: 6
+	AutoTargetPriority@DEFAULT:
+		ValidTargets: Structure
+	Production:
+		Produces: XenoBuild
+	GivesBuildableArea:
+		AreaTypes: xeno-minor, xeno-major
+	Tooltip:
+		Name: actor-hivelord.name
+	Valued:
+		Cost: 200
+	Buildable:
+		Queue: Xeno
+		BuildPaletteOrder: 76
+		Prerequisites: evolution-tower
+		Description: actor-hivelord.description
+
+# Puppeteer: raises puppets, little husks that rush the enemy and fall apart after twenty seconds.
+puppeteer:
+	Inherits: ^Xeno
+	ActiveAbility@abilitypuppets:
+		OrderName: AbilityPuppets
+		PlasmaCost: 40
+		Slot: 1
+		Label: Puppets
+		Cooldown: 600
+		Spawn: puppet, puppet, puppet
+		AiRange: 8c0
+		AiMinTargets: 1
+		Sounds: xeno-hiss-3.ogg
+	Voiced:
+		VoiceSet: HunterVoice
+	Health:
+		HP: 150
+	Selectable:
+		Bounds: 768, 768, 0, -128
+	TgmcMobile:
+		Speed: 140
+	Tooltip:
+		Name: actor-puppeteer.name
+	Valued:
+		Cost: 170
+	Buildable:
+		Queue: Xeno
+		BuildPaletteOrder: 78
+		Prerequisites: evolution-tower
+		Description: actor-puppeteer.description
+
+puppet:
+	Inherits: ^Xeno
+	Targetable@SMALL:
+		TargetTypes: SmallXeno
+	Expires:
+		Ticks: 500
+	Voiced:
+		VoiceSet: HunterVoice
+	Health:
+		HP: 40
+	Selectable:
+		Bounds: 512, 512, 0, -64
+	TgmcMobile:
+		Speed: 200
+	Tooltip:
+		Name: actor-puppet.name
+	Valued:
+		Cost: 0
+
+# Pyrogen: a fire xeno. Fireball lobs a ball of blue fire that leaves the ground burning.
+pyrogen:
+	Inherits: ^Xeno
+	ActiveAbility@abilityfireball:
+		OrderName: AbilityFireball
+		PlasmaCost: 30
+		Slot: 1
+		Label: Fireball
+		Cooldown: 300
+		Weapon: TGMCPyroFireball
+		Aim: Nearest
+		Launch: true
+		Range: 7c0
+		AiRange: 7c0
+		AiMinTargets: 1
+		Sounds: xeno-roar-2.ogg
+	Voiced:
+		VoiceSet: HunterVoice
+	Health:
+		HP: 160
+	Selectable:
+		Bounds: 768, 768, 0, -128
+	TgmcMobile:
+		Speed: 150
+	Tooltip:
+		Name: actor-pyrogen.name
+	Valued:
+		Cost: 170
+	Buildable:
+		Queue: Xeno
+		BuildPaletteOrder: 80
+		Prerequisites: evolution-tower
+		Description: actor-pyrogen.description
+
+# Scorpion: a ranged stinger. Its tail spits acid from range, and Acid Sting pins a marine with a stunning jab.
+scorpion:
+	Inherits: ^Xeno
+	Armament@PRIMARY:
+		Weapon: TGMCScorpionSting
+	ActiveAbility@abilitypin:
+		OrderName: AbilityScorpionPin
+		PlasmaCost: 25
+		Slot: 1
+		Label: Acid Sting
+		Cooldown: 350
+		Weapon: TGMCAcidCone
+		Aim: Nearest
+		Range: 5c0
+		AiRange: 5c0
+		AiMinTargets: 1
+		Sounds: acid-spit-1.ogg
+	Voiced:
+		VoiceSet: HunterVoice
+	Health:
+		HP: 150
+	Selectable:
+		Bounds: 768, 768, 0, -128
+	TgmcMobile:
+		Speed: 140
+	Tooltip:
+		Name: actor-scorpion.name
+	Valued:
+		Cost: 160
+	Buildable:
+		Queue: Xeno
+		BuildPaletteOrder: 82
+		Prerequisites: evolution-tower
+		Description: actor-scorpion.description
+
+# Dragon: a huge fire-breathing xeno. Fire Breath burns a cone ahead; Wing Gust knocks everyone around it flat. One at a time.
+dragon:
+	Inherits: ^Xeno
+	Armor:
+		Type: Heavy
+	ActiveAbility@abilitybreath:
+		OrderName: AbilityDragonBreath
+		PlasmaCost: 40
+		Slot: 1
+		Label: Fire Breath
+		Cooldown: 300
+		Weapon: TGMCDragonBreath
+		Aim: Nearest
+		Range: 5c0
+		AiRange: 5c0
+		AiMinTargets: 2
+		Sounds: xeno-roar-1.ogg
+	ActiveAbility@abilitygust:
+		OrderName: AbilityWingGust
+		PlasmaCost: 40
+		Slot: 2
+		Label: Wing Gust
+		Cooldown: 500
+		Weapon: TGMCStompBig
+		Aim: Self
+		AiRange: 3c0
+		AiMinTargets: 2
+		Sounds: slam-2.ogg
+	Voiced:
+		VoiceSet: QueenVoice
+	Health:
+		HP: 700
+	Selectable:
+		Bounds: 2048, 1536, 0, -256
+	TgmcMobile:
+		Speed: 120
+	Tooltip:
+		Name: actor-dragon.name
+	Valued:
+		Cost: 450
+	Buildable:
+		Queue: Xeno
+		BuildPaletteOrder: 190
+		Prerequisites: queen
+		BuildLimit: 1
+		Description: actor-dragon.description
+
+# King: the hive's warlord. Royal Roar stuns every marine around him and sends the xenos near him into a rage.
+king:
+	Inherits: ^Xeno
+	Armor:
+		Type: Heavy
+	ActiveAbility@abilityroar:
+		OrderName: AbilityRoyalRoar
+		PlasmaCost: 50
+		Slot: 1
+		Label: Royal Roar
+		Cooldown: 600
+		Weapon: TGMCKingRoar
+		Aim: Self
+		AuraRange: 6c0
+		AuraCondition: rage
+		AuraDuration: 250
+		AuraIncludesSelf: false
+		Ring: FF4040
+		AiRange: 5c0
+		AiMinTargets: 2
+		Sounds: xeno-roar-3.ogg
+	ActiveAbility@abilityblast:
+		OrderName: AbilityKingBlast
+		PlasmaCost: 30
+		Slot: 2
+		Label: Psychic Blast
+		Cooldown: 300
+		Weapon: TGMCPsychicBlast
+		Aim: Nearest
+		Range: 6c0
+		AiRange: 6c0
+		AiMinTargets: 1
+		Sounds: xeno-hiss-3.ogg
+	Voiced:
+		VoiceSet: QueenVoice
+	Health:
+		HP: 650
+	Selectable:
+		Bounds: 1024, 1024, 0, -256
+	TgmcMobile:
+		Speed: 130
+	Tooltip:
+		Name: actor-king.name
+	Valued:
+		Cost: 450
+	Buildable:
+		Queue: Xeno
+		BuildPaletteOrder: 195
+		Prerequisites: queen
+		BuildLimit: 1
+		Description: actor-king.description

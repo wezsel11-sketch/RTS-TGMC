@@ -445,6 +445,151 @@ UNITS = {
             "icon": "stand:S",
         },
     },
+    # The castes added from TGMC's caste sheets (units.yaml, "castes from TGMC"): walk, run, die and, where TGMC has one, a gib.
+    "baneling": {
+        "sequences": {
+            "walk": [("icons/Xeno/castes/baneling.dmi", "Baneling Walking")],
+            "run": [("icons/Xeno/castes/baneling.dmi", "Baneling Running")],
+            "stand": "walk#1",
+            "die": [("icons/Xeno/castes/baneling.dmi", "Baneling Dead")],
+            "die-gib": "die",
+            "attack": "stand",
+            "icon": "stand:S",
+        },
+    },
+    "beetle": {
+        "sequences": {
+            "walk": [("icons/Xeno/castes/beetle.dmi", "Beetle Walking")],
+            "run": [("icons/Xeno/castes/beetle.dmi", "Beetle Running")],
+            "stand": "walk#1",
+            "die": [("icons/Xeno/castes/beetle.dmi", "Beetle Dead")],
+            "die-gib": [("icons/Xeno/castes/beetle.dmi", "gibbed-a", None, {"tick": 70})],
+            "attack": "stand",
+            "icon": "stand:S",
+        },
+    },
+    "defender": {
+        "sequences": {
+            "walk": [("icons/Xeno/castes/defender.dmi", "Defender Walking")],
+            "run": [("icons/Xeno/castes/defender.dmi", "Defender Running")],
+            "stand": "walk#1",
+            "die": [("icons/Xeno/castes/defender.dmi", "Defender Dead")],
+            "die-gib": [("icons/Xeno/castes/defender.dmi", "gibbed-a", None, {"tick": 70})],
+            "attack": "stand",
+            "icon": "stand:S",
+        },
+    },
+    "dragon": {
+        "sequences": {
+            "walk": [("icons/Xeno/castes/dragon.dmi", "Dragon Walking")],
+            "run": [("icons/Xeno/castes/dragon.dmi", "Dragon Running")],
+            "stand": "walk#1",
+            "die": [("icons/Xeno/castes/dragon.dmi", "Dragon Dead")],
+            "die-gib": [("icons/Xeno/castes/dragon.dmi", "gibbed-a", None, {"tick": 70})],
+            "attack": "stand",
+            "icon": "stand:S",
+        },
+    },
+    "gorger": {
+        "sequences": {
+            "walk": [("icons/Xeno/castes/gorger.dmi", "Gorger Walking")],
+            "run": [("icons/Xeno/castes/gorger.dmi", "Gorger Running")],
+            "stand": "walk#1",
+            "die": [("icons/Xeno/castes/gorger.dmi", "Gorger Dead")],
+            "die-gib": [("icons/Xeno/castes/gorger.dmi", "gibbed-a", None, {"tick": 70})],
+            "attack": "stand",
+            "icon": "stand:S",
+        },
+    },
+    "hivelord": {
+        "sequences": {
+            "walk": [("icons/Xeno/castes/hivelord.dmi", "Hivelord Walking")],
+            "run": [("icons/Xeno/castes/hivelord.dmi", "Hivelord Running")],
+            "stand": "walk#1",
+            "die": [("icons/Xeno/castes/hivelord.dmi", "Hivelord Dead")],
+            "die-gib": [("icons/Xeno/castes/hivelord.dmi", "gibbed-a", None, {"tick": 70})],
+            "attack": "stand",
+            "icon": "stand:S",
+        },
+    },
+    "mantis": {
+        "sequences": {
+            "walk": [("icons/Xeno/castes/mantis.dmi", "Mantis Walking")],
+            "run": [("icons/Xeno/castes/mantis.dmi", "Mantis Running")],
+            "stand": "walk#1",
+            "die": [("icons/Xeno/castes/mantis.dmi", "Mantis Dead")],
+            "die-gib": [("icons/Xeno/castes/mantis.dmi", "gibbed-a", None, {"tick": 70})],
+            "attack": "stand",
+            "icon": "stand:S",
+        },
+    },
+    "nymph": {
+        "sequences": {
+            "walk": [("icons/Xeno/castes/nymph.dmi", "Nymph Walking")],
+            "run": [("icons/Xeno/castes/nymph.dmi", "Nymph Running")],
+            "stand": "walk#1",
+            "die": [("icons/Xeno/castes/nymph.dmi", "Nymph Dead")],
+            "die-gib": [("icons/Xeno/castes/nymph.dmi", "gibbed-a", None, {"tick": 70})],
+            "attack": "stand",
+            "icon": "stand:S",
+        },
+    },
+    "puppeteer": {
+        "sequences": {
+            "walk": [("icons/Xeno/castes/puppeteer.dmi", "Puppeteer Walking")],
+            "run": [("icons/Xeno/castes/puppeteer.dmi", "Puppeteer Running")],
+            "stand": "walk#1",
+            "die": [("icons/Xeno/castes/puppeteer.dmi", "Puppeteer Dead")],
+            "die-gib": [("icons/Xeno/castes/puppeteer.dmi", "gibbed-a", None, {"tick": 70})],
+            "attack": "stand",
+            "icon": "stand:S",
+        },
+    },
+    "pyrogen": {
+        "sequences": {
+            "walk": [("icons/Xeno/castes/pyrogen.dmi", "Pyrogen Walking")],
+            "run": [("icons/Xeno/castes/pyrogen.dmi", "Pyrogen Running")],
+            "stand": "walk#1",
+            "die": [("icons/Xeno/castes/pyrogen.dmi", "Pyrogen Dead")],
+            "die-gib": "die",
+            "attack": "stand",
+            "icon": "stand:S",
+        },
+    },
+    "scorpion": {
+        "sequences": {
+            "walk": [("icons/Xeno/castes/scorpion.dmi", "Scorpion Walking")],
+            "run": [("icons/Xeno/castes/scorpion.dmi", "Scorpion Running")],
+            "stand": "walk#1",
+            "die": [("icons/Xeno/castes/scorpion.dmi", "Scorpion Dead")],
+            "die-gib": [("icons/Xeno/castes/scorpion.dmi", "gibbed-a", None, {"tick": 70})],
+            "attack": "stand",
+            "icon": "stand:S",
+        },
+    },
+    "king": {
+        "sequences": {
+            "walk": [("icons/Xeno/castes/king/king.dmi", "King Walking")],
+            "run": [("icons/Xeno/castes/king/king.dmi", "King Running")],
+            "stand": "walk#1",
+            "die": [("icons/Xeno/castes/king/king.dmi", "King Dead")],
+            "die-gib": "die",  # too heavy to gib
+            "attack": [("icons/Xeno/castes/king/king.dmi", "King Screeching")],
+            "icon": "stand:S",
+        },
+    },
+    # The puppeteer's minion: a small husk that runs at the enemy and falls apart after a while.
+    "puppet": {
+        "sequences": {
+            "walk": [("icons/Xeno/castes/puppet.dmi", "Puppet Running")],
+            "run": [("icons/Xeno/castes/puppet.dmi", "Puppet Running")],
+            "stand": "walk#1",
+            "die": [("icons/Xeno/castes/puppet.dmi", "Puppet Dead")],
+            "die-gib": "die",
+            "attack": "stand",
+            "icon": "stand:S",
+        },
+    },
     "bull": {
         "sequences": {
             "walk": [(BULL, "Bull Walking")],
@@ -1364,6 +1509,51 @@ UNITS = {
     "fx-slam-big": {
         "sequences": {"impact": [(FX96, "throw_impact_s", None, {"tick": 60})]},
     },
+    # TGMC's weather tiles, drawn over every cell on screen by TiledWeather (Weather.cs) when the lobby's Weather option picks them.
+    "fx-weather": {
+        "sequences": {
+            "rain": [("icons/effects/weather_effects.dmi", "rain_med", None, {"tick": 60})],
+            "acidrain": [("icons/effects/weather_effects.dmi", "acid_rain", None, {"tick": 60})],
+            "ash": [("icons/effects/weather_effects.dmi", "ash_storm", None, {"tick": 90})],
+            "snow": [("icons/effects/weather_effects.dmi", "snow_storm", None, {"tick": 70})],
+            "dust": [("icons/effects/weather_effects.dmi", "dust_med", None, {"tick": 90})],
+        },
+    },
+    # Bloody footprints (fluidtracks.dmi, white in TGMC, which tints them with the blood colour: red for marines, acid green for
+    # xenos) a badly hurt unit leaves behind (LeavesTracks in Blood.cs): boots for marines, claws for xenos.
+    "fx-tracks": {
+        "sequences": {
+            "human1": [("icons/effects/fluidtracks.dmi", "human1", (150, 18, 18), {})],
+            "human2": [("icons/effects/fluidtracks.dmi", "human2", (150, 18, 18), {})],
+            "claw1": [("icons/effects/fluidtracks.dmi", "claw1", (150, 200, 40), {})],
+            "claw2": [("icons/effects/fluidtracks.dmi", "claw2", (150, 200, 40), {})],
+        },
+    },
+    # Bullet holes punched in a structure a bullet hits (bulletholes.dmi), and the holes acid eats in one (new_acid.dmi).
+    "fx-hole": {
+        "sequences": {
+            "bullet1": [("icons/effects/bulletholes.dmi", "bhole_1_1", None, {})],
+            "bullet2": [("icons/effects/bulletholes.dmi", "bhole_1_5", None, {})],
+            "bullet3": [("icons/effects/bulletholes.dmi", "bhole_1_9", None, {})],
+            "bullet4": [("icons/effects/bulletholes.dmi", "bhole_1_14", None, {})],
+            "acid1": [("icons/effects/new_acid.dmi", "hole_0", None, {})],
+            "acid2": [("icons/effects/new_acid.dmi", "hole_1", None, {})],
+        },
+    },
+    # Ground warnings (Telegraph in Weather.cs): where an orbital strike or a boiler glob will land, and where a drop pod comes down.
+    "fx-telegraph": {
+        "sequences": {"box": [("icons/effects/telegraph_96x96.dmi", "target_largebox", None, {"size": 96})]},
+    },
+    "fx-marker": {
+        "sequences": {
+            "xeno": [("icons/effects/xeno_target.dmi", "all", None, {"size": 64})],
+            "pod": [("icons/effects/supplypod_down_target.dmi", "all", None, {"size": 64})],
+        },
+    },
+    # The heat bar over a machine gun that has been firing a long burst (overheat.dmi).
+    "fx-overheat": {
+        "sequences": {"bar": [("icons/effects/overheat.dmi", "status_bar", (255, 110, 30), {})]},
+    },
     # A runner's claw swipe, drawn over whatever it hits (the runner has no attack frames of its own in TGMC)
     "fx-claw": {
         "sequences": {"slash": [(FX32, "claw", None, {"tick": 60})]},
@@ -1390,7 +1580,7 @@ for _unit in UNITS.values():
         _first = _seqs["stand"][0]
         _seqs["down"] = [(_first[0], _first[1], None, {**(_first[3] if len(_first) > 3 else {}), "fall": 6, "last": True})] + _seqs["stand"][1:]
 
-XENO_UNITS = ["runner", "hunter", "sentinel", "drone", "warrior", "queen", "facehugger", "larva"] + ["spitter", "praetorian", "crusher", "ravager", "defiler", "boiler", "carrier", "warlock", "shrike", "widow", "wraith", "bull", "behemoth"]
+XENO_UNITS = ["runner", "hunter", "sentinel", "drone", "warrior", "queen", "facehugger", "larva"] + ["baneling", "beetle", "defender", "dragon", "gorger", "hivelord", "king", "mantis", "nymph", "puppeteer", "puppet", "pyrogen", "scorpion"] + ["spitter", "praetorian", "crusher", "ravager", "defiler", "boiler", "carrier", "warlock", "shrike", "widow", "wraith", "bull", "behemoth"]
 for _unit in XENO_UNITS:
     _seqs = UNITS[_unit]["sequences"]
     for _name, _value in _seqs.items():

@@ -109,10 +109,25 @@ Player:
 			wraith: 8
 			bull: 8
 			behemoth: 4
+			nymph: 15
+			mantis: 15
+			baneling: 12
+			defender: 12
+			beetle: 10
+			gorger: 10
+			hivelord: 4
+			puppeteer: 8
+			pyrogen: 10
+			scorpion: 12
+			dragon: 3
+			king: 3
 			queen: 30
 		UnitLimits:
 			queen: 1
 			drone: 4
+			hivelord: 2
+			dragon: 1
+			king: 1
 			facehugger: 6
 	# The stock unit builder queues one unit at a time; this fills the other production slots from the same list (see ParallelBuildBotModule in Bots.cs).
 	# Marine bot: while ore fields lie unclaimed it builds a couple of engineers to claim them, for the miners' income (see FieldWorkerBotModule in Bots.cs).
@@ -743,12 +758,12 @@ Player:
 	DefendBotModule@xenos:
 		RequiresCondition: enable-skirmish-ai && faction-xenos && !enable-turtle-ai
 		Protect: mini-silo, weed-node, resin-turret, forward-hive
-		Defenders: runner, hunter, sentinel, warrior, spitter, defender, praetorian, ravager, crusher
+		Defenders: runner, hunter, sentinel, warrior, spitter, defender, praetorian, ravager, crusher, beetle, gorger, scorpion, pyrogen, mantis
 		BaseTypes: resin-silo
 	DefendBotModule@xenos-turtle:
 		RequiresCondition: enable-skirmish-ai && faction-xenos && enable-turtle-ai
 		Protect: mini-silo, weed-node, resin-turret, forward-hive
-		Defenders: runner, hunter, sentinel, warrior, spitter, defender, praetorian, ravager, crusher
+		Defenders: runner, hunter, sentinel, warrior, spitter, defender, praetorian, ravager, crusher, beetle, gorger, scorpion, pyrogen, mantis
 		BaseTypes: resin-silo
 		OvermatchPercent: 250
 	# Both bots send a few fast units at the enemy's least defended outpost, round known defences, and turn back when outmatched (see RaidBotModule in Bots.cs).
@@ -767,12 +782,12 @@ Player:
 		MaxThreatPercent: 100
 	RaidBotModule@xenos:
 		RequiresCondition: enable-skirmish-ai && faction-xenos && !enable-turtle-ai && !enable-raider-ai
-		Raiders: runner, hunter
+		Raiders: runner, hunter, mantis
 		Targets: miner, engineer
 		BaseTypes: resin-silo
 	RaidBotModule@xenos-raider:
 		RequiresCondition: enable-skirmish-ai && faction-xenos && enable-raider-ai
-		Raiders: runner, hunter
+		Raiders: runner, hunter, mantis
 		Targets: miner, engineer
 		BaseTypes: resin-silo
 		Interval: 25

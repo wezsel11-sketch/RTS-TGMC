@@ -288,8 +288,12 @@ namespace OpenRA.Mods.TGMC.Traits
 		void IEffect.Tick(World world)
 		{
 			ticks++;
-			if (!fired && ticks == 1 && info.IncomingSounds.Length > 0)
+			if (!fired && ticks == 1)
+			{
 				Fx.Sound(world, target, info.IncomingSounds);
+				// A box on the ground where the shells will fall (telegraph_96x96.dmi), blinking faster as they come.
+				GroundFx.Marker(world, target, "fx-telegraph", "box", info.FallDelay);
+			}
 
 			if (!fired && ticks >= info.FallDelay)
 			{

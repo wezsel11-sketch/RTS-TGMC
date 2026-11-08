@@ -686,6 +686,9 @@ mech:
 		Aim: Target
 		Range: 10c0
 		Launch: true
+		TargetMarkerImage: fx-telegraph
+		TargetMarkerSequence: box
+		TargetMarkerTicks: 60
 		Weapon: TGMCMechBarrage
 		Cooldown: 900
 		AiRange: 10c0
@@ -856,6 +859,9 @@ boiler:
 		Aim: Target
 		Range: 22c0
 		Launch: true
+		TargetMarkerImage: fx-marker
+		TargetMarkerSequence: xeno
+		TargetMarkerTicks: 60
 		Weapon: TGMCBombardAcid
 		Cooldown: 400
 		PlasmaCost: 20
@@ -870,6 +876,9 @@ boiler:
 		Aim: Target
 		Range: 22c0
 		Launch: true
+		TargetMarkerImage: fx-marker
+		TargetMarkerSequence: xeno
+		TargetMarkerTicks: 60
 		Weapon: TGMCBombardNeuro
 		Cooldown: 400
 		PlasmaCost: 20

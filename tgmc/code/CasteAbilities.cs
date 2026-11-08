@@ -114,6 +114,13 @@ namespace OpenRA.Mods.TGMC.Traits
 
 		[Desc("Fire Weapon as a projectile from the unit (a grenade's arc, a shell's whistle) instead of hitting the target at once.")]
 		public readonly bool Launch = false;
+
+		[Desc("A blinking marker on the ground where a launched shot will land (GroundFx.Marker), so the other side sees it coming: " +
+			"an image and sequence, e.g. fx-marker xeno or fx-telegraph box. None when the image is empty.")]
+		public readonly string TargetMarkerImage = null;
+		public readonly string TargetMarkerSequence = null;
+		public readonly int TargetMarkerTicks = 50;
+
 		public readonly WDist Range = new(1024);
 
 		[Desc("Whose units Aim: TargetActor can pick: Enemy for an attack, Ally for a heal or a buff.")]
@@ -542,6 +549,9 @@ namespace OpenRA.Mods.TGMC.Traits
 					world.AddFrameEndTask(w => w.Add(new Fuse(self, Info, weapon, aim.CenterPosition, Info.FuseTicks)));
 				else if (Info.Launch && weapon.Projectile != null)
 				{
+					if (!string.IsNullOrEmpty(Info.TargetMarkerImage))
+						GroundFx.Marker(world, aim.CenterPosition, Info.TargetMarkerImage, Info.TargetMarkerSequence, Info.TargetMarkerTicks);
+
 					var facing = (aim.CenterPosition - self.CenterPosition).Yaw;
 					var projectile = weapon.Projectile.Create(new ProjectileArgs
 					{

@@ -66,7 +66,7 @@ namespace OpenRA.Mods.TGMC.Traits
 		public readonly bool FloatingTextDefault = true;
 		public readonly bool NightDefault = false;
 
-		[Desc("Weather when there is no lobby, and the lobby's default: clear, rain or dust.")]
+		[Desc("Weather when there is no lobby, and the lobby's default: clear, rain, dust, ash, snow or acidrain.")]
 		public readonly string WeatherDefault = "clear";
 
 		[GrantedConditionReference]
@@ -74,6 +74,15 @@ namespace OpenRA.Mods.TGMC.Traits
 
 		[GrantedConditionReference]
 		public readonly string DustCondition = "dust";
+
+		[GrantedConditionReference]
+		public readonly string AshCondition = "ash";
+
+		[GrantedConditionReference]
+		public readonly string SnowCondition = "snow";
+
+		[GrantedConditionReference]
+		public readonly string AcidRainCondition = "acidrain";
 
 		public override object Create(ActorInitializer init) { return new TgmcOptions(init.Self, this); }
 
@@ -103,7 +112,8 @@ namespace OpenRA.Mods.TGMC.Traits
 				"dropdown-tgmc-weather.label", "dropdown-tgmc-weather.description", true, 16,
 				new Dictionary<string, string>
 				{
-					{ "clear", "weather-clear" }, { "rain", "weather-rain" }, { "dust", "weather-dust" }
+					{ "clear", "weather-clear" }, { "rain", "weather-rain" }, { "dust", "weather-dust" },
+					{ "ash", "weather-ash" }, { "snow", "weather-snow" }, { "acidrain", "weather-acidrain" }
 				}, WeatherDefault, false);
 
 			yield return new LobbyBooleanOption(map, Options.Night,
@@ -114,7 +124,7 @@ namespace OpenRA.Mods.TGMC.Traits
 		}
 	}
 
-	// Turns the lobby's weather choice into a condition ("rain" or "dust") that the WeatherOverlay traits in world.yaml wait for.
+	// Turns the lobby's weather choice into a condition ("rain", "dust", "ash", "snow" or "acidrain") that the WeatherOverlay traits in world.yaml wait for.
 	public class TgmcOptions : INotifyCreated
 	{
 		readonly Actor self;
@@ -133,6 +143,12 @@ namespace OpenRA.Mods.TGMC.Traits
 				this.self.GrantCondition(info.RainCondition);
 			else if (weather == "dust")
 				this.self.GrantCondition(info.DustCondition);
+			else if (weather == "ash")
+				this.self.GrantCondition(info.AshCondition);
+			else if (weather == "snow")
+				this.self.GrantCondition(info.SnowCondition);
+			else if (weather == "acidrain")
+				this.self.GrantCondition(info.AcidRainCondition);
 		}
 	}
 }

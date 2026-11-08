@@ -129,6 +129,8 @@ namespace OpenRA.Mods.TGMC.Traits
 			this.target = target;
 			wait = delay;
 			world = owner.World;
+			// The spot blinks until the pod is down (supplypod_down_target.dmi).
+			GroundFx.Marker(world, target, "fx-marker", "pod", delay + info.FallTicks);
 		}
 
 		WPos Where()

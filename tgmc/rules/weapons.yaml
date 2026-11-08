@@ -1,6 +1,11 @@
 # Effects (fx-* images) are drawn by mod/build_sprites.py from TGMC art. Bullets fly as tracers, hits splash sparks on structures
 # and acid-green gore on xenos, spit is a visible acid glob, the grenade explodes, and melee hits get their own flash.
 TGMCRifle:
+	# Bullet holes in the structure it hits (bulletholes.dmi), which fade after a while (DecalWarhead in GroundFx.cs).
+	Warhead@Holes: Decal
+		Sequences: bullet1, bullet2, bullet3, bullet4
+		ValidTargets: Structure
+		ValidRelationships: Enemy, Neutral
 	Range: 9c0
 	# Fires in bursts of three, then the trigger rests (TGMC rifles have burst_amount 3 and a longer delay between bursts).
 	Burst: 3
@@ -776,6 +781,12 @@ TGMCClaws:
 
 # Sentinel spit: a lobbed acid glob. It is fast and splashes wide enough to land on a walking target.
 TGMCSpit:
+	# Acid eats holes in the structure it hits (new_acid.dmi), which fade after a while (DecalWarhead in GroundFx.cs).
+	Warhead@Holes: Decal
+		Sequences: acid1, acid2
+		Chance: 60
+		ValidTargets: Structure
+		ValidRelationships: Enemy, Neutral
 	Range: 5c0
 	ReloadDelay: 30
 	Report: acid-spit-1.ogg, acid-spit-2.ogg
@@ -841,6 +852,12 @@ TGMCMend:
 
 # Resin turret: the same acid glob as the Sentinel, with more punch.
 TGMCAcid:
+	# Acid eats holes in the structure it hits (new_acid.dmi), which fade after a while (DecalWarhead in GroundFx.cs).
+	Warhead@Holes: Decal
+		Sequences: acid1, acid2
+		Chance: 60
+		ValidTargets: Structure
+		ValidRelationships: Enemy, Neutral
 	Range: 6c0
 	ReloadDelay: 25
 	Report: acid-spit-1.ogg, acid-spit-2.ogg
@@ -880,6 +897,12 @@ TGMCAcid:
 
 # The boiler's glob: xeno artillery. A big lobbed ball of acid from far away that splashes wide and leaves a pool on the ground.
 TGMCBoilerGlob:
+	# Acid eats holes in the structure it hits (new_acid.dmi), which fade after a while (DecalWarhead in GroundFx.cs).
+	Warhead@Holes: Decal
+		Sequences: acid1, acid2
+		Chance: 60
+		ValidTargets: Structure
+		ValidRelationships: Enemy, Neutral
 	Inherits: TGMCAcid
 	Range: 22c0
 	MinRange: 6c0
@@ -976,6 +999,11 @@ TGMCHowitzerSiege:
 
 # Marine gunners. Smartgunner: fast, spread bullets. Grenadier: a grenade launcher, lobbed and explosive.
 TGMCSmartgun:
+	# Bullet holes in the structure it hits (bulletholes.dmi), which fade after a while (DecalWarhead in GroundFx.cs).
+	Warhead@Holes: Decal
+		Sequences: bullet1, bullet2, bullet3, bullet4
+		ValidTargets: Structure
+		ValidRelationships: Enemy, Neutral
 	Range: 10c512
 	ReloadDelay: 5
 	Report: smartgun-fire-1.ogg, smartgun-fire-2.ogg, smartgun-fire-3.ogg
@@ -1731,6 +1759,12 @@ TGMCAcidCone:
 		ValidTargets: Ground, Water, Structure
 
 TGMCAcidSpray:
+	# Acid eats holes in the structure it hits (new_acid.dmi), which fade after a while (DecalWarhead in GroundFx.cs).
+	Warhead@Holes: Decal
+		Sequences: acid1, acid2
+		Chance: 60
+		ValidTargets: Structure
+		ValidRelationships: Enemy, Neutral
 	Range: 3c0
 	Projectile: InstantHit
 	Warhead@1Dam: SpreadDamage
@@ -2100,3 +2134,81 @@ TGMCRailgun:
 		Duration: 10
 		Intensity: 4
 		Multiplier: 1, 1
+
+# ---------------------------------------------------------------- weapons of the castes from TGMC (units.yaml)
+
+# The baneling's burst: a splash of acid around it and a cloud of acid gas. Fired when it bursts or dies.
+TGMCBanelingBurst:
+	Inherits: TGMCBoilerGlob
+	Range: 1c0
+	MinRange: 0
+	-Report:
+	Projectile: InstantHit
+	Warhead@1Dam: SpreadDamage
+		Damage: 70
+		Spread: 1c768
+		Falloff: 100, 80, 40, 0
+
+# The defender's tail sweep: everyone close is knocked back and stunned for a moment.
+TGMCTailSweep:
+	Inherits: TGMCStomp
+	Range: 2c0
+	Warhead@1Dam: SpreadDamage
+		Damage: 18
+		Spread: 1c768
+	Warhead@6Throw: Knockback
+		Distance: 2c0
+		Duration: 12
+		Height: 0c512
+		LandDamage: 4
+		BlockedDamage: 8
+		ValidRelationships: Enemy
+
+# The pyrogen's fireball: a lobbed ball of blue fire that leaves the ground burning where it lands.
+TGMCPyroFireball:
+	Inherits: TGMCBoilerGlob
+	Range: 7c0
+	MinRange: 0
+	ReloadDelay: 60
+	-Warhead@3Pool:
+	-Warhead@4Gas:
+	-Warhead@Holes:
+	Projectile: Shell
+		Speed: 300
+		Image: fx-acid
+		LaunchAngle: 120
+		Inaccuracy: 256
+	Warhead@1Dam: SpreadDamage
+		DamageTypes: ExplosionDeath
+		Damage: 35
+		Spread: 1c256
+	Warhead@3Fire: SpawnActor
+		Actor: flame-patch-blue
+		TrailCells: 0
+		Radius: 1
+
+# The scorpion's tail: an acid shot from range, a little stronger than the sentinel's spit.
+TGMCScorpionSting:
+	Inherits: TGMCSpit
+	Range: 6c0
+	ReloadDelay: 35
+	Warhead@1Dam: SpreadDamage
+		Damage: 20
+
+# The dragon's fire breath: a wide cone of fire that sets the ground burning.
+TGMCDragonBreath:
+	Inherits: TGMCAcidCone
+	Warhead@1Cone: ConeDamage
+		DamageTypes: ExplosionDeath
+		Damage: 45
+		ConeRange: 5c0
+		HalfAngle: 180
+	-Warhead@9Stun:
+	Warhead@3Gas: SpawnActor
+		Actor: flame-patch-blue
+		Radius: 2
+
+# The king's roar: every marine around him is stunned.
+TGMCKingRoar:
+	Inherits: TGMCStompBig
+	Range: 6c0

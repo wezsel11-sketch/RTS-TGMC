@@ -11,7 +11,7 @@
 		Scripts: tgmc|scripts/music.lua
 	SmoothScroll:
 	TgmcOptions:
-	# The lobby's Weather option grants "rain" or "dust" (TgmcOptions in tgmc/code/Options.cs).
+	# The lobby's Weather option grants "rain", "dust", "ash", "snow" or "acidrain" (TgmcOptions in tgmc/code/Options.cs).
 	WeatherOverlay@Rain:
 		RequiresCondition: rain
 		# Clear weather starts with no particles at all (the default would show them fading out for the first seconds).
@@ -41,6 +41,27 @@
 		ParticleColors: D8B070A0, C89C5890, E6C48CA0
 		FadeInTicks: 150
 		FadeOutTicks: 150
+	# TGMC's own weather tiles over the whole screen (TiledWeather in GroundFx.cs), on top of the falling particles above.
+	TiledWeather@Rain:
+		RequiresCondition: rain
+		Sequence: rain
+		Alpha: 0.45
+	TiledWeather@AcidRain:
+		RequiresCondition: acidrain
+		Sequence: acidrain
+		Alpha: 0.55
+	TiledWeather@Ash:
+		RequiresCondition: ash
+		Sequence: ash
+		Alpha: 0.6
+	TiledWeather@Snow:
+		RequiresCondition: snow
+		Sequence: snow
+		Alpha: 0.6
+	TiledWeather@Dust:
+		RequiresCondition: dust
+		Sequence: dust
+		Alpha: 0.5
 	SnapPlacement:
 	# Big blasts (mortar, rocket, CAS strike) rattle the screen.
 	ScreenShaker:

@@ -859,6 +859,12 @@ SCENARIOS = {
     ]},
     "scenario-evac-full": {"scripts": ("mission-evac", "test-evac", "evac-case-full"), "drop_conquest": True, "size": (64, 48), "ground": "evac",
                            "extra_rules": EVAC_RULES + "cryo-pod:\n\tHealth:\n\t\tHP: 1000000\nvendor:\n\tHealth:\n\t\tHP: 1000000\n", "actors": EVAC},
+    # The castes added from TGMC each use their first ability on a marine (see scenarios/test-new-castes.lua).
+    "scenario-new-castes": {"scripts": ("test-new-castes",), "size": (32, 52), "drop_conquest": True,
+                            "extra_rules": "rifleman:\n\tHealth:\n\t\tHP: 3000\n", "actors": [
+        ("baneling", "Xenos", 10, 3, 256), ("rifleman", "Marines", 12, 3, 768), ("defender", "Xenos", 10, 7, 256), ("rifleman", "Marines", 12, 7, 768), ("beetle", "Xenos", 10, 11, 256), ("rifleman", "Marines", 12, 11, 768), ("gorger", "Xenos", 10, 15, 256), ("rifleman", "Marines", 12, 15, 768), ("puppeteer", "Xenos", 10, 19, 256), ("rifleman", "Marines", 12, 19, 768), ("pyrogen", "Xenos", 10, 23, 256), ("rifleman", "Marines", 12, 23, 768), ("scorpion", "Xenos", 10, 27, 256), ("rifleman", "Marines", 12, 27, 768), ("dragon", "Xenos", 10, 31, 256), ("rifleman", "Marines", 12, 31, 768), ("king", "Xenos", 10, 35, 256), ("rifleman", "Marines", 12, 35, 768), ("nymph", "Xenos", 10, 39, 256), ("mantis", "Xenos", 10, 43, 256), ("hivelord", "Xenos", 10, 47, 256),
+        ("cryo-pod", "Marines", 28, 48, 0), ("resin-silo", "Xenos", 28, 2, 0),
+    ]},
     # A raided miner warns its owner once (see scenarios/test-raid-warning.lua).
     "scenario-raid-warning": {"scripts": ("test-raid-warning",), "drop_conquest": True, "extra_rules": "miner:\n\tHealth:\n\t\tHP: 3000\n", "actors": [
         ("miner-field", "Neutral", 10, 10, 0), ("miner", "Marines", 10, 10, 0), ("runner", "Xenos", 13, 10, 0),
@@ -1229,6 +1235,14 @@ SCENARIOS = {
         ("resin-silo", "Xenos", 22, 22, 0),
     ]},
     # The mech's walking dust, gun smoke and hit sparks (Not a test).
+    # The ground effects in one view (see scenarios/shot-groundfx.lua): ash storm, bullet and acid holes, footprints, markers, heat bar.
+    "shot-groundfx": {"scripts": ("shot-groundfx",), "size": (32, 24), "drop_conquest": True,
+                      "extra_rules": "World:\n\tScreenshotAt:\n\t\tTick: 150\n\tTgmcOptions:\n\t\tWeatherDefault: ash\nresin-turret:\n\tHealth:\n\t\tHP: 100000\ncade:\n\tHealth:\n\t\tHP: 100000\n", "actors": [
+        ("resin-turret", "Xenos", 14, 6, 0), ("rifleman", "Marines", 8, 5, 256), ("rifleman", "Marines", 8, 7, 256), ("machinegunner", "Marines", 9, 6, 256),
+        ("cade", "Marines", 12, 11, 0), ("spitter", "Xenos", 16, 11, 768),
+        ("rifleman", "Marines", 12, 15, 768), ("rifleman", "Marines", 12, 17, 768), ("runner", "Xenos", 18, 19, 256),
+        ("cryo-pod", "Marines", 3, 20, 0), ("workshop", "Marines", 3, 2, 0), ("resin-silo", "Xenos", 28, 22, 0),
+    ]},
     "shot-mech-fx": {"scripts": ("shot-mech-fx",), "size": (32, 24), "extra_rules": "World:\n\tScreenshotAt:\n\t\tTick: 70\n", "actors": [
         ("mech", "Marines", 10, 12, 256), ("hunter", "Xenos", 17, 11, 768), ("hunter", "Xenos", 17, 13, 768), ("hunter", "Xenos", 18, 12, 768),
         ("cryo-pod", "Marines", 3, 3, 0), ("resin-silo", "Xenos", 28, 22, 0),
@@ -1373,11 +1387,11 @@ SCENARIOS = {
         ("resin-silo", "Xenos", 58, 42, 0),
     ]},
     # Bot personality rusher (see scenarios/test-ai-personality.lua): eight riflemen at home, no money.
-    "scenario-ai-rusher": {"scripts": ("test-ai-personality", "personality-case-rusher"), "marine_bot": "rusher", "extra_rules": "Player:\n\tPlayerResources:\n\t\tDefaultCash: 0\n", "drop_conquest": True, "size": (64, 40), "actors": [
+    "scenario-ai-rusher": {"scripts": ("test-ai-personality", "personality-case-rusher"), "marine_bot": "rusher", "extra_rules": "Player:\n\tPlayerResources:\n\t\tDefaultCash: 0\n\tShroud:\n\t\tFogCheckboxEnabled: false\n\t\tExploredMapCheckboxEnabled: true\n", "drop_conquest": True, "size": (64, 40), "actors": [
         ("cryo-pod", "Marines", 6, 20, 0), ("resin-silo", "Xenos", 60, 36, 0), ("rifleman", "Marines", 8, 18, 0), ("rifleman", "Marines", 9, 18, 0), ("rifleman", "Marines", 10, 18, 0), ("rifleman", "Marines", 8, 19, 0), ("rifleman", "Marines", 9, 19, 0), ("rifleman", "Marines", 10, 19, 0), ("rifleman", "Marines", 8, 17, 0), ("rifleman", "Marines", 9, 17, 0),
     ]},
     # Bot personality turtle (see scenarios/test-ai-personality.lua): eight riflemen at home, no money.
-    "scenario-ai-turtle": {"scripts": ("test-ai-personality", "personality-case-turtle"), "marine_bot": "turtle", "extra_rules": "Player:\n\tPlayerResources:\n\t\tDefaultCash: 0\n", "drop_conquest": True, "size": (64, 40), "actors": [
+    "scenario-ai-turtle": {"scripts": ("test-ai-personality", "personality-case-turtle"), "marine_bot": "turtle", "extra_rules": "Player:\n\tPlayerResources:\n\t\tDefaultCash: 0\n\tShroud:\n\t\tFogCheckboxEnabled: false\n\t\tExploredMapCheckboxEnabled: true\n", "drop_conquest": True, "size": (64, 40), "actors": [
         ("cryo-pod", "Marines", 6, 20, 0), ("resin-silo", "Xenos", 60, 36, 0), ("rifleman", "Marines", 8, 18, 0), ("rifleman", "Marines", 9, 18, 0), ("rifleman", "Marines", 10, 18, 0), ("rifleman", "Marines", 8, 19, 0), ("rifleman", "Marines", 9, 19, 0), ("rifleman", "Marines", 10, 19, 0), ("rifleman", "Marines", 8, 17, 0), ("rifleman", "Marines", 9, 17, 0),
     ]},
     # DefendBotModule: xenos hit a marine sentry (on HoldFire) far from the base; the bot sends riflemen, enough but not all (see scenarios/test-ai-defend.lua).

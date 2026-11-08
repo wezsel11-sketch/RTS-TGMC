@@ -1,5 +1,5 @@
 -- Scenario test: bot personalities (ai.yaml). The marine bot starts with eight riflemen beside its cryo pod and no money; the xeno
--- silo stands across the map. The Rusher forms a small squad and sends it out; the Turtle waits for a squad it can never fill. At
+-- silo stands across the map, in plain sight (the map has no fog: a squad only sets out for an enemy it has seen). The Rusher forms a small squad and sends it out; the Turtle waits for a squad it can never fill. At
 -- tick 1500 it counts riflemen more than 15 cells from the pod (the scout may be one of them). A case script sets Personality:
 -- "rusher" expects 3 or more out, "turtle" at most 1.
 -- Prints "TEST ai-personality-<personality> PASS|FAIL".

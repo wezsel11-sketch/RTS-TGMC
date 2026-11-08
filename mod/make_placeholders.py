@@ -860,10 +860,10 @@ SCENARIOS = {
     "scenario-evac-full": {"scripts": ("mission-evac", "test-evac", "evac-case-full"), "drop_conquest": True, "size": (64, 48), "ground": "evac",
                            "extra_rules": EVAC_RULES + "cryo-pod:\n\tHealth:\n\t\tHP: 1000000\nvendor:\n\tHealth:\n\t\tHP: 1000000\n", "actors": EVAC},
     # The castes added from TGMC each use their first ability on a marine (see scenarios/test-new-castes.lua).
-    "scenario-new-castes": {"scripts": ("test-new-castes",), "size": (32, 52), "drop_conquest": True,
-                            "extra_rules": "rifleman:\n\tHealth:\n\t\tHP: 3000\n", "actors": [
-        ("baneling", "Xenos", 10, 3, 256), ("rifleman", "Marines", 12, 3, 768), ("defender", "Xenos", 10, 7, 256), ("rifleman", "Marines", 12, 7, 768), ("beetle", "Xenos", 10, 11, 256), ("rifleman", "Marines", 12, 11, 768), ("gorger", "Xenos", 10, 15, 256), ("rifleman", "Marines", 12, 15, 768), ("puppeteer", "Xenos", 10, 19, 256), ("rifleman", "Marines", 12, 19, 768), ("pyrogen", "Xenos", 10, 23, 256), ("rifleman", "Marines", 12, 23, 768), ("scorpion", "Xenos", 10, 27, 256), ("rifleman", "Marines", 12, 27, 768), ("dragon", "Xenos", 10, 31, 256), ("rifleman", "Marines", 12, 31, 768), ("king", "Xenos", 10, 35, 256), ("rifleman", "Marines", 12, 35, 768), ("nymph", "Xenos", 10, 39, 256), ("mantis", "Xenos", 10, 43, 256), ("hivelord", "Xenos", 10, 47, 256),
-        ("cryo-pod", "Marines", 28, 48, 0), ("resin-silo", "Xenos", 28, 2, 0),
+    "scenario-new-castes": {"scripts": ("test-new-castes",), "size": (32, 56), "drop_conquest": True,
+                            "extra_rules": "rifleman:\n\tHealth:\n\t\tHP: 3000\nking:\n\tPlasma:\n\t\tStartPercent: 100\nbehemoth:\n\tPlasma:\n\t\tStartPercent: 100\n", "actors": [
+        ("baneling", "Xenos", 10, 3, 256), ("rifleman", "Marines", 12, 3, 768), ("defender", "Xenos", 10, 7, 256), ("rifleman", "Marines", 12, 7, 768), ("beetle", "Xenos", 10, 11, 256), ("rifleman", "Marines", 12, 11, 768), ("gorger", "Xenos", 10, 15, 256), ("rifleman", "Marines", 12, 15, 768), ("puppeteer", "Xenos", 10, 19, 256), ("rifleman", "Marines", 12, 19, 768), ("pyrogen", "Xenos", 10, 23, 256), ("rifleman", "Marines", 12, 23, 768), ("scorpion", "Xenos", 10, 27, 256), ("rifleman", "Marines", 12, 27, 768), ("dragon", "Xenos", 10, 31, 256), ("rifleman", "Marines", 12, 31, 768), ("king", "Xenos", 10, 35, 256), ("rifleman", "Marines", 12, 35, 768), ("mantis", "Xenos", 10, 43, 256), ("rifleman", "Marines", 12, 43, 768), ("hivelord", "Xenos", 10, 47, 256), ("nymph", "Xenos", 12, 47, 768), ("behemoth", "Xenos", 10, 51, 256), ("rifleman", "Marines", 12, 51, 768),
+        ("cryo-pod", "Marines", 28, 52, 0), ("resin-silo", "Xenos", 28, 2, 0),
     ]},
     # The vehicles from TGMC: two tanks shoot, a rifleman rides the APC (see scenarios/test-vehicles.lua).
     "scenario-vehicles": {"scripts": ("test-vehicles",), "size": (32, 24), "drop_conquest": True,

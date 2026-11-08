@@ -2549,18 +2549,35 @@ bull:
 
 behemoth:
 	Inherits: ^Xeno
-	# Command card ability: a heavy stomp.
-	ActiveAbility@abilitystomp:
-		OrderName: AbilityStomp
-		PlasmaCost: 50
+	# TGMC's behemoth: Landslide charges and knocks aside everything in its path; Geocrush is one crushing blow.
+	ActiveAbility@abilitylandslide:
+		OrderName: AbilityLandslide
+		PlasmaCost: 40
 		Slot: 1
-		Label: Stomp
-		Cooldown: 600
+		Label: Landslide
+		Description: Charge forward and knock aside every marine in the way.
+		Cooldown: 500
+		Range: 6c0
+		ChargeDistance: 6c0
+		ChargeTicks: 16
+		ChargeHitThrow: 2c512
 		Weapon: TGMCStompBig
-		Aim: Self
-		AiRange: 3c768
+		AiRange: 6c0
 		AiMinTargets: 2
 		Sounds: xeno-roar-5.ogg
+	ActiveAbility@abilitygeocrush:
+		OrderName: AbilityGeocrush
+		PlasmaCost: 40
+		Slot: 2
+		Label: Geocrush
+		Description: Crush the nearest marine: heavy damage and a long stun.
+		Cooldown: 300
+		Weapon: TGMCGeocrush
+		Aim: Nearest
+		Range: 2c0
+		AiRange: 2c0
+		AiMinTargets: 1
+		Sounds: slam-1.ogg
 	Armor:
 		Type: Heavy
 	Evolves:
@@ -2774,20 +2791,24 @@ nymph:
 		BuildPaletteOrder: 5
 		Description: actor-nymph.description
 
-# Mantis: a fast ambusher. It hides when still, like the hunter, and its claws hit harder from hiding.
+# Mantis: a fast minion with TGMC's Ravage: a slashing lunge that cuts and throws back the marines in front of it.
 mantis:
 	Inherits: ^Xeno
 	Targetable@SMALL:
 		TargetTypes: SmallXeno
-	Cloak@stealth:
-		InitialDelay: 75
-		CloakDelay: 50
-		UncloakOn: Attack, Damage
-		CloakedCondition: stealthed
-		CloakedAlpha: 0.25
-	FirepowerMultiplier@ambush:
-		RequiresCondition: stealthed
-		Modifier: 200
+	ActiveAbility@abilityravage:
+		OrderName: AbilityMantisRavage
+		PlasmaCost: 40
+		Slot: 1
+		Label: Ravage
+		Description: Slash and knock back every marine in front of you.
+		Cooldown: 300
+		Weapon: TGMCRavage
+		Aim: Forward
+		ForwardDistance: 1c0
+		AiRange: 2c0
+		AiMinTargets: 1
+		Sounds: xeno-roar-2.ogg
 	Evolves:
 		Previous: nymph
 	Voiced:
@@ -2903,6 +2924,7 @@ beetle:
 		Slot: 1
 		Label: Charge
 		Cooldown: 300
+		Range: 6c0
 		ChargeDistance: 6c0
 		ChargeTicks: 12
 		ChargeHitThrow: 2c0
@@ -2989,6 +3011,20 @@ gorger:
 # Hivelord: the big builder. It builds and mends like a drone, gives a wider build area and is tough enough to build under fire.
 hivelord:
 	Inherits: ^Xeno
+	ActiveAbility@abilityinfusion:
+		OrderName: AbilityHealingInfusion
+		PlasmaCost: 40
+		Slot: 1
+		Label: Infusion
+		Description: Healing Infusion: the xeno you click regenerates fast for twelve seconds.
+		Aim: TargetActor
+		TargetRelationships: Ally
+		Range: 3c0
+		Weapon: TGMCInfusion
+		Cooldown: 310
+		Sounds: heal.ogg
+		AiRange: 6c0
+		AiWoundedPercent: 60
 	Evolves:
 		Previous: drone
 	Voiced:
@@ -3210,17 +3246,18 @@ king:
 		AiRange: 5c0
 		AiMinTargets: 2
 		Sounds: xeno-roar-3.ogg
-	ActiveAbility@abilityblast:
-		OrderName: AbilityKingBlast
-		PlasmaCost: 30
+	ActiveAbility@abilitypetrify:
+		OrderName: AbilityPetrify
+		PlasmaCost: 40
 		Slot: 2
-		Label: Psychic Blast
-		Cooldown: 300
-		Weapon: TGMCPsychicBlast
-		Aim: Nearest
-		Range: 6c0
-		AiRange: 6c0
-		AiMinTargets: 1
+		Label: Petrify
+		Description: Every marine close around you turns to stone for three seconds.
+		Cooldown: 750
+		Weapon: TGMCPetrify
+		Aim: Self
+		Ring: A0A0A0
+		AiRange: 4c0
+		AiMinTargets: 3
 		Sounds: xeno-hiss-3.ogg
 	Voiced:
 		VoiceSet: QueenVoice

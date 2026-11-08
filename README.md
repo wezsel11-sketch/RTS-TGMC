@@ -94,7 +94,7 @@ the commits this mod was tested against (see the top of `mod/bootstrap.py`), so 
   - **Armour.** Big xeno castes (Warrior, Praetorian, Crusher, Bull, Behemoth) are *Heavy*: rifles and the machine gun do 70 percent, snipers and
     rockets more. The Gungnir heavy gunner (minigun, 320 HP, slow) takes 55 percent from claws and acid. The EOD demolitionist (high-explosive
     launcher) takes 25 percent from blasts and 85 percent from claws. **Explosives hurt friendly units**: grenades, the mortar and SADAR.
-  - **More castes from TGMC.** Nymph (cheap starter), Mantis (hides and ambushes for double damage), Baneling (bursts into acid and gas),
+  - **More castes from TGMC.** Nymph (cheap starter), Mantis (fast, Ravage slashes what's in front), Baneling (bursts into acid and gas),
     Defender (Fortify halves damage and roots it; Tail Sweep), Beetle (armoured charge), Gorger (Feast; a healing aura), Hivelord (the big
     builder), Puppeteer (raises puppets that fall apart after twenty seconds), Pyrogen (blue-fire fireballs), Scorpion (ranged acid
     sting), and, with the Queen, one Dragon (fire breath, wing gust) and one King (a stunning roar that enrages the xenos near him).

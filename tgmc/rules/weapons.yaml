@@ -2213,6 +2213,43 @@ TGMCKingRoar:
 	Inherits: TGMCStompBig
 	Range: 6c0
 
+# The mantis's ravage: a slash at everything just ahead, thrown back.
+TGMCRavage:
+	Inherits: TGMCTailSweep
+	Warhead@1Dam: SpreadDamage
+		Damage: 30
+		Spread: 1c256
+
+# The behemoth's geocrush: one crushing blow that leaves the marine stunned for long.
+TGMCGeocrush:
+	Inherits: TGMCPunch
+	Range: 2c0
+	Warhead@1Dam: TargetDamage
+		Damage: 80
+	Warhead@9Stun: GrantExternalCondition
+		Duration: 90
+
+# The king's petrify: every marine around him stands frozen. No damage.
+TGMCPetrify:
+	Range: 4c0
+	Projectile: InstantHit
+	Warhead@9Stun: GrantExternalCondition
+		Condition: stunned
+		Duration: 75
+		Range: 4c0
+		ValidRelationships: Enemy
+		ValidTargets: Human
+
+# The hivelord's healing infusion: one xeno regenerates fast for a while (^Xeno's psycure).
+TGMCInfusion:
+	Range: 3c0
+	Projectile: InstantHit
+	Warhead@1Cure: GrantExternalCondition
+		Condition: psycure
+		Duration: 300
+		Range: 0c512
+		ValidRelationships: Ally
+
 # ---------------------------------------------------------------- vehicle weapons (units.yaml, vehicles from TGMC)
 
 # The tank's main gun: a heavy shell with a wide blast, good against armour and structures.

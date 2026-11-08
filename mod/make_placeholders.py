@@ -1788,7 +1788,8 @@ SCENARIOS = {
         ("resin-silo", "Xenos", 28, 24, 0),
     ]},
     # A friendly blast hurts an ally but raises no under-attack alert (same layout as scenario-explosive).
-    "scenario-friendly-fire-alert": {"scripts": ("test-friendly-fire-alert",), "actors": [
+    # The crusher must outlive the test: dead, it leaves an acid pool whose (enemy) burns would raise a real alert.
+    "scenario-friendly-fire-alert": {"scripts": ("test-friendly-fire-alert",), "extra_rules": "crusher:\n\tHealth:\n\t\tHP: 20000\n", "actors": [
         ("demolitionist", "Marines", 10, 10, 512),
         ("demolitionist", "Marines", 15, 11, 512),
         ("rifleman", "Marines", 15, 9, 512),

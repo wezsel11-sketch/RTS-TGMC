@@ -61,7 +61,7 @@ the commits this mod was tested against (see the top of `mod/bootstrap.py`), so 
 
 ## How to play
 
-- **Main menu -> Singleplayer -> Skirmish.** Pick a skirmish map (**Landing Zone**, **Canyon Run**, **Jungle Crossing**, **Close Quarters**, **Great Plains**, **Twin Rivers**, **Quarry Pit**, **Broken Bridge**, plus five converted from TGMC's own maps: **LV-624**, **Big Red**, **Whiskey Outpost**, **Desert Dam**, **Fiorina**) or one of the wave missions: **Hold the Line** (marines against waves), **Night Raid** (waves from two sides, spitters and a drone) or **Last Stand** (eight growing waves, a Behemoth in the last) or **The Hundred** (a hundred waves, from runners up to behemoths) or **Evac** (about ten minutes: build up between eight varied waves that each go for your weakest spot, earn from miners and a payout per wave, then get at least one marine aboard the Alamo at the landing zone while the xenos pour in; it leaves after 90 seconds, or select it and press Deploy to launch early).
+- **Main menu -> Singleplayer -> Skirmish.** Pick a skirmish map (**Landing Zone**, **Canyon Run**, **Jungle Crossing**, **Close Quarters**, **Great Plains**, **Twin Rivers**, **Quarry Pit**, **Broken Bridge**, plus five converted from TGMC's own maps: **LV-624**, **Big Red**, **Whiskey Outpost**, **Desert Dam**, **Fiorina**) or one of the wave missions: **Hold the Line** (marines against waves), **Night Raid** (waves from two sides, spitters and a drone) or **Last Stand** (eight growing waves, a Behemoth in the last) or **The Hundred** (a hundred waves, from runners up to behemoths) or **Evac** (about ten minutes: build up between eight varied waves that each go for your weakest spot, earn from miners and a payout per wave, then get at least one marine aboard the Alamo, which flies in to the landing zone while the xenos pour in; it leaves after 90 seconds, or select it and press Deploy to launch early).
   In Landing Zone choose a faction for yourself and set the other slot to **Skirmish AI** (Easy, Normal or Hard), then Start Game.
 - **Marines** start with a cryo pod, a vendor and a squad. Click the cryo pod and use the sidebar's *Infantry* tab to train riflemen,
   corpsmen (they heal), engineers (they repair), smartgunners (rapid spread fire) and grenadiers (splash). **Xenos** start with a resin silo and mini silos; use the *Xeno* tab for Runner,
@@ -100,11 +100,12 @@ the commits this mod was tested against (see the top of `mod/bootstrap.py`), so 
     sting), and, with the Queen, one Dragon (fire breath, wing gust) and one King (a stunning roar that enrages the xenos near him; Petrify).
   - **Kits follow TGMC's.** Each caste's command card has the abilities its TGMC caste has (strain extras aside): Crusher Crest Toss,
     Ravager Charge and Ravage, Defender Forward Charge, Warlock Psychic Shield and Psychic Crush, Pyrogen Fire Storm, Inferno and Fire
-    Charge (the Pyrogen and Dragon do not burn), Widow spiderlings, Carrier hidden traps, Puppeteer Flay and Pincushion, Mantis Ravage,
-    Behemoth Landslide and Geocrush, Hivelord Healing Infusion.
+    Charge (it puts out the flames round its target for plasma; the Pyrogen and Dragon do not burn), Widow spiderlings (five at most),
+    Carrier hidden traps, Puppeteer Flay (its biomass refills plasma) and Pincushion, Mantis Ravage, Behemoth Landslide and Geocrush,
+    Hivelord Healing Infusion. The xeno AI uses them all.
   - **Vehicles.** The Workshop builds a marine **Tank** (cannon and chaingun in a turret that fires on the move, two at a time), an
     **APC** that carries eight marines on foot (right-click it with marines selected; Deploy unloads) and, for the SOM, a **SOM Tank**
-    with a coilgun. Art from TGMC's armoured vehicle sheets.
+    with a coilgun. Art from TGMC's armoured vehicle sheets. A destroyed vehicle leaves its wreck for a minute.
   - **Facehuggers.** A Facehugger hunts marines. It latches on, the marine drops for four seconds, then the hugger dies. The marine carries
     an embryo: after a minute it bursts, dies, and a xeno **Larva** for the infector's side stands in its place, unless a corpsman heals the marine first.
     Only infantry can be hugged, not turrets or machines.

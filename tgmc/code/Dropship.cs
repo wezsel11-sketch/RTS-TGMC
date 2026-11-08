@@ -15,7 +15,7 @@ using OpenRA.Traits;
 namespace OpenRA.Mods.TGMC.Traits
 {
 	[Desc("A dropship that flies in when it is created: it is drawn coming down from Height over LandTicks, its shadow on the pad below, " +
-		"and grants LandedCondition once down. When this trait is enabled (RequiresCondition, e.g. launch) it climbs away over " +
+		"and grants LandedCondition (if set) once down. When this trait is enabled (RequiresCondition, e.g. launch) it climbs away over " +
 		"LaunchTicks and is removed. Drawing only: the actor stands on its cell throughout.")]
 	public class DropshipInfo : ConditionalTraitInfo
 	{
@@ -27,7 +27,8 @@ namespace OpenRA.Mods.TGMC.Traits
 		public readonly float ShadowAlpha = 0.45f;
 
 		[GrantedConditionReference]
-		public readonly string LandedCondition = "landed";
+		[Desc("Granted once down, until it starts to climb away. None by default.")]
+		public readonly string LandedCondition = null;
 
 		public override object Create(ActorInitializer init) { return new Dropship(init.Self, this); }
 	}
@@ -68,7 +69,7 @@ namespace OpenRA.Mods.TGMC.Traits
 
 			if (landing < Info.LandTicks)
 				landing++;
-			else if (landedToken == Actor.InvalidConditionToken)
+			else if (landedToken == Actor.InvalidConditionToken && Info.LandedCondition != null)
 				landedToken = self.GrantCondition(Info.LandedCondition);
 		}
 

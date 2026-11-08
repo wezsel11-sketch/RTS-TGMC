@@ -431,6 +431,9 @@ actor-acid-pool =
 actor-flame-patch =
     .name = Burning ground
 
+actor-vehicle-wreck =
+    .name = Wreck
+
 actor-gas-cloud =
     .name = Gas cloud
 

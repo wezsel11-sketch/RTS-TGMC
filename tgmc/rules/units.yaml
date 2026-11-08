@@ -3523,10 +3523,48 @@ king:
 	FireWarheadsOnDeath:
 		Weapon: TGMCBlastFxBig
 		EmptyWeapon: TGMCBlastFxBig
+	# A destroyed vehicle leaves its burnt-out hull, facing the way it did, owned by no side (the <type>-wreck actors below).
+	SpawnActorOnDeath:
+		OwnerType: InternalName
+
+# A vehicle's wreck: its hull's wreck art from TGMC's sheets. It blocks its cell like the hull did, cannot be shot, and burns out
+# after a minute.
+^VehicleWreck:
+	Interactable:
+	Husk:
+		AllowedTerrain: Clear, Road, Rock, Ford
+	BodyOrientation:
+	RenderSprites:
+	QuantizeFacingsFromSequence:
+		Sequence: wreck
+	WithFacingSpriteBody:
+		Sequence: wreck
+	Tooltip:
+		Name: actor-vehicle-wreck.name
+	HiddenUnderFog:
+	KillsSelf:
+		Delay: 1500
+
+tank-wreck:
+	Inherits: ^VehicleWreck
+	RenderSprites:
+		Image: tank
+
+apc-wreck:
+	Inherits: ^VehicleWreck
+	RenderSprites:
+		Image: apc
+
+som-tank-wreck:
+	Inherits: ^VehicleWreck
+	RenderSprites:
+		Image: som-tank
 
 # The marine tank: a long-barrelled cannon in the turret and a chaingun beside it. Slow, very tough, hits hard at range.
 tank:
 	Inherits: ^TgmcVehicle
+	SpawnActorOnDeath:
+		Actor: tank-wreck
 	Health:
 		HP: 1800
 	TgmcMobile:
@@ -3557,6 +3595,8 @@ tank:
 # The marine APC: carries eight marines on foot under armour, with a light gun on top.
 apc:
 	Inherits: ^TgmcVehicle
+	SpawnActorOnDeath:
+		Actor: apc-wreck
 	Health:
 		HP: 1100
 	TgmcMobile:
@@ -3589,6 +3629,8 @@ apc:
 # The SOM tank: a coilgun that punches through anything in a line of fire.
 som-tank:
 	Inherits: ^TgmcVehicle
+	SpawnActorOnDeath:
+		Actor: som-tank-wreck
 	Health:
 		HP: 1700
 	TgmcMobile:

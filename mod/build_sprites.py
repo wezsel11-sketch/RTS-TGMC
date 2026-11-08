@@ -607,6 +607,7 @@ UNITS = {
     "tank": {
         "sequences": {
             "idle": [("icons/obj/armored/3x3/tank.dmi", "tank")],
+            "wreck": [("icons/obj/armored/3x3/tank.dmi", "tank_wreck")],
             "icon": [("icons/obj/armored/3x3/tank.dmi", "tank", None, {"side": "S", "fit": (46, 46)})],
         },
     },
@@ -620,12 +621,15 @@ UNITS = {
         "sequences": {
             "idle": [("icons/obj/armored/2x2/medium_vehicles.dmi", "apc")],
             "turret": [("icons/obj/armored/2x2/medium_vehicles.dmi", "apc_turret")],
+            # TGMC has no APC wreck: the hull, burnt dark, under its heaviest damage overlay.
+            "wreck": [("icons/obj/armored/2x2/medium_vehicles.dmi", "apc", (90, 85, 80)), ("icons/obj/armored/2x2/medium_vehicles.dmi", "damage_major")],
             "icon": [("icons/obj/armored/2x2/medium_vehicles.dmi", "apc_full", None, {"side": "S", "fit": (46, 46)})],
         },
     },
     "som-tank": {
         "sequences": {
             "idle": [("icons/obj/armored/3x4/som_tank.dmi", "tank")],
+            "wreck": [("icons/obj/armored/3x4/som_tank.dmi", "tank_wreck")],
             "icon": [("icons/obj/armored/3x4/som_tank.dmi", "tank", None, {"side": "S", "fit": (46, 46)})],
         },
     },

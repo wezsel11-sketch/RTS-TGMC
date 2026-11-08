@@ -883,6 +883,11 @@ SCENARIOS = {
                              "extra_rules": "widow:\n\tActiveAbility@abilityspiderling:\n\t\tCooldown: 0\n\t\tPlasmaCost: 0\n", "actors": [
         ("widow", "Xenos", 10, 10, 768), ("cryo-pod", "Marines", 2, 2, 0), ("resin-silo", "Xenos", 28, 20, 0),
     ]},
+    # A destroyed vehicle leaves its wreck (see scenarios/test-vehicle-wrecks.lua).
+    "scenario-vehicle-wrecks": {"scripts": ("test-vehicle-wrecks",), "size": (32, 24), "drop_conquest": True, "actors": [
+        ("tank", "Marines", 6, 6, 256), ("apc", "Marines", 12, 6, 256), ("som-tank", "Marines", 18, 6, 256),
+        ("cryo-pod", "Marines", 2, 20, 0), ("resin-silo", "Xenos", 28, 20, 0),
+    ]},
     # The vehicles from TGMC: two tanks shoot, a rifleman rides the APC (see scenarios/test-vehicles.lua).
     "scenario-vehicles": {"scripts": ("test-vehicles",), "size": (32, 24), "drop_conquest": True,
                           "extra_rules": "crusher:\n\tHealth:\n\t\tHP: 20000\n", "actors": [

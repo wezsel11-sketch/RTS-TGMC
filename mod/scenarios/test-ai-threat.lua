@@ -9,6 +9,8 @@ WorldLoaded = function()
 	local scout = marines.GetActorsByType("rifleman")[1]
 	local spot = CPos.New(30, 24)
 	local function threat() return marines.ThreatNear(spot, 3) end
+	-- The sentinels hold fire: the test is about memory, and a rifleman shot dead beside them cannot be moved away again.
+	for _, x in ipairs(Player.GetPlayer("Xenos").GetActorsByType("sentinel")) do x.Stance = "HoldFire" end
 	local function report(ok, why)
 		if not reported then
 			reported = true

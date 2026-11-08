@@ -3,7 +3,8 @@
 local reported = false
 -- The widest mix seen so far: a match can end with the xenos wiped out.
 local best = {}
-local castes = { "runner", "hunter", "sentinel", "warrior", "queen", "spitter", "praetorian", "crusher", "ravager", "boiler", "drone" }
+local castes = { "runner", "hunter", "sentinel", "warrior", "queen", "spitter", "praetorian", "crusher", "ravager", "boiler", "drone",
+	"nymph", "mantis", "baneling", "defender", "beetle", "gorger", "hivelord", "puppeteer", "pyrogen", "scorpion", "dragon", "king" }
 
 WorldLoaded = function()
 	local xenos = Player.GetPlayer("Xenos")

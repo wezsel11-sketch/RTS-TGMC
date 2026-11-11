@@ -222,7 +222,11 @@ Three arms against the plain map, 40 matches each, on the baseline build (`mod/b
 Taken: the miner at 10, the one arm inside 40% to 60% on both maps. Deep-Core Drills went from 6 to 5 with it so that it is
 still half as much again. The weed arm overshoots on balance-aivai. The quicker xeno queue helped the marines, against what
 was expected; not explained yet, most likely the xeno bot spends itself poor on cheap castes. Look at that with the bot work.
-Not yet measured: the other four baseline maps with the miner at 10.
+
+The other four baseline maps with the miner at 10 (commit `f4d90c5`, 40 matches a map), marine win rate against the baseline:
+aimap-canyon-run 42% (29% to 58%), was 80%; aimap-jungle-crossing 33% (21% to 49%), was 75%; aimap-close-quarters 39%
+(25% to 55%), was 65%; aimap-quarry-pit 39% (26% to 55%), was 84%. Four maps together: 59 marine wins to 94 xeno wins, 39%.
+The xenos are now a little ahead on these four, and jungle-crossing sits under the target. A miner at 11 is the next arm to try.
 
 Decided
 - HUD: design C, confirmed by the user on 2026-11-11.

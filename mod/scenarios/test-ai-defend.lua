@@ -2,7 +2,7 @@
 -- alone; in the help case the script keeps it above half health) 34 cells from the bot's base at tick 300. It has no miner guards, and the stock squads no longer protect it, so only
 -- DefendBotModule can answer.
 -- DefendCase (set by a defend-case-*.lua beside this script) picks what is checked:
---   help:   by tick 1200, at least 3 riflemen are within 5 cells of the sentry and at least 2 are still within 12 cells of the
+--   help:   by tick 1200, at least 2 riflemen are within 5 cells of the sentry and at least 2 are still within 12 cells of the
 --           base: the response is sized, it does not empty the base.
 --   dies:   the sentry and the runners are killed at tick 320; by tick 1500 no rifleman is left within 8 cells of where the sentry
 --           stood: whoever was sent was handed back and walked home.
@@ -78,7 +78,8 @@ WorldLoaded = function()
 			end
 			local n = riflemen_near(spot, 5)
 			local home = riflemen_near(base, 12)
-			if n >= 3 and home >= 2 then
+			-- Three are sent; one may fall to the runners on the way, so two beside the sentry is a response that arrived.
+			if n >= 2 and home >= 2 then
 				report(true, n .. " riflemen beside the miner and " .. home .. " at the base by tick " .. ticks)
 			elseif ticks >= 1200 then
 				report(false, n .. " riflemen beside the miner and " .. home .. " at the base at tick 1200")

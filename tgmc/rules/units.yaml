@@ -2,6 +2,8 @@
 # Sequence names here must exist in the generated sequences/*.yaml.
 
 ^Unit:
+	# Each player's units carry that player's colour (the sprites come neutral out of build_sprites.py).
+	WithPlayerTint:
 	# Tells the owner's ThreatMemory who hit it.
 	ReportsThreatOnDamage:
 	Retreat:

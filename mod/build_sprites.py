@@ -139,12 +139,11 @@ FACING_SOURCE = {"N": "N", "NE": "E", "E": "E", "SE": "E", "S": "S", "SW": "W", 
 # TGMC's standard marine kit, the unprefixed states, which are a mottled grey-brown pattern camo that shows up well
 # against green terrain (the "m_" jungle set is dark and blends in). The boots go over the armour, whose legs would
 # otherwise hide them.
-# Team colour, one per faction (the same for every player on that side): a multiply tint over the cloth. Marine cloth
-# (the uniform and the armour) goes blue; the xeno units go red. Skin, helmets, boots and weapons keep their own colours.
-MARINE_TEAM = (120, 150, 255)
-XENO_TEAM = (255, 150, 150)
-# Sons of Mars: red cloth, black armour (TGMC's own SOM sheets, which are black already, so they are not tinted).
-SOM_TEAM = (255, 110, 90)
+# The cloth layers were tinted here once, one colour per faction. Units are now tinted per player when drawn (WithPlayerTint in
+# tgmc/code/PlayerTint.cs), so the sheets stay neutral. The names still mark which layers are cloth.
+MARINE_TEAM = None
+XENO_TEAM = None
+SOM_TEAM = None
 SOM_ARMOR = "icons/mob/modular/som_armor.dmi"
 SOM_HELMETS = "icons/mob/modular/som_helmets.dmi"
 GEAR = [(MARINE_ARMOR, "xarmor", MARINE_TEAM), (FEET, "marine"), (MARINE_HELMETS, "helmet", MARINE_TEAM)]

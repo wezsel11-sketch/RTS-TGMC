@@ -179,6 +179,12 @@ Added to Track D (Gameplay)
   evac mission is the start of it), and a co-op wave mode for two marine players.
 - D11. **Onboarding.** A ten-minute tutorial mission per faction, and hints that fire the first time a player meets a mechanic.
 
+Found on 2026-11-11 (D7)
+- `scenario-ai-defend` fails about one run in four, on the build before today's changes too (2 of 10): no rifleman goes to help
+  the miner. `scenario-ai-easy` fails about one run in five: the Easy xeno bot ends tick 1000 with one or two units.
+  Both are the bots' behaviour under some seeds, not the tests. They belong to D5.
+- The Fatty's ring of eight and every rocket used the pyrogen's blue fire as their blast. Fixed.
+
 Decided
 - HUD: design C, confirmed by the user on 2026-11-11.
 - Menus: mockup m3 (green TACNET terminal), confirmed 2026-11-11.

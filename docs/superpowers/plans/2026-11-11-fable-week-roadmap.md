@@ -209,6 +209,21 @@ aimap-canyon-run (40 matches an arm), not distinguishable from no change. Left a
 castes (drone, sentinel, spitter) have less health than their TGMC share, which their cost pays for. Still to audit: melee
 damage and attack delay per caste, ability numbers, marine weapons against `code/modules/projectiles`, vehicles.
 
+Economy arms (D5), 2026-11-11
+Three arms against the plain map, 40 matches each, on the baseline build (`mod/balance-arms/`). Marine win rate:
+
+| Arm | balance-aivai | aimap-twin-rivers |
+|---|---|---|
+| Plain map | 56% (39% to 71%) | 82% (67% to 91%) |
+| Weed node pays 9, was 7 | 21% (11% to 36%) | 55% (40% to 70%) |
+| Miner pays 10, was 12 | 45% (29% to 62%) | 53% (37% to 68%) |
+| Xeno queue at 160% of cost-time, was 200% | 81% (66% to 91%) | 92% (80% to 97%) |
+
+Taken: the miner at 10, the one arm inside 40% to 60% on both maps. Deep-Core Drills went from 6 to 5 with it so that it is
+still half as much again. The weed arm overshoots on balance-aivai. The quicker xeno queue helped the marines, against what
+was expected; not explained yet, most likely the xeno bot spends itself poor on cheap castes. Look at that with the bot work.
+Not yet measured: the other four baseline maps with the miner at 10.
+
 Decided
 - HUD: design C, confirmed by the user on 2026-11-11.
 - Menus: mockup m3 (green TACNET terminal), confirmed 2026-11-11.

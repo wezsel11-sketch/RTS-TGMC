@@ -519,9 +519,8 @@ only for the marines. `docs/hud-designs/` keeps the three mockups the dock was c
 - The pounce, the stun, the facehugger drop and the egg are only checked by scenarios (`scenario-pounce`, `scenario-infest`,
   `scenario-infest-cure`, `scenario-egg`) that count health and units. The building ghost snapping, tile-by-tile movement, the lobby
   options, the CAS icon, the selection card, repeat build and the keypad stepping were built and load without errors, but nobody has used them with a mouse.
-- Units are coloured by team, not by player: marine cloth is blue and xeno units are red, a fixed multiply tint in
-  `mod/build_sprites.py` (`MARINE_TEAM`, `XENO_TEAM`). Two players on one side share a colour. Per-player remapping is off:
-  the sprites are RGBA, so the `player` palette doesn't recolour them.
+- Marines take their owner's colour: `WithPlayerTint` (`tgmc/code/PlayerTint.cs`) multiplies the whole sprite by it, skin and
+  gun too. Xenos keep TGMC's own colours and structures are not tinted. Seen in screenshots only, not with two humans in a lobby.
 - Runners have no attack frames: `attack` reuses `stand`. A hit shows TGMC's claw slash (`fx-claw`), and the claws play the hiss on attack.
 - Sounds are all unheard (no audio device here). See the Sound section.
 - Medic and engineer signals are drawn here, not from TGMC: a green + + + over a healed unit, and a rocking wrench with
@@ -552,18 +551,17 @@ only for the marines. `docs/hud-designs/` keeps the three mockups the dock was c
   the vendor spawns queued marines, income ticks up, and a "Skirmish AI" in the xeno slot trains Runners that attack
   the marine base. `mod/test_scenarios.sh` checks heal, repair, mend, victory, combat, every effect-carrying weapon (`scenario-fx`), the wave script and the AI. The xeno seat was played on Landing Zone against a marine bot: silo, mini silos, all four castes, palette and tooltips work.
   Not yet checked: voices (no audio device).
-- AI against AI (`mod/balance.sh`, Landing Zone layout, fastest speed): the marines win about every time, in 2 to 5 minutes
-  of game time. The xeno AI masses 12 to 17 units, attacks around minute one, and loses them crossing open ground to
-  rifles, sentries and corpsmen before reaching a structure; the marine AI then destroys the hive. The match is never over
-  in under two minutes and the loser keeps fighting, but the xenos need a stronger opening. A human xeno player who
-  attacks from several sides at once should do better than the AI.
+- AI against AI (`mod/balance.sh`, 40 matches a map): the marines won 77% over six maps at commit `e583359`, between 64% and
+  90% a map, and more often the longer a match ran. The target is 40% to 60%. With the Miner paying 10 instead of 12 they won
+  45% on `balance-aivai` and 53% on `aimap-twin-rivers`; the other four maps are not measured yet. The tables are in
+  `docs/superpowers/plans/2026-11-11-fable-week-roadmap.md`.
 - Hold the Line against a marine bot that holds the base (`mod/balance.sh 4 420 balance-holdline`): the marines win all
   four runs, finishing the last wave (16 Runners, 10 Hunters, 8 Sentinels) with about 30 units and 2 or 3 of their 5
   buildings. The waves attack-move to the marine base because `Hunt()` cannot see across the map for a scripted player.
 - Tuning so far: the marine queue takes cost x 60% x 350% ticks (a rifleman is about 8 s) and the xeno queue x 250% (a Runner is about 3 s). Marines have
   120 HP and rifles fire three 12-damage rounds every 42 ticks at 6 cells; Runners have 120 HP (raised from 100 so the early push survives rifles), run at speed 144 and claws do 20 every 14 ticks;
   Hunters 130 HP; sentries do 10; the corpsman heals 20 every 36 ticks.
-  Base income is 6 cash every 2 s from the vendor and silo and 3 from a mini silo (it was 15 and 5 before the Build tab); a Miner gives 8 and a Weed Node 7.
+  Base income is 6 cash every 2 s from the vendor and silo and 3 from a mini silo (it was 15 and 5 before the Build tab); a Miner gives 10 and a Weed Node 7.
   None of this has had real play time.
 - `mod/setup.sh` was run from an empty directory on a fresh clone (it installed .NET, built OpenRA, made the sparse TGMC clone, built
   and linted the mod in about two minutes on a fast connection); a second run skipped the finished steps, and the scenarios, the smoke test

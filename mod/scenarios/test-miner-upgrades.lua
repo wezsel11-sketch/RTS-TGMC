@@ -1,4 +1,4 @@
--- Scenario test: the economy upgrades. A miner's income over 500 ticks before and after Deep-Core Drills (18 instead of 12 per 50 ticks),
+-- Scenario test: the economy upgrades. A miner's income over 500 ticks before and after Deep-Core Drills (15 instead of 10 per 50 ticks),
 -- and both upgrades can be bought with an Armory. Prints "TEST miner-upgrades PASS" or "TEST miner-upgrades FAIL".
 WorldLoaded = function()
 	local marines = Player.GetPlayer("Marines")

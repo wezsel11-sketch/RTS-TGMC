@@ -688,7 +688,7 @@ miner:
 		Sequences: idle
 	CashTrickler:
 		Interval: 50
-		Amount: 12
+		Amount: 10
 		# A disabled miner (at its floor, see MinerField) pays nothing until a marine repairs it.
 		RequiresCondition: !miner-disabled
 	# Deep-core drills (upgrades.yaml): half as much again, silently (the main trickle already shows the payout).
@@ -697,7 +697,7 @@ miner:
 		Prerequisites: upgrade-miner-drills
 	CashTrickler@drills:
 		Interval: 50
-		Amount: 6
+		Amount: 5
 		ShowTicks: false
 		RequiresCondition: miner-drills && !miner-disabled
 	# Reinforced housings (upgrades.yaml): a third less damage, so it takes the xenos longer to disable the miner.

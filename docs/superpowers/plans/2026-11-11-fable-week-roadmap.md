@@ -185,6 +185,21 @@ Found on 2026-11-11 (D7)
   Both are the bots' behaviour under some seeds, not the tests. They belong to D5.
 - The Fatty's ring of eight and every rocket used the pyrogen's blue fire as their blast. Fixed.
 
+Balance baseline (D2), commit `e583359`, 2026-11-11
+`mod/balance.sh 40 400 <map>`, Skirmish AI on both sides, 40 matches a map. Marine win rate is of the matches that ended.
+
+| Map | Marines | Xenos | No result | Marine win rate (95%) | Median end tick |
+|---|---|---|---|---|---|
+| balance-aivai | 21 | 12 | 7 | 64% (47% to 78%) | 12000 |
+| aimap-canyon-run | 32 | 8 | 0 | 80% (65% to 90%) | 14000 |
+| aimap-jungle-crossing | 30 | 10 | 0 | 75% (60% to 86%) | 14000 |
+| aimap-close-quarters | 26 | 14 | 0 | 65% (50% to 78%) | 13000 |
+| aimap-twin-rivers | 36 | 4 | 0 | 90% (77% to 96%) | 17000 |
+| aimap-quarry-pit | 32 | 6 | 2 | 84% (70% to 93%) | 19000 |
+| All six | 177 | 54 | 9 | 77% | |
+
+The marines are ahead on every map, and furthest ahead on the two where matches run longest. The target is 40% to 60%.
+
 Decided
 - HUD: design C, confirmed by the user on 2026-11-11.
 - Menus: mockup m3 (green TACNET terminal), confirmed 2026-11-11.

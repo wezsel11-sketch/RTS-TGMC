@@ -1,0 +1,27 @@
+# Arm: the castes whose health or speed sits furthest from their TGMC rank (fidelity audit, 2026-11-11).
+# TGMC's gorger is its tank (700 health against the warrior's 400); the defiler, drone, sentinel and pyrogen are quick there,
+# the nymph slow, and the shrike and mantis only middling.
+gorger:
+	Health:
+		HP: 330
+defiler:
+	TgmcMobile:
+		Speed: 190
+drone:
+	TgmcMobile:
+		Speed: 190
+sentinel:
+	TgmcMobile:
+		Speed: 180
+pyrogen:
+	TgmcMobile:
+		Speed: 180
+nymph:
+	TgmcMobile:
+		Speed: 130
+shrike:
+	TgmcMobile:
+		Speed: 160
+mantis:
+	TgmcMobile:
+		Speed: 170

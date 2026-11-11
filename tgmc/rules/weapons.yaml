@@ -103,10 +103,10 @@ TGMCSadar:
 		TrailImage: fx-light
 		TrailSequences: rocket
 		TrailInterval: 3
-	# A rocket bursts in a fireball, and the ground shudders.
+	# A rocket bursts in a fireball, and the ground shudders. (fx-blast's own "fireball" is the pyrogen's blue fire, not this.)
 	Warhead@2Boom: CreateEffect
 		Image: fx-blast
-		Explosions: fireball
+		Explosions: grenade
 		ImpactSounds: explosion-1.ogg, explosion-2.ogg, explosion-3.ogg
 		ForceDisplayAtGroundLevel: true
 		ValidTargets: Ground, Water, Structure
@@ -1427,7 +1427,7 @@ TGMCCasMini:
 		Falloff: 100, 60, 25, 0
 	Warhead@2Boom: CreateEffect
 		Image: fx-blast
-		Explosions: fireball
+		Explosions: grenade
 		ImpactSounds: explosion-1.ogg, explosion-2.ogg, explosion-3.ogg
 		ForceDisplayAtGroundLevel: true
 		ValidTargets: Ground, Water, Structure
@@ -2183,6 +2183,12 @@ TGMCPyroFireball:
 		DamageTypes: ExplosionDeath
 		Damage: 35
 		Spread: 1c256
+	# TGMC's fireball_explosion: the blue burst where the ball lands.
+	Warhead@2PyroBoom: CreateEffect
+		Image: fx-blast
+		Explosions: fireball
+		ForceDisplayAtGroundLevel: true
+		ValidTargets: Ground, Water, Structure
 	Warhead@3Fire: SpawnActor
 		Actor: flame-patch-blue
 		TrailCells: 0

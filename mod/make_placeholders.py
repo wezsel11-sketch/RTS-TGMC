@@ -1055,7 +1055,7 @@ SCENARIOS = {
         ("cryo-pod", "Marines", 6, 4, 0), ("engineer", "Marines", 8, 5, 256), ("armory", "Marines", 11, 7, 0), ("ordnance-depot", "Marines", 14, 7, 0), ("workshop", "Marines", 8, 7, 0), ("medbay", "Marines", 11, 11, 0),
         ("rifleman", "Marines", 10, 14, 512), ("hunter", "Xenos", 18, 12, 0), ("resin-silo", "Xenos", 19, 19, 0),
     ]},
-    "shot-blast": {"scripts": ("shot-blast",), "extra_rules": "World:\n\tScreenshotAt:\n\t\tTick: 218\n\t\tAlso: 222, 226, 230, 234, 238, 244, 252\n", "actors": [
+    "shot-blast": {"scripts": ("shot-blast",), "extra_rules": "World:\n\tScreenshotAt:\n\t\tTick: 156\n\t\tAlso: 159, 162, 166, 172, 180, 196, 232, 235, 238, 244, 256\n", "actors": [
         ("ordnance-depot", "Marines", 6, 6, 0), ("workshop", "Marines", 6, 9, 0),
         ("rifleman", "Marines", 12, 14, 512), ("hunter", "Xenos", 17, 12, 0), ("hunter", "Xenos", 14, 10, 0), ("resin-silo", "Xenos", 19, 19, 0),
     ]},

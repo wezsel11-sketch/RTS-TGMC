@@ -200,6 +200,15 @@ Balance baseline (D2), commit `e583359`, 2026-11-11
 
 The marines are ahead on every map, and furthest ahead on the two where matches run longest. The target is 40% to 60%.
 
+Fidelity audit, castes (D1, first part), 2026-11-11
+Health and speed of 35 castes set against TGMC's caste datums. The mod's health is about 0.47 of TGMC's at the median. Changed,
+where a caste sat furthest from its TGMC rank: gorger health 220 to 330 (TGMC's tank); speed of defiler 125 to 190, drone 140
+to 190, sentinel 160 to 180, pyrogen 150 to 180 (quick in TGMC), nymph 170 to 130 (slow there), shrike 220 to 160, mantis 210
+to 170. Measured as an arm before it went in: marine win rate 69% against 69% on balance-aivai and 82% against 77% on
+aimap-canyon-run (40 matches an arm), not distinguishable from no change. Left as they are on purpose: the cheap tier-one
+castes (drone, sentinel, spitter) have less health than their TGMC share, which their cost pays for. Still to audit: melee
+damage and attack delay per caste, ability numbers, marine weapons against `code/modules/projectiles`, vehicles.
+
 Decided
 - HUD: design C, confirmed by the user on 2026-11-11.
 - Menus: mockup m3 (green TACNET terminal), confirmed 2026-11-11.

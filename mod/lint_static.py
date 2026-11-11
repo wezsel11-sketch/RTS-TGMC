@@ -159,9 +159,13 @@ def main():
 
     # Sequences: the actors that build_sprites.py makes, and the sequence names the rules ask for
     seqs = {u: set(spec["sequences"]) for u, spec in build_sprites.UNITS.items()}
+    # build_sprites.py copies a vehicle turret's sequences into its hull's file (merge_turret), so <hull>-turret.yaml is not loaded
+    merged = {u for u in seqs if u.endswith("-turret") and u[:-len("-turret")] in seqs}
+    for u in merged:
+        seqs[u[:-len("-turret")]] |= seqs[u]
     # A generated sequence file mod.yaml does not list is never loaded: the game then crashes the first time it plays that image
     registered = set(re.findall(r"\|sequences/([\w-]+)\.yaml", read("mod.yaml")))
-    for u in sorted(set(seqs) - registered):
+    for u in sorted(set(seqs) - registered - merged):
         errors.append(f"build_sprites.py makes sequences/{u}.yaml but mod.yaml's Sequences list does not load it")
     # Effect actors drawn without TGMC art (make_placeholders.py) are declared in tgmc/sequences/*.yaml: each top-level
     # key is an actor and each tab-indented key under it is one of its sequences.
@@ -176,15 +180,20 @@ def main():
                 seqs.setdefault(actor, set())
             elif actor and (m := re.match(r"^	([A-Za-z][\w-]*):\s*$", line)):
                 seqs[actor].add(m.group(1))
-    actor = None
+    actor, image = None, None
     for line in all_rules.splitlines():
         if re.match(r"^\^?[A-Za-z][\w-]*:\s*$", line):
             actor = line.rstrip(": \t")
+        # A trait that names its own Image (WithDecoration and the like) reads its sequences from that image, not the actor's
+        if re.match(r"^\t?\S", line):
+            image = None
+        elif m := re.match(r"^\t\tImage: ([\w-]+)$", line):
+            image = m.group(1)
         m = re.match(r"^\s+(?:Sequence|MoveSequence|StandSequences|DefaultAttackSequence|DeathSequence|Sequences): ([\w, ]+)$", line)
-        if m and actor in seqs:
+        if m and (image or actor) in seqs:
             for s in (x.strip() for x in m.group(1).split(",")):
-                if s not in seqs[actor]:
-                    errors.append(f"{actor} asks for sequence {s}, which build_sprites.py does not make for it")
+                if s not in seqs[image or actor]:
+                    errors.append(f"{image or actor} asks for sequence {s}, which build_sprites.py does not make for it")
 
     errors += check_death_types(all_rules, weapon_text, seqs)
 
@@ -223,6 +232,9 @@ def main():
                 weapon = line.split(":")[0]
             else:
                 block = line.strip().split(":")[0]
+                # DecalWarhead (GroundFx.cs) draws from fx-hole unless it names another image
+                if line.strip().endswith(": Decal"):
+                    image = "fx-hole"
         m = re.match(r"^\t\t(Image|Explosions|Sequences): (.+)$", line)
         if m and block:
             if m.group(1) == "Image":

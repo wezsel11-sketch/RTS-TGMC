@@ -6,6 +6,9 @@
 #
 # With no name parts every shot map runs. SHOT_SIZE (default 1280,800) is the window size. Runs at game speed, drawing: TGMC_FAST
 # is off here, since a screenshot needs the frame. SHOT_JOBS (default 4) caps how many run at once.
+#
+# A map whose ScreenshotAt lists more ticks (Also: 200, 210, 220) gives a filmstrip: mod/filmstrip.py joins the frames, in tick
+# order, into the one build/shots/<map>.png. STRIP_CROP (default 640x400) is the middle part of each frame it keeps.
 set -u
 
 HERE=$(cd "$(dirname "$0")" && pwd)
@@ -28,12 +31,17 @@ if [ "${1:-}" = "--one" ]; then
 		Game.ViewportEdgeScroll=False Graphics.Mode=Windowed Graphics.WindowedSize=${SHOT_SIZE:-1280,800} Launch.Map=$uid" > "$support/game.log" 2>&1 &
 	runner=$!
 	waited=0
+	# One frame, plus one for each tick in the map's Also list
+	want=$(( $(grep -m1 'Also:' "$MAPS/$name/rules.yaml" 2>/dev/null | tr ',' '\n' | grep -c .) + 1 ))
 	while [ "$waited" -lt 120 ]; do
-		shot=$(find "$support/Screenshots" -name '*.png' 2>/dev/null | head -1)
-		if [ -n "$shot" ]; then
+		if [ "$(find "$support/Screenshots" -name '*.png' 2>/dev/null | wc -l)" -ge "$want" ]; then
 			# The file is written by another thread: let it finish.
 			sleep 2
-			cp "$shot" "$OUT/$name.png"
+			if [ "$want" -gt 1 ]; then
+				find "$support/Screenshots" -name '*.png' | sort | xargs python3 -I "$HERE/filmstrip.py" "$OUT/$name.png"
+			else
+				cp "$(find "$support/Screenshots" -name '*.png' | head -1)" "$OUT/$name.png"
+			fi
 			echo "shot  $OUT/$name.png"
 			break
 		fi

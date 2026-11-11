@@ -265,6 +265,7 @@ actor-spiderling =
     .name = Spiderling
 actor-resin-trap =
     .name = Resin Trap
+    .description = Sticky resin that holds and stings a marine who steps beside it. Needs an Evolution Tower. Costs 60.
 actor-pyrogen =
     .name = Pyrogen
     .description = A fire xeno. Fireball lobs blue fire that leaves the ground burning. Needs the Evolution Tower. Costs 170.

@@ -21,6 +21,11 @@ JUNGLE = "icons/turf/jungle.dmi"
 GROUND = "icons/turf/ground_map.dmi"
 CAVE = "icons/turf/walls/cave.dmi"
 
+# TGMC's jungle grass is bright blades on near-black: tiled over a whole map it shimmers and hides the units standing on it.
+# SOFTEN pulls each pixel of a tile this far (0 to 1) toward the average colour of all the softened tiles together, so patches
+# of grass1 and grass2 do not read as a checkerboard either.
+SOFTEN = {"grass1": 0.7, "grass2": 0.7}
+
 TILES = {
     "grass1": (JUNGLE, "grass1", 0),
     "grass2": (JUNGLE, "grass2", 0),
@@ -41,13 +46,17 @@ def main():
     os.makedirs(args.out, exist_ok=True)
     dmis = {}
     report = {}
+    for path in {spec[0] for spec in TILES.values()}:
+        dmis[path] = tgmc_dmi.Dmi(os.path.join(args.tgmc, path))
+    means = [dmis[TILES[n][0]].frames(TILES[n][1])[TILES[n][2]][0].convert("RGB").resize((1, 1), Image.BOX).getpixel((0, 0)) for n in SOFTEN]
+    soft = tuple(sum(m[i] for m in means) // len(means) for i in range(3))
     for name, (path, state, frame) in sorted(TILES.items()):
-        if path not in dmis:
-            dmis[path] = tgmc_dmi.Dmi(os.path.join(args.tgmc, path))
         dmi = dmis[path]
         img = dmi.frames(state)[frame][0]
         if img.size != (32, 32):
             raise SystemExit(f"{path}:{state} is {img.size}, expected 32x32")
+        if name in SOFTEN:
+            img = Image.blend(img.convert("RGB"), Image.new("RGB", img.size, soft), SOFTEN[name])
         meta = PngImagePlugin.PngInfo()
         meta.add_text("FrameSize", "32,32")
         meta.add_text("FrameAmount", "1")

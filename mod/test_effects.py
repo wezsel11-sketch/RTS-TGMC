@@ -73,7 +73,10 @@ def test_explosions_only_from_listed_weapons():
             names |= {line.split(":")[0] for line in block.splitlines() if line and line[0].isalpha()}
     # Grenades, the mortar shell, the vest detonation and the CAS bombs (bomb run, Fatty, MOAB, the orbital warheads, the rail gun) are the explosions the design allows.
     # Any other weapon with DamageTypes is new and needs a look before it is added here.
-    assert names == {"TGMCGrenade", "TGMCMortar", "TGMCVestBlast", "TGMCCasBomb", "TGMCCasFatty", "TGMCCasMoab", "TGMCOrbital", "TGMCOrbitalFire", "TGMCRailgun"}, names
+    # The pyrogen's and the dragon's fire (fireball, fire storm, inferno, breath) gibs too until fire has a death of its own
+    # (roadmap 2026-11-11, C9).
+    assert names == {"TGMCGrenade", "TGMCMortar", "TGMCVestBlast", "TGMCCasBomb", "TGMCCasFatty", "TGMCCasMoab", "TGMCOrbital", "TGMCOrbitalFire", "TGMCRailgun",
+                     "TGMCPyroFireball", "TGMCFirestorm", "TGMCInferno", "TGMCDragonBreath"}, names
 
 
 if __name__ == "__main__":

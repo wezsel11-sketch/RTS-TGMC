@@ -1000,7 +1000,8 @@ SCENARIOS = {
         ("rifleman", "Marines", 20, 20, 0),
         ("resin-silo", "Xenos", 19, 19, 0),
     ]},
-    "scenario-nofriendlyfire": {"scripts": ("test-nofriendlyfire",), "extra_rules": "World:\n\tTgmcOptions:\n\t\tFriendlyFireDefault: false\n", "actors": [
+    # The crusher must outlive the test: dead, it leaves an acid pool whose (enemy) burns would count as friends hurt.
+    "scenario-nofriendlyfire": {"scripts": ("test-nofriendlyfire",), "extra_rules": "World:\n\tTgmcOptions:\n\t\tFriendlyFireDefault: false\ncrusher:\n\tHealth:\n\t\tHP: 20000\n", "actors": [
         ("demolitionist", "Marines", 10, 10, 512),
         ("demolitionist", "Marines", 15, 11, 512),
         ("rifleman", "Marines", 15, 9, 512),
@@ -1054,7 +1055,7 @@ SCENARIOS = {
         ("cryo-pod", "Marines", 6, 4, 0), ("engineer", "Marines", 8, 5, 256), ("armory", "Marines", 11, 7, 0), ("ordnance-depot", "Marines", 14, 7, 0), ("workshop", "Marines", 8, 7, 0), ("medbay", "Marines", 11, 11, 0),
         ("rifleman", "Marines", 10, 14, 512), ("hunter", "Xenos", 18, 12, 0), ("resin-silo", "Xenos", 19, 19, 0),
     ]},
-    "shot-blast": {"scripts": ("shot-blast",), "extra_rules": "World:\n\tScreenshotAt:\n\t\tTick: 215\n", "actors": [
+    "shot-blast": {"scripts": ("shot-blast",), "extra_rules": "World:\n\tScreenshotAt:\n\t\tTick: 218\n\t\tAlso: 222, 226, 230, 234, 238, 244, 252\n", "actors": [
         ("ordnance-depot", "Marines", 6, 6, 0), ("workshop", "Marines", 6, 9, 0),
         ("rifleman", "Marines", 12, 14, 512), ("hunter", "Xenos", 17, 12, 0), ("hunter", "Xenos", 14, 10, 0), ("resin-silo", "Xenos", 19, 19, 0),
     ]},

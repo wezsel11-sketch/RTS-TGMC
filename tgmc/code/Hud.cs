@@ -406,6 +406,10 @@ namespace OpenRA.Mods.TGMC.Traits
 	public class ScreenshotAtInfo : TraitInfo
 	{
 		public readonly int Tick = 100;
+
+		[Desc("More ticks to take a screenshot on. mod/shots.sh joins them all into one filmstrip, to judge an effect's timing.")]
+		public readonly int[] Also = [];
+
 		public readonly string[] Select = [];
 
 		[Desc("Buttons to click just before the shot, by widget id (for example HELP_BUTTON).")]
@@ -488,7 +492,7 @@ namespace OpenRA.Mods.TGMC.Traits
 			if (info.Place != null && ticks == (info.ClickTick > 0 ? info.ClickTick : info.Tick - 5))
 				placeNow = true;
 
-			if (ticks == info.Tick)
+			if (ticks == info.Tick || info.Also.Contains(ticks))
 				Game.TakeScreenshot();
 		}
 	}

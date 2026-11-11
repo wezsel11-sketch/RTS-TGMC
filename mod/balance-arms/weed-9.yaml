@@ -1,0 +1,4 @@
+# Arm: a weed node pays 9 per 50 ticks instead of 7.
+weed-node:
+	CashTrickler:
+		Amount: 9

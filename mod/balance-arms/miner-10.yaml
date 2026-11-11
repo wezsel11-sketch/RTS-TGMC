@@ -1,0 +1,4 @@
+# Arm: a working miner pays 10 per 50 ticks instead of 12.
+miner:
+	CashTrickler:
+		Amount: 10

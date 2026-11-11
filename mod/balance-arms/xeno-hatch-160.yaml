@@ -1,0 +1,4 @@
+# Arm: xeno units hatch a fifth faster (the queue takes 160% of cost-time instead of 200%).
+Player:
+	MultiProductionQueue@Xeno:
+		BuildDurationModifier: 160

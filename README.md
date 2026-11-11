@@ -519,8 +519,10 @@ only for the marines. `docs/hud-designs/` keeps the three mockups the dock was c
 - The pounce, the stun, the facehugger drop and the egg are only checked by scenarios (`scenario-pounce`, `scenario-infest`,
   `scenario-infest-cure`, `scenario-egg`) that count health and units. The building ghost snapping, tile-by-tile movement, the lobby
   options, the CAS icon, the selection card, repeat build and the keypad stepping were built and load without errors, but nobody has used them with a mouse.
-- Marines take their owner's colour: `WithPlayerTint` (`tgmc/code/PlayerTint.cs`) multiplies the whole sprite by it, skin and
-  gun too. Xenos keep TGMC's own colours and structures are not tinted. Seen in screenshots only, not with two humans in a lobby.
+- Marines take their owner's colour on uniform, armour and helmet: `mod/build_sprites.py` writes those layers to a
+  `<unit>-cloth` sheet and `WithPlayerTint` (`tgmc/code/PlayerTint.cs`) draws it over the unit in the player colour. Skin, boots
+  and gun keep their own colours. A unit with no cloth sheet (xenos, vehicles) has its whole sprite tinted. Seen in one
+  screenshot (`shot-miner`), not with two humans in a lobby, and the scenario suite has not been run on this build.
 - Runners have no attack frames: `attack` reuses `stand`. A hit shows TGMC's claw slash (`fx-claw`), and the claws play the hiss on attack.
 - Sounds are all unheard (no audio device here). See the Sound section.
 - Medic and engineer signals are drawn here, not from TGMC: a green + + + over a healed unit, and a rocking wrench with

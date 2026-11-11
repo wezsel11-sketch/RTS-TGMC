@@ -141,9 +141,12 @@ FACING_SOURCE = {"N": "N", "NE": "E", "E": "E", "SE": "E", "S": "S", "SW": "W", 
 # otherwise hide them.
 # The cloth layers were tinted here once, one colour per faction. Units are now tinted per player when drawn (WithPlayerTint in
 # tgmc/code/PlayerTint.cs), so the sheets stay neutral. The names still mark which layers are cloth.
-MARINE_TEAM = None
+# Layers marked CLOTH take the owner's colour in the game: they are drawn untinted here and again, in grey, on the unit's
+# "<unit>-cloth" sheet, which WithPlayerTint (tgmc/code/PlayerTint.cs) draws over the unit in the player colour.
+CLOTH = "cloth"
+MARINE_TEAM = CLOTH
 XENO_TEAM = None
-SOM_TEAM = None
+SOM_TEAM = CLOTH
 SOM_ARMOR = "icons/mob/modular/som_armor.dmi"
 SOM_HELMETS = "icons/mob/modular/som_helmets.dmi"
 GEAR = [(MARINE_ARMOR, "xarmor", MARINE_TEAM), (FEET, "marine"), (MARINE_HELMETS, "helmet", MARINE_TEAM)]
@@ -1646,7 +1649,7 @@ for _unit in XENO_UNITS:
 
 def tinted(img, rgb):
     """Multiply the colour channels by rgb/255 and keep the alpha."""
-    if rgb is None:
+    if rgb is None or rgb == CLOTH:
         return img
     r, g, b, a = img.split()
     out = ImageChops.multiply(Image.merge("RGB", (r, g, b)), Image.new("RGB", img.size, rgb))
@@ -1731,8 +1734,15 @@ def layer_images(dmi, state, tint=None, opts=None):
     return sides
 
 
-def composite(layers):
-    """layers: list of (dmi, state, sides) -> {side or '*': [composited frames]}."""
+def cloth_grey(img):
+    """A cloth layer as light grey, so the player colour multiplied over it reads as that colour and not as a dark mud."""
+    grey = img.convert("L").point(lambda v: 90 + round(165 * (v / 255) ** 0.5))
+    return Image.merge("RGBA", (grey, grey, grey, img.getchannel("A")))
+
+
+def composite(layers, cloth=None):
+    """layers: list of (dmi, state, sides) -> {side or '*': [composited frames]}.
+    With `cloth` (one flag a layer) only the flagged layers are drawn, in grey, and every other layer cuts its shape out of them."""
     names = set(k for _, _, sides in layers for k in sides)
     out = {}
     for name in names:
@@ -1740,9 +1750,18 @@ def composite(layers):
         stacked = []
         for f in range(frame_count):
             base = None
-            for dmi, state, sides in layers:
+            for i, (dmi, state, sides) in enumerate(layers):
                 img = sides[name][f]
-                if base is None:
+                if cloth:
+                    if base is None:
+                        base = Image.new("RGBA", img.size, (0, 0, 0, 0))
+                    if img.size != base.size:
+                        raise SystemExit(f"{dmi.path}:{state} is {img.size}, base is {base.size}")
+                    if cloth[i]:
+                        base = Image.alpha_composite(base, cloth_grey(img))
+                    else:
+                        base.putalpha(ImageChops.subtract(base.getchannel("A"), img.getchannel("A")))
+                elif base is None:
                     base = img.copy()
                 else:
                     if img.size != base.size:
@@ -1801,7 +1820,7 @@ def frame_timing(delays):
     return unit * 100, order
 
 
-def render_sequences(tgmc, sequences, cell=None):
+def render_sequences(tgmc, sequences, cell=None, cloth=False):
     """Composite every non-alias sequence in `sequences` into one list of cells. With `cell`, every frame is centred on a
     transparent cell of that size, so art of different sizes can share one sheet.
 
@@ -1824,7 +1843,7 @@ def render_sequences(tgmc, sequences, cell=None):
 
         layers = [(dmi, state, layer_images(dmi, state, spec[2] if len(spec) > 2 else None, options(spec)))
                   for (dmi, state), spec in zip(dmis, layer_specs)]
-        sides = composite(layers)
+        sides = composite(layers, [len(spec) > 2 and spec[2] == CLOTH for spec in layer_specs] if cloth else None)
         first_opts = layer_specs[0][3] if len(layer_specs[0]) > 3 else {}
         if "fade" in first_opts:  # a still pose that fades out over N frames
             sides = {k: fade_frames(frames[0], first_opts["fade"]) for k, frames in sides.items()}
@@ -1985,6 +2004,11 @@ def build_unit(tgmc, unit, spec, out_dir):
     cw, ch = cell_size
     os.makedirs(os.path.join(out_dir, "sequences"), exist_ok=True)
     save_sheet(sheet_cells, cell_size, os.path.join(out_dir, "sprites", f"{unit}.png"))
+    has_cloth = any(len(layer) > 2 and layer[2] == CLOTH for v in main.values() if isinstance(v, list) for layer in v)
+    if has_cloth:
+        cloth_cells = render_sequences(tgmc, main, spec.get("cell"), cloth=True)[0]
+        assert len(cloth_cells) == len(sheet_cells), unit
+        save_sheet(cloth_cells, cell_size, os.path.join(out_dir, "sprites", f"{unit}-cloth.png"))
     if icon_cells is not None:
         save_sheet(icon_cells, icon_size, os.path.join(out_dir, "sprites", f"{unit}-icon.png"))
 
@@ -2012,6 +2036,8 @@ def build_unit(tgmc, unit, spec, out_dir):
         if tick is not None:
             lines.append(f"\t\tTick: {tick}")
         seq_defs.append(("icon", start, length, facings, tick, None))
+    if has_cloth:  # the same cells on the cloth sheet
+        lines += [f"{unit}-cloth:", f"\tInherits: {unit}", "\tDefaults:", f"\t\tFilename: sprites/{unit}-cloth.png"]
     with open(os.path.join(out_dir, "sequences", f"{unit}.yaml"), "w", encoding="utf-8", newline="\n") as f:
         f.write("\n".join(lines) + "\n")
 

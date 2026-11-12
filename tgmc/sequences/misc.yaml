@@ -52,6 +52,17 @@ repair-wrench:
 		Tick: 100
 		ZOffset: 2000
 
+# The ground shadow under a unit (WithIdleOverlay@shadow on ^Unit). Drawn by mod/make_placeholders.py (no TGMC art).
+fx-shadow:
+	Defaults:
+		Filename: unit-shadow.png
+		ZOffset: -1023
+	small:
+	mid:
+		Scale: 1.8
+	big:
+		Scale: 2.6
+
 # The move-order click effect (OpenRA's terrain flash). Drawn by mod/make_placeholders.py (no TGMC art).
 moveflsh:
 	idle:

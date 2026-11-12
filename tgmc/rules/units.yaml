@@ -2,6 +2,11 @@
 # Sequence names here must exist in the generated sequences/*.yaml.
 
 ^Unit:
+	# A soft shadow at the feet, so the unit stands off the ground.
+	WithIdleOverlay@shadow:
+		Image: fx-shadow
+		Sequence: small
+		Offset: 0, 0, -400
 	# Each player's units carry that player's colour (the sprites come neutral out of build_sprites.py).
 	WithPlayerTint:
 	# Tells the owner's ThreatMemory who hit it.
@@ -1305,6 +1310,11 @@ mech:
 		GreenTint: 1
 		BlueTint: 1.1
 	Inherits: ^Unit
+	# The shadow sits at the feet of the 96-pixel frame.
+	WithIdleOverlay@shadow:
+		Image: fx-shadow
+		Sequence: mid
+		Offset: 0, 0, -1300
 	StatusLabel@stunned:
 		RequiresCondition: stunned
 		Text: STUNNED
@@ -3502,6 +3512,10 @@ king:
 # on its own and keeps firing while the tank drives.
 ^TgmcVehicle:
 	Inherits: ^Unit
+	WithIdleOverlay@shadow:
+		Image: fx-shadow
+		Sequence: big
+		Offset: 0, 0, 0
 	-Retreat:
 	Armor:
 		Type: Heavy

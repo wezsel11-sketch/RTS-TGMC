@@ -9,6 +9,7 @@ Usage: build_tileset.py --tgmc CHECKOUT [--out DIR]
 """
 import argparse
 import json
+import math
 import os
 import sys
 
@@ -36,6 +37,36 @@ TILES = {
     "wall": (CAVE, "cave-255", 0),
 }
 
+# Tiles that meet grass get an edge sheet, <name>-edge.png: 16 frames, frame m with grass grown in from the sides named by the
+# bits of m (1 north, 2 east, 4 south, 8 west). Frame 0 is the plain tile. mod/make_placeholders.py picks the frame from a
+# cell's four neighbours, so a shore or a road side is a ragged line of grass and not a ruler-straight tile border.
+EDGES = ("water", "ford", "dirt")
+EDGE_DEPTH = 7  # pixels of grass at the deepest
+
+
+def edge_sheet(base, grass):
+    """The 16 edge frames of `base` side by side."""
+    def reach(t):
+        # How far the grass comes in at position t along a side: two waves that both repeat every 32 px, so tiles line up.
+        return EDGE_DEPTH * (0.62 + 0.25 * math.sin(2 * math.pi * t / 32 * 2 + 1.0) + 0.13 * math.sin(2 * math.pi * t / 32 * 5))
+
+    sheet = Image.new("RGB", (32 * 16, 32))
+    for m in range(16):
+        mask = Image.new("L", (32, 32), 0)
+        px = mask.load()
+        for y in range(32):
+            for x in range(32):
+                a = 0.0
+                # (distance in from the side, position along it) for each side that has grass beyond it
+                for bit, d, t in ((1, y, x), (2, 31 - x, y), (4, 31 - y, x), (8, x, y)):
+                    if m & bit:
+                        a = max(a, min(1.0, max(0.0, (reach(t) - d) / 2)))
+                px[x, y] = round(255 * a)
+        frame = base.convert("RGB").copy()
+        frame.paste(grass.convert("RGB"), (0, 0), mask)
+        sheet.paste(frame, (32 * m, 0))
+    return sheet
+
 
 def main():
     ap = argparse.ArgumentParser()
@@ -50,6 +81,7 @@ def main():
         dmis[path] = tgmc_dmi.Dmi(os.path.join(args.tgmc, path))
     means = [dmis[TILES[n][0]].frames(TILES[n][1])[TILES[n][2]][0].convert("RGB").resize((1, 1), Image.BOX).getpixel((0, 0)) for n in SOFTEN]
     soft = tuple(sum(m[i] for m in means) // len(means) for i in range(3))
+    made = {}
     for name, (path, state, frame) in sorted(TILES.items()):
         dmi = dmis[path]
         img = dmi.frames(state)[frame][0]
@@ -61,9 +93,15 @@ def main():
         meta.add_text("FrameSize", "32,32")
         meta.add_text("FrameAmount", "1")
         img.save(os.path.join(args.out, f"{name}.png"), pnginfo=meta)
+        made[name] = img
         r, g, b = img.convert("RGB").resize((1, 1), Image.BOX).getpixel((0, 0))
         report[name] = f"{r:02X}{g:02X}{b:02X}"
         print(f"{name}.png <- {path}:{state}  average colour {report[name]}")
+    for name in EDGES:
+        meta = PngImagePlugin.PngInfo()
+        meta.add_text("FrameSize", "32,32")
+        meta.add_text("FrameAmount", "16")
+        edge_sheet(made[name], made["grass1"]).save(os.path.join(args.out, f"{name}-edge.png"), pnginfo=meta)
     with open(os.path.join(args.out, "tiles.json"), "w") as f:
         json.dump(report, f, indent=2)
 

@@ -49,28 +49,76 @@ Templates:
 			0: Clear
 	Template@2:
 		Id: 2
-		Images: water.png
+		# 16 frames: grass grown in from the sides named by the frame number (mod/build_tileset.py, edge_sheet).
+		Images: water-edge.png
 		Size: 1,1
 		PickAny: True
 		Categories: Water
 		Tiles:
 			0: Water
+			1: Water
+			2: Water
+			3: Water
+			4: Water
+			5: Water
+			6: Water
+			7: Water
+			8: Water
+			9: Water
+			10: Water
+			11: Water
+			12: Water
+			13: Water
+			14: Water
+			15: Water
 	Template@3:
 		Id: 3
-		Images: ford.png
+		# 16 frames: grass grown in from the sides named by the frame number (mod/build_tileset.py, edge_sheet).
+		Images: ford-edge.png
 		Size: 1,1
 		PickAny: True
 		Categories: Water
 		Tiles:
 			0: Ford
+			1: Ford
+			2: Ford
+			3: Ford
+			4: Ford
+			5: Ford
+			6: Ford
+			7: Ford
+			8: Ford
+			9: Ford
+			10: Ford
+			11: Ford
+			12: Ford
+			13: Ford
+			14: Ford
+			15: Ford
 	Template@4:
 		Id: 4
-		Images: dirt.png
+		# 16 frames: grass grown in from the sides named by the frame number (mod/build_tileset.py, edge_sheet).
+		Images: dirt-edge.png
 		Size: 1,1
 		PickAny: True
 		Categories: Road
 		Tiles:
 			0: Road
+			1: Road
+			2: Road
+			3: Road
+			4: Road
+			5: Road
+			6: Road
+			7: Road
+			8: Road
+			9: Road
+			10: Road
+			11: Road
+			12: Road
+			13: Road
+			14: Road
+			15: Road
 	Template@5:
 		Id: 5
 		Images: rock.png

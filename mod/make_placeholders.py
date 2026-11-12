@@ -22,7 +22,7 @@ import shutil
 import struct
 import sys
 
-from PIL import Image, ImageDraw, PngImagePlugin
+from PIL import Image, ImageDraw, ImageFilter, PngImagePlugin
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import build_sounds  # noqa: E402
@@ -32,7 +32,7 @@ import tgmc_dmm  # noqa: E402
 
 CLOCK_W, CLOCK_H, CLOCK_FRAMES, CLOCK_COLS = 62, 46, 30, 6  # matches the sidebar palette's IconSize
 # Template ids in tilesets/ground.yaml. Grass lists two images, which the engine picks between per cell. The byte
-# after the id in map.bin is the tile's index within a multi-cell template, so it is 0 for every one of these.
+# after the id in map.bin is the tile's index within its template: 0, except where write_map picks a grass-edge frame.
 GRASS, WATER, FORD, DIRT, ROCK = 1, 2, 3, 4, 5
 WALL = 6  # rock that heavy weapons can knock down
 
@@ -556,6 +556,16 @@ def write_acid_pool(out):
     meta.add_text("FrameSize", "32,32")
     meta.add_text("FrameAmount", str(frames))
     img.save(os.path.join(out, "acid-pool.png"), pnginfo=meta)
+
+
+def write_unit_shadow(out):
+    """unit-shadow.png: a soft dark ellipse, 32x16, drawn on the ground under every unit so it stands off the terrain."""
+    big = Image.new("L", (128, 64), 0)
+    ImageDraw.Draw(big).ellipse([20, 14, 108, 50], fill=150)
+    alpha = big.filter(ImageFilter.GaussianBlur(6)).resize((32, 16), Image.LANCZOS)
+    img = Image.new("RGBA", (32, 16), (0, 0, 0, 0))
+    img.putalpha(alpha)
+    img.save(os.path.join(out, "unit-shadow.png"))
 
 
 def write_repair_fx(out):
@@ -1927,7 +1937,17 @@ def write_map(folder, title, size_w, size_h, placed, visibility, spawns, scripts
     # map.bin: version byte, width, height, u32 tiles offset, u32 heights offset (0), u32 resources offset (0),
     # then per cell (x-major): u16 template id, u8 variant index.
     header = struct.pack("<BHHIII", 2, size_w, size_h, 17, 0, 0)
-    body = b"".join(struct.pack("<HB", *ground(x, y)) for x in range(size_w) for y in range(size_h))
+    def tile(x, y):
+        # Water, ford and dirt show grass along each side that has grass beyond it: the variant index is the frame of the
+        # tile's edge sheet (mod/build_tileset.py), bit 1 north, 2 east, 4 south, 8 west.
+        template, index = ground(x, y)
+        if template in (WATER, FORD, DIRT):
+            sides = ((x, y - 1), (x + 1, y), (x, y + 1), (x - 1, y))
+            index = sum(1 << i for i, (nx, ny) in enumerate(sides)
+                        if 0 <= nx < size_w and 0 <= ny < size_h and ground(nx, ny)[0] == GRASS)
+        return template, index
+
+    body = b"".join(struct.pack("<HB", *tile(x, y)) for x in range(size_w) for y in range(size_h))
     with open(os.path.join(folder, "map.bin"), "wb") as f:
         f.write(header + body)
 
@@ -2178,6 +2198,7 @@ def main():
     write_overlay(args.out)
     write_acid_pool(args.out)
     write_repair_fx(args.out)
+    write_unit_shadow(args.out)
     write_rank_chevrons(args.out)
     write_miner_art(args.out)
     if args.tgmc:

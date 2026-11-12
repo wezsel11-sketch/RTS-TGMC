@@ -1,0 +1,4 @@
+# Arm: a working miner pays 11 per 50 ticks instead of 10 (it was 12 before the first economy arms).
+miner:
+	CashTrickler:
+		Amount: 11

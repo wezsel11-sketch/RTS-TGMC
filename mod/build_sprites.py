@@ -208,15 +208,15 @@ def som(armor, helmet, weapon):
 
 # Presets for the mech: the accent colours painted on TGMC's medium mech, and the two weapons on its arms.
 MECH_PRESETS = {
-    "assault": {"paint": (110, 150, 235), "trim": (205, 205, 215), "right": "assaultrifle_right", "left": "rocketlauncher_left"},
-    "flame": {"paint": (245, 120, 40), "trim": (255, 215, 90), "right": "shotgun_right", "left": "flamer_left"},
-    "support": {"paint": (110, 195, 100), "trim": (205, 235, 175), "right": "smg_right", "left": "rpg_left"},
-    "tow": {"paint": (215, 215, 220), "trim": (90, 95, 115), "right": "assaultrifle_right", "left": "tow_left"},
+    "assault": {"trim": (205, 205, 215), "right": "assaultrifle_right", "left": "rocketlauncher_left"},
+    "flame": {"trim": (255, 215, 90), "right": "shotgun_right", "left": "flamer_left"},
+    "support": {"trim": (205, 235, 175), "right": "smg_right", "left": "rpg_left"},
+    "tow": {"trim": (90, 95, 115), "right": "assaultrifle_right", "left": "tow_left"},
     # The Sons of Mars' walker: the same four builds in SOM red and black.
-    "som_assault": {"paint": (200, 40, 35), "trim": (40, 40, 45), "right": "assaultrifle_right", "left": "rocketlauncher_left"},
-    "som_flame": {"paint": (200, 40, 35), "trim": (255, 150, 60), "right": "shotgun_right", "left": "flamer_left"},
-    "som_support": {"paint": (170, 30, 30), "trim": (60, 60, 65), "right": "smg_right", "left": "rpg_left"},
-    "som_tow": {"paint": (150, 25, 25), "trim": (30, 30, 35), "right": "assaultrifle_right", "left": "tow_left"},
+    "som_assault": {"trim": (40, 40, 45), "right": "assaultrifle_right", "left": "rocketlauncher_left"},
+    "som_flame": {"trim": (255, 150, 60), "right": "shotgun_right", "left": "flamer_left"},
+    "som_support": {"trim": (60, 60, 65), "right": "smg_right", "left": "rpg_left"},
+    "som_tow": {"trim": (30, 30, 35), "right": "assaultrifle_right", "left": "tow_left"},
 }
 
 
@@ -225,12 +225,13 @@ def mech(preset):
     skeleton) and two thin paint masks, which get the preset's accent colours. The weapons come from another sheet of the same
     96x96 size and are laid on top."""
     spec = MECH_PRESETS[preset]
-    paint, trim = spec["paint"], spec["trim"]
+    trim = spec["trim"]
     opts = {"pad": (96, 96), "scale": 1.0}
     stack = []
     for part, frame in (("legs", "legsnocolor"), ("core", "corenocolor"), ("head", "headnocolor"), ("leftarm", "leftarmnocolor"),
                         ("rightarm", "rightarmnocolor")):
-        stack += [(frame, None), (f"{part}primary", paint), (f"{part}secondary", trim)]
+        # The main paint is the owner's colour (CLOTH); the preset's own paint colour is no longer used on the map sprite.
+        stack += [(frame, None), (f"{part}primary", CLOTH), (f"{part}secondary", trim)]
     stack += [("visor", None)]
     layers = [(MECH_MEDIUM, state, tint, dict(opts)) for state, tint in stack]
     layers += [(MECH_WEAPONS, spec["right"], None, dict(opts)), (MECH_WEAPONS, spec["left"], None, dict(opts))]

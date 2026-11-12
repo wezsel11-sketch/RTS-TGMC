@@ -504,8 +504,10 @@ TGMCFlamer:
 	Report: flamer-fire-1.ogg, flamer-fire-2.ogg, flamer-fire-3.ogg
 	TargetActorCenter: true
 	Projectile: InstantHit
+	# Killed by fire, a unit leaves a charred body (BurntTypes on WithLingeringCorpse).
 	Warhead@1Cone: ConeDamage
 		Damage: 25
+		DamageTypes: FlameDeath
 		ConeRange: 4c0
 		HalfAngle: 64
 		FarEndPercent: 40
@@ -597,6 +599,7 @@ TGMCFlamePatch:
 	Projectile: InstantHit
 	Warhead@1Dam: SpreadDamage
 		Damage: 5
+		DamageTypes: FlameDeath
 		Spread: 1c0
 		Falloff: 100, 0
 		ValidRelationships: Enemy, Neutral, Ally
@@ -1494,6 +1497,7 @@ TGMCCasFire:
 	-Warhead@2Boom:
 	Warhead@1Dam: ExplosiveDamage
 		Damage: 7
+		DamageTypes: FlameDeath
 		Spread: 1c0
 		Falloff: 100, 0
 	Warhead@3Fire: CreateEffect

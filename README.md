@@ -167,6 +167,8 @@ the commits this mod was tested against (see the top of `mod/bootstrap.py`), so 
     with a purple one (`AlertOnDamage` with its own event key). The cryo pod and the resin silo have a **Recall** power (the town bell):
     every own unit within 10 cells of the spot runs to the nearest base building; it recharges in 30 seconds (`Recall.cs`).
   - **Bodies.** Fallen units lie where they fell for 20 seconds and then fade away (`WithLingeringCorpse`).
+    One killed by the flamer, burning ground or napalm lies there charred (`BurntTypes`, damage type `FlameDeath`).
+  - **Claw lunge.** A xeno's body darts at a target within two cells on each strike (`AttackLunge`), as TGMC draws melee.
   - **Left and right.** OpenRA's facing angle grows counter-clockwise while the sprite sheets are drawn clockwise, so the generator
     now writes `Facings: -8` and `-16`. Marines face and aim the right way, and the Condor's nose points along its path.
   - **Rockets.** The SADAR and the mech's RPG and missile fly straight with a smoke trail (`fx-rocket`); the grenadier still lobs grenades.

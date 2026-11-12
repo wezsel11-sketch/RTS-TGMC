@@ -7,10 +7,12 @@ using System.Collections.Frozen;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using System.Numerics;
 using OpenRA.Effects;
 using OpenRA.Graphics;
 using OpenRA.Mods.Common.Traits;
 using OpenRA.Mods.Common.Traits.Render;
+using OpenRA.Primitives;
 using OpenRA.Traits;
 
 namespace OpenRA.Mods.TGMC.Traits
@@ -43,6 +45,11 @@ namespace OpenRA.Mods.TGMC.Traits
 		[Desc("Ticks the body then takes to fade out.")]
 		public readonly int Fade = 60;
 
+		[Desc("Killed by one of these damage types, the body is charred: the fallback sequence, darkened by BurntTint.")]
+		public readonly BitSet<DamageType> BurntTypes = new("FlameDeath");
+
+		public readonly float BurntTint = 0.28f;
+
 		public override object Create(ActorInitializer init) { return new WithLingeringCorpse(init.Self, this); }
 	}
 
@@ -62,6 +69,7 @@ namespace OpenRA.Mods.TGMC.Traits
 				return;
 
 			string sequence;
+			var burnt = false;
 			if (e.Damage.DamageTypes.IsEmpty)
 			{
 				if (Info.FallbackSequence == null)
@@ -72,10 +80,15 @@ namespace OpenRA.Mods.TGMC.Traits
 			else
 			{
 				var damageType = Info.DeathTypes.Keys.FirstOrDefault(e.Damage.DamageTypes.Contains);
-				if (damageType == null)
+				if (damageType != null)
+					sequence = Info.DeathSequence + Info.DeathTypes[damageType].Random(self.World.SharedRandom);
+				else if (e.Damage.DamageTypes.Overlaps(Info.BurntTypes) && Info.FallbackSequence != null)
+				{
+					sequence = Info.FallbackSequence;
+					burnt = true;
+				}
+				else
 					return;
-
-				sequence = Info.DeathSequence + Info.DeathTypes[damageType].Random(self.World.SharedRandom);
 			}
 
 			var palette = Info.DeathSequencePalette;
@@ -84,7 +97,7 @@ namespace OpenRA.Mods.TGMC.Traits
 
 			var pos = self.CenterPosition;
 			var image = rs.GetImage(self);
-			self.World.AddFrameEndTask(w => w.Add(new LyingBody(pos, w, image, sequence, palette, Info)));
+			self.World.AddFrameEndTask(w => w.Add(new LyingBody(pos, w, image, sequence, palette, Info, burnt)));
 		}
 	}
 
@@ -95,14 +108,16 @@ namespace OpenRA.Mods.TGMC.Traits
 		readonly Animation anim;
 		readonly string palette;
 		readonly WithLingeringCorpseInfo info;
+		readonly bool burnt;
 		int age;
 		int endedAt = -1;
 
-		public LyingBody(WPos pos, World world, string image, string sequence, string palette, WithLingeringCorpseInfo info)
+		public LyingBody(WPos pos, World world, string image, string sequence, string palette, WithLingeringCorpseInfo info, bool burnt)
 		{
 			this.pos = pos;
 			this.palette = palette;
 			this.info = info;
+			this.burnt = burnt;
 			anim = new Animation(world, image);
 			anim.PlayThen(sequence, () => endedAt = age);
 		}
@@ -126,7 +141,18 @@ namespace OpenRA.Mods.TGMC.Traits
 			}
 
 			foreach (var r in anim.Render(pos, wr.Palette(palette)))
-				yield return alpha < 1f && r is IModifyableRenderable m ? m.WithAlpha(alpha) : r;
+			{
+				if (r is not IModifyableRenderable m)
+				{
+					yield return r;
+					continue;
+				}
+
+				if (burnt)
+					m = m.WithTint(new Vector3(info.BurntTint, info.BurntTint * 0.9f, info.BurntTint * 0.8f), m.TintModifiers);
+
+				yield return alpha < 1f ? m.WithAlpha(alpha) : m;
+			}
 		}
 	}
 }

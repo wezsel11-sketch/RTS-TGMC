@@ -59,7 +59,9 @@ def check_death_types(rules, weapons, seqs):
         for t, suffix in listed.items():
             if "die" + suffix not in seqs[actor]:
                 errors.append(f"{actor} maps {t} to sequence die{suffix}, which build_sprites.py does not make for it")
-        for t in sorted(used - set(listed)):
+        # A WithLingeringCorpse charrs the fallback body for its BurntTypes (FlameDeath) without a DeathTypes entry.
+        burnt = {"FlameDeath"} if any("WithLingeringCorpse" in b for b in bodies) else set()
+        for t in sorted(used - set(listed) - burnt):
             errors.append(f"{actor} has no DeathTypes entry for damage type {t}, so a kill by it plays no death animation")
     return errors
 

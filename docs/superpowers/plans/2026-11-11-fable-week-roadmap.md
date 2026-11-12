@@ -234,6 +234,35 @@ on two maps, so the miner stays at 10. The miner-10 runs repeated here differ fr
 (canyon-run 42% then 59%), which is the spread of 40 matches. Both miner-10 runs together: jungle-crossing 29 of 79 (37%),
 canyon-run 40 of 79 (51%), twin-rivers 43 of 76 (57%).
 
+Fidelity audit, guns and claws (D1, second part), 2026-11-12
+Damage per second while firing, reloads left out: TGMC's ammo damage over the gun's fire delay, against the mod's burst
+damage over its burst-and-rest cycle at 25 ticks a second.
+
+| Gun | TGMC | Mod | Mod share | Verdict |
+|---|---|---|---|---|
+| AR-12 rifle (TGMCRifle) | 125 | 34 | 0.28 | the reference |
+| AR-18 carbine (TGMCCarbine) | 125 | 28 | 0.22 | wrong: weaker and shorter-ranged than the rifle |
+| PR-412 (TGMCM412) | 131 | 26 | 0.20 | wrong: a quarter less than the rifle for one cell of range |
+| SMG-90 (TGMCSMG) | 133 | 25 | 0.19 | scaled on purpose: the corpsman's sidearm |
+| SH-35 shotgun (TGMCShotgun) | 120 | 18 | 0.15 | scaled on purpose: the engineer's, with knockback |
+| SG-29 smartgun | 100 | 35 | 0.35 | match |
+| MG-60 | 167 | 69 | 0.41 | match (stops to fire) |
+| MG-100 minigun | 167 | 63 | 0.38 | match |
+| ST-571 sentry | 100 | 46 | 0.46 | scaled on purpose: a building that cannot move |
+| BR-8 scout rifle (TGMCSniperTX8) | 100 | 49 | 0.49 | scaled on purpose |
+| SR-33 Dragunov (TGMCSniperSVD) | 63 | 43 | 0.69 | scaled on purpose |
+| SR-26 scoped rifle (TGMCSniper) | 36 | 38 | 1.04 | scaled on purpose: TGMC's aimed shot is folded into every shot |
+
+A rifleman is given one of the first three at random, so one in three is a fifth weaker than his neighbour and another a
+quarter weaker. Tried: carbine burst of 4 (TGMC's burst) and PR-412 damage 14, which puts both within 5% of the rifle.
+40 matches a map on the frozen miner-10 build (weapons added to copies of the maps, since `mod/balance.sh` arms hold
+rules only): marine win rate aimap-jungle-crossing 62%, aimap-canyon-run 64%, aimap-twin-rivers 57%; together 72 of 118
+(61%) against 112 of 234 (48%) for the plain build. It lifts the marines out of the target on two maps, so it is not
+applied. It goes in together with the next change that helps the xenos, or with a rifle of 10 damage.
+
+Claws: TGMC's fighting castes hit for 16 to 33 a blow (most 18 to 26). The mod's shared `TGMCClaws` does 20, inside
+that band, and the castes with a blow of their own (slam, punch, charge, gore) carry it as a separate weapon. No change.
+
 Decided
 - HUD: design C, confirmed by the user on 2026-11-11.
 - Menus: mockup m3 (green TACNET terminal), confirmed 2026-11-11.

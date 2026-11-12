@@ -3514,6 +3514,9 @@ king:
 # on its own and keeps firing while the tank drives.
 ^TgmcVehicle:
 	Inherits: ^Unit
+	# A lighter wash of the player colour than infantry get: the hull's own paint and markings stay readable.
+	WithPlayerTint:
+		Strength: 40
 	WithIdleOverlay@shadow:
 		Image: fx-shadow
 		Sequence: big

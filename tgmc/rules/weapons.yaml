@@ -1212,8 +1212,8 @@ TGMCHEGrenade:
 		Damage: 260
 		Radius: 2c0
 
-# The other basic rifles a rifleman may carry (one is picked at random for each marine): the T-18 carbine fires quicker and
-# lighter, the M412 heavier and slower. The T-12 assault rifle is TGMCRifle above.
+# The other steps of the rifle ladder (upgrades.yaml): a rifleman starts with the T-18 carbine, quicker and lighter, moves to
+# the T-12 assault rifle (TGMCRifle above) and then to the M412, heavier and slower with more reach.
 TGMCCarbine:
 	Inherits: TGMCRifle
 	Range: 8c0

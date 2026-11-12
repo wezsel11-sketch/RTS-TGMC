@@ -243,8 +243,8 @@ damage over its burst-and-rest cycle at 25 ticks a second.
 | Gun | TGMC | Mod | Mod share | Verdict |
 |---|---|---|---|---|
 | AR-12 rifle (TGMCRifle) | 125 | 34 | 0.28 | the reference |
-| AR-18 carbine (TGMCCarbine) | 125 | 28 | 0.22 | wrong: weaker and shorter-ranged than the rifle |
-| PR-412 (TGMCM412) | 131 | 26 | 0.20 | wrong: a quarter less than the rifle for one cell of range |
+| AR-18 carbine (TGMCCarbine) | 125 | 28 | 0.22 | scaled on purpose: the first step of the ladder |
+| PR-412 (TGMCM412) | 131 | 26 | 0.20 | wrong: the last step of the ladder, yet a quarter less than the rifle |
 | SMG-90 (TGMCSMG) | 133 | 25 | 0.19 | scaled on purpose: the corpsman's sidearm |
 | SH-35 shotgun (TGMCShotgun) | 120 | 18 | 0.15 | scaled on purpose: the engineer's, with knockback |
 | SG-29 smartgun | 100 | 35 | 0.35 | match |
@@ -255,12 +255,15 @@ damage over its burst-and-rest cycle at 25 ticks a second.
 | SR-33 Dragunov (TGMCSniperSVD) | 63 | 43 | 0.69 | scaled on purpose |
 | SR-26 scoped rifle (TGMCSniper) | 36 | 38 | 1.04 | scaled on purpose: TGMC's aimed shot is folded into every shot |
 
-A rifleman is given one of the first three at random, so one in three is a fifth weaker than his neighbour and another a
-quarter weaker. Tried: carbine burst of 4 (TGMC's burst) and PR-412 damage 14, which puts both within 5% of the rifle.
-40 matches a map on the frozen miner-10 build (weapons added to copies of the maps, since `mod/balance.sh` arms hold
-rules only): marine win rate aimap-jungle-crossing 62%, aimap-canyon-run 64%, aimap-twin-rivers 57%; together 72 of 118
-(61%) against 112 of 234 (48%) for the plain build. It lifts the marines out of the target on two maps, so it is not
-applied. It goes in together with the next change that helps the xenos, or with a rifle of 10 damage.
+The first three are the rifle ladder (`upgrades.yaml`): a rifleman starts with the carbine, then T-12 Rifles (300), then
+M412 Rifles (500). The carbine being weakest is the design. The M412 is the defect: the last and dearest step cuts damage
+per second by a quarter for one cell of range, and the marine bot buys it in every match.
+
+Runs on the frozen miner-10 build, 40 matches a map, weapons added to copies of the maps (`mod/balance.sh` arms hold rules
+only). Marine win rate on aimap-jungle-crossing, aimap-canyon-run, aimap-twin-rivers; the plain build is 37%, 51%, 57%
+(112 of 234, 48%).
+- Carbine burst of 4 and M412 damage 14: 62%, 64%, 57% (72 of 118, 61%).
+- Carbine burst of 4 alone: 37%, 65%, 68% (63 of 112, 56%). Not a fix, since the carbine is meant to be the weak start; dropped.
 
 Claws: TGMC's fighting castes hit for 16 to 33 a blow (most 18 to 26). The mod's shared `TGMCClaws` does 20, inside
 that band, and the castes with a blow of their own (slam, punch, charge, gore) carry it as a separate weapon. No change.

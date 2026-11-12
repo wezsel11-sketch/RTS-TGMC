@@ -289,10 +289,21 @@ weed-node:
 	SpreadWeeds:
 		MaxRadius: 5
 		Interval: 60
+	WeedEdges:
+		Prefix:
+	# The node sits on a cell of carpet, so the weeds around it have no hole.
+	WithIdleOverlay@carpet:
+		Image: weeds
+		Sequence: idle
 
 weeds:
 	Inherits: weed-node
 	-CashTrickler:
+	# The carpet's edge is ragged where no weed lies beyond it (see WeedEdges; the node above only counts as a neighbour).
+	-WithIdleAnimation:
+	WeedEdges:
+		Prefix: c
+	-WithIdleOverlay@carpet:
 	-SpreadWeeds:
 	-MustBeDestroyed:
 	-AppearsOnRadar:

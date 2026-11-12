@@ -7,6 +7,7 @@ using OpenRA.Effects;
 using OpenRA.Graphics;
 using OpenRA.Mods.Common;
 using OpenRA.Mods.Common.Traits;
+using OpenRA.Mods.Common.Traits.Render;
 using OpenRA.Primitives;
 using OpenRA.Traits;
 
@@ -144,5 +145,71 @@ namespace OpenRA.Mods.TGMC.Traits
 		{
 			yield break;
 		}
+	}
+
+	[Desc("A weed cell that joins its neighbours: its sprite is ragged on each side with no weed beyond it.")]
+	public class WeedEdgesInfo : TraitInfo
+	{
+		[Desc("The sequence for a set of joined sides is this plus a number: 1 north, 2 south, 4 east, 8 west, added up. " +
+			"Empty for an actor that only counts as a neighbour (a weed node).")]
+		public readonly string Prefix = "c";
+
+		public override object Create(ActorInitializer init) { return new WeedEdges(this); }
+	}
+
+	public class WeedEdges : INotifyAddedToWorld, INotifyRemovedFromWorld
+	{
+		static readonly (CVec Offset, int Bit)[] Sides = [(new CVec(0, -1), 1), (new CVec(0, 1), 2), (new CVec(1, 0), 4), (new CVec(-1, 0), 8)];
+		readonly WeedEdgesInfo info;
+
+		public WeedEdges(WeedEdgesInfo info) { this.info = info; }
+
+		static WeedEdges At(Actor self, CPos cell, out Actor other)
+		{
+			// Weeds can be walked on, so the actor map does not hold them; the building influence does.
+			foreach (var a in self.World.WorldActor.Trait<BuildingInfluence>().GetBuildingsAt(cell))
+			{
+				var edges = a == self || a.IsDead ? null : a.TraitOrDefault<WeedEdges>();
+				if (edges != null)
+				{
+					other = a;
+					return edges;
+				}
+			}
+
+			other = null;
+			return null;
+		}
+
+		void Refresh(Actor self, CPos? without)
+		{
+			if (string.IsNullOrEmpty(info.Prefix) || !self.IsInWorld)
+				return;
+
+			var joined = 0;
+			foreach (var (offset, bit) in Sides)
+				if (self.Location + offset != without && At(self, self.Location + offset, out _) != null)
+					joined |= bit;
+
+			self.Trait<WithSpriteBody>().DefaultAnimation.PlayRepeating(info.Prefix + joined);
+		}
+
+		void RefreshAround(Actor self, CPos? without)
+		{
+			foreach (var (offset, _) in Sides)
+				At(self, self.Location + offset, out var other)?.Refresh(other, without);
+		}
+
+		void INotifyAddedToWorld.AddedToWorld(Actor self)
+		{
+			// Look once every actor added this tick is in place.
+			self.World.AddFrameEndTask(_ =>
+			{
+				Refresh(self, null);
+				RefreshAround(self, null);
+			});
+		}
+
+		void INotifyRemovedFromWorld.RemovedFromWorld(Actor self) { RefreshAround(self, self.Location); }
 	}
 }

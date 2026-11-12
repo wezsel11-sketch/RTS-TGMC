@@ -1258,6 +1258,11 @@ UNITS = {
         "zoffset": -1023,  # the carpet lies under everything that walks on it
         "sequences": {
             "idle": [(WEEDS, "weed15")],
+            # TGMC's edge pieces, picked by WeedEdges (tgmc/code/Weeds.cs): c<n> joins the neighbours named by the bits of n
+            # (BYOND's own numbering: 1 north, 2 south, 4 east, 8 west) and is ragged on the other sides.
+            "c0": [(WEEDS, "base")],
+            **{f"c{n}": [(WEEDS, f"weed_dir{n}")] for n in range(1, 15)},
+            "c15": "idle",
             "icon": [(WEEDS, "weednode3", None, {"fit": (44, 44), "frames": (0, 1)})],
         },
     },

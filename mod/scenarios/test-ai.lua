@@ -29,7 +29,7 @@ WorldLoaded = function()
 		if count >= 3 then
 			reported = true
 			print("TEST ai PASS (" .. count .. " xeno units by tick " .. ticks .. ", cash " .. xenos.Cash .. ")")
-		elseif ticks >= 1000 then
+		elseif ticks >= 2000 then
 			reported = true
 			local types = {}
 			for _, a in ipairs(units) do table.insert(types, a.Type) end

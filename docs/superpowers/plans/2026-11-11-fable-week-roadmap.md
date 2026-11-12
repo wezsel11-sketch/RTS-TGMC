@@ -183,6 +183,8 @@ Found on 2026-11-11 (D7)
 - `scenario-ai-defend` fails about one run in four, on the build before today's changes too (2 of 10): no rifleman goes to help
   the miner. `scenario-ai-easy` fails about one run in five: the Easy xeno bot ends tick 1000 with one or two units.
   Both are the bots' behaviour under some seeds, not the tests. They belong to D5.
+  2026-11-12: on the failing seeds the Easy xeno bot builds first and hatches its second unit near tick 1100, with its cash
+  spent. The test now waits 2000 ticks (12 of 12).
 - The Fatty's ring of eight and every rocket used the pyrogen's blue fire as their blast. Fixed.
 
 Balance baseline (D2), commit `e583359`, 2026-11-11

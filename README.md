@@ -558,7 +558,7 @@ only for the marines. `docs/hud-designs/` keeps the three mockups the dock was c
   Not yet checked: voices (no audio device).
 - AI against AI (`mod/balance.sh`, 40 matches a map): the marines won 77% over six maps at commit `e583359`, between 64% and
   90% a map, and more often the longer a match ran. The target is 40% to 60%. With the Miner paying 10 instead of 12 they won
-  45% on `balance-aivai` and 53% on `aimap-twin-rivers`; the other four maps are not measured yet. The tables are in
+  between 37% and 57% a map on the six baseline maps (jungle-crossing lowest); a run of 40 matches moves by up to 17 points. The tables are in
   `docs/superpowers/plans/2026-11-11-fable-week-roadmap.md`.
 - Hold the Line against a marine bot that holds the base (`mod/balance.sh 4 420 balance-holdline`): the marines win all
   four runs, finishing the last wave (16 Runners, 10 Hunters, 8 Sentinels) with about 30 units and 2 or 3 of their 5

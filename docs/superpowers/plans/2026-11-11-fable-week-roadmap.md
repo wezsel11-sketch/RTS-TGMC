@@ -228,6 +228,12 @@ aimap-canyon-run 42% (29% to 58%), was 80%; aimap-jungle-crossing 33% (21% to 49
 (25% to 55%), was 65%; aimap-quarry-pit 39% (26% to 55%), was 84%. Four maps together: 59 marine wins to 94 xeno wins, 39%.
 The xenos are now a little ahead on these four, and jungle-crossing sits under the target. A miner at 11 is the next arm to try.
 
+Miner at 11 against 10 (2026-11-12, 40 matches an arm), marine win rate: aimap-jungle-crossing 45% against 40%;
+aimap-canyon-run 67% against 59%; aimap-twin-rivers 72% against 61%. No pair is distinguishable, but 11 sits above the target
+on two maps, so the miner stays at 10. The miner-10 runs repeated here differ from the first ones by up to 17 points
+(canyon-run 42% then 59%), which is the spread of 40 matches. Both miner-10 runs together: jungle-crossing 29 of 79 (37%),
+canyon-run 40 of 79 (51%), twin-rivers 43 of 76 (57%).
+
 Decided
 - HUD: design C, confirmed by the user on 2026-11-11.
 - Menus: mockup m3 (green TACNET terminal), confirmed 2026-11-11.

@@ -1,5 +1,6 @@
 -- Scenario test (see mod/test_scenarios.sh): the Skirmish AI, set on the xeno player by the map, should spend its cash on
--- units from its silo. Prints "TEST ai PASS" or "TEST ai FAIL". It polls so that it finishes as soon as three exist.
+-- units from its silo. Prints "TEST ai PASS" or "TEST ai FAIL". It polls so that it finishes as soon as three exist
+-- or two have been hatched beside the queen.
 local reported = false
 
 WorldLoaded = function()
@@ -13,12 +14,18 @@ WorldLoaded = function()
 		return units
 	end
 
+	-- Units the bot has hatched so far. Counting only the living fails a bot that hatched banelings and sent them to burst.
+	local hatched = 0
+	Trigger.OnAnyProduction(function(_, produced)
+		if produced.Owner == xenos and produced.HasProperty("Move") then hatched = hatched + 1 end
+	end)
+
 	local function poll(ticks)
 		if reported then
 			return
 		end
 		local units = army()
-		local count = #units
+		local count = math.max(#units, hatched + 1)
 		if count >= 3 then
 			reported = true
 			print("TEST ai PASS (" .. count .. " xeno units by tick " .. ticks .. ", cash " .. xenos.Cash .. ")")

@@ -533,7 +533,8 @@ only for the marines. `docs/hud-designs/` keeps the three mockups the dock was c
 - Weapons that use `InstantHit` need `TargetActorCenter: true`, or the hit lands on a position and does nothing.
 - Acid is now a projectile, so a fast runner can still outrun a glob. Effects have not been tuned by eye in a long match.
 - Terrain on the generated maps is flat tiles from TGMC's `jungle.dmi`, `ground_map.dmi` and `cave.dmi`: grass (two variants,
-  softened toward one shared colour), dirt road, a walkable ford, impassable water and rock. Water, ford and dirt carry grass along
+  softened toward one shared colour, in patches, and one cell in fourteen with a tuft or stones from `jungleflora.dmi`; looks only,
+  no cover), dirt road, a walkable ford, impassable water and rock. Water, ford and dirt carry grass along
   each side that has grass beyond it (16 edge frames a tile, `edge_sheet` in `mod/build_tileset.py`). The edges look at the four
   side neighbours only, so a diagonal corner still shows a small notch. Rock and walls use TGMC's 47 cave pieces, picked from all
   eight neighbours; a wall knocked down in play leaves the pieces beside it as they were. Seen on one map (`aimap-twin-rivers`).

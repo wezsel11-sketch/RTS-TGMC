@@ -41,12 +41,32 @@ Terrain:
 Templates:
 	Template@1:
 		Id: 1
-		Images: grass1.png, grass2.png
+		# Two plain grass tiles, then grass with a piece of jungle flora on it (mod/build_tileset.py, FLORA_STATES).
+		Images: grass-var.png
 		Size: 1,1
 		PickAny: True
 		Categories: Terrain
 		Tiles:
 			0: Clear
+			1: Clear
+			2: Clear
+			3: Clear
+			4: Clear
+			5: Clear
+			6: Clear
+			7: Clear
+			8: Clear
+			9: Clear
+			10: Clear
+			11: Clear
+			12: Clear
+			13: Clear
+			14: Clear
+			15: Clear
+			16: Clear
+			17: Clear
+			18: Clear
+			19: Clear
 	Template@2:
 		Id: 2
 		# 16 frames: grass grown in from the sides named by the frame number (mod/build_tileset.py, edge_sheet).

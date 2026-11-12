@@ -39,6 +39,14 @@ TILES = {
     "wall": (CAVE, "cave-255", 0),
 }
 
+# Open grass is one sheet, grass-var.png: frame 0 and 1 are the two plain tiles, then grass1 with one piece of TGMC's jungle
+# flora on it (thin grass, tufts, small stones), a little faint so it stays ground. mod/make_placeholders.py picks the frame per cell.
+FLORA = "icons/obj/flora/jungleflora.dmi"
+FLORA_STATES = [f"{kind}{n}" for kind in ("grass_thin", "grass", "rock") for n in ("", "_1", "_2", "_3", "_4", "_5")]
+FLORA_DIM = 0.95
+FLORA_ALPHA = 0.8
+GRASS_FRAMES = 2 + len(FLORA_STATES)
+
 # Tiles that meet grass get an edge sheet, <name>-edge.png: 16 frames, frame m with grass grown in from the sides named by the
 # bits of m (1 north, 2 east, 4 south, 8 west). Frame 0 is the plain tile. mod/make_placeholders.py picks the frame from a
 # cell's four neighbours, so a shore or a road side is a ragged line of grass and not a ruler-straight tile border.
@@ -121,6 +129,22 @@ def main():
         meta.add_text("FrameSize", "32,32")
         meta.add_text("FrameAmount", "16")
         edge_sheet(made[name], made["grass1"]).save(os.path.join(args.out, f"{name}-edge.png"), pnginfo=meta)
+    flora = tgmc_dmi.Dmi(os.path.join(args.tgmc, FLORA))
+    sheet = Image.new("RGB", (32 * GRASS_FRAMES, 32))
+    sheet.paste(made["grass1"].convert("RGB"), (0, 0))
+    sheet.paste(made["grass2"].convert("RGB"), (32, 0))
+    for i, state in enumerate(FLORA_STATES):
+        piece = flora.frames(state)[0][0].convert("RGBA")
+        if piece.size != (32, 32):
+            raise SystemExit(f"{FLORA}:{state} is {piece.size}, expected 32x32")
+        dark = Image.merge("RGBA", [c.point(lambda v: round(v * FLORA_DIM)) for c in piece.split()[:3]] + [piece.getchannel("A").point(lambda v: round(v * FLORA_ALPHA))])
+        frame = made["grass1"].convert("RGBA")
+        frame.alpha_composite(dark)
+        sheet.paste(frame.convert("RGB"), (32 * (2 + i), 0))
+    meta = PngImagePlugin.PngInfo()
+    meta.add_text("FrameSize", "32,32")
+    meta.add_text("FrameAmount", str(GRASS_FRAMES))
+    sheet.save(os.path.join(args.out, "grass-var.png"), pnginfo=meta)
     cave = dmis[CAVE]
     sheet = Image.new("RGB", (32 * len(CAVE_JUNCTIONS), 32))
     for i, junction in enumerate(CAVE_JUNCTIONS):

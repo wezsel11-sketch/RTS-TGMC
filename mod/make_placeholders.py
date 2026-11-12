@@ -1945,6 +1945,15 @@ def write_map(folder, title, size_w, size_h, placed, visibility, spawns, scripts
         # Water, ford and dirt show grass along each side that has grass beyond it: the variant index is the frame of the
         # tile's edge sheet (mod/build_tileset.py), bit 1 north, 2 east, 4 south, 8 west.
         template, index = ground(x, y)
+        if template == GRASS:
+            # Patches of the second grass tile three cells across, and one cell in twelve with a piece of flora on it
+            # (frames of grass-var.png). A fixed scramble of the position, so a map builds the same every time.
+            def scramble(a, b):
+                n = (a * 374761393 + b * 668265263) & 0xFFFFFFFF
+                n = ((n ^ (n >> 13)) * 1274126177) & 0xFFFFFFFF
+                return n ^ (n >> 16)
+            h = scramble(x, y)
+            index = 2 + h // 14 % (build_tileset.GRASS_FRAMES - 2) if h % 14 == 0 else scramble(x // 3, y // 3) % 3 == 0
         if template in (WATER, FORD, DIRT):
             sides = ((x, y - 1), (x + 1, y), (x, y + 1), (x - 1, y))
             index = sum(1 << i for i, (nx, ny) in enumerate(sides)

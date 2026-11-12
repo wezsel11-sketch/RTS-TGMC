@@ -151,18 +151,36 @@ namespace OpenRA.Mods.TGMC.Traits
 	public class WeedEdgesInfo : TraitInfo
 	{
 		[Desc("The sequence for a set of joined sides is this plus a number: 1 north, 2 south, 4 east, 8 west, added up. " +
-			"Empty for an actor that only counts as a neighbour (a weed node).")]
+			"Empty for an actor that only counts as a neighbour.")]
 		public readonly string Prefix = "c";
+
+		[Desc("Draw the carpet under the actor from this image, and leave its own body alone (a weed node, whose body is the sack). " +
+			"Empty, or the actor's own image: the carpet is the actor's body.")]
+		public readonly string Image = null;
 
 		public override object Create(ActorInitializer init) { return new WeedEdges(this); }
 	}
 
-	public class WeedEdges : INotifyAddedToWorld, INotifyRemovedFromWorld
+	public class WeedEdges : INotifyCreated, INotifyAddedToWorld, INotifyRemovedFromWorld
 	{
 		static readonly (CVec Offset, int Bit)[] Sides = [(new CVec(0, -1), 1), (new CVec(0, 1), 2), (new CVec(1, 0), 4), (new CVec(-1, 0), 8)];
 		readonly WeedEdgesInfo info;
 
+		Animation carpet;
+
 		public WeedEdges(WeedEdgesInfo info) { this.info = info; }
+
+		void INotifyCreated.Created(Actor self)
+		{
+			// An actor that inherits this trait cannot clear Image in yaml (an empty value keeps the inherited one).
+			var rs = self.Trait<RenderSprites>();
+			if (string.IsNullOrEmpty(info.Image) || info.Image == rs.GetImage(self))
+				return;
+
+			carpet = new Animation(self.World, info.Image);
+			carpet.PlayRepeating(info.Prefix + 0);
+			rs.Add(new AnimationWithOffset(carpet, null, null));
+		}
 
 		static WeedEdges At(Actor self, CPos cell, out Actor other)
 		{
@@ -191,7 +209,7 @@ namespace OpenRA.Mods.TGMC.Traits
 				if (self.Location + offset != without && At(self, self.Location + offset, out _) != null)
 					joined |= bit;
 
-			self.Trait<WithSpriteBody>().DefaultAnimation.PlayRepeating(info.Prefix + joined);
+			(carpet ?? self.Trait<WithSpriteBody>().DefaultAnimation).PlayRepeating(info.Prefix + joined);
 		}
 
 		void RefreshAround(Actor self, CPos? without)

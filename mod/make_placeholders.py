@@ -27,6 +27,7 @@ from PIL import Image, ImageDraw, ImageFilter, PngImagePlugin
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import build_sounds  # noqa: E402
 import build_maptiles  # noqa: E402
+import build_tileset  # noqa: E402
 import tgmc_dmi  # noqa: E402
 import tgmc_dmm  # noqa: E402
 
@@ -1753,7 +1754,9 @@ SCENARIOS = {
     "scenario-ai-engineers": {"scripts": ("test-ai-engineers",), "marine_bot": "skirmish", "drop_conquest": True, "fast": True, "size": (40, 28), "actors": [
         ("cryo-pod", "Marines", 6, 14, 0), ("miner-field", "Neutral", 16, 14, 0), ("resin-silo", "Xenos", 36, 14, 0),
     ]},
-    "scenario-ai-upgrade": {"scripts": ("test-ai-upgrade",), "marine_bot": "skirmish", "drop_conquest": True, "fast": True, "size": (32, 28), "actors": [
+    # Starts with 2000: on the base trickle alone the bot sometimes had no cash left for the second rifle step in 9000 ticks.
+    "scenario-ai-upgrade": {"scripts": ("test-ai-upgrade",), "marine_bot": "skirmish", "drop_conquest": True, "fast": True, "size": (32, 28),
+                            "extra_rules": "Player:\n\tPlayerResources:\n\t\tDefaultCash: 2000\n", "actors": [
         ("cryo-pod", "Marines", 6, 4, 0), ("armory", "Marines", 12, 4, 0), ("rifleman", "Marines", 8, 8, 256),
         ("resin-silo", "Xenos", 28, 24, 0),
     ]},
@@ -1945,6 +1948,12 @@ def write_map(folder, title, size_w, size_h, placed, visibility, spawns, scripts
             sides = ((x, y - 1), (x + 1, y), (x, y + 1), (x - 1, y))
             index = sum(1 << i for i, (nx, ny) in enumerate(sides)
                         if 0 <= nx < size_w and 0 <= ny < size_h and ground(nx, ny)[0] == GRASS)
+        if template in (ROCK, WALL):
+            # Rock joins rock, wall and the map edge: the frame is TGMC's cave piece for that set of neighbours.
+            def rock(dx, dy):
+                nx, ny = x + dx, y + dy
+                return not (0 <= nx < size_w and 0 <= ny < size_h) or ground(nx, ny)[0] in (ROCK, WALL)
+            index = build_tileset.cave_frame(rock)
         return template, index
 
     body = b"".join(struct.pack("<HB", *tile(x, y)) for x in range(size_w) for y in range(size_h))

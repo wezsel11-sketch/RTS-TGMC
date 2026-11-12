@@ -121,18 +121,112 @@ Templates:
 			15: Road
 	Template@5:
 		Id: 5
-		Images: rock.png
+		# 47 frames: TGMC's cave pieces, one for each way the cell joins its neighbours (mod/build_tileset.py, CAVE_JUNCTIONS).
+		Images: rock-edge.png
 		Size: 1,1
 		PickAny: True
 		Categories: Terrain
 		Tiles:
 			0: Rock
+			1: Rock
+			2: Rock
+			3: Rock
+			4: Rock
+			5: Rock
+			6: Rock
+			7: Rock
+			8: Rock
+			9: Rock
+			10: Rock
+			11: Rock
+			12: Rock
+			13: Rock
+			14: Rock
+			15: Rock
+			16: Rock
+			17: Rock
+			18: Rock
+			19: Rock
+			20: Rock
+			21: Rock
+			22: Rock
+			23: Rock
+			24: Rock
+			25: Rock
+			26: Rock
+			27: Rock
+			28: Rock
+			29: Rock
+			30: Rock
+			31: Rock
+			32: Rock
+			33: Rock
+			34: Rock
+			35: Rock
+			36: Rock
+			37: Rock
+			38: Rock
+			39: Rock
+			40: Rock
+			41: Rock
+			42: Rock
+			43: Rock
+			44: Rock
+			45: Rock
+			46: Rock
 	# A wall that heavy weapons can knock down (DestructibleWalls), the same picture as the rock; scenario maps use it.
 	Template@6:
 		Id: 6
-		Images: wall.png
+		# 47 frames: TGMC's cave pieces, one for each way the cell joins its neighbours (mod/build_tileset.py, CAVE_JUNCTIONS).
+		Images: wall-edge.png
 		Size: 1,1
 		PickAny: True
 		Categories: Terrain
 		Tiles:
 			0: Wall
+			1: Wall
+			2: Wall
+			3: Wall
+			4: Wall
+			5: Wall
+			6: Wall
+			7: Wall
+			8: Wall
+			9: Wall
+			10: Wall
+			11: Wall
+			12: Wall
+			13: Wall
+			14: Wall
+			15: Wall
+			16: Wall
+			17: Wall
+			18: Wall
+			19: Wall
+			20: Wall
+			21: Wall
+			22: Wall
+			23: Wall
+			24: Wall
+			25: Wall
+			26: Wall
+			27: Wall
+			28: Wall
+			29: Wall
+			30: Wall
+			31: Wall
+			32: Wall
+			33: Wall
+			34: Wall
+			35: Wall
+			36: Wall
+			37: Wall
+			38: Wall
+			39: Wall
+			40: Wall
+			41: Wall
+			42: Wall
+			43: Wall
+			44: Wall
+			45: Wall
+			46: Wall

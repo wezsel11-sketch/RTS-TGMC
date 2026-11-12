@@ -263,7 +263,14 @@ Runs on the frozen miner-10 build, 40 matches a map, weapons added to copies of 
 only). Marine win rate on aimap-jungle-crossing, aimap-canyon-run, aimap-twin-rivers; the plain build is 37%, 51%, 57%
 (112 of 234, 48%).
 - Carbine burst of 4 and M412 damage 14: 62%, 64%, 57% (72 of 118, 61%).
+- M412 damage 15 alone (35 a second, just over the T-12): 44%, 44%, 38% (48 of 114, 42%). Inside the target. Applied.
+- M412 damage 15 with the weed node paying 8, was 7: 37%, 29%, 40% (41 of 116, 35%). Not applied.
 - Carbine burst of 4 alone: 37%, 65%, 68% (63 of 112, 56%). Not a fix, since the carbine is meant to be the weak start; dropped.
+
+The same fault in the machine-gun ladder: Miniguns (800) took the gunner from 69 a second at 10.5 cells to 63 at 9. The
+minigun's round goes from 6 to 8 damage (84 a second, still at 9 cells). Not measured on its own. The other ladders rise at
+each step (SMG 25, then the M25, then 67; shotgun 18, 24; sniper 38, 43, 49, 49 with more reach; SADAR 22, AP 39).
+The six runs above also show the spread: three arms of 40 on one map land anywhere from 37% to 68%.
 
 Claws: TGMC's fighting castes hit for 16 to 33 a blow (most 18 to 26). The mod's shared `TGMCClaws` does 20, inside
 that band, and the castes with a blow of their own (slam, punch, charge, gore) carry it as a separate weapon. No change.

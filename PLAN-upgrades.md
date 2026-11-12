@@ -37,13 +37,13 @@ Read from `tgmc/rules/weapons.yaml`. A weapon fires `Burst` shots `BurstDelays` 
 |---|---|---|---|---|
 | TGMCRifle (T-12) | 9 | 3 x 11 | 24 | 1.38 |
 | TGMCCarbine (T-18) | 8 | 3 x 7 | 19 | 1.11 |
-| TGMCM412 | 10 | 3 x 11 | 32 | 1.03 |
+| TGMCM412 | 10 | 3 x 15 | 32 | 1.41 |
 | TGMCSMG | 6.75 | 1 x 5 | 5 | 1.00 |
 | TGMCShotgun | 4 | 6 x 6 | 50 | 0.72 (all pellets) |
 | TGMCSmartgun | 10.5 | 1 x 7 | 5 | 1.40 |
 | TGMCSniper | 12 | 1 x 60 | 40 | 1.50 |
 | TGMCMG60 | 10.5 | 1 x 11 | 4 | 2.75 |
-| TGMCMinigun | 9 | 8 x 6 | 19 | 2.53 |
+| TGMCMinigun | 9 | 8 x 8 | 19 | 3.37 |
 | TGMCPlasmaRifle | 9 | 1 x 20 | 22 | 0.91 |
 | TGMCSadar | 9 | 1 x 80 (blast) | 90 | 0.89 |
 | TGMCMechRPG | 10 | 1 x 90 (blast) | 170 | 0.53 |

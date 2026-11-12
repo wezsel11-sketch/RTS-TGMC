@@ -1196,7 +1196,7 @@ TGMCMinigun:
 	Projectile: CoverBullet
 		Inaccuracy: 960
 	Warhead@1Dam: SpreadDamage
-		Damage: 6
+		Damage: 8
 		Spread: 192
 
 # B17 demolitionist's launcher: a heavier shell than the grenadier's, with the same friendly fire.
@@ -1233,7 +1233,7 @@ TGMCM412:
 	Projectile: CoverBullet
 		Inaccuracy: 492
 	Warhead@1Dam: SpreadDamage
-		Damage: 11
+		Damage: 15
 
 # Engineer's shotgun: six pellets that scatter, deadly up close.
 TGMCShotgun:

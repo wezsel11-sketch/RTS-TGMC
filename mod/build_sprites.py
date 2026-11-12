@@ -1912,6 +1912,28 @@ def save_sheet(sheet_cells, cell_size, path):
     sheet.save(path, pnginfo=meta)
 
 
+SHADOW_PAD = 8  # a shadow cell is the unit's cell with this much room on every side: feet stand on the cell's bottom edge
+
+
+def ground_shadow(cell):
+    """A soft dark ellipse on the ground under the lowest part of `cell`'s figure, as wide as what stands there."""
+    out = Image.new("RGBA", (cell.width + 2 * SHADOW_PAD, cell.height + 2 * SHADOW_PAD), (0, 0, 0, 0))
+    solid = cell.getchannel("A").point(lambda v: 255 if v > 40 else 0)
+    box = solid.getbbox()
+    if box is None:
+        return out
+    left, top, right, bottom = box
+    band = max(4, round((bottom - top) * 0.15))
+    feet = solid.crop((left, bottom - band, right, bottom)).getbbox()
+    w = max(14, feet[2] - feet[0] + 6)
+    h = min(14, max(6, w * 0.35))
+    cx, cy = left + (feet[0] + feet[2]) / 2 + SHADOW_PAD, bottom - 2 + SHADOW_PAD
+    big = Image.new("L", (out.width * 4, out.height * 4), 0)
+    ImageDraw.Draw(big).ellipse([(cx - w / 2) * 4, (cy - h / 2) * 4, (cx + w / 2) * 4, (cy + h / 2) * 4], fill=150)
+    out.putalpha(big.filter(ImageFilter.GaussianBlur(6)).resize(out.size, Image.LANCZOS))
+    return out
+
+
 ICON_W, ICON_H = 62, 46   # the production palette's cell
 # Marine cards wear the HUD's tgui charcoal (see make_chrome.py); xeno cards stay purple.
 CAMEO_TONES = {"marine": ((58, 62, 70), (26, 27, 30)), "xeno": ((72, 44, 84), (28, 16, 36))}
@@ -2042,6 +2064,13 @@ def build_unit(tgmc, unit, spec, out_dir):
         if tick is not None:
             lines.append(f"\t\tTick: {tick}")
         seq_defs.append(("icon", start, length, facings, tick, None))
+    # A unit that turns gets a shadow for each facing, placed under that view's feet (WithIdleOverlay@shadow on ^Unit).
+    pose = next((n for n in ("stand", "idle") if n in starts and starts[n][2] > 1), None)
+    if pose:
+        start, length, facings, _, stride = starts[pose]
+        save_sheet([ground_shadow(sheet_cells[start + i * (stride or length)]) for i in range(facings)],
+                   (cw + 2 * SHADOW_PAD, ch + 2 * SHADOW_PAD), os.path.join(out_dir, "sprites", f"{unit}-shadow.png"))
+        lines += ["\tshadow:", f"\t\tFilename: sprites/{unit}-shadow.png", "\t\tStart: 0", f"\t\tFacings: -{facings}", "\t\tZOffset: -1023"]
     if has_cloth:  # the same cells on the cloth sheet
         lines += [f"{unit}-cloth:", f"\tInherits: {unit}", "\tDefaults:", f"\t\tFilename: sprites/{unit}-cloth.png"]
     with open(os.path.join(out_dir, "sequences", f"{unit}.yaml"), "w", encoding="utf-8", newline="\n") as f:

@@ -539,7 +539,7 @@ only for the marines. `docs/hud-designs/` keeps the three mockups the dock was c
   side neighbours only, so a diagonal corner still shows a small notch. Rock and walls use TGMC's 47 cave pieces, picked from all
   eight neighbours; a wall knocked down in play leaves the pieces beside it as they were. Seen on one map (`aimap-twin-rivers`).
 - The weed carpet uses TGMC's edge pieces (`WeedEdges`), ragged where no weed lies beyond.
-- Every unit has a soft ground shadow (`fx-shadow`). Under tanks and the APC the hull covers it.
+- Every unit has a soft ground shadow under its feet, one for each way it can face (`shadow` in the unit's sequences, drawn by `mod/build_sprites.py` from the sprite itself).
 - The HUD is a command sidebar (radar, production palette with an Infantry and a Xeno tab, requisition, menu button); it reads the same for either faction. The selection card under the palette shows the selected unit.
   Production icons are the units' front-facing sprite. The clock overlay is still a placeholder. The production tab icons are
   pictograms (rifle, claw, hammer) drawn by `mod/make_chrome.py`. The readout card under the palette has a Build-range hint,

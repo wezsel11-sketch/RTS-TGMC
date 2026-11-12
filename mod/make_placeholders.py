@@ -560,16 +560,6 @@ def write_acid_pool(out):
     img.save(os.path.join(out, "acid-pool.png"), pnginfo=meta)
 
 
-def write_unit_shadow(out):
-    """unit-shadow.png: a soft dark ellipse, 32x16, drawn on the ground under every unit so it stands off the terrain."""
-    big = Image.new("L", (128, 64), 0)
-    ImageDraw.Draw(big).ellipse([20, 14, 108, 50], fill=150)
-    alpha = big.filter(ImageFilter.GaussianBlur(6)).resize((32, 16), Image.LANCZOS)
-    img = Image.new("RGBA", (32, 16), (0, 0, 0, 0))
-    img.putalpha(alpha)
-    img.save(os.path.join(out, "unit-shadow.png"))
-
-
 def write_repair_fx(out):
     """Medic and engineer signals, drawn here rather than from TGMC: 8 frames each, 24x24.
 
@@ -2217,7 +2207,6 @@ def main():
     write_overlay(args.out)
     write_acid_pool(args.out)
     write_repair_fx(args.out)
-    write_unit_shadow(args.out)
     write_rank_chevrons(args.out)
     write_miner_art(args.out)
     if args.tgmc:

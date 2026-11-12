@@ -26,6 +26,8 @@ CAVE = "icons/turf/walls/cave.dmi"
 # SOFTEN pulls each pixel of a tile this far (0 to 1) toward the average colour of all the softened tiles together, so patches
 # of grass1 and grass2 do not read as a checkerboard either.
 SOFTEN = {"grass1": 0.7, "grass2": 0.7}
+# TGMC's sea and cave tiles are far brighter than the softened grass and pull the eye off the units: DIM multiplies their colours.
+DIM = {"water": 0.72, "ford": 0.78, "rock": 0.78, "wall": 0.78}
 
 TILES = {
     "grass1": (JUNGLE, "grass1", 0),
@@ -104,6 +106,8 @@ def main():
             raise SystemExit(f"{path}:{state} is {img.size}, expected 32x32")
         if name in SOFTEN:
             img = Image.blend(img.convert("RGB"), Image.new("RGB", img.size, soft), SOFTEN[name])
+        if name in DIM:
+            img = img.convert("RGB").point(lambda v, k=DIM[name]: round(v * k))
         meta = PngImagePlugin.PngInfo()
         meta.add_text("FrameSize", "32,32")
         meta.add_text("FrameAmount", "1")
@@ -120,7 +124,7 @@ def main():
     cave = dmis[CAVE]
     sheet = Image.new("RGB", (32 * len(CAVE_JUNCTIONS), 32))
     for i, junction in enumerate(CAVE_JUNCTIONS):
-        sheet.paste(cave.frames(f"cave-{junction}")[0][0].convert("RGB"), (32 * i, 0))
+        sheet.paste(cave.frames(f"cave-{junction}")[0][0].convert("RGB").point(lambda v: round(v * DIM["rock"])), (32 * i, 0))
     for name in ("rock", "wall"):
         meta = PngImagePlugin.PngInfo()
         meta.add_text("FrameSize", "32,32")

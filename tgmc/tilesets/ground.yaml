@@ -11,7 +11,7 @@ Terrain:
 	TerrainType@Clear:
 		Type: Clear
 		TargetTypes: Ground
-		Color: 2E5230
+		Color: 2C482A
 	TerrainType@Road:
 		Type: Road
 		TargetTypes: Ground
@@ -19,15 +19,15 @@ Terrain:
 	TerrainType@Ford:
 		Type: Ford
 		TargetTypes: Ground
-		Color: 92A6A1
+		Color: 72817E
 	TerrainType@Water:
 		Type: Water
 		TargetTypes: Water
-		Color: 4D86B8
+		Color: 456D8C
 	TerrainType@Rock:
 		Type: Rock
 		TargetTypes: Rock
-		Color: B2B2B2
+		Color: 8B8B8B
 	# The walls of the converted maps: rock to walk, but heavy weapons can knock them down (DestructibleWalls).
 	TerrainType@Wall:
 		Type: Wall

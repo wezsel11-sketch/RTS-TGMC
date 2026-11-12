@@ -530,9 +530,13 @@ only for the marines. `docs/hud-designs/` keeps the three mockups the dock was c
   `TGMCHeal` and `TGMCRepair`, so they play on the target. Healing and repair are weapons with negative damage. Scenario tests cover heal, repair, victory and a rifleman-versus-Runner fight.
 - Weapons that use `InstantHit` need `TargetActorCenter: true`, or the hit lands on a position and does nothing.
 - Acid is now a projectile, so a fast runner can still outrun a glob. Effects have not been tuned by eye in a long match.
-- Terrain is flat tiles from TGMC's `jungle.dmi`, `ground_map.dmi` and `cave.dmi`: grass (two variants), dirt road, a walkable
-  ford, impassable water and impassable rock. There are no edge or transition tiles, so shorelines are hard. The test field is all grass.
-- The HUD is a command sidebar (radar, production palette with an Infantry and a Xeno tab, requisition, menu button); it reads the same for either faction. There is no selection readout.
+- Terrain on the generated maps is flat tiles from TGMC's `jungle.dmi`, `ground_map.dmi` and `cave.dmi`: grass (two variants,
+  softened toward one shared colour), dirt road, a walkable ford, impassable water and rock. Water, ford and dirt carry grass along
+  each side that has grass beyond it (16 edge frames a tile, `edge_sheet` in `mod/build_tileset.py`). The edges look at the four
+  side neighbours only, so a diagonal corner still shows a small notch, and rock has no edge frames. Seen on one map
+  (`aimap-twin-rivers`).
+- Every unit has a soft ground shadow (`fx-shadow`). Under tanks and the APC the hull covers it.
+- The HUD is a command sidebar (radar, production palette with an Infantry and a Xeno tab, requisition, menu button); it reads the same for either faction. The selection card under the palette shows the selected unit.
   Production icons are the units' front-facing sprite. The clock overlay is still a placeholder. The production tab icons are
   pictograms (rifle, claw, hammer) drawn by `mod/make_chrome.py`. The readout card under the palette has a Build-range hint,
   "Builders place within 5 cells", shown on every tab.
@@ -543,9 +547,8 @@ only for the marines. `docs/hud-designs/` keeps the three mockups the dock was c
   `--check-yaml` pass; `scenario-build` checks that the tech buildings unlock only once built and that a Miner and a Weed Node add income;
   on Landing Zone (marine seat, driven with synthetic mouse clicks) the Build tab lists the structures with locked ones dimmed, a Miner and a Cade
   built and placed next to the Engineer, and a placement 10 cells from every builder was refused. In AI-vs-AI both bots build generators,
-  tech and turrets (4 to 8 structures for the marines, 5 to 10 for the xenos by minute five); the marines still win (2 of 2 finished runs),
-  so the xenos need more help. Not yet seen in play: the xeno Build tab (Drone and Queen ranges), dragging a wall line, and any tuning of
-  the new income numbers (Miner +8 and Weed Node +7 every 2 s, base trickle 6, mini silo 3).
+  tech and turrets (4 to 8 structures for the marines, 5 to 10 for the xenos by minute five). Not yet seen in play: the xeno Build tab
+  (Drone and Queen ranges) and dragging a wall line. Income is Miner +10 and Weed Node +7 every 2 s, base trickle 6, mini silo 3.
 - The path menu -> Singleplayer -> Skirmish -> lobby (add a Skirmish AI, Start Game) was walked headless and works.
   `tgmc/chrome/mainmenu.yaml` is OpenRA's main menu in TGUI-style windows, without the news feed, update notice and player profile; `ingame-menu.yaml` does the same for the Esc menu.
 - Verified by running the mod headless (OpenRA bleed, `mod/check_mod.sh` and `mod/smoke.sh`): the lint passes with

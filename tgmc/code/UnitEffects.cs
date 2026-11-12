@@ -3,7 +3,10 @@
 // the same licence as OpenRA, whose traits this file extends.
 #endregion
 
+using System.Collections.Generic;
 using System.Linq;
+using OpenRA.Graphics;
+using OpenRA.Primitives;
 using OpenRA.Mods.Common.Traits;
 using OpenRA.Traits;
 
@@ -89,6 +92,64 @@ namespace OpenRA.Mods.TGMC.Traits
 		}
 
 		void INotifyAttack.PreparingAttack(Actor self, in Target target, Armament a, Barrel barrel) { }
+	}
+
+	[Desc("The body darts toward a close target on each attack and settles back (TGMC's attack animation is this lunge; it has no attack frames).")]
+	public class AttackLungeInfo : TraitInfo
+	{
+		[Desc("How far the body moves at the peak.")]
+		public readonly WDist Distance = new(360);
+
+		[Desc("Ticks from the strike until the body is back.")]
+		public readonly int Duration = 7;
+
+		[Desc("Targets further than this get no lunge (spit and other ranged attacks).")]
+		public readonly WDist MaxRange = new(2048);
+
+		public override object Create(ActorInitializer init) { return new AttackLunge(this); }
+	}
+
+	public class AttackLunge : INotifyAttack, ITick, IRenderModifier
+	{
+		readonly AttackLungeInfo info;
+		WVec reach;
+		int left;
+
+		public AttackLunge(AttackLungeInfo info) { this.info = info; }
+
+		void INotifyAttack.Attacking(Actor self, in Target target, Armament a, Barrel barrel)
+		{
+			var to = target.CenterPosition - self.CenterPosition;
+			if (to.HorizontalLength == 0 || to.HorizontalLength > info.MaxRange.Length)
+				return;
+
+			reach = new WVec(to.X, to.Y, 0) * info.Distance.Length / to.HorizontalLength;
+			left = info.Duration;
+		}
+
+		void INotifyAttack.PreparingAttack(Actor self, in Target target, Armament a, Barrel barrel) { }
+
+		void ITick.Tick(Actor self)
+		{
+			if (left > 0)
+				left--;
+		}
+
+		IEnumerable<IRenderable> IRenderModifier.ModifyRender(Actor self, WorldRenderer wr, IEnumerable<IRenderable> r)
+		{
+			if (left == 0)
+				return r;
+
+			// Out in the first two ticks, back over the rest.
+			var passed = info.Duration - left;
+			var shift = passed < 2 ? reach * (passed + 1) / 2 : reach * left / (info.Duration - 1);
+			return r.Select(x => x.OffsetBy(shift));
+		}
+
+		IEnumerable<Rectangle> IRenderModifier.ModifyScreenBounds(Actor self, WorldRenderer wr, IEnumerable<Rectangle> bounds)
+		{
+			return bounds;
+		}
 	}
 
 	[Desc("Sparks fly off the unit when it is hit (armour: the mech). Healing makes none.")]

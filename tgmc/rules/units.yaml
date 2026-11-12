@@ -1506,6 +1506,8 @@ demolitionist:
 	LeavesTracks:
 		Sequences: claw1, claw2
 	Inherits: ^Unit
+	# A clawing xeno darts at its target (AttackLunge in UnitEffects.cs).
+	AttackLunge:
 	# Xenos sense what is in front of them through walls: a cone of 120 degrees, nine cells deep (see TgmcSight in tgmc/code/Sight.cs).
 	TgmcSight@cone:
 		Range: 9c0

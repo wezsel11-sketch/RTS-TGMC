@@ -239,7 +239,8 @@ def write_shroud_tiles(out, tile=32):
     """
     half = tile // 2
     centres = {1: (half / 2, half / 2), 2: (half + half / 2, half / 2), 4: (half + half / 2, half + half / 2), 8: (half / 2, half + half / 2)}
-    for name, alpha in (("shroud", 255), ("fog", 128)):
+    # Fog is a blue-grey veil, not half black: explored ground stays readable and loses some of its colour.
+    for name, rgb, alpha in (("shroud", (0, 0, 0), 255), ("fog", (20, 24, 34), 105)):
         sheet = Image.new("RGBA", (tile * 14, tile), (0, 0, 0, 0))
         px = sheet.load()
         for pattern in range(1, 15):
@@ -253,13 +254,13 @@ def write_shroud_tiles(out, tile=32):
                     top = corners[0] * (1 - u) + corners[1] * u
                     bottom = corners[3] * (1 - u) + corners[2] * u
                     a = int(round(alpha * (top * (1 - v) + bottom * v)))
-                    px[tile * (pattern - 1) + x, y] = (0, 0, 0, a)
+                    px[tile * (pattern - 1) + x, y] = rgb + (a,)
         meta = PngImagePlugin.PngInfo()
         meta.add_text("FrameSize", f"{tile},{tile}")
         meta.add_text("FrameAmount", "14")
         sheet.save(os.path.join(out, f"{name}.png"), pnginfo=meta)
 
-        full = Image.new("RGBA", (tile, tile), (0, 0, 0, alpha))
+        full = Image.new("RGBA", (tile, tile), rgb + (alpha,))
         meta = PngImagePlugin.PngInfo()
         meta.add_text("FrameSize", f"{tile},{tile}")
         meta.add_text("FrameAmount", "1")

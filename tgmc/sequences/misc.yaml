@@ -216,7 +216,7 @@ fx-light:
 		Tick: 120
 		Scale: 1.2
 		# Faint, since a napalm run lays dozens side by side and additive lights add up to white.
-		Alpha: 0.3
+		Alpha: 0.14
 		BlendMode: Additive
 		ZOffset: 2047
 	glow-acid:

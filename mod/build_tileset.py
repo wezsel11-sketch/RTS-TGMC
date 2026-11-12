@@ -47,9 +47,10 @@ FLORA_DIM = 0.95
 FLORA_ALPHA = 0.8
 GRASS_FRAMES = 2 + len(FLORA_STATES)
 
-# Tiles that meet grass get an edge sheet, <name>-edge.png: 16 frames, frame m with grass grown in from the sides named by the
-# bits of m (1 north, 2 east, 4 south, 8 west). Frame 0 is the plain tile. mod/make_placeholders.py picks the frame from a
-# cell's four neighbours, so a shore or a road side is a ragged line of grass and not a ruler-straight tile border.
+# Tiles that meet grass get an edge sheet, <name>-edge.png, with grass grown in from each side and each corner that has grass
+# beyond it. Its frames are CAVE_JUNCTIONS backwards, a junction here naming the neighbours that are NOT grass: frame 0 is the
+# plain tile. mod/make_placeholders.py picks the frame with edge_frame, so a shore or a road side is a ragged line of grass and
+# not a ruler-straight tile border, and the line turns a corner without a notch.
 EDGES = ("water", "ford", "dirt")
 EDGE_DEPTH = 7  # pixels of grass at the deepest
 
@@ -69,23 +70,34 @@ def cave_frame(rock):
     return CAVE_JUNCTIONS.index(junction)
 
 
+def edge_frame(grass):
+    """The frame of an edge sheet for a cell: grass(dx, dy) says whether the neighbour that way is grass."""
+    return len(CAVE_JUNCTIONS) - 1 - cave_frame(lambda dx, dy: not grass(dx, dy))
+
+
 def edge_sheet(base, grass):
-    """The 16 edge frames of `base` side by side."""
+    """The edge frames of `base` side by side."""
     def reach(t):
         # How far the grass comes in at position t along a side: two waves that both repeat every 32 px, so tiles line up.
         return EDGE_DEPTH * (0.62 + 0.25 * math.sin(2 * math.pi * t / 32 * 2 + 1.0) + 0.13 * math.sin(2 * math.pi * t / 32 * 5))
 
-    sheet = Image.new("RGB", (32 * 16, 32))
-    for m in range(16):
+    corner = reach(0)  # how deep a neighbour's grass is where its side ends, at this tile's corner
+    sheet = Image.new("RGB", (32 * len(CAVE_JUNCTIONS), 32))
+    for m, junction in enumerate(reversed(CAVE_JUNCTIONS)):
+        n, s, e, w = (not junction & bit for bit in (1, 2, 4, 8))
         mask = Image.new("L", (32, 32), 0)
         px = mask.load()
         for y in range(32):
             for x in range(32):
                 a = 0.0
                 # (distance in from the side, position along it) for each side that has grass beyond it
-                for bit, d, t in ((1, y, x), (2, 31 - x, y), (4, 31 - y, x), (8, x, y)):
-                    if m & bit:
+                for side, d, t in ((n, y, x), (e, 31 - x, y), (s, 31 - y, x), (w, x, y)):
+                    if side:
                         a = max(a, min(1.0, max(0.0, (reach(t) - d) / 2)))
+                # Grass at a corner alone (neither side beside it has any): a quarter disc that meets the neighbours' edges.
+                for bit, a_side, b_side, dx, dy in ((16, n, e, 31 - x, y), (32, s, e, 31 - x, 31 - y), (64, s, w, x, 31 - y), (128, n, w, x, y)):
+                    if not a_side and not b_side and not junction & bit:
+                        a = max(a, min(1.0, max(0.0, (corner - math.hypot(dx, dy)) / 2)))
                 px[x, y] = round(255 * a)
         frame = base.convert("RGB").copy()
         frame.paste(grass.convert("RGB"), (0, 0), mask)
@@ -127,7 +139,7 @@ def main():
     for name in EDGES:
         meta = PngImagePlugin.PngInfo()
         meta.add_text("FrameSize", "32,32")
-        meta.add_text("FrameAmount", "16")
+        meta.add_text("FrameAmount", str(len(CAVE_JUNCTIONS)))
         edge_sheet(made[name], made["grass1"]).save(os.path.join(args.out, f"{name}-edge.png"), pnginfo=meta)
     flora = tgmc_dmi.Dmi(os.path.join(args.tgmc, FLORA))
     sheet = Image.new("RGB", (32 * GRASS_FRAMES, 32))

@@ -1932,8 +1932,8 @@ def write_map(folder, title, size_w, size_h, placed, visibility, spawns, scripts
     # then per cell (x-major): u16 template id, u8 variant index.
     header = struct.pack("<BHHIII", 2, size_w, size_h, 17, 0, 0)
     def tile(x, y):
-        # Water, ford and dirt show grass along each side that has grass beyond it: the variant index is the frame of the
-        # tile's edge sheet (mod/build_tileset.py), bit 1 north, 2 east, 4 south, 8 west.
+        # Water, ford and dirt show grass along each side and corner that has grass beyond it: the variant index is the frame
+        # of the tile's edge sheet (mod/build_tileset.py, edge_frame).
         template, index = ground(x, y)
         if template == GRASS:
             # Patches of the second grass tile three cells across, and one cell in twelve with a piece of flora on it
@@ -1945,9 +1945,10 @@ def write_map(folder, title, size_w, size_h, placed, visibility, spawns, scripts
             h = scramble(x, y)
             index = 2 + h // 14 % (build_tileset.GRASS_FRAMES - 2) if h % 14 == 0 else scramble(x // 3, y // 3) % 3 == 0
         if template in (WATER, FORD, DIRT):
-            sides = ((x, y - 1), (x + 1, y), (x, y + 1), (x - 1, y))
-            index = sum(1 << i for i, (nx, ny) in enumerate(sides)
-                        if 0 <= nx < size_w and 0 <= ny < size_h and ground(nx, ny)[0] == GRASS)
+            def grass(dx, dy):
+                nx, ny = x + dx, y + dy
+                return 0 <= nx < size_w and 0 <= ny < size_h and ground(nx, ny)[0] == GRASS
+            index = build_tileset.edge_frame(grass)
         if template in (ROCK, WALL):
             # Rock joins rock, wall and the map edge: the frame is TGMC's cave piece for that set of neighbours.
             def rock(dx, dy):

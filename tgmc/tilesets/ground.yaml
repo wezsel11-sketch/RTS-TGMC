@@ -69,7 +69,7 @@ Templates:
 			19: Clear
 	Template@2:
 		Id: 2
-		# 16 frames: grass grown in from the sides named by the frame number (mod/build_tileset.py, edge_sheet).
+		# 47 frames: grass grown in from the sides and corners that have grass beyond them (mod/build_tileset.py, edge_sheet).
 		Images: water-edge.png
 		Size: 1,1
 		PickAny: True
@@ -91,9 +91,40 @@ Templates:
 			13: Water
 			14: Water
 			15: Water
+			16: Water
+			17: Water
+			18: Water
+			19: Water
+			20: Water
+			21: Water
+			22: Water
+			23: Water
+			24: Water
+			25: Water
+			26: Water
+			27: Water
+			28: Water
+			29: Water
+			30: Water
+			31: Water
+			32: Water
+			33: Water
+			34: Water
+			35: Water
+			36: Water
+			37: Water
+			38: Water
+			39: Water
+			40: Water
+			41: Water
+			42: Water
+			43: Water
+			44: Water
+			45: Water
+			46: Water
 	Template@3:
 		Id: 3
-		# 16 frames: grass grown in from the sides named by the frame number (mod/build_tileset.py, edge_sheet).
+		# 47 frames: grass grown in from the sides and corners that have grass beyond them (mod/build_tileset.py, edge_sheet).
 		Images: ford-edge.png
 		Size: 1,1
 		PickAny: True
@@ -115,9 +146,40 @@ Templates:
 			13: Ford
 			14: Ford
 			15: Ford
+			16: Ford
+			17: Ford
+			18: Ford
+			19: Ford
+			20: Ford
+			21: Ford
+			22: Ford
+			23: Ford
+			24: Ford
+			25: Ford
+			26: Ford
+			27: Ford
+			28: Ford
+			29: Ford
+			30: Ford
+			31: Ford
+			32: Ford
+			33: Ford
+			34: Ford
+			35: Ford
+			36: Ford
+			37: Ford
+			38: Ford
+			39: Ford
+			40: Ford
+			41: Ford
+			42: Ford
+			43: Ford
+			44: Ford
+			45: Ford
+			46: Ford
 	Template@4:
 		Id: 4
-		# 16 frames: grass grown in from the sides named by the frame number (mod/build_tileset.py, edge_sheet).
+		# 47 frames: grass grown in from the sides and corners that have grass beyond them (mod/build_tileset.py, edge_sheet).
 		Images: dirt-edge.png
 		Size: 1,1
 		PickAny: True
@@ -139,6 +201,37 @@ Templates:
 			13: Road
 			14: Road
 			15: Road
+			16: Road
+			17: Road
+			18: Road
+			19: Road
+			20: Road
+			21: Road
+			22: Road
+			23: Road
+			24: Road
+			25: Road
+			26: Road
+			27: Road
+			28: Road
+			29: Road
+			30: Road
+			31: Road
+			32: Road
+			33: Road
+			34: Road
+			35: Road
+			36: Road
+			37: Road
+			38: Road
+			39: Road
+			40: Road
+			41: Road
+			42: Road
+			43: Road
+			44: Road
+			45: Road
+			46: Road
 	Template@5:
 		Id: 5
 		# 47 frames: TGMC's cave pieces, one for each way the cell joins its neighbours (mod/build_tileset.py, CAVE_JUNCTIONS).

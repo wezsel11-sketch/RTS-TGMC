@@ -6,7 +6,8 @@ WorldLoaded = function()
 	local xenos = Player.GetPlayer("Xenos")
 	local total = #xenos.GetActorsByType("hunter")
 	-- Standing still, hunters fade from sight and the AI cannot aim at what it cannot see: switch their stealth off (as in test-ai-pod).
-	Utils.Do(xenos.GetActorsByType("hunter"), function(h) h.UseAbility(1) end)
+	-- They also hold fire: left alone they kill the one rifleman who sees them within ten seconds, and a blind AI calls no strike.
+	Utils.Do(xenos.GetActorsByType("hunter"), function(h) h.UseAbility(1) h.Stance = "HoldFire" end)
 	local function poll(ticks)
 		if reported then
 			return

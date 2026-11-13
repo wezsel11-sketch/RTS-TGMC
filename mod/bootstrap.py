@@ -95,7 +95,7 @@ def openra():
 
 def tgmc():
     b.step("TGMC art (sparse clone, only the files the converters read)")
-    paths = subprocess.run([sys.executable, "-I", os.path.join(b.HERE, "tgmc_paths.py")], capture_output=True, text=True, check=True).stdout
+    paths = subprocess.run([sys.executable, "-X", "utf8", "-I", os.path.join(b.HERE, "tgmc_paths.py")], capture_output=True, text=True, check=True).stdout
     with open(os.path.join(b.BUILD, "tgmc-paths.txt"), "w", encoding="utf-8", newline="\n") as f:
         f.write(paths)
     os.environ["GIT_LFS_SKIP_SMUDGE"] = "1"

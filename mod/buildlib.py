@@ -65,7 +65,7 @@ def utility(*args):
 
 
 def py(script, *args):
-    subprocess.run([sys.executable, "-I", os.path.join(HERE, script), *args], check=True)
+    subprocess.run([sys.executable, "-X", "utf8", "-I", os.path.join(HERE, script), *args], check=True)  # UTF-8: Windows defaults to cp1252
 
 
 def link_mod():

@@ -99,10 +99,10 @@ def _parse(path):
             cur = None  # a proc (`/obj/thing/Initialize()`) or other code: its tabbed lines are not variables of the type
 
 
-OBJECT_DIRS = ("code/game/objects", "code/game/turfs", "code/modules/flora", "code/modules/power", "code/modules/paperwork", "code/modules/reagents/chemistry/machinery",
+OBJECT_DIRS = ("code/game/objects", "code/game/turfs", "code/modules/power", "code/modules/paperwork", "code/modules/reagents/chemistry/machinery",
                "code/modules/vehicles", "code/modules/recycling", "code/modules/atmospherics/machinery", "code/modules/hydroponics", "code/modules/mapping",
                "code/modules/food_and_drinks/kitchen_machinery", "code/modules/economy", "code/modules/shuttle", "code/modules/mining",
-               "code/modules/clothing", "code/modules/reagents", "code/modules/food_and_drinks", "code/modules/projectiles", "code/modules/medical")
+               "code/modules/clothing", "code/modules/reagents", "code/modules/food_and_drinks", "code/modules/projectiles")
 
 
 def load(tgmc, dirs=OBJECT_DIRS):

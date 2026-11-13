@@ -1485,7 +1485,15 @@ namespace OpenRA.Mods.TGMC.Traits
 					.Any(e => !e.IsDead && player.RelationshipWith(e.Owner) == PlayerRelationship.Enemy && e.Info.HasTraitInfo<MobileInfo>()
 						&& e.CanBeViewedByPlayer(player));
 				if (best != null && !fighting)
+				{
 					squad.SetActorToTarget((best, WVec.Zero));
+
+					// The stock idle state sets off only once it sees an enemy near its target, and a target picked from memory is
+					// usually under fog: the squad then stood at home all game. Walk it there; in sight, the stock states take over.
+					var units = squad.Units.Where(u => !u.IsDead && u.IsInWorld).ToArray();
+					if (units.Length > 0 && units.All(u => u.IsIdle))
+						bot.QueueOrder(new Order("AttackMove", null, Target.FromActor(best), false, groupedActors: units));
+				}
 			}
 		}
 	}

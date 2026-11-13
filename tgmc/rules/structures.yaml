@@ -479,8 +479,10 @@ sticky-resin:
 		HP: 40
 	Valued:
 		Cost: 10
+	# A patch has no footprint cells, so it sees from its centre, as weeds do.
 	RevealsShroud:
 		Range: 1c0
+		Type: CenterPosition
 	LineBuild:
 		Range: 5
 		NodeTypes: sticky

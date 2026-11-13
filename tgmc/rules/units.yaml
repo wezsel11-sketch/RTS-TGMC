@@ -1521,14 +1521,14 @@ demolitionist:
 		RequiresCondition: resting
 		Step: 3
 		Delay: 25
-		StartIfBelow: 101
+		StartIfBelow: 100
 		DamageCooldown: 125
 	# As in TGMC, a xeno mends on weeds: 2 health a second, once it has gone five seconds without being hit.
 	ChangesHealth@weeds:
 		RequiresCondition: on-weeds
 		Step: 2
 		Delay: 25
-		StartIfBelow: 101
+		StartIfBelow: 100
 		DamageCooldown: 125
 	# Xenos see 9 cells through the fog (the marines on foot 10).
 	RevealsShroud:
@@ -1553,7 +1553,7 @@ demolitionist:
 		RequiresCondition: psycure
 		Step: 6
 		Delay: 10
-		StartIfBelow: 101
+		StartIfBelow: 100
 	WithColoredOverlay@psycure:
 		RequiresCondition: psycure && !rage
 		Color: 60FF6040
@@ -2281,7 +2281,7 @@ ravager:
 		RequiresCondition: endure
 		Step: 4
 		Delay: 8
-		StartIfBelow: 101
+		StartIfBelow: 100
 	WithColoredOverlay@endure:
 		RequiresCondition: endure
 		Color: FFD04040

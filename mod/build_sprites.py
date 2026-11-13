@@ -126,6 +126,10 @@ BULL = "icons/Xeno/castes/bull.dmi"
 BEHEMOTH = "icons/Xeno/castes/behemoth.dmi"
 RESIN_WALL = "icons/obj/smooth_objects/resin-wall.dmi"
 RESIN_DOOR = "icons/obj/smooth_objects/resin-door.dmi"
+# How far below the units each flat ground layer sorts (OpenRA sorts by Y + ZOffset, 1024 a cell). It must be more than a unit's
+# sprite reaches below its feet cell, or the carpet of the next row south is drawn over its legs; at -1023 it was not. Lowest first,
+# so blood lies on weeds and a shadow on blood. Footprints are drawn in code (GroundFx.cs Decal) at -14500.
+GROUND_Z = {"weeds": -16384, "sticky": -16000, "blood": -15000, "gibs": -14000, "shadow": -13000}
 APC = "icons/obj/armored/3x3/apc.dmi"
 APC_CUPOLA = {"N": "cupola_1", "S": "cupola_2", "E": "cupola_4", "W": "cupola_8"}
 CADE = "icons/obj/structures/barricades/metal.dmi"
@@ -1262,7 +1266,7 @@ UNITS = {
         },
     },
     "weeds": {
-        "zoffset": -1023,  # the carpet lies under everything that walks on it
+        "zoffset": GROUND_Z["weeds"],  # the carpet lies under everything that walks on it
         "sequences": {
             "idle": [(WEEDS, "weed15")],
             # TGMC's edge pieces, picked by WeedEdges (tgmc/code/Weeds.cs): c<n> joins the neighbours named by the bits of n
@@ -1315,7 +1319,7 @@ UNITS = {
         },
     },
     "sticky-resin": {
-        "zoffset": -1000,
+        "zoffset": GROUND_Z["sticky"],
         "sequences": {
             "idle": [("icons/Xeno/Effects.dmi", "sticky")],
             "icon": [("icons/Xeno/Effects.dmi", "sticky", None, {"fit": (44, 44)})],
@@ -1520,7 +1524,7 @@ UNITS = {
     # Blood on the floor where a marine is hit and while a badly hurt one walks (xenos leave green blood, fx-blood-xeno) (the Bleeds trait in tgmc/code/Blood.cs): TGMC's floor blood
     # sprites tinted red, each lying for about half a minute, drawn under the units.
     "fx-blood": {
-        "zoffset": -1023,
+        "zoffset": GROUND_Z["blood"],
         "sequences": {
             "small1": [(BLOOD, "mfloor1", (150, 14, 14), {"tick": 200000})],
             "small2": [(BLOOD, "mfloor2", (150, 14, 14), {"tick": 200000})],
@@ -1539,7 +1543,7 @@ UNITS = {
     },
     # Body parts thrown out of a gibbed marine (h-*, tinted red) or xeno (x-*) by the ThrowsGibs trait; each lies for over three minutes.
     "fx-gibs": {
-        "zoffset": -1000,
+        "zoffset": GROUND_Z["gibs"],
         "sequences": {
             "h-head": [(BLOOD, "gibhead", (170, 30, 30), {"tick": 200000})],
             "h-arm": [(BLOOD, "gibarm", (170, 30, 30), {"tick": 200000})],
@@ -1582,7 +1586,7 @@ UNITS = {
         "sequences": {"idle": [(CHEMSMOKE, "", (225, 225, 225), {"side": "S", "size": 128, "tick": 240})]},
     },
     "fx-blood-xeno": {
-        "zoffset": -1023,
+        "zoffset": GROUND_Z["blood"],
         "sequences": {
             "small1": [(BLOOD, "mfloor1", (110, 210, 40), {"tick": 200000})],
             "small2": [(BLOOD, "mfloor2", (110, 210, 40), {"tick": 200000})],
@@ -2119,7 +2123,7 @@ def build_unit(tgmc, unit, spec, out_dir):
         start, length, facings, _, stride = starts[pose]
         save_sheet([ground_shadow(sheet_cells[start + i * (stride or length)]) for i in range(facings)],
                    (cw + 2 * SHADOW_PAD, ch + 2 * SHADOW_PAD), os.path.join(out_dir, "sprites", f"{unit}-shadow.png"))
-        lines += ["\tshadow:", f"\t\tFilename: sprites/{unit}-shadow.png", "\t\tStart: 0", f"\t\tFacings: -{facings}", "\t\tZOffset: -1023"]
+        lines += ["\tshadow:", f"\t\tFilename: sprites/{unit}-shadow.png", "\t\tStart: 0", f"\t\tFacings: -{facings}", f"\t\tZOffset: {GROUND_Z['shadow']}"]
     if has_cloth:  # the same cells on the cloth sheet
         lines += [f"{unit}-cloth:", f"\tInherits: {unit}", "\tDefaults:", f"\t\tFilename: sprites/{unit}-cloth.png"]
     with open(os.path.join(out_dir, "sequences", f"{unit}.yaml"), "w", encoding="utf-8", newline="\n") as f:

@@ -148,8 +148,8 @@ namespace OpenRA.Mods.TGMC.Traits
 		readonly int zOffset;
 		int age;
 
-		// zOffset below 0 lies under the units (footprints); above 0 sits on top of the structure it marks (holes).
-		public Decal(World world, WPos pos, string image, string sequence, string palette, WAngle facing, int linger, int fade, int zOffset = -512)
+		// zOffset below 0 lies under the units (footprints, above weeds and blood, see GROUND_Z in mod/build_sprites.py); above 0 sits on top of the structure it marks (holes).
+		public Decal(World world, WPos pos, string image, string sequence, string palette, WAngle facing, int linger, int fade, int zOffset = -14500)
 		{
 			this.zOffset = zOffset;
 			this.pos = pos;

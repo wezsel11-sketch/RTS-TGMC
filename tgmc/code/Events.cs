@@ -39,9 +39,11 @@ namespace OpenRA.Mods.TGMC.Traits
 			public readonly Player Owner;
 			public readonly string Text;
 			public readonly WPos Position;
+			public readonly string Key;
 
-			public Entry(int tick, Player owner, string text, WPos position)
+			public Entry(int tick, Player owner, string text, WPos position, string key)
 			{
+				Key = key;
 				Tick = tick;
 				Owner = owner;
 				Text = text;
@@ -84,7 +86,7 @@ namespace OpenRA.Mods.TGMC.Traits
 				return;
 
 			log.counts[(owner, key)] = log.Count(owner, key) + 1;
-			log.entries.Add(new Entry(world.WorldTick, owner, FluentProvider.GetMessage(key), position));
+			log.entries.Add(new Entry(world.WorldTick, owner, FluentProvider.GetMessage(key), position, key));
 			if (log.entries.Count > log.info.Keep)
 				log.entries.RemoveAt(0);
 		}
@@ -118,6 +120,22 @@ namespace OpenRA.Mods.TGMC.Widgets.Logic
 				}
 
 				button.IsVisible = () => Get() != null;
+
+				// Design C's alert stack: a stripe down the left of each line, red for a loss or a raid, green for a gain, amber otherwise.
+				var stripe = widget.GetOrNull<ColorBlockWidget>($"EVENT_{i + 1}_STRIPE");
+				if (stripe != null)
+				{
+					stripe.IsVisible = () => Get() != null;
+					stripe.GetColor = () =>
+					{
+						var key = Get()?.Key ?? "";
+						if (key.Contains("attack") || key.Contains("facehugged") || key.Contains("burst"))
+							return Color.FromArgb(235, 77, 75);
+						if (key.Contains("matured") || key.Contains("evolved") || key.Contains("larva") || key.Contains("egg"))
+							return Color.FromArgb(46, 204, 113);
+						return Color.FromArgb(255, 159, 67);
+					};
+				}
 				button.GetText = () =>
 				{
 					var e = Get();

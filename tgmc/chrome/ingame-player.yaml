@@ -52,6 +52,12 @@ Container@PLAYER_WIDGETS:
 					Background: sidebar-button
 					Font: TinyBold
 					Align: Left
+					LeftMargin: 10
+				ColorBlock@EVENT_1_STRIPE:
+					X: 2
+					Y: 3
+					Width: 3
+					Height: 14
 				Button@EVENT_2:
 					X: 0
 					Y: 22
@@ -60,6 +66,12 @@ Container@PLAYER_WIDGETS:
 					Background: sidebar-button
 					Font: TinyBold
 					Align: Left
+					LeftMargin: 10
+				ColorBlock@EVENT_2_STRIPE:
+					X: 2
+					Y: 25
+					Width: 3
+					Height: 14
 				Button@EVENT_3:
 					X: 0
 					Y: 44
@@ -68,6 +80,12 @@ Container@PLAYER_WIDGETS:
 					Background: sidebar-button
 					Font: TinyBold
 					Align: Left
+					LeftMargin: 10
+				ColorBlock@EVENT_3_STRIPE:
+					X: 2
+					Y: 47
+					Width: 3
+					Height: 14
 				Button@EVENT_4:
 					X: 0
 					Y: 66
@@ -76,6 +94,12 @@ Container@PLAYER_WIDGETS:
 					Background: sidebar-button
 					Font: TinyBold
 					Align: Left
+					LeftMargin: 10
+				ColorBlock@EVENT_4_STRIPE:
+					X: 2
+					Y: 69
+					Width: 3
+					Height: 14
 				Button@EVENT_5:
 					X: 0
 					Y: 88
@@ -84,6 +108,12 @@ Container@PLAYER_WIDGETS:
 					Background: sidebar-button
 					Font: TinyBold
 					Align: Left
+					LeftMargin: 10
+				ColorBlock@EVENT_5_STRIPE:
+					X: 2
+					Y: 91
+					Width: 3
+					Height: 14
 				Button@EVENT_6:
 					X: 0
 					Y: 110
@@ -92,6 +122,12 @@ Container@PLAYER_WIDGETS:
 					Background: sidebar-button
 					Font: TinyBold
 					Align: Left
+					LeftMargin: 10
+				ColorBlock@EVENT_6_STRIPE:
+					X: 2
+					Y: 113
+					Width: 3
+					Height: 14
 		Background@TOP_BAR:
 			Logic: TopBarLogic
 			X: WINDOW_WIDTH / 2 - 270

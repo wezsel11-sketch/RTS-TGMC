@@ -395,6 +395,11 @@ resin-wall:
 		VoiceSet: XenoStructureVoice
 	Tooltip:
 		Name: actor-resin-wall.name
+	# Walls and doors grow together: each cell shows TGMC's piece for the neighbours it has.
+	WeedEdges:
+		Group: resin
+		Prefix: w
+		Corners: true
 
 # Resin door (TGMC's /obj/structure/mineral_door/resin): xenos and their allies walk through, it opens for them and closes ten
 # seconds after the last one has gone; marines have to break it down. With resin walls it lets the hive wall itself in.
@@ -435,6 +440,10 @@ resin-door:
 		Name: hopen
 		RequiresCondition: door-open && door-sideways
 		Sequence: hresin-open
+	# Counts as a neighbour for the resin walls beside it.
+	WeedEdges:
+		Group: resin
+		Prefix:
 	MapDoor:
 		Prefix: resin
 		FriendsOnly: true

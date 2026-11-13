@@ -1515,6 +1515,14 @@ demolitionist:
 	# Plasma fuels the abilities; it builds up slowly, and faster on weeds.
 	Plasma:
 		WeedCondition: on-weeds
+		RestCondition: resting
+	# Resting (hurt and idle on weeds for two seconds) it curls up and mends 3 more a second, as a resting xeno does in TGMC.
+	ChangesHealth@rest:
+		RequiresCondition: resting
+		Step: 3
+		Delay: 25
+		StartIfBelow: 101
+		DamageCooldown: 125
 	# As in TGMC, a xeno mends on weeds: 2 health a second, once it has gone five seconds without being hit.
 	ChangesHealth@weeds:
 		RequiresCondition: on-weeds
@@ -1626,9 +1634,19 @@ demolitionist:
 	Armor:
 		Type: Light
 	WithInfantryBody:
+		RequiresCondition: !stunned && !resting
 		MoveSequence: run
 		StandSequences: stand
 		DefaultAttackSequence: attack
+	# TGMC's own pictures of the caste knocked flat and curled up asleep.
+	WithInfantryBody@down:
+		RequiresCondition: stunned
+		MoveSequence: down
+		StandSequences: down
+	WithInfantryBody@rest:
+		RequiresCondition: resting && !stunned
+		MoveSequence: rest
+		StandSequences: rest
 	# The body lies where it fell for three minutes, then fades away.
 	WithLingeringCorpse:
 		DeathSequence: die

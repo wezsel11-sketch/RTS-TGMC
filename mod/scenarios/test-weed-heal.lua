@@ -9,7 +9,7 @@ WorldLoaded = function()
 	off.Health = 40
 	local plasmaOn, plasmaOff = on.Plasma, off.Plasma
 	Trigger.AfterDelay(300, function()
-		local ok = on.Health >= 50 and off.Health == 40 and on.Plasma - plasmaOn > off.Plasma - plasmaOff
+		local ok = on.Health >= 65 and off.Health == 40 and on.Plasma - plasmaOn > off.Plasma - plasmaOff
 		print("TEST weed-heal " .. (ok and "PASS" or "FAIL") .. " (on weeds " .. on.Health .. " health, +" .. (on.Plasma - plasmaOn)
 			.. " plasma; off weeds " .. off.Health .. " health, +" .. (off.Plasma - plasmaOff) .. " plasma)")
 	end)

@@ -172,6 +172,10 @@ the commits this mod was tested against (see the top of `mod/bootstrap.py`), so 
     (40) opens for the hive and its allies and closes ten seconds after the last one has gone; marines must break it down, so walls and
     doors make a maze only xenos walk freely. Beside a wall to its east or west it turns to stand in that wall. **Sticky Resin** (10,
     dragged in lines) is a patch enemies cross at half speed; marines clear it with the rifle butt or the flamer. The bot does not build either yet.
+  - **Resin walls join.** Each wall cell shows TGMC's piece for the walls and doors around it (47 pieces, all eight neighbours;
+    `WeedEdges` with `Corners`), so a line, a corner or a ring reads as one wall.
+  - **Resting and knocked down.** A hurt xeno left idle on weeds for two seconds curls up (TGMC's `Sleeping` picture) and mends 3 more a
+    second; any order gets it up. A stunned xeno lies knocked flat (`Knocked Down`). Facehugger, larva and puppet have no such pictures.
   - **Healing on weeds.** As in TGMC, a xeno standing on weeds mends 2 health a second once it has gone five seconds without being hit
     (`ChangesHealth@weeds`, condition `on-weeds` from `Plasma`). Off the weeds it does not heal by itself.
   - **Claw lunge.** A xeno's body darts at a target within two cells on each strike (`AttackLunge`), as TGMC draws melee.

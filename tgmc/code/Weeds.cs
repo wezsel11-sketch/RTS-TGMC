@@ -158,12 +158,21 @@ namespace OpenRA.Mods.TGMC.Traits
 			"Empty, or the actor's own image: the carpet is the actor's body.")]
 		public readonly string Image = null;
 
+		[Desc("Only actors of the same group join each other.")]
+		public readonly string Group = "weeds";
+
+		[Desc("Count the four corners too (16 north-east, 32 south-east, 64 south-west, 128 north-west; a corner counts only when " +
+			"both sides beside it join): TGMC's smoothing junction, for resin walls.")]
+		public readonly bool Corners = false;
+
 		public override object Create(ActorInitializer init) { return new WeedEdges(this); }
 	}
 
 	public class WeedEdges : INotifyCreated, INotifyAddedToWorld, INotifyRemovedFromWorld
 	{
 		static readonly (CVec Offset, int Bit)[] Sides = [(new CVec(0, -1), 1), (new CVec(0, 1), 2), (new CVec(1, 0), 4), (new CVec(-1, 0), 8)];
+		static readonly (CVec Offset, int Bit, int Beside)[] Corners =
+			[(new CVec(1, -1), 16, 1 | 4), (new CVec(1, 1), 32, 2 | 4), (new CVec(-1, 1), 64, 2 | 8), (new CVec(-1, -1), 128, 1 | 8)];
 		readonly WeedEdgesInfo info;
 
 		Animation carpet;
@@ -182,13 +191,13 @@ namespace OpenRA.Mods.TGMC.Traits
 			rs.Add(new AnimationWithOffset(carpet, null, null));
 		}
 
-		static WeedEdges At(Actor self, CPos cell, out Actor other)
+		WeedEdges At(Actor self, CPos cell, out Actor other)
 		{
 			// Weeds can be walked on, so the actor map does not hold them; the building influence does.
 			foreach (var a in self.World.WorldActor.Trait<BuildingInfluence>().GetBuildingsAt(cell))
 			{
 				var edges = a == self || a.IsDead ? null : a.TraitOrDefault<WeedEdges>();
-				if (edges != null)
+				if (edges != null && edges.info.Group == info.Group)
 				{
 					other = a;
 					return edges;
@@ -209,12 +218,19 @@ namespace OpenRA.Mods.TGMC.Traits
 				if (self.Location + offset != without && At(self, self.Location + offset, out _) != null)
 					joined |= bit;
 
+			if (info.Corners)
+				foreach (var (offset, bit, beside) in Corners)
+					if ((joined & beside) == beside && self.Location + offset != without && At(self, self.Location + offset, out _) != null)
+						joined |= bit;
+
 			(carpet ?? self.Trait<WithSpriteBody>().DefaultAnimation).PlayRepeating(info.Prefix + joined);
 		}
 
 		void RefreshAround(Actor self, CPos? without)
 		{
 			foreach (var (offset, _) in Sides)
+				At(self, self.Location + offset, out var other)?.Refresh(other, without);
+			foreach (var (offset, _, _) in Corners)
 				At(self, self.Location + offset, out var other)?.Refresh(other, without);
 		}
 

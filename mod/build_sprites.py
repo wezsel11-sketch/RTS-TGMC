@@ -41,6 +41,7 @@ from PIL import Image, ImageChops, ImageDraw, ImageFilter, PngImagePlugin
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import tgmc_dmi  # noqa: E402
+from build_tileset import CAVE_JUNCTIONS  # noqa: E402
 
 HUMAN = "icons/mob/human.dmi"
 MARINE_UNIFORM = "icons/mob/clothing/uniforms/marine_uniforms.dmi"
@@ -1286,8 +1287,10 @@ UNITS = {
         },
     },
     "resin-wall": {
+        # One piece for each way a wall cell joins its neighbours, w<TGMC's junction number> (WeedEdges in Weeds.cs picks it).
         "sequences": {
-            "idle": [(RESIN_WALL, "resin-wall-255")],
+            "idle": [(RESIN_WALL, "resin-wall-0")],
+            **{f"w{j}": [(RESIN_WALL, f"resin-wall-{j}")] for j in CAVE_JUNCTIONS},
             "icon": [(RESIN_WALL, "resin-wall-255", None, {"fit": (44, 44), "frames": (0, 1)})],
         },
     },
@@ -1657,6 +1660,22 @@ def team_layer(layer, rgb):
         return (layer[0], layer[1], rgb) + tuple(layer[3:])
     return layer
 
+
+# Every xeno caste has a curled-up and a knocked-flat picture in TGMC ("<Caste> Sleeping", "<Caste> Knocked Down", one view each):
+# rest, for a hurt xeno lying idle on weeds, and down, for a stunned one (WithInfantryBody@rest and @down on ^Xeno).
+for _unit in UNITS.values():
+    _seqs = _unit["sequences"]
+    _pose = _seqs.get("stand") or _seqs.get("walk")
+    while isinstance(_pose, str):
+        _pose = _seqs.get(_pose.partition(":")[0].partition("#")[0])
+    if _pose and _pose[0][1].endswith(" Walking"):
+        _caste = _pose[0][1][:-len(" Walking")]
+        _seqs.setdefault("rest", [(_pose[0][0], f"{_caste} Sleeping")])
+        _seqs.setdefault("down", [(_pose[0][0], f"{_caste} Knocked Down")])
+# These three have no such pictures: they stay as they stand.
+for _name in ("facehugger", "larva", "puppet"):
+    UNITS[_name]["sequences"].setdefault("rest", "stand")
+    UNITS[_name]["sequences"].setdefault("down", "stand")
 
 # Xeno units take the xeno team colour on every layer
 # A marine that dies topples over rather than becoming a husk: any unit whose stand is the marine stack and die is still the husk.

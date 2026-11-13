@@ -860,6 +860,11 @@ namespace OpenRA.Mods.TGMC.Traits
 		[Desc("Condition the xeno has while it stands on weeds (it heals there, see ChangesHealth@weeds).")]
 		public readonly string WeedCondition = null;
 
+		[GrantedConditionReference]
+		[Desc("Condition the xeno has while it rests: hurt, on weeds, and with nothing to do for RestAfter ticks. It lies down and heals faster.")]
+		public readonly string RestCondition = null;
+		public readonly int RestAfter = 50;
+
 		public override object Create(ActorInitializer init) { return new Plasma(init.Self, this); }
 	}
 
@@ -870,6 +875,8 @@ namespace OpenRA.Mods.TGMC.Traits
 		int value;
 		int wait;
 		int weedToken = Actor.InvalidConditionToken;
+		int restToken = Actor.InvalidConditionToken;
+		int idle;
 
 		public Plasma(Actor self, PlasmaInfo info)
 		{
@@ -894,6 +901,15 @@ namespace OpenRA.Mods.TGMC.Traits
 					weedToken = self.GrantCondition(info.WeedCondition);
 				else if (!onWeeds && weedToken != Actor.InvalidConditionToken)
 					weedToken = self.RevokeCondition(weedToken);
+			}
+
+			if (info.RestCondition != null)
+			{
+				idle = onWeeds && self.IsIdle && self.GetDamageState() != DamageState.Undamaged ? idle + 1 : 0;
+				if (idle >= info.RestAfter && restToken == Actor.InvalidConditionToken)
+					restToken = self.GrantCondition(info.RestCondition);
+				else if (idle == 0 && restToken != Actor.InvalidConditionToken)
+					restToken = self.RevokeCondition(restToken);
 			}
 
 			if (value >= info.Max)

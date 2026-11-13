@@ -1,5 +1,5 @@
-# TGMC command HUD for players: a glass dock along the bottom (minimap, selection, commands), a build panel on the left, a
-# resource bar on top. It floats over a full-window map view (tgmc/chrome/ingame.yaml).
+# TGMC command HUD for players, design C (docs/hud-designs/design-c.png): resources top centre, alerts top left, minimap top right,
+# selection card bottom left, one production bar bottom centre, orders and abilities bottom right. It floats over a full-window map view.
 
 Container@PLAYER_WIDGETS:
 	Logic: LoadIngameChatLogic
@@ -19,8 +19,8 @@ Container@PLAYER_WIDGETS:
 		LogicTicker@SIDEBAR_TICKER:
 		Container@SUPPORT_POWERS:
 			Logic: SupportPowerBinLogic
-			X: 10
-			Y: 8
+			X: WINDOW_WIDTH - 58
+			Y: 242
 			Children:
 				SupportPowers@SUPPORT_PALETTE:
 					IconSize: 46, 34
@@ -34,12 +34,12 @@ Container@PLAYER_WIDGETS:
 					HotkeyPrefix: SupportPower
 					HotkeyCount: 6
 		SupportPowerTimer@SUPPORT_POWER_TIMER:
-			X: 34
-			Y: 12
+			X: WINDOW_WIDTH - 200
+			Y: 246
 			Order: Descending
 		Container@EVENT_LOG:
 			Logic: EventLogLogic
-			X: 76
+			X: 10
 			Y: 8
 			Width: 158
 			Height: 140
@@ -522,7 +522,7 @@ Container@PLAYER_WIDGETS:
 		Button@CODEX_BUTTON:
 			Logic: CodexLogic
 			X: WINDOW_WIDTH - 214
-			Y: 8
+			Y: 206
 			Width: 66
 			Height: 28
 			Background: sidebar-button
@@ -531,7 +531,7 @@ Container@PLAYER_WIDGETS:
 		Button@HELP_BUTTON:
 			Logic: HelpOverlayLogic
 			X: WINDOW_WIDTH - 144
-			Y: 8
+			Y: 206
 			Width: 28
 			Height: 28
 			Background: sidebar-button
@@ -546,17 +546,17 @@ Container@PLAYER_WIDGETS:
 			Height: WINDOW_HEIGHT
 			Children:
 				Background@BUILD_PANEL:
-					X: WINDOW_WIDTH - 190
-					Y: 44
-					Width: 180
+					X: WINDOW_WIDTH / 2 - 320
+					Y: WINDOW_HEIGHT - 116
+					Width: 640
 					# Ends above the command card and its next-type button.
-					Height: WINDOW_HEIGHT - 218
+					Height: 106
 					Background: tgui-window
 					Logic: RepeatBuildLogic
 					Children:
 						Button@REPEAT_BUILD:
-							X: PARENT_WIDTH - 64
-							Y: 6
+							X: PARENT_WIDTH - 56
+							Y: -22
 							Width: 56
 							Height: 20
 							Background: sidebar-button
@@ -564,32 +564,34 @@ Container@PLAYER_WIDGETS:
 							Key: TgmcRepeatBuild
 							Font: TinyBold
 						Label@HEADER:
-							X: 10
-							Y: 6
-							Width: PARENT_WIDTH - 20
+							Visible: false
+							X: 0
+							Y: -20
+							Width: 0
 							Height: 18
 							Text: hud-header
 							Font: TinyBold
 							Align: Left
 						Label@FACTION:
-							X: 10
-							Y: 22
-							Width: PARENT_WIDTH - 20
+							Visible: false
+							X: 0
+							Y: -20
+							Width: 0
 							Height: 14
 							Text: hud-faction
 							Font: Tiny
 							Align: Left
 						Container@SIDEBAR_PRODUCTION:
 							Logic: ClassicProductionLogic
-							X: 4
-							Y: 44
-							Width: 172
-							Height: PARENT_HEIGHT - 82
+							X: 6
+							Y: 6
+							Width: PARENT_WIDTH - 12
+							Height: PARENT_HEIGHT - 12
 							Children:
 								LogicTicker@PRODUCTION_TICKER:
 								ProductionPalette@PRODUCTION_PALETTE:
-									X: 34
-									Columns: 2
+									X: 62
+									Columns: 9
 									IconSize: 62, 46
 									IconMargin: 1, 1
 									TooltipContainer: TOOLTIP_CONTAINER
@@ -600,11 +602,13 @@ Container@PLAYER_WIDGETS:
 									SelectProductionBuildingHotkey: SelectProductionBuilding
 								Container@PRODUCTION_TYPES:
 									Logic: ProductionTabProgressLogic
-									X: 2
-									Width: 28
-									Height: 124
+									X: 0
+									Width: 58
+									Height: 94
 									Children:
 										ProductionTypeButton@INFANTRY:
+											Y: 8
+											X: 0
 											Width: 28
 											Height: 28
 											VisualHeight: 0
@@ -622,7 +626,8 @@ Container@PLAYER_WIDGETS:
 													Height: 3
 													BarMargin: 0, 0
 										ProductionTypeButton@XENO:
-											Y: 31
+											X: 30
+											Y: 8
 											Width: 28
 											Height: 28
 											VisualHeight: 0
@@ -640,7 +645,8 @@ Container@PLAYER_WIDGETS:
 													Height: 3
 													BarMargin: 0, 0
 										ProductionTypeButton@BUILD:
-											Y: 62
+											X: 0
+											Y: 50
 											Width: 28
 											Height: 28
 											VisualHeight: 0
@@ -658,7 +664,8 @@ Container@PLAYER_WIDGETS:
 													Height: 3
 													BarMargin: 0, 0
 										ProductionTypeButton@UPGRADE:
-											Y: 93
+											X: 30
+											Y: 50
 											Width: 28
 											Height: 28
 											VisualHeight: 0
@@ -676,17 +683,17 @@ Container@PLAYER_WIDGETS:
 													Height: 3
 													BarMargin: 0, 0
 						Label@BUILD_HINT:
-							X: 8
-							Y: PARENT_HEIGHT - 34
-							Width: PARENT_WIDTH - 16
-							Height: 28
+							X: 4
+							Y: -24
+							Width: PARENT_WIDTH - 70
+							Height: 20
 							Text: hud-build-hint
 							Font: Tiny
 							WordWrap: true
 							Align: Center
 				MenuButton@OPTIONS_BUTTON:
 					X: WINDOW_WIDTH - 70
-					Y: 8
+					Y: 206
 					Width: 60
 					Height: 28
 					Background: sidebar-button
@@ -702,10 +709,10 @@ Container@PLAYER_WIDGETS:
 					Height: 186
 					Children:
 						Background@RADAR_FRAME:
-							X: 0
-							Y: 86
+							X: PARENT_WIDTH - 190
+							Y: 204 - WINDOW_HEIGHT
 							Width: 190
-							Height: 100
+							Height: 190
 							Background: tgmc-radar-frame
 							Logic: IngameRadarDisplayLogic
 							Children:
@@ -715,13 +722,13 @@ Container@PLAYER_WIDGETS:
 									X: 3
 									Y: 3
 									Width: 184
-									Height: 94
+									Height: 184
 						Background@SELECTION_PANEL:
 							Logic: SelectionReadoutLogic
-							X: 198
-							Y: 86
-							Width: 480
-							Height: 100
+							X: 0
+							Y: 36
+							Width: 300
+							Height: 150
 							Background: tgui-card
 							Children:
 								Sprite@SEL_PORTRAIT:
@@ -732,25 +739,25 @@ Container@PLAYER_WIDGETS:
 								Label@SEL_NAME:
 									X: 84
 									Y: 6
-									Width: 110
+									Width: 206
 									Height: 22
 									Font: Bold
 								Label@SEL_HEALTH:
 									X: 84
 									Y: 28
-									Width: 110
+									Width: 206
 									Height: 16
 									Font: Tiny
 								ProgressBar@SEL_HPBAR:
 									X: 84
 									Y: 46
-									Width: 110
+									Width: 200
 									Height: 7
 									BarMargin: 1, 1
 								Label@SEL_AMMO:
 									X: 84
 									Y: 60
-									Width: 110
+									Width: 206
 									Height: 16
 									Font: Tiny
 								Label@SEL_STATUS:
@@ -761,33 +768,33 @@ Container@PLAYER_WIDGETS:
 									Font: TinyBold
 									Align: Left
 								Label@SEL_RANK:
-									X: 210
-									Y: 8
-									Width: 262
+									X: 10
+									Y: 84
+									Width: 280
 									Height: 16
 									Font: TinyBold
 								ProgressBar@SEL_XPBAR:
-									X: 210
-									Y: 26
-									Width: 252
+									X: 10
+									Y: 102
+									Width: 280
 									Height: 5
 									BarMargin: 1, 1
 								Label@SEL_WEAPON:
-									X: 210
-									Y: 38
-									Width: 262
+									X: 10
+									Y: 110
+									Width: 280
 									Height: 16
 									Font: Tiny
 								Label@SEL_RECORD:
-									X: 210
-									Y: 56
-									Width: 262
+									X: 10
+									Y: 128
+									Width: 280
 									Height: 16
 									Font: Tiny
 						Background@GROUP_PANEL:
 							Logic: GroupGridLogic
-							X: 410
-							Y: 86 + 20
+							X: 18
+							Y: 120
 							Width: 264
 							Height: 60
 							Background: tgui-card

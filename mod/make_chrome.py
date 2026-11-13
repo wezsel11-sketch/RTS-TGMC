@@ -140,47 +140,44 @@ def glass_style(name):
     return (255, 255, 255, 22), (255, 255, 255, 76)
 
 
-# TGUI look (the chosen HUD concept): the colours of TGMC's own in-game tgui windows. Charcoal square panels, a #363636 title
-# strip with a blue rule under it, blue buttons with slightly rounded corners, and tgui's green for the selected state.
-# Applies to the in-game HUD (is_hud) except the bars.
-G_EDGE = (16, 16, 16, 255)
-G_RULE = (73, 114, 161, 255)
-G_PANEL = (37, 37, 37, 235)
-G_SECTION = (27, 27, 27, 230)
-G_TITLE = (54, 54, 54, 245)
-G_BUTTON = (64, 98, 138, 245)
-G_STATES = (("disabled", (70, 70, 70, 230)), ("highlighted", (27, 150, 56, 250)), ("active", (27, 150, 56, 250)),
-            ("pressed", (44, 70, 100, 250)), ("hover", (84, 128, 178, 250)))
+# Design C (docs/hud-designs/design-c.png, the HUD the user chose): near-black rounded panels the map shows through a little,
+# a hair-thin light edge, and amber for whatever is selected or pressed. Applies to the in-game HUD (is_hud) except the bars.
+G_EDGE = (255, 255, 255, 30)
+G_AMBER = (255, 159, 67, 255)
+G_PANEL = (13, 17, 22, 226)
+G_SECTION = (17, 22, 28, 232)
+G_TITLE = (22, 28, 35, 240)
+G_BUTTON = (26, 32, 40, 238)
+# (word in the collection's name, fill, edge), first match wins
+G_STATES = (("disabled", (18, 21, 25, 200), (255, 255, 255, 14)), ("highlighted", (58, 42, 20, 245), G_AMBER),
+            ("active", (58, 42, 20, 245), G_AMBER), ("pressed", (18, 22, 28, 245), G_AMBER),
+            ("hover", (40, 48, 58, 245), (255, 190, 120, 170)))
 G_PANELS = ("tgui-window", "tgmc-radar-frame", "tgmc-panel", "sidebar")
 G_TITLES = ("tgui-card-header", "tgui-titlebar", "tgui-rail")
 
 
 def tgui_style(name):
-    """(fill, kind) of an in-game HUD collection; kind is panel, title or button."""
+    """(fill, kind, edge) of an in-game HUD collection; kind is panel, title or button."""
     if name in G_PANELS:
-        return G_PANEL, "panel"
+        return G_PANEL, "panel", G_EDGE
     if name in ("tgui-card", "tgmc-selection"):
-        return G_SECTION, "panel"
+        return G_SECTION, "panel", G_EDGE
     if name in G_TITLES:
-        return G_TITLE, "title"
-    for key, fill in G_STATES:
+        return G_TITLE, "title", G_EDGE
+    for key, fill, edge in G_STATES:
         if key in name:
-            return fill, "button"
-    return G_BUTTON, "button"
+            return fill, "button", edge
+    return G_BUTTON, "button", (255, 255, 255, 40)
 
 
-def draw_tgui_tile(fill, kind):
-    """Panels: square with a dark one pixel edge. Titles: the same with tgui's blue rule along the bottom. Buttons: a two
-    pixel corner radius and a faint lighter top line, as tgui buttons have."""
+def draw_tgui_tile(fill, kind, edge=G_EDGE):
+    """A rounded tile with a one pixel edge and a faint lighter line along the top. Titles carry an amber rule along the bottom."""
     img = Image.new("RGBA", (TILE, TILE), (0, 0, 0, 0))
     d = ImageDraw.Draw(img)
-    if kind == "button":
-        d.rounded_rectangle([0, 0, TILE - 1, TILE - 1], radius=2, fill=fill, outline=G_EDGE)
-        d.line([(2, 1), (TILE - 3, 1)], fill=tuple(min(255, c + 24) for c in fill[:3]) + (fill[3],))
-        return img
-    d.rectangle([0, 0, TILE - 1, TILE - 1], fill=fill, outline=G_EDGE)
+    d.rounded_rectangle([0, 0, TILE - 1, TILE - 1], radius=4 if kind == "button" else CORNER - 1, fill=fill, outline=edge)
+    d.line([(CORNER, 1), (TILE - CORNER - 1, 1)], fill=tuple(min(255, c + 18) for c in fill[:3]) + (fill[3],))
     if kind == "title":
-        d.rectangle([1, TILE - 3, TILE - 2, TILE - 2], fill=G_RULE)
+        d.line([(CORNER, TILE - 2), (TILE - CORNER - 1, TILE - 2)], fill=G_AMBER)
     return img
 
 
@@ -210,7 +207,7 @@ def style_for(name):
     if name == "tgui-bar-track":
         return TGUI_TRACK, GREY
     if name == "tgui-bar-fill":
-        return G_RULE, G_RULE
+        return G_AMBER, G_AMBER
     if name == "tgui-tab":
         return TGUI_TAB, TGUI_EDGE
     if name == "tgui-tab-hover":

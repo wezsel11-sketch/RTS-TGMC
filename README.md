@@ -514,11 +514,13 @@ The effect sprites are TGMC art too (`fx-*` images in `build_sprites.py`) and ar
 
 ## The HUD
 
-The HUD is a glass dock along the bottom (minimap, selection card with a group grid, command buttons), a Build panel on the left (the
-production tabs and icons), a resource bar on top (requisition, income, army, clock), the CAS bin beside the Build panel, the event log
-top right, and Codex, help and Menu buttons in the corner (`tgmc/chrome/ingame-player.yaml`). The panels are rounded dark-blue glass tiles
-drawn by `mod/make_chrome.py`. The map fills the whole window under it. Evolve and Devolve show only for the xeno side; Medic and Infected
-only for the marines. `docs/hud-designs/` keeps the three mockups the dock was chosen from (A bottom dock, B refined sidebar, C minimal).
+The HUD follows design C (`docs/hud-designs/design-c.png`): a resource bar top centre (requisition, income, army, clock), the event
+log top left, the minimap top right with the Codex, help and Menu buttons under it and the support powers in a column below those, the
+selection card with its group grid bottom left, one production bar bottom centre (four tabs, nine icons a row) and the orders and
+abilities bottom right (`tgmc/chrome/ingame-player.yaml`). The panels are near-black rounded tiles with a thin light edge, amber for
+whatever is selected, drawn by `mod/make_chrome.py`. The map fills the whole window under it. Evolve and Devolve show only for the xeno
+side; Medic and Infected only for the marines. Laid out for a window 1280 wide or more. Still to come from the design: one cell per
+hotkey with its letter and cost, faction skins, a round minimap. `docs/hud-designs/` keeps the three mockups (A, B, C).
 
 ## Known gaps
 

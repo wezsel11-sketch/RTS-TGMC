@@ -12,12 +12,23 @@ structure-mending Drone, a heavy Warrior and a long list of further castes, plus
 converted sprites or audio, no `.mix`/`.oramap`, and no OpenRA binaries are committed.
 The build step makes all of those locally, under `build/`, which is git-ignored.
 
+## Download and play
+
+Ready-to-play packages are on the [Releases page](https://github.com/wezsel11-sketch/RTS-TGMC/releases/latest). Nothing else to install:
+
+- **Windows 10 or 11 (64-bit):** download `TGMC-<version>-windows-x64.zip`, unzip it, double-click `TGMC.exe`. If SmartScreen warns
+  about an unknown publisher, choose *More info*, then *Run anyway* (the package is not code-signed).
+- **Linux (64-bit):** download `TGMC-<version>-linux-x64.tar.gz`, unpack it, run `./TGMC.sh`.
+
+Each package carries the game engine (OpenRA), its own .NET runtime and the converted TGMC art and sound, about 170 MB.
+`mod/package.sh` builds both from a built mod. To build from source instead, see [Quick start](#quick-start).
+
 ## Non-commercial use only
 
 The TGMC art and sounds are licensed under Creative Commons NonCommercial terms, and
-some are ShareAlike. Use the mod for yourself. Do not sell it, do not host or
-redistribute the built mod, and do not publish TGMC-derived art or audio. See
-[Licenses](#licenses) below.
+some are ShareAlike. The release packages carry them, converted, under those terms: share
+them only for free and with credit to TerraGov Marine Corps, and never sell them or anything
+made from them. See [Licenses](#licenses) below.
 
 ## Quick start
 
@@ -604,9 +615,11 @@ afford it (`HotkeyPaletteWidget`). Still to come from the design: faction skins,
   repo contains no OpenRA code.
 - **This repo's scripts and YAML.** No licence has been chosen yet. OpenRA is GPL-3.0, so
   any YAML you distribute with OpenRA should be GPL-compatible.
-- **Non-commercial.** Because the TGMC art and sounds are NonCommercial, the built mod is
-  for personal use only. Don't redistribute `build/`, its `.oramap` or `.zip` files, or any
-  converted sprite or sound.
+- **Non-commercial.** Because the TGMC art and sounds are NonCommercial, the release packages
+  and anything built from this repo may only be shared free of charge, with credit to TGMC, and
+  under the same terms for the ShareAlike files. TGMC's `sound/credits.md` says some of its sounds
+  were taken from commercial games (Call of Duty, Halo, Counter-Strike, Team Fortress 2 and others);
+  TGMC hosts them under CC-BY-NC-SA, and the packages carry the same files on the same footing.
 
 ## Music credits
 

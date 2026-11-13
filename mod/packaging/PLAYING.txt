@@ -1,0 +1,19 @@
+TGMC: Marines vs Xenos (version @VERSION@)
+An OpenRA real-time strategy mod made from TerraGov Marine Corps, the SS13 game.
+Source and instructions: https://github.com/wezsel11-sketch/RTS-TGMC
+
+START
+  Windows: double-click TGMC.exe. If Windows SmartScreen warns about an unknown publisher, choose "More info", then "Run anyway".
+  Linux:   run ./TGMC.sh. Needs a desktop with OpenGL 3.3 (any graphics driver from the last ten years).
+  Then Singleplayer -> Skirmish, pick a map, add a Skirmish AI to the other slot, Start Game.
+  Settings, saves and logs are kept by OpenRA: Documents\OpenRA on Windows, ~/.config/openra on Linux.
+
+NON-COMMERCIAL USE ONLY
+  This package contains art and sound converted from TerraGov Marine Corps
+  (https://github.com/tgstation/TerraGov-Marine-Corps). TGMC licenses them under Creative Commons
+  NonCommercial terms: CC-BY-NC (sprites and artwork), CC-BY-NC-SA (icons and some sounds), CC-BY-SA
+  (some sprites) and CC-BY (some sounds, from FreeSound). Credit for them goes to the TGMC contributors.
+  Do not sell this package or anything made from it. TGMC's sound/credits.md says some of its sounds were
+  taken from commercial games and are used under CC-BY-NC-SA by TGMC.
+
+  OpenRA (https://www.openra.net) is GPL-3.0; its licence is in COPYING. The .NET runtime is MIT.

@@ -126,6 +126,8 @@ BULL = "icons/Xeno/castes/bull.dmi"
 BEHEMOTH = "icons/Xeno/castes/behemoth.dmi"
 RESIN_WALL = "icons/obj/smooth_objects/resin-wall.dmi"
 RESIN_DOOR = "icons/obj/smooth_objects/resin-door.dmi"
+APC = "icons/obj/armored/3x3/apc.dmi"
+APC_CUPOLA = {"N": "cupola_1", "S": "cupola_2", "E": "cupola_4", "W": "cupola_8"}
 CADE = "icons/obj/structures/barricades/metal.dmi"
 MECH_MEDIUM = "icons/mecha/mech_medium.dmi"
 MECH_WEAPONS = "icons/mecha/mech_core_weapons.dmi"
@@ -616,19 +618,20 @@ UNITS = {
             "icon": [("icons/obj/armored/3x3/tank.dmi", "tank", None, {"side": "S", "fit": (46, 46)})],
         },
     },
+    # A vehicle turret is laid out as TGMC draws it (build_vehicle_turret): the turret body and the cannon on one canvas centred on the hull.
     "tank-turret": {
-        "sequences": {
-            # The cannon only: TGMC's turret-body state is drawn with offsets of its own per facing, and off-centre without them.
-            "turret": [("icons/obj/armored/3x3/tank_gun.dmi", "ltb_cannon")],
-        },
+        "vehicle_turret": {"hull": ("icons/obj/armored/3x3/tank.dmi", "tank"), "body": "turret", "cannon": "ltb_cannon",
+                           "gun": "icons/obj/armored/3x3/tank_gun.dmi"},
+        "sequences": {"turret": [("icons/obj/armored/3x3/tank_gun.dmi", "turret"), ("icons/obj/armored/3x3/tank_gun.dmi", "ltb_cannon")]},
     },
+    # TGMC's troop APC, the Athena (3x3, the tank's size), with its cupola gun mount. TGMC draws the cupola in a different place for
+    # each hull direction (cupola_1 north, _2 south, _4 east, _8 west), so it is part of the hull here, pointing where the hull points.
     "apc": {
         "sequences": {
-            "idle": [("icons/obj/armored/2x2/medium_vehicles.dmi", "apc")],
-            "turret": [("icons/obj/armored/2x2/medium_vehicles.dmi", "apc_turret")],
-            # TGMC has no APC wreck: the hull, burnt dark, under its heaviest damage overlay.
-            "wreck": [("icons/obj/armored/2x2/medium_vehicles.dmi", "apc", (90, 85, 80)), ("icons/obj/armored/2x2/medium_vehicles.dmi", "damage_major")],
-            "icon": [("icons/obj/armored/2x2/medium_vehicles.dmi", "apc_full", None, {"side": "S", "fit": (46, 46)})],
+            "idle": [(APC, "apc"), (APC, "cupola_1", None, {"by_side": APC_CUPOLA})],
+            # TGMC has no APC wreck: the hull, burnt dark.
+            "wreck": [(APC, "apc", (90, 85, 80)), (APC, "cupola_1", (90, 85, 80), {"by_side": APC_CUPOLA})],
+            "icon": [(APC, "apc", None, {"side": "S", "fit": (46, 46)})],
         },
     },
     "som-tank": {
@@ -638,10 +641,12 @@ UNITS = {
             "icon": [("icons/obj/armored/3x4/som_tank.dmi", "tank", None, {"side": "S", "fit": (46, 46)})],
         },
     },
+    # The SOM hull carries its own turret ring, and TGMC's coilgun pictures each fit only the hull view they were drawn for (a gun
+    # aimed north over a hull facing east floats off it). So the SOM tank turns to fire: its body sequence is hull and coilgun together.
     "som-tank-turret": {
-        "sequences": {
-            "turret": [("icons/obj/armored/3x4/som_tank_gun.dmi", "coilgun")],
-        },
+        "vehicle_turret": {"hull": ("icons/obj/armored/3x4/som_tank.dmi", "tank"), "body": None, "cannon": "coilgun",
+                           "gun": "icons/obj/armored/3x4/som_tank_gun.dmi", "with_hull": True, "sequence": "armed"},
+        "sequences": {"turret": [("icons/obj/armored/3x4/som_tank_gun.dmi", "coilgun")]},
     },
     "bull": {
         "sequences": {
@@ -1725,6 +1730,8 @@ def _layer_images(dmi, state, tint=None, opts=None):
             merged[k] = better
         return merged
     frames = dmi.frames(state)
+    if "by_side" in opts:  # each side from its own 4-direction state, that state's own view of that side (a vehicle part drawn per hull direction)
+        return {side: [tinted(fr[tgmc_dmi.DIRS4.index(side)], tint) for fr in dmi.frames(opts["by_side"][side])] for side in tgmc_dmi.DIRS4}
     if "frames" in opts:
         frames = frames[slice(*opts["frames"])]
     dirs = dmi.state(state)["dirs"]
@@ -2346,6 +2353,43 @@ def build_condor(tgmc, out_dir, scale=0.5, facings=16):
     return {"unit": "condor", "sheet": "sprites/condor.png", "cell": [cell, cell], "cells": len(cells) + len(shadows)}
 
 
+# TGMC's tank gun overlay sits this far from the turret's corner (/atom/movable/vis_obj/tank_gun: pixel_x -70, pixel_y -69).
+TANK_GUN_OFFSET = (-70, -69)
+
+
+def build_vehicle_turret(tgmc, unit, spec, out_dir):
+    """sprites/<unit>.png: the turret of a vehicle, one cell per facing, on a canvas the size of the gun sheet centred on the hull.
+    BYOND anchors pictures at their bottom-left corner: the turret body's corner is the hull's, and the cannon's is TANK_GUN_OFFSET from it.
+    Each TGMC view is the turret pointing that way, whatever the hull does, so it turns freely over the hull (WithSpriteTurret)."""
+    vt = spec["vehicle_turret"]
+    hull = tgmc_dmi.Dmi(os.path.join(tgmc, vt["hull"][0]))
+    gun = tgmc_dmi.Dmi(os.path.join(tgmc, vt["gun"]))
+    size = gun.icon_w
+    corner = ((size - hull.icon_w) // 2, (size + hull.icon_h) // 2)  # the hull's bottom-left corner on the canvas
+    sides = {}
+    for d, side in enumerate(tgmc_dmi.DIRS4):
+        cell = Image.new("RGBA", (size, size), (0, 0, 0, 0))
+        if vt.get("with_hull"):
+            h = hull.frames(vt["hull"][1])[0][d]
+            cell.paste(h, ((size - hull.icon_w) // 2, (size - hull.icon_h) // 2), h)
+        if vt["body"]:
+            body = gun.frames(vt["body"])[0][d]
+            cell.paste(body, (corner[0], corner[1] - gun.icon_h), body)
+        cannon = gun.frames(vt["cannon"])[0][d]
+        layer = Image.new("RGBA", (size, size), (0, 0, 0, 0))
+        layer.paste(cannon, (corner[0] + TANK_GUN_OFFSET[0], corner[1] - TANK_GUN_OFFSET[1] - gun.icon_h), cannon)
+        cell.alpha_composite(layer)
+        sides[side] = cell
+    cells = [sides[FACING_SOURCE[name]] for name in FACING_NAMES]
+    save_sheet(cells, (size, size), os.path.join(out_dir, "sprites", f"{unit}.png"))
+    os.makedirs(os.path.join(out_dir, "sequences"), exist_ok=True)
+    with open(os.path.join(out_dir, "sequences", f"{unit}.yaml"), "w", encoding="utf-8", newline="\n") as f:
+        f.write("\n".join(["# Generated by mod/build_sprites.py from TGMC art. Do not edit.", f"{unit}:", "\tDefaults:",
+                           f"\t\tFilename: sprites/{unit}.png", f"\t{vt.get('sequence', 'turret')}:", "\t\tStart: 0", f"\t\tFacings: -{len(cells)}"]) + "\n")
+    return {"unit": unit, "sheet": f"sprites/{unit}.png", "cell": [size, size], "cells": len(cells),
+            "sequences": [{"name": vt.get("sequence", "turret"), "start": 0, "length": 1, "facings": len(cells), "tick": None}]}
+
+
 def merge_turret(out_dir, hull, turret):
     seq_dir = os.path.join(out_dir, "sequences")
     lines = open(os.path.join(seq_dir, f"{turret}.yaml"), encoding="utf-8").read().splitlines()
@@ -2372,6 +2416,7 @@ def main():
     for unit in args.units:
         info = (build_condor(args.tgmc, args.out) if unit == "condor" else build_alamo(args.tgmc, args.out) if unit == "alamo"
                 else build_alamo(args.tgmc, args.out, "tadpole", ALAMO_FILES[1]) if unit == "tadpole"
+                else build_vehicle_turret(args.tgmc, unit, UNITS[unit], args.out) if "vehicle_turret" in UNITS.get(unit, {})
                 else build_unit(args.tgmc, unit, UNITS[unit], args.out))
         report.append(info)
         print(f"{unit}: {info['cells']} cells of {info['cell'][0]}x{info['cell'][1]}px -> {info['sheet']}")

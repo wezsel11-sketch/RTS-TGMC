@@ -115,8 +115,8 @@ the commits this mod was tested against (see the top of `mod/bootstrap.py`), so 
     Carrier hidden traps, Puppeteer Flay (its biomass refills plasma) and Pincushion, Mantis Ravage, Behemoth Landslide and Geocrush,
     Hivelord Healing Infusion. The xeno AI uses them all.
   - **Vehicles.** The Workshop builds a marine **Tank** (cannon and chaingun in a turret that fires on the move, two at a time), an
-    **APC** that carries eight marines on foot (right-click it with marines selected; Deploy unloads) and, for the SOM, a **SOM Tank**
-    with a coilgun. Art from TGMC's armoured vehicle sheets. A destroyed vehicle leaves its wreck for a minute.
+    **APC** (TGMC's Athena, the tank's size, its cupola gun on the hull) that carries eight marines on foot (right-click it with marines selected; Deploy unloads) and, for the SOM, a **SOM Tank**
+    with a coilgun (a hover tank: it turns to fire, as TGMC's coilgun pictures only fit the hull view they were drawn for). Art from TGMC's armoured vehicle sheets. A destroyed vehicle leaves its wreck for a minute.
   - **Facehuggers.** A Facehugger hunts marines. It latches on, the marine drops for four seconds, then the hugger dies. The marine carries
     an embryo: after a minute it bursts, dies, and a xeno **Larva** for the infector's side stands in its place, unless a corpsman heals the marine first.
     Only infantry can be hugged, not turrets or machines.

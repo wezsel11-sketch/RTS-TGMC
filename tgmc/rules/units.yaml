@@ -3644,9 +3644,8 @@ apc:
 	TgmcMobile:
 		Speed: 100
 	Selectable:
-		Bounds: 2048, 2048, 0, -128
-	WithSpriteTurret:
-		Sequence: turret
+		Bounds: 2560, 2560, 0, -256
+	# No turret sprite: TGMC's Athena carries its gun in a cupola drawn on the hull (sequence idle), so the turret swings unseen.
 	Armament@PRIMARY:
 		Weapon: TGMCTankChaingun
 		LocalOffset: 400,0,300
@@ -3679,8 +3678,15 @@ som-tank:
 		Speed: 76
 	Selectable:
 		Bounds: 2816, 2816, 0, -256
-	WithSpriteTurret:
-		Sequence: turret
+	# A hover tank that turns to fire: TGMC's coilgun is drawn on the hull per view (sequence armed, mod/build_sprites.py).
+	QuantizeFacingsFromSequence:
+		Sequence: armed
+	WithFacingSpriteBody:
+		Sequence: armed
+	-Turreted:
+	-AttackTurreted:
+	AttackFrontal:
+		FacingTolerance: 40
 	Armament@PRIMARY:
 		Weapon: TGMCCoilgun
 		LocalOffset: 1300,0,300

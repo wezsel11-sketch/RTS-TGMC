@@ -160,7 +160,9 @@ def main():
         errors.append(f"Fluent key {k} is not in tgmc.ftl")
 
     # Sequences: the actors that build_sprites.py makes, and the sequence names the rules ask for
-    seqs = {u: set(spec["sequences"]) for u, spec in build_sprites.UNITS.items()}
+    # A vehicle turret built by build_vehicle_turret writes one sequence, named by its spec ("turret" unless it says otherwise).
+    seqs = {u: {spec["vehicle_turret"].get("sequence", "turret")} if "vehicle_turret" in spec else set(spec["sequences"])
+            for u, spec in build_sprites.UNITS.items()}
     # build_sprites.py copies a vehicle turret's sequences into its hull's file (merge_turret), so <hull>-turret.yaml is not loaded
     merged = {u for u in seqs if u.endswith("-turret") and u[:-len("-turret")] in seqs}
     for u in merged:

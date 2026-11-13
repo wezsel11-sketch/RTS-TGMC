@@ -589,7 +589,7 @@ Container@PLAYER_WIDGETS:
 							Height: PARENT_HEIGHT - 12
 							Children:
 								LogicTicker@PRODUCTION_TICKER:
-								ProductionPalette@PRODUCTION_PALETTE:
+								HotkeyPalette@PRODUCTION_PALETTE:
 									X: 62
 									Columns: 9
 									IconSize: 62, 46

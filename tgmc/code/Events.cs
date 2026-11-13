@@ -6,6 +6,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using OpenRA.Graphics;
 using OpenRA.Mods.Common.Orders;
 using OpenRA.Mods.Common.Traits;
@@ -13,6 +14,8 @@ using OpenRA.Mods.Common.Widgets;
 using OpenRA.Mods.Common.Widgets.Logic;
 using OpenRA.Mods.TGMC.Orders;
 using OpenRA.Mods.TGMC.Traits;
+using OpenRA.Network;
+using OpenRA.Primitives;
 using OpenRA.Traits;
 using OpenRA.Widgets;
 
@@ -590,6 +593,50 @@ namespace OpenRA.Mods.TGMC.Widgets
 			}
 
 			return false;
+		}
+	}
+
+	[Desc("The production palette of design C: every cell also shows its hotkey (top left) and what the item costs (bottom right).")]
+	public class HotkeyPaletteWidget : ProductionPaletteWidget
+	{
+		public readonly string CellFont = "TinyBold";
+		public readonly Color HotkeyColor = Color.FromArgb(255, 159, 67);
+		public readonly Color CostColor = Color.FromArgb(225, 230, 235);
+		public readonly Color TooDearColor = Color.FromArgb(235, 90, 80);
+
+		readonly ModData modData;
+
+		[ObjectCreator.UseCtor]
+		public HotkeyPaletteWidget(ModData modData, OrderManager orderManager, World world, WorldRenderer worldRenderer)
+			: base(modData, orderManager, world, worldRenderer) { this.modData = modData; }
+
+		public override void Draw()
+		{
+			base.Draw();
+			if (CurrentQueue == null)
+				return;
+
+			// The cells in the order and place RefreshIcons gives them (its list is private).
+			var font = Game.Renderer.Fonts[CellFont];
+			var cash = CurrentQueue.Actor.Owner.PlayerActor.Trait<PlayerResources>().GetCashAndResources();
+			var rb = RenderBounds;
+			var i = 0;
+			foreach (var item in AllBuildables.Skip(IconRowOffset * Columns).Take(DisplayedIconCount))
+			{
+				var at = new Vector2(rb.X + i % Columns * (IconSize.X + IconMargin.X), rb.Y + i / Columns * (IconSize.Y + IconMargin.Y));
+				if (i < HotkeyCount)
+				{
+					var key = modData.Hotkeys[HotkeyPrefix + (i + 1).ToString("D2", System.Globalization.CultureInfo.InvariantCulture)].GetValue();
+					if (key.IsValid())
+						font.DrawTextWithContrast(key.DisplayString(), at + new Vector2(3, 1), HotkeyColor, Color.Black, 1);
+				}
+
+				var cost = CurrentQueue.GetProductionCost(item);
+				var text = cost.ToString(System.Globalization.CultureInfo.InvariantCulture);
+				var size = font.Measure(text);
+				font.DrawTextWithContrast(text, at + new Vector2(IconSize.X - size.X - 3, IconSize.Y - size.Y - 2), cost > cash ? TooDearColor : CostColor, Color.Black, 1);
+				i++;
+			}
 		}
 	}
 

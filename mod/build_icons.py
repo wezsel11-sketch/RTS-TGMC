@@ -150,7 +150,7 @@ def main():
             continue
         icon = dmi.frames(state)[0][0].convert("RGBA")
         if icon.size != (SIZE, SIZE):
-            icon = icon.resize((SIZE, SIZE), Image.NEAREST)
+            icon = tgmc_dmi.nearest(icon, (SIZE, SIZE))
         icons.append((name, icon))
 
     # A greyed, darker copy the card shows while the ability cannot be used (cooldown, no plasma, silenced).

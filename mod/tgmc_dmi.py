@@ -101,3 +101,11 @@ class Dmi:
                 row.append(self.sheet.crop((x, y, x + self.icon_w, y + self.icon_h)))
             out.append(row)
         return out
+
+
+def nearest(img, size):
+    """img resized to size with no smoothing. Not Image.resize: python3-pil 12.1.1-2ubuntu1.5 fails every NEAREST resize
+    ("returned NULL without setting an exception"), while a NEAREST transform still works and picks the same pixels."""
+    w, h = size
+    return img.transform((w, h), Image.AFFINE, (img.width / w, 0, 0, 0, img.height / h, 0), Image.NEAREST)
+

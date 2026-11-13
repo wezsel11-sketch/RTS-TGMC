@@ -1952,7 +1952,7 @@ def cameo(img, tone="marine", bust=False):
     scale = min(room_w / img.width, room_h / img.height)
     if scale >= 1:
         scale = int(scale)
-        img = img.resize((img.width * scale, img.height * scale), Image.NEAREST)
+        img = tgmc_dmi.nearest(img, (img.width * scale, img.height * scale))
     else:
         img = img.resize((max(1, round(img.width * scale)), max(1, round(img.height * scale))), Image.LANCZOS)
     top, bottom = CAMEO_TONES[tone]

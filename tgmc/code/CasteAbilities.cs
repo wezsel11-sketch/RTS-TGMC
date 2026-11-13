@@ -856,6 +856,10 @@ namespace OpenRA.Mods.TGMC.Traits
 		[Desc("Starts with this share of the maximum, in percent.")]
 		public readonly int StartPercent = 60;
 
+		[GrantedConditionReference]
+		[Desc("Condition the xeno has while it stands on weeds (it heals there, see ChangesHealth@weeds).")]
+		public readonly string WeedCondition = null;
+
 		public override object Create(ActorInitializer init) { return new Plasma(init.Self, this); }
 	}
 
@@ -865,6 +869,7 @@ namespace OpenRA.Mods.TGMC.Traits
 		readonly PlasmaInfo info;
 		int value;
 		int wait;
+		int weedToken = Actor.InvalidConditionToken;
 
 		public Plasma(Actor self, PlasmaInfo info)
 		{
@@ -880,10 +885,20 @@ namespace OpenRA.Mods.TGMC.Traits
 
 		void ITick.Tick(Actor self)
 		{
+			// Weeds can be walked on, so the actor map does not hold them; the building influence does.
+			var onWeeds = self.World.WorldActor.Trait<BuildingInfluence>().GetBuildingsAt(self.Location)
+				.Any(a => !a.IsDead && info.Weeds.Contains(a.Info.Name));
+			if (info.WeedCondition != null)
+			{
+				if (onWeeds && weedToken == Actor.InvalidConditionToken)
+					weedToken = self.GrantCondition(info.WeedCondition);
+				else if (!onWeeds && weedToken != Actor.InvalidConditionToken)
+					weedToken = self.RevokeCondition(weedToken);
+			}
+
 			if (value >= info.Max)
 				return;
 
-			var onWeeds = self.World.ActorMap.GetActorsAt(self.Location).Any(a => info.Weeds.Contains(a.Info.Name));
 			if (++wait >= (onWeeds ? info.WeedRegen : info.Regen))
 			{
 				wait = 0;

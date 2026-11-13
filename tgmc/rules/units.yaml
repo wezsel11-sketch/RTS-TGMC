@@ -1508,6 +1508,14 @@ demolitionist:
 		ThroughWalls: true
 	# Plasma fuels the abilities; it builds up slowly, and faster on weeds.
 	Plasma:
+		WeedCondition: on-weeds
+	# As in TGMC, a xeno mends on weeds: 2 health a second, once it has gone five seconds without being hit.
+	ChangesHealth@weeds:
+		RequiresCondition: on-weeds
+		Step: 2
+		Delay: 25
+		StartIfBelow: 101
+		DamageCooldown: 125
 	# Xenos see 9 cells through the fog (the marines on foot 10).
 	RevealsShroud:
 		Range: 9c0

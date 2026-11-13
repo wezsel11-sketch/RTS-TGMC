@@ -697,7 +697,8 @@ def write_tgmc_miner_art(out, tgmc):
     strip(running, "miner.png")
     strip(broken, "miner-field.png", under=((255, 210, 60, 255), (255, 210, 60, 110)))
     icon = running[0].copy()
-    icon.thumbnail((44, 44), Image.NEAREST)
+    fit = min(1, 44 / max(icon.size))
+    icon = tgmc_dmi.nearest(icon, (round(icon.width * fit), round(icon.height * fit)))
     icon.save(os.path.join(out, "miner-icon.png"))
 
 
@@ -1564,6 +1565,10 @@ SCENARIOS = {
     # Plasma pays for abilities (see scenarios/test-plasma.lua): a ravager that starts nearly empty.
     "scenario-plasma": {"scripts": ("test-plasma",), "size": (32, 24), "drop_conquest": True, "extra_rules": "ravager:\n\tPlasma:\n\t\tStartPercent: 10\n", "actors": [
         ("ravager", "Xenos", 8, 10, 0), ("resin-silo", "Xenos", 28, 20, 0), ("rifleman", "Marines", 4, 4, 0), ("sentinel", "Xenos", 26, 4, 0),
+    ]},
+    # Xenos mend and gain plasma faster on weeds (see scenarios/test-weed-heal.lua): the runner at x 8 stands on weeds.
+    "scenario-weed-heal": {"scripts": ("test-weed-heal",), "size": (32, 24), "drop_conquest": True, "extra_rules": "runner:\n\tPlasma:\n\t\tStartPercent: 10\n", "actors": [
+        ("weeds", "Xenos", 8, 10, 0), ("runner", "Xenos", 8, 10, 0), ("runner", "Xenos", 20, 10, 0), ("resin-silo", "Xenos", 28, 20, 0), ("rifleman", "Marines", 4, 4, 0),
     ]},
     # A wall stops rifle bullets (see scenarios/test-cover.lua): the wall of the walls ground at x 14 to 16, y 8 to 15.
     "scenario-cover": {"scripts": ("test-cover",), "size": (32, 24), "drop_conquest": True, "ground": "walls",

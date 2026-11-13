@@ -148,6 +148,15 @@ namespace OpenRA.Mods.TGMC.Traits
 			return (int)sum;
 		}
 
+		/// <summary>Whether StrengthNear(cell, radiusCells) takes in the grid square that holds other.</summary>
+		public bool Counts(CPos cell, int radiusCells, CPos other)
+		{
+			var (x0, y0) = Square(new CPos(cell.X - radiusCells, cell.Y - radiusCells));
+			var (x1, y1) = Square(new CPos(cell.X + radiusCells, cell.Y + radiusCells));
+			var (x, y) = Square(other);
+			return x >= x0 && x <= x1 && y >= y0 && y <= y1;
+		}
+
 		/// <summary>Attacks on this player's actors within AttackMemory ticks, one per victim and attacker, newest first. Dead victims are left out.</summary>
 		public IEnumerable<(Actor Victim, Actor Attacker, int Tick)> RecentAttacks =>
 			attacks.Where(kv => !kv.Key.Victim.IsDead && kv.Key.Victim.IsInWorld && world.WorldTick - kv.Value <= Info.AttackMemory)

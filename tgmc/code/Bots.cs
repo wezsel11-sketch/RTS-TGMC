@@ -1372,9 +1372,10 @@ namespace OpenRA.Mods.TGMC.Traits
 
 			var value = raid.Sum(BotUnits.Value);
 			var atEnd = leg >= route.Count - 1;
-			// The target's own value is not defence: at the target, count only what stands around it.
-			var atTarget = (centre - target).LengthSquared <= Info.Radius * Info.Radius;
-			var around = atTarget ? memory.DefenceNear(centre, targetValue, Info.Radius) : memory.StrengthNear(centre, Info.Radius);
+			// The target's own value is not defence: wherever the count takes the target in, count only what stands around it.
+			// (The count goes by whole grid squares, so it takes the target in from up to a square further out than Radius: a raid
+			// worth less than its target used to turn home there, some four to eight cells short, and never arrive.)
+			var around = memory.Counts(centre, Info.Radius, target) ? memory.DefenceNear(centre, targetValue, Info.Radius) : memory.StrengthNear(centre, Info.Radius);
 			if (around * 100 > value * Info.BackOffPercent || (atEnd && ordered && raid.All(a => a.IsIdle)))
 			{
 				// Outmatched, or done: nothing left to hit at the target.

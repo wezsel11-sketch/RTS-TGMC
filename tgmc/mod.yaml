@@ -145,6 +145,8 @@ Sequences:
 	tgmc|sequences/weed-node.yaml
 	tgmc|sequences/weeds.yaml
 	tgmc|sequences/resin-wall.yaml
+	tgmc|sequences/resin-door.yaml
+	tgmc|sequences/sticky-resin.yaml
 	tgmc|sequences/egg.yaml
 	tgmc|sequences/hugger-trap.yaml
 	tgmc|sequences/evolution-tower.yaml

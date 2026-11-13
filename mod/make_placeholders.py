@@ -1570,6 +1570,16 @@ SCENARIOS = {
     "scenario-weed-heal": {"scripts": ("test-weed-heal",), "size": (32, 24), "drop_conquest": True, "extra_rules": "runner:\n\tPlasma:\n\t\tStartPercent: 10\n", "actors": [
         ("weeds", "Xenos", 8, 10, 0), ("runner", "Xenos", 8, 10, 0), ("runner", "Xenos", 20, 10, 0), ("resin-silo", "Xenos", 28, 20, 0), ("rifleman", "Marines", 4, 4, 0),
     ]},
+    # Resin doors open for the hive only, and sticky resin slows marines (see scenarios/test-resin-door.lua). Two walled lanes with a
+    # door at x 11 (the xenos' lane at y 10, the marines' at y 14, each closed off above and below), a strip of sticky resin at y 19.
+    "scenario-resin-door": {"scripts": ("test-resin-door",), "size": (32, 28), "drop_conquest": True, "actors": [
+        ("resin-wall", "Xenos", 9, 9, 0), ("resin-wall", "Xenos", 9, 11, 0), ("resin-wall", "Xenos", 10, 9, 0), ("resin-wall", "Xenos", 10, 11, 0), ("resin-wall", "Xenos", 11, 9, 0), ("resin-wall", "Xenos", 11, 11, 0), ("resin-wall", "Xenos", 12, 9, 0), ("resin-wall", "Xenos", 12, 11, 0), ("resin-wall", "Xenos", 13, 9, 0), ("resin-wall", "Xenos", 13, 11, 0), ("resin-wall", "Xenos", 11, 8, 0), ("resin-wall", "Xenos", 11, 12, 0), 
+        ("resin-wall", "Xenos", 9, 13, 0), ("resin-wall", "Xenos", 9, 15, 0), ("resin-wall", "Xenos", 10, 13, 0), ("resin-wall", "Xenos", 10, 15, 0), ("resin-wall", "Xenos", 11, 13, 0), ("resin-wall", "Xenos", 11, 15, 0), ("resin-wall", "Xenos", 12, 13, 0), ("resin-wall", "Xenos", 12, 15, 0), ("resin-wall", "Xenos", 13, 13, 0), ("resin-wall", "Xenos", 13, 15, 0), ("resin-wall", "Xenos", 11, 12, 0), ("resin-wall", "Xenos", 11, 16, 0), 
+        ("resin-door", "Xenos", 11, 10, 0), ("resin-door", "Xenos", 11, 14, 0),
+        ("sticky-resin", "Xenos", 7, 19, 0), ("sticky-resin", "Xenos", 8, 19, 0), ("sticky-resin", "Xenos", 9, 19, 0), ("sticky-resin", "Xenos", 10, 19, 0), ("sticky-resin", "Xenos", 11, 19, 0), ("sticky-resin", "Xenos", 12, 19, 0), ("sticky-resin", "Xenos", 13, 19, 0), ("sticky-resin", "Xenos", 14, 19, 0), 
+        ("runner", "Xenos", 5, 10, 0), ("rifleman", "Marines", 5, 14, 0), ("rifleman", "Marines", 5, 19, 0), ("rifleman", "Marines", 5, 22, 0),
+        ("resin-silo", "Xenos", 28, 3, 0),
+    ]},
     # A wall stops rifle bullets (see scenarios/test-cover.lua): the wall of the walls ground at x 14 to 16, y 8 to 15.
     "scenario-cover": {"scripts": ("test-cover",), "size": (32, 24), "drop_conquest": True, "ground": "walls",
                        "extra_rules": "hunter:\n\tHealth:\n\t\tHP: 3000\n", "actors": [

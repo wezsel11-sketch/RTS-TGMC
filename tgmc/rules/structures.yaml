@@ -396,6 +396,94 @@ resin-wall:
 	Tooltip:
 		Name: actor-resin-wall.name
 
+# Resin door (TGMC's /obj/structure/mineral_door/resin): xenos and their allies walk through, it opens for them and closes ten
+# seconds after the last one has gone; marines have to break it down. With resin walls it lets the hive wall itself in.
+resin-door:
+	Inherits: ^Structure
+	Inherits@build: ^XenoMinorBuildable
+	Buildable:
+		Queue: XenoBuild
+		BuildPaletteOrder: 21
+		Description: actor-resin-door.description
+	Voiced:
+		VoiceSet: XenoStructureVoice
+	Tooltip:
+		Name: actor-resin-door.name
+	-MustBeDestroyed:
+	-AppearsOnRadar:
+	-ProvidesPrerequisite@buildingname:
+	Health:
+		HP: 250
+	Valued:
+		Cost: 40
+	RevealsShroud:
+		Range: 3c0
+	# A resin wall can end on a door when a line of them is dragged.
+	LineBuildNode:
+		Types: wall
+	BlocksBullets:
+	-WithSpriteBody:
+	WithSpriteBody@closed:
+		Name: closed
+		RequiresCondition: !door-open
+		Sequence: resin-closed
+	WithSpriteBody@open:
+		Name: open
+		RequiresCondition: door-open && !door-sideways
+		Sequence: resin-open
+	WithSpriteBody@hopen:
+		Name: hopen
+		RequiresCondition: door-open && door-sideways
+		Sequence: hresin-open
+	MapDoor:
+		Prefix: resin
+		FriendsOnly: true
+		CloseDelay: 250
+		Walls: resin-wall, resin-door
+		SidewaysCondition: door-sideways
+		OpenSound: resin-build.ogg
+		CloseSound: resin-build.ogg
+
+# Sticky resin (TGMC's /obj/alien/resin/sticky): a patch on the floor that anyone but the hive wades through at half speed.
+# Dragged out in lines like a wall. Marines clear it as they clear weed sacks, with the rifle butt or the flamer.
+sticky-resin:
+	Inherits: ^Structure
+	Inherits@build: ^XenoMinorBuildable
+	Buildable:
+		Queue: XenoBuild
+		BuildPaletteOrder: 23
+		Description: actor-sticky-resin.description
+	Voiced:
+		VoiceSet: XenoStructureVoice
+	Tooltip:
+		Name: actor-sticky-resin.name
+	-MustBeDestroyed:
+	-AppearsOnRadar:
+	-ProvidesPrerequisite@buildingname:
+	-Selectable:
+	-SelectionDecorations:
+	-SelectionRing:
+	Interactable:
+	Building:
+		Footprint: =
+	Health:
+		HP: 40
+	Valued:
+		Cost: 10
+	RevealsShroud:
+		Range: 1c0
+	LineBuild:
+		Range: 5
+		NodeTypes: sticky
+	LineBuildNode:
+		Types: sticky
+	Targetable:
+		TargetTypes: WeedNode
+	ProximityExternalCondition:
+		Condition: stuck
+		Range: 0c640
+		ValidRelationships: Enemy, Neutral
+
 evolution-tower:
 	Inherits: ^Structure
 	Inherits@build: ^XenoMajorBuildable

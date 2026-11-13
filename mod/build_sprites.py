@@ -124,6 +124,7 @@ WRAITH = "icons/Xeno/castes/wraith.dmi"
 BULL = "icons/Xeno/castes/bull.dmi"
 BEHEMOTH = "icons/Xeno/castes/behemoth.dmi"
 RESIN_WALL = "icons/obj/smooth_objects/resin-wall.dmi"
+RESIN_DOOR = "icons/obj/smooth_objects/resin-door.dmi"
 CADE = "icons/obj/structures/barricades/metal.dmi"
 MECH_MEDIUM = "icons/mecha/mech_medium.dmi"
 MECH_WEAPONS = "icons/mecha/mech_core_weapons.dmi"
@@ -1288,6 +1289,28 @@ UNITS = {
         "sequences": {
             "idle": [(RESIN_WALL, "resin-wall-255")],
             "icon": [(RESIN_WALL, "resin-wall-255", None, {"fit": (44, 44), "frames": (0, 1)})],
+        },
+    },
+    # TGMC's resin door, the piece with no neighbours (seam north to south) and the one in an east-west wall ("h" sequences).
+    "resin-door": {
+        "sequences": {
+            "resin-closed": [(RESIN_DOOR, "resin-door-0")],
+            "resin-opening": [(RESIN_DOOR, "resin-door-0-opening", None, {"tick": 60})],
+            "resin-closing": [(RESIN_DOOR, "resin-door-0-closing", None, {"tick": 60})],
+            "resin-open": [(RESIN_DOOR, "resin-door-0-open", None, {"side": "S"})],
+            "hresin-closed": [(RESIN_DOOR, "resin-door-12")],
+            "hresin-opening": [(RESIN_DOOR, "resin-door-12-opening", None, {"tick": 60})],
+            "hresin-closing": [(RESIN_DOOR, "resin-door-12-closing", None, {"tick": 60})],
+            "hresin-open": [(RESIN_DOOR, "resin-door-12-open", None, {"side": "S"})],
+            "idle": "resin-closed",
+            "icon": [(RESIN_DOOR, "resin-door-0", None, {"fit": (44, 44)})],
+        },
+    },
+    "sticky-resin": {
+        "zoffset": -1000,
+        "sequences": {
+            "idle": [("icons/Xeno/Effects.dmi", "sticky")],
+            "icon": [("icons/Xeno/Effects.dmi", "sticky", None, {"fit": (44, 44)})],
         },
     },
     "evolution-tower": {

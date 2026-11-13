@@ -60,6 +60,12 @@
 	# Warheads can stun a unit with this condition (pounce, stomp): it stands still and does not fire until it wears off.
 	ExternalCondition@stun:
 		Condition: stunned
+	# Wading through the hive's sticky resin (sticky-resin in structures.yaml).
+	ExternalCondition@stuck:
+		Condition: stuck
+	SpeedMultiplier@stuck:
+		RequiresCondition: stuck
+		Modifier: 50
 	# Caught in a gas cloud: slower and tinted green while it lasts.
 	ExternalCondition@gassed:
 		Condition: gassed

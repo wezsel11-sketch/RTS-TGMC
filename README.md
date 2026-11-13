@@ -168,6 +168,10 @@ the commits this mod was tested against (see the top of `mod/bootstrap.py`), so 
     every own unit within 10 cells of the spot runs to the nearest base building; it recharges in 30 seconds (`Recall.cs`).
   - **Bodies.** Fallen units lie where they fell for 20 seconds and then fade away (`WithLingeringCorpse`).
     One killed by the flamer, burning ground or napalm lies there charred (`BurntTypes`, damage type `FlameDeath`).
+  - **Resin doors and sticky resin.** Both from TGMC, both in the xeno Build tab, placed like weeds near a Drone or the Queen. A **Resin Door**
+    (40) opens for the hive and its allies and closes ten seconds after the last one has gone; marines must break it down, so walls and
+    doors make a maze only xenos walk freely. Beside a wall to its east or west it turns to stand in that wall. **Sticky Resin** (10,
+    dragged in lines) is a patch enemies cross at half speed; marines clear it with the rifle butt or the flamer. The bot does not build either yet.
   - **Healing on weeds.** As in TGMC, a xeno standing on weeds mends 2 health a second once it has gone five seconds without being hit
     (`ChangesHealth@weeds`, condition `on-weeds` from `Plasma`). Off the weeds it does not heal by itself.
   - **Claw lunge.** A xeno's body darts at a target within two cells on each strike (`AttackLunge`), as TGMC draws melee.

@@ -10,7 +10,7 @@ using OpenRA.Traits;
 
 namespace OpenRA.Mods.TGMC.Traits
 {
-	[Desc("A door of a converted TGMC map. It opens by itself, with TGMC's animation, when a unit comes near, and closes again a little after the last unit has gone. " +
+	[Desc("A door: one of a converted TGMC map, or a resin door the xenos build (FriendsOnly, CloseDelay, Walls). It opens by itself, with TGMC's animation, when a unit comes near, and closes again a little after the last unit has gone. " +
 		"Closed, it blocks movement and bullets; units path through it as through a gate. Needs the sequences <Prefix>-closed, -opening and -open. Once open, it stays open.")]
 	public class MapDoorInfo : TraitInfo, ITemporaryBlockerInfo, Requires<BuildingInfo>, Requires<WithSpriteBodyInfo>
 	{
@@ -30,6 +30,19 @@ namespace OpenRA.Mods.TGMC.Traits
 		[Desc("Condition granted once the door is open: the open body (a second WithSpriteBody that needs it) takes over from the closed one.")]
 		public readonly string OpenCondition = "door-open";
 
+		[Desc("Only units allied with the door's owner open it and pass. Everyone else has to break it down.")]
+		public readonly bool FriendsOnly = false;
+
+		[Desc("Ticks with nobody near before an open door closes again. 0: it stays open for good.")]
+		public readonly int CloseDelay = 0;
+
+		[Desc("With one of these actors in the cell east or west of it, the door is part of a wall that runs east to west: " +
+			"it uses the sequences h<Prefix>-closed, -opening and -closing, and has SidewaysCondition.")]
+		public readonly string[] Walls = [];
+
+		[GrantedConditionReference]
+		public readonly string SidewaysCondition = null;
+
 		public readonly string[] OpenSound = ["door-open.ogg"];
 		public readonly string[] CloseSound = ["door-close.ogg"];
 
@@ -38,7 +51,7 @@ namespace OpenRA.Mods.TGMC.Traits
 
 	public class MapDoor : ITick, ITemporaryBlocker, INotifyBlockingMove, INotifyAddedToWorld
 	{
-		enum Phase { Closed, Opening, Open }
+		enum Phase { Closed, Opening, Open, Closing }
 
 		readonly MapDoorInfo info;
 		readonly Building building;
@@ -47,6 +60,9 @@ namespace OpenRA.Mods.TGMC.Traits
 		int scan;
 		bool started;
 		int openToken = Actor.InvalidConditionToken;
+		int sidewaysToken = Actor.InvalidConditionToken;
+		int quiet;
+		string prefix;
 
 		public MapDoor(Actor self, MapDoorInfo info)
 		{
@@ -55,6 +71,42 @@ namespace OpenRA.Mods.TGMC.Traits
 			body = self.TraitsImplementing<WithSpriteBody>().First();
 			phase = info.StartsOpen ? Phase.Open : Phase.Closed;
 			scan = self.World.SharedRandom.Next(8);
+			prefix = info.Prefix;
+		}
+
+		bool Friend(Actor self, Actor other) { return !info.FriendsOnly || other.Owner.IsAlliedWith(self.Owner); }
+
+		// Which way the door stands: across a wall that runs east to west, or (the default) across one that runs north to south.
+		void Turn(Actor self)
+		{
+			if (info.Walls.Length == 0)
+				return;
+
+			var influence = self.World.WorldActor.Trait<BuildingInfluence>();
+			var sideways = new[] { new CVec(1, 0), new CVec(-1, 0) }
+				.Any(v => influence.GetBuildingsAt(self.Location + v).Any(a => !a.IsDead && info.Walls.Contains(a.Info.Name)));
+			if (sideways == (prefix != info.Prefix))
+				return;
+
+			prefix = sideways ? "h" + info.Prefix : info.Prefix;
+			if (info.SidewaysCondition != null)
+				sidewaysToken = sideways ? self.GrantCondition(info.SidewaysCondition) : self.RevokeCondition(sidewaysToken);
+			if (phase == Phase.Closed)
+				body.PlayCustomAnimationRepeating(self, prefix + "-closed");
+		}
+
+		void Close(Actor self)
+		{
+			phase = Phase.Closing;
+			self.World.ActorMap.AddInfluence(self, building);
+			if (openToken != Actor.InvalidConditionToken)
+				openToken = self.RevokeCondition(openToken);
+			Fx.Sound(self.World, self.CenterPosition, info.CloseSound);
+			body.PlayCustomAnimation(self, prefix + "-closing", () =>
+			{
+				phase = Phase.Closed;
+				body.PlayCustomAnimationRepeating(self, prefix + "-closed");
+			});
 		}
 
 		public bool IsOpen => phase == Phase.Open;
@@ -65,19 +117,17 @@ namespace OpenRA.Mods.TGMC.Traits
 		bool Near(Actor self)
 		{
 			return self.World.FindActorsInCircle(self.CenterPosition, info.Radius)
-				.Any(a => a != self && !a.IsDead && a.IsInWorld && a.Info.HasTraitInfo<MobileInfo>());
+				.Any(a => a != self && !a.IsDead && a.IsInWorld && a.Info.HasTraitInfo<MobileInfo>() && Friend(self, a));
 		}
 
 		void Open(Actor self)
 		{
-			if (phase == Phase.Opening || phase == Phase.Open)
-			{
+			if (phase != Phase.Closed)
 				return;
-			}
 
 			phase = Phase.Opening;
 			Fx.Sound(self.World, self.CenterPosition, info.OpenSound);
-			body.PlayCustomAnimation(self, info.Prefix + "-opening", () =>
+			body.PlayCustomAnimation(self, prefix + "-opening", () =>
 			{
 				phase = Phase.Open;
 				self.World.ActorMap.RemoveInfluence(self, building);
@@ -99,16 +149,29 @@ namespace OpenRA.Mods.TGMC.Traits
 						openToken = self.GrantCondition(info.OpenCondition);
 				}
 				else
-					body.PlayCustomAnimationRepeating(self, info.Prefix + "-closed");
+					body.PlayCustomAnimationRepeating(self, prefix + "-closed");
 			}
 
 			if (++scan < 6)
 				return;
 
 			scan = 0;
-			// A closed door opens when a unit comes near. An opened door stays open: it never closes again.
-			if (phase == Phase.Closed && Near(self))
-				Open(self);
+			// A closed door opens when a unit comes near. An opened map door stays open; a resin door closes behind the last xeno.
+			if (phase == Phase.Closed)
+			{
+				Turn(self);
+				if (Near(self))
+					Open(self);
+			}
+			else if (phase == Phase.Open && info.CloseDelay > 0)
+			{
+				quiet = Near(self) ? 0 : quiet + 6;
+				if (quiet >= info.CloseDelay && !self.World.ActorMap.GetActorsAt(self.Location).Any(a => a != self))
+				{
+					quiet = 0;
+					Close(self);
+				}
+			}
 		}
 
 		bool ITemporaryBlocker.IsBlocking(Actor self, CPos cell)
@@ -116,11 +179,11 @@ namespace OpenRA.Mods.TGMC.Traits
 			return phase != Phase.Open && cell == self.Location;
 		}
 
-		bool ITemporaryBlocker.CanRemoveBlockage(Actor self, Actor blocking) { return true; }
+		bool ITemporaryBlocker.CanRemoveBlockage(Actor self, Actor blocking) { return Friend(self, blocking); }
 
 		void INotifyBlockingMove.OnNotifyBlockingMove(Actor self, Actor blocking)
 		{
-			if (phase == Phase.Closed)
+			if (phase == Phase.Closed && Friend(self, blocking))
 				Open(self);
 		}
 	}

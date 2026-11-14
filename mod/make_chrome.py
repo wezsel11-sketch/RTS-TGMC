@@ -11,6 +11,7 @@ Outputs in --out:
 Usage: make_chrome.py --out DIR
 """
 import argparse
+import colorsys
 import os
 
 from PIL import Image, ImageDraw, ImageFilter, ImageFont
@@ -595,6 +596,27 @@ def all_collections():
     return names
 
 
+# Faction skins: the hue the amber accents turn to, and a tint over the grey panels.
+SKINS = {"xenos": (0.80, (1.30, 0.80, 1.50)), "som": (0.0, (1.35, 0.85, 0.85))}
+
+
+def skin_atlas(atlas, hue, tint):
+    out = atlas.copy()
+    px = out.load()
+    for y in range(out.height):
+        for x in range(out.width):
+            r, g, b, a = px[x, y]
+            if not a:
+                continue
+            h, sat, v = colorsys.rgb_to_hsv(r / 255, g / 255, b / 255)
+            if sat > 0.35 and 0.03 < h < 0.15:  # amber
+                r, g, b = (int(c * 255) for c in colorsys.hsv_to_rgb(hue, sat * 0.8, v))
+            else:
+                r, g, b = (min(255, int(c * t)) for c, t in zip((r, g, b), tint))
+            px[x, y] = (r, g, b, a)
+    return out
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--out", required=True)
@@ -650,6 +672,14 @@ def main():
 
     os.makedirs(args.out, exist_ok=True)
     atlas.save(os.path.join(args.out, "chrome.png"))
+    # Faction skins: the HUD collections again as "<faction>-<name>" on a recoloured copy of the atlas. FactionSkinLogic
+    # (tgmc/code/Events.cs) points the HUD's widgets at them for a player of that faction.
+    for faction, (hue, tint) in SKINS.items():
+        skin_atlas(atlas, hue, tint).save(os.path.join(args.out, f"chrome-{faction}.png"))
+        for i, name in enumerate(names):
+            if is_hud(name):
+                at = lines.index(f"{name}:")
+                lines += [f"{faction}-{name}:", f"\tImage: chrome-{faction}.png", lines[at + 2]]
     with open(os.path.join(args.out, "chrome.yaml"), "w", encoding="utf-8", newline="\n") as f:
         f.write("\n".join(lines) + "\n")
     print(f"chrome: {len(names)} collections in {COLS}x{rows} atlas")

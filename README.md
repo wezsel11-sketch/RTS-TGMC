@@ -304,6 +304,9 @@ the commits this mod was tested against (see the top of `mod/bootstrap.py`), so 
     - **To medic** sends the hurt and infected among the selection to the nearest Medbay or corpsman.
     - **Infected** selects every infected marine you own.
     - The status line shows ability cooldowns (Leap, Evade).
+    - Each button shows its key in its corner.
+  - **Faction skins.** A xeno player's HUD panels are purple and a Sons of Mars player's red (`FactionSkinLogic`; recoloured copies of
+    the chrome from `mod/make_chrome.py`). Each support power sits on its own card.
   - **Codex** (top bar button): every unit and building with its portrait, description and stats read live from the rules
     (health, cost, speed, armour, each weapon's damage, range and damage per second, prerequisites and evolution line).
   - **Lobby:** a Burst Time dropdown (30 s to 2 min) for facehugged marines.

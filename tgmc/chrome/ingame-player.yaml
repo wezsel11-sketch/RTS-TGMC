@@ -2,7 +2,7 @@
 # selection card bottom left, one production bar bottom centre, orders and abilities bottom right. It floats over a full-window map view.
 
 Container@PLAYER_WIDGETS:
-	Logic: LoadIngameChatLogic
+	Logic: LoadIngameChatLogic, FactionSkinLogic
 	Children:
 		Container@CHAT_ROOT:
 		LogicKeyListener@PLAYER_KEYHANDLER:
@@ -22,11 +22,20 @@ Container@PLAYER_WIDGETS:
 			X: WINDOW_WIDTH - 58
 			Y: 242
 			Children:
+				# A card behind each power (SupportPowerBinLogic copies the template once per icon).
+				Container@PALETTE_BACKGROUND:
+					Children:
+						Background@ICON_TEMPLATE:
+							X: -2
+							Y: -2
+							Width: 50
+							Height: 38
+							Background: tgui-card
 				SupportPowers@SUPPORT_PALETTE:
 					IconSize: 46, 34
 					ClockAnimation: small-clock
 					# Small and tight, so even a dozen powers (every tech building adds some) stop above the minimap.
-					IconMargin: 2
+					IconMargin: 4
 					IconSpriteOffset: 0, 0
 					TooltipContainer: TOOLTIP_CONTAINER
 					ReadyText: supportpowers-support-powers-palette.ready

@@ -674,6 +674,35 @@ namespace OpenRA.Mods.TGMC.Widgets
 		}
 	}
 
+	// Faction skins: for a xeno or Sons of Mars player the HUD's panels and buttons are drawn from that faction's recoloured copies
+	// ("<faction>-<name>", mod/make_chrome.py). Widgets made later from templates (tooltips, palette icons) keep the plain set.
+	public class FactionSkinLogic : ChromeLogic
+	{
+		static readonly string[] Skinned = ["sidebar", "tgmc-", "tgui-"];
+
+		[ObjectCreator.UseCtor]
+		public FactionSkinLogic(Widget widget, World world)
+		{
+			var faction = world.LocalPlayer?.Faction.InternalName;
+			if (faction != "xenos" && faction != "som")
+				return;
+
+			string Skin(string name) { return name != null && Skinned.Any(name.StartsWith) ? faction + "-" + name : name; }
+			void Walk(Widget w)
+			{
+				if (w is ButtonWidget b)
+					b.Background = Skin(b.Background);
+				else if (w is BackgroundWidget bg)
+					bg.Background = Skin(bg.Background);
+
+				foreach (var c in w.Children)
+					Walk(c);
+			}
+
+			Walk(widget);
+		}
+	}
+
 	[Desc("A command card button that also takes a right click (autocast, Warcraft-style) and says when the mouse is over it (the range preview).")]
 	public class AbilityButtonWidget : ButtonWidget
 	{

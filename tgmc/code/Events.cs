@@ -695,6 +695,8 @@ namespace OpenRA.Mods.TGMC.Widgets
 					b.Background = Skin(b.Background);
 				else if (w is BackgroundWidget bg)
 					bg.Background = Skin(bg.Background);
+				else if (w is PowerTilesWidget tiles)
+					tiles.Background = Skin(tiles.Background);
 
 				foreach (var c in w.Children)
 					Walk(c);

@@ -480,8 +480,14 @@ namespace OpenRA.Mods.TGMC.Traits
 
 			if (ticks == (info.ClickTick > 0 ? info.ClickTick : info.Tick - 5))
 			{
+				// A button is clicked; the power tiles open their first family.
 				foreach (var id in info.Click)
-					OpenRA.Widgets.Ui.Root.GetOrNull<OpenRA.Mods.Common.Widgets.ButtonWidget>(id)?.OnClick();
+				{
+					var w = OpenRA.Widgets.Ui.Root.GetOrNull<OpenRA.Widgets.Widget>(id);
+					(w as OpenRA.Mods.Common.Widgets.ButtonWidget)?.OnClick();
+					(w as OpenRA.Mods.TGMC.Widgets.PowerTilesWidget)?.ClickTile(0);
+				}
+
 				foreach (var id in info.RightClick)
 					OpenRA.Widgets.Ui.Root.GetOrNull<OpenRA.Mods.TGMC.Widgets.AbilityButtonWidget>(id)?.OnRightClick();
 				foreach (var id in info.Hover)

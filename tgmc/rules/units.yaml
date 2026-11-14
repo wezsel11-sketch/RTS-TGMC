@@ -961,6 +961,9 @@ mirage-decoy:
 		Ticks: 750
 	Tooltip:
 		Name: actor-mirage-decoy.name
+	# Nothing to order: it cannot be selected, only seen and shot.
+	-Selectable:
+	Interactable:
 
 # Squad leader (TGMC kit): the squad's rifleman with the squad's commander role. Unlocked at the Armory.
 squad_leader:

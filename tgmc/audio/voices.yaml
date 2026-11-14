@@ -11,6 +11,9 @@ MarineVoice:
 	DefaultVariant: .ogg
 	Prefixes:
 		marines: marine-m-, marine-f-
+		som: marine-m-, marine-f-
+		xenos: marine-m-, marine-f-
+		Random: marine-m-, marine-f-
 	Voices:
 		Select: warcry-1, warcry-6, warcry-10, warcry-11, warcry-13
 		Action: warcry-5, warcry-12, warcry-15, warcry-17, warcry-18, warcry-19
@@ -21,6 +24,9 @@ CorpsmanVoice:
 	DefaultVariant: .ogg
 	Prefixes:
 		marines: marine-m-, marine-f-
+		som: marine-m-, marine-f-
+		xenos: marine-m-, marine-f-
+		Random: marine-m-, marine-f-
 	Voices:
 		Select: medic-1
 		Action: warcry-5, warcry-15, warcry-17, warcry-18

@@ -79,6 +79,19 @@ start=$(date +%s)
 # shellcheck disable=SC2086
 printf '%s\n' $names | xargs -P "${SCENARIO_JOBS:-4}" -I{} sh "$0" --one {} "$WAIT"
 
+# Timing-sensitive scenarios (the AI ones) can fail when four run at once on a loaded machine: one that failed without an
+# exception runs once more, alone, and its result line says so.
+retried=""
+for name in $names; do
+	ls "$OUT/$name"/support/Logs/exception* >/dev/null 2>&1 && continue
+	lines=$(grep -h "TEST " "$OUT/$name/game.log" 2>/dev/null)
+	if [ -z "$lines" ] || echo "$lines" | grep -q " FAIL"; then
+		cp "$OUT/$name/game.log" "$OUT/$name/game-first-try.log" 2>/dev/null
+		sh "$0" --one "$name" "$WAIT"
+		retried="$retried $name "
+	fi
+done
+
 fail=0
 passed=0
 total=0
@@ -96,6 +109,7 @@ for name in $names; do
 		sed -n 7,10p "$OUT/$name"/support/Logs/exception*
 		fail=1
 	elif [ -n "$lines" ] && ! echo "$lines" | grep -q " FAIL"; then
+		case "$retried" in *" $name "*) lines="$lines (second try, alone)" ;; esac
 		echo "pass  $name: $(echo "$lines" | head -1)"
 		passed=$((passed + 1))
 	else

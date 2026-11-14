@@ -2175,10 +2175,38 @@ def write_tgmc_map(folder, title, rows, marines, xenos, art=None, objects=None, 
             placed = [(open_variant(n), x, y) for n, x, y in placed]
         extra = [(n, "Neutral", x, y, 0) for n, x, y in placed]
     # The ore fields (TGMC's ore drills): one per drill on walkable ground, kept clear of the bases (see mapobjects.yaml).
-    extra += [("miner-field", "Neutral", x, y, 0) for x, y in fields
-              if 1 <= x < w - 1 and 1 <= y < h - 1 and land[y][x] in "GDF"
-              and not any(abs(x - bx) < 4 and abs(y - by) < 4 for _, _, bx, by, _ in actors + xeno_actors)
-              and not any(abs(x - bx) < 4 and abs(y - by) < 4 for bx, by in extra_spawn)]
+    ore = [(x, y) for x, y in fields
+           if 1 <= x < w - 1 and 1 <= y < h - 1 and land[y][x] in "GDF"
+           and not any(abs(x - bx) < 4 and abs(y - by) < 4 for _, _, bx, by, _ in actors + xeno_actors)
+           and not any(abs(x - bx) < 4 and abs(y - by) < 4 for bx, by in extra_spawn)]
+    # A field is worth nothing unless an engineer can walk up to it: keep those with a cell beside them that the marine
+    # base reaches on foot. The rest (sealed rooms, drills behind TGMC's walls) are dropped. Objects in the way do not count:
+    # every blocking one can be shot to pieces.
+    if ore:
+        blocked = set(ore)
+        reach, queue = {spawn_m}, [spawn_m]
+        while queue:
+            cx, cy = queue.pop()
+            for n in ((cx + 1, cy), (cx - 1, cy), (cx, cy + 1), (cx, cy - 1)):
+                if n not in reach and 1 <= n[0] < w - 1 and 1 <= n[1] < h - 1 and land[n[1]][n[0]] in "GDF" and n not in blocked:
+                    reach.add(n)
+                    queue.append(n)
+        kept = [(x, y) for x, y in ore if any(n in reach for n in ((x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1)))]
+        # Any slot may be a marine, so every base gets a field within 40 cells: where TGMC put none, one goes on the
+        # nearest open cell 6 or more cells from the base.
+        added = 0
+        for bx, by in [spawn_m, spawn_x] + extra_spawn:
+            if any(abs(x - bx) + abs(y - by) <= 40 for x, y in kept):
+                continue
+            spots = sorted((abs(x - bx) + abs(y - by), x, y) for x, y in reach
+                           if max(abs(x - bx), abs(y - by)) >= 6 and (x, y) not in kept
+                           and all(n in reach for n in ((x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1))))
+            if spots:
+                kept.append(spots[0][1:])
+                added += 1
+        print(f"{title}: {len(kept)} ore fields, {len(ore) + added - len(kept)} unreachable dropped, {added} added beside a base")
+        ore = kept
+    extra += [("miner-field", "Neutral", x, y, 0) for x, y in ore]
     original = rows
     def dug_art(x, y):
         """A tunnel cell dug through rock wears the picture of the nearest ordinary ground cell, not the repo's flat dirt tile."""

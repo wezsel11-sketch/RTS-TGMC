@@ -100,8 +100,7 @@ namespace OpenRA.Mods.TGMC.Widgets.Logic
 				return null;
 
 			var name = selected.GroupBy(a => a.Info.Name).OrderByDescending(g => g.Count()).First().Key;
-			var sequences = world.Map.Sequences;
-			return sequences.HasSequence(name, "icon") ? sequences.GetSequence(name, "icon").GetSprite(0) : null;
+			return Icons.Of(world, name);
 		}
 
 		List<Actor> Selected()
@@ -663,8 +662,7 @@ namespace OpenRA.Mods.TGMC.Widgets.Logic
 				icon.GetSprite = () =>
 				{
 					var a = At();
-					var sequences = world.Map.Sequences;
-					return a != null && sequences.HasSequence(a.Info.Name, "icon") ? sequences.GetSequence(a.Info.Name, "icon").GetSprite(0) : null;
+					return a == null ? null : Icons.Of(world, a.Info.Name);
 				};
 
 				// Production icons are 64x48; shrink them into the cell.
@@ -717,6 +715,17 @@ namespace OpenRA.Mods.TGMC.Widgets.Logic
 	}
 
 	// A health bar that turns amber and then red as the unit is hurt (the three bar tiles come from make_chrome.py).
+	static class Icons
+	{
+		// An actor's production icon, or null. HasSequence throws for an image with no sequences at all
+		// (the mirage decoy wears the rifleman's image), so ask for the image first.
+		public static Sprite Of(World world, string actor)
+		{
+			var sequences = world.Map.Sequences;
+			return sequences.Images.Contains(actor) && sequences.HasSequence(actor, "icon") ? sequences.GetSequence(actor, "icon").GetSprite(0) : null;
+		}
+	}
+
 	static class HealthTint
 	{
 		public static int Apply(ProgressBarWidget bar, int percent)

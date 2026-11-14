@@ -54,10 +54,7 @@ namespace OpenRA.Mods.TGMC.Widgets.Logic
 			{
 				portrait.GetSprite = () =>
 				{
-					if (selected == null || !world.Map.Sequences.HasSequence(selected.Name, "icon"))
-						return null;
-
-					return world.Map.Sequences.GetSequence(selected.Name, "icon").GetSprite(0);
+					return selected == null ? null : Icons.Of(world, selected.Name);
 				};
 				portrait.GetScale = () =>
 				{

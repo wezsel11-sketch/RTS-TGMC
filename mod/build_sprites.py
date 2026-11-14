@@ -154,12 +154,19 @@ FACING_SOURCE = {"N": "N", "NE": "E", "E": "E", "SE": "E", "S": "S", "SW": "W", 
 # Layers marked CLOTH take the owner's colour in the game: they are drawn untinted here and again, in grey, on the unit's
 # "<unit>-cloth" sheet, which WithPlayerTint (tgmc/code/PlayerTint.cs) draws over the unit in the player colour.
 CLOTH = "cloth"
+# Arm and leg armour: the same team palette, a shade darker (TGMC's Mk.I armour colours each piece on its own), so limbs read apart.
+CLOTH_LIMB = "cloth-limb"
+# The standard armour and helmet: drawn in the map's TGMC camo (camo sheets below), not the team colour.
+CAMO = "camo"
+# TGMC's camo for standard gear, by the "armor" of its map config: jungle m_, ice s_, prison k_ (desert, urban and the rest keep the plain set).
+CAMO_STYLES = {"jungle": "m_", "ice": "s_", "prison": "k_"}
+TEAM_FLAGS = (CLOTH, CLOTH_LIMB)
 MARINE_TEAM = CLOTH
 XENO_TEAM = None
 SOM_TEAM = CLOTH
 SOM_ARMOR = "icons/mob/modular/som_armor.dmi"
 SOM_HELMETS = "icons/mob/modular/som_helmets.dmi"
-GEAR = [(MARINE_ARMOR, "xarmor", MARINE_TEAM), (FEET, "marine"), (MARINE_HELMETS, "helmet", MARINE_TEAM)]
+GEAR = [(MARINE_ARMOR, "xarmor", CAMO), (FEET, "marine"), (MARINE_HELMETS, "helmet", CAMO)]
 
 
 def centred(layer, size=(64, 32)):
@@ -206,6 +213,12 @@ def marine(uniform, weapon, armor=None):
     Jaeger plates in place of the standard armour and helmet: the armour upgrades (ARMOR_LOOKS)."""
     if armor is None:
         gear = GEAR
+    elif armor.startswith("mk1:"):
+        # TGMC's Mk.I set: legs, chest, arms and helmet are separate pieces, each greyscale with a "*_no_color" overlay (fittings).
+        # Arms and legs take the team palette a shade darker (CLOTH_LIMB).
+        dmi = JAEGER_MK1.format(armor[4:])
+        gear = [(FEET, "marine"), (dmi, "leg", CLOTH_LIMB), (dmi, "leg_no_color"), (dmi, "chest", MARINE_TEAM), (dmi, "chest_no_color"),
+                (dmi, "arm", CLOTH_LIMB), (dmi, "arm_no_color"), (dmi, "helm", MARINE_TEAM), (dmi, "helm_no_color")]
     else:
         dmi = JAEGER.format(armor)
         # TGMC splits each piece in two: "chest" and "helm" are greyscale and take the colour, "*_no_color" (visor, fittings) keep theirs.
@@ -214,6 +227,7 @@ def marine(uniform, weapon, armor=None):
 
 
 JAEGER = "icons/mob/modular/mark_two/{}.dmi"
+JAEGER_MK1 = "icons/mob/modular/mark_one/{}.dmi"
 
 
 def jaeger(pattern, weapon):
@@ -1721,13 +1735,14 @@ GUN_LOOKS = {  # unit: [(suffix, weapon layer, condition)], the first is the gun
 }
 # Each role wears its own pieces of TGMC's Jaeger Mk.II family at each weight, so a mixed squad does not look cloned:
 # light (scout, skirmisher, trooper), medium (infantry, eva, ranger, helljumper), heavy (gugnir, assault, eod).
-ROLE_ARMOR = {
+# The upgrade sets are TGMC's Mk.I pieces ("mk1:"), which have arms and legs of their own; Mk.I has no gugnir, so mjolnir is its third heavy.
+ROLE_ARMOR = {u: tuple("mk1:" + p for p in sets) for u, sets in {
     "rifleman": ("trooper", "infantry", "assault"), "medic": ("skirmisher", "eva", "assault"), "engineer": ("trooper", "ranger", "eod"),
-    "skirmisher": ("skirmisher", "helljumper", "assault"), "sniper": ("scout", "ranger", "gugnir"),
-    "rocketeer": ("trooper", "helljumper", "eod"), "flamer": ("skirmisher", "infantry", "gugnir"),
-    "machinegunner": ("trooper", "infantry", "gugnir"), "grenadier": ("skirmisher", "eva", "eod"), "bomber": ("scout", "helljumper", "eod"),
-    "blademan": ("scout", "ranger", "assault"), "mortarman": ("trooper", "eva", "eod"), "smartgunner": ("skirmisher", "infantry", "gugnir"),
-}
+    "skirmisher": ("skirmisher", "helljumper", "assault"), "sniper": ("scout", "ranger", "mjolnir"),
+    "rocketeer": ("trooper", "helljumper", "eod"), "flamer": ("skirmisher", "infantry", "mjolnir"),
+    "machinegunner": ("trooper", "infantry", "mjolnir"), "grenadier": ("skirmisher", "eva", "eod"), "bomber": ("scout", "helljumper", "eod"),
+    "blademan": ("scout", "ranger", "assault"), "mortarman": ("trooper", "eva", "eod"), "smartgunner": ("skirmisher", "infantry", "mjolnir"),
+}.items()}
 LOOK_UNITS = {}  # unit: [(sequence, condition)], filled below, read by write_looks()
 for _unit, _spec in UNITS.items():
     _stand = _spec["sequences"].get("stand")
@@ -1787,7 +1802,7 @@ for _unit in XENO_UNITS:
 
 def tinted(img, rgb):
     """Multiply the colour channels by rgb/255 and keep the alpha."""
-    if rgb is None or rgb == CLOTH:
+    if rgb is None or rgb in (CLOTH, CLOTH_LIMB, CAMO):
         return img
     r, g, b, a = img.split()
     out = ImageChops.multiply(Image.merge("RGB", (r, g, b)), Image.new("RGB", img.size, rgb))
@@ -1898,6 +1913,23 @@ TGMC_RAMP = _ramp_luma()
 GAGS_TEMPLATE = {(106, 106, 123), (128, 139, 144), (148, 157, 164), (183, 195, 198), (204, 211, 216)}
 
 
+def cloth_index(img, limb=False):
+    """A team layer as palette slots for the indexed cloth sheet: its place on TGMC's ramp (cloth_grey, 0 to 4) as slot 1 to 16,
+    or 17 to 32 for an arm or leg piece. TgmcArmorPalette (tgmc/code/PlayerTint.cs) fills those slots from the player's TGMC palette."""
+    grey = cloth_grey(img)
+    level = grey.getchannel("R")
+    ramp = [round(255 * x) for x in TGMC_RAMP]
+    def slot(v):
+        # back from the ramp's brightness to its position, 0 to 4
+        for i in range(4):
+            if v <= ramp[i + 1] or i == 3:
+                t = 0 if ramp[i + 1] == ramp[i] else max(0.0, min(1.0, (v - ramp[i]) / (ramp[i + 1] - ramp[i])))
+                return 1 + round((i + t) / 4 * 15) + (16 if limb else 0)
+    idx = level.point(slot)
+    alpha = img.getchannel("A").point(lambda a: 255 if a > 127 else 0)
+    return Image.merge("RGBA", (idx, idx, idx, alpha))
+
+
 def cloth_grey(img):
     """A cloth layer as grey at TGMC's armour brightness: each pixel's brightness, read as a place on TGMC's five-slot ramp, becomes that
     slot's brightness. WithPlayerTint then gives it the player's hue at that brightness, so armour is as dark as TGMC paints it."""
@@ -1920,7 +1952,8 @@ def cloth_grey(img):
 
 def composite(layers, cloth=None):
     """layers: list of (dmi, state, sides) -> {side or '*': [composited frames]}.
-    With `cloth` (one flag a layer) only the flagged layers are drawn, in grey, and every other layer cuts its shape out of them."""
+    With `cloth` (one flag a layer: None, a team flag or CAMO), only the drawn layers are drawn and every other layer cuts its shape out of
+    them: team layers as palette slots (cloth_index) when any team flag is set, else CAMO layers as they are (a camo sheet)."""
     names = set(k for _, _, sides in layers for k in sides)
     if names - {"*"}:
         names.discard("*")  # a one-view layer (TGMC draws some fittings with a single view) is drawn on every side
@@ -1938,8 +1971,10 @@ def composite(layers, cloth=None):
                         base = Image.new("RGBA", img.size, (0, 0, 0, 0))
                     if img.size != base.size:
                         raise SystemExit(f"{dmi.path}:{state} is {img.size}, base is {base.size}")
-                    if cloth[i]:
-                        base = Image.alpha_composite(base, cloth_grey(img))
+                    if cloth[i] in TEAM_FLAGS:
+                        base = Image.alpha_composite(base, cloth_index(img, cloth[i] == CLOTH_LIMB))
+                    elif cloth[i]:
+                        base = Image.alpha_composite(base, img)
                     else:
                         base.putalpha(ImageChops.subtract(base.getchannel("A"), img.getchannel("A")))
                 elif base is None:
@@ -2001,7 +2036,7 @@ def frame_timing(delays):
     return unit * 100, order
 
 
-def render_sequences(tgmc, sequences, cell=None, cloth=False):
+def render_sequences(tgmc, sequences, cell=None, cloth=False, camo=None):
     """Composite every non-alias sequence in `sequences` into one list of cells. With `cell`, every frame is centred on a
     transparent cell of that size, so art of different sizes can share one sheet.
 
@@ -2015,6 +2050,8 @@ def render_sequences(tgmc, sequences, cell=None, cloth=False):
         if isinstance(layer_specs, str):
             aliases.append((seq_name, layer_specs))
             continue
+        if camo is not None:  # a camo sheet: the CAMO layers in that camo's sprites (TGMC names them with a prefix)
+            layer_specs = [(sp[0], camo + sp[1]) + tuple(sp[2:]) if len(sp) > 2 and sp[2] == CAMO else sp for sp in layer_specs]
         dmis = [(tgmc_dmi.Dmi(os.path.join(tgmc, spec[0])), spec[1]) for spec in layer_specs]
         def options(spec):
             opts = spec[3] if len(spec) > 3 else None
@@ -2024,7 +2061,12 @@ def render_sequences(tgmc, sequences, cell=None, cloth=False):
 
         layers = [(dmi, state, layer_images(dmi, state, spec[2] if len(spec) > 2 else None, options(spec)))
                   for (dmi, state), spec in zip(dmis, layer_specs)]
-        sides = composite(layers, [len(spec) > 2 and spec[2] == CLOTH for spec in layer_specs] if cloth else None)
+        flags = [spec[2] if len(spec) > 2 and spec[2] in (CLOTH, CLOTH_LIMB, CAMO) else None for spec in layer_specs]
+        if cloth:
+            flags = [f if f in TEAM_FLAGS else None for f in flags]
+        elif camo is not None:
+            flags = [f if f == CAMO else None for f in flags]
+        sides = composite(layers, flags if (cloth or camo is not None) else None)
         first_opts = layer_specs[0][3] if len(layer_specs[0]) > 3 else {}
         if "fade" in first_opts:  # a still pose that fades out over N frames
             sides = {k: fade_frames(frames[0], first_opts["fade"]) for k, frames in sides.items()}
@@ -2107,6 +2149,25 @@ def ground_shadow(cell):
     ImageDraw.Draw(big).ellipse([(cx - w / 2) * 4, (cy - h / 2) * 4, (cx + w / 2) * 4, (cy + h / 2) * 4], fill=150)
     out.putalpha(big.filter(ImageFilter.GaussianBlur(6)).resize(out.size, Image.LANCZOS))
     return out
+
+
+def save_indexed_sheet(sheet_cells, cell_size, path):
+    """A cloth sheet as an 8-bit indexed PNG: each pixel is a palette slot (the red channel of the cells cloth_index made), 0 transparent.
+    OpenRA draws an indexed sprite through a palette, here the owner's TGMC armour palette."""
+    cols = 8
+    rows = (len(sheet_cells) + cols - 1) // cols
+    cw, ch = cell_size
+    sheet = Image.new("P", (cols * cw, rows * ch), 0)
+    for i, img in enumerate(sheet_cells):
+        r, _, _, a = img.convert("RGBA").split()
+        cell = Image.composite(r, Image.new("L", img.size, 0), a.point(lambda v: 255 if v > 127 else 0))
+        sheet.paste(Image.frombytes("P", img.size, cell.tobytes()), ((i % cols) * cw, (i // cols) * ch))
+    sheet.putpalette([v for i in range(256) for v in (i, i, i)])
+    meta = PngImagePlugin.PngInfo()
+    meta.add_text("FrameSize", f"{cw},{ch}")
+    meta.add_text("FrameAmount", str(len(sheet_cells)))
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    sheet.save(path, pnginfo=meta, transparency=0)
 
 
 ICON_W, ICON_H = 62, 46   # the production palette's cell
@@ -2207,11 +2268,17 @@ def build_unit(tgmc, unit, spec, out_dir):
     cw, ch = cell_size
     os.makedirs(os.path.join(out_dir, "sequences"), exist_ok=True)
     save_sheet(sheet_cells, cell_size, os.path.join(out_dir, "sprites", f"{unit}.png"))
-    has_cloth = any(len(layer) > 2 and layer[2] == CLOTH for v in main.values() if isinstance(v, list) for layer in v)
+    has_cloth = any(len(layer) > 2 and layer[2] in TEAM_FLAGS for v in main.values() if isinstance(v, list) for layer in v)
     if has_cloth:
         cloth_cells = render_sequences(tgmc, main, spec.get("cell"), cloth=True)[0]
         assert len(cloth_cells) == len(sheet_cells), unit
-        save_sheet(cloth_cells, cell_size, os.path.join(out_dir, "sprites", f"{unit}-cloth.png"))
+        save_indexed_sheet(cloth_cells, cell_size, os.path.join(out_dir, "sprites", f"{unit}-cloth.png"))
+    has_camo = any(len(layer) > 2 and layer[2] == CAMO for v in main.values() if isinstance(v, list) for layer in v)
+    if has_camo:
+        for style, prefix in CAMO_STYLES.items():
+            camo_cells = render_sequences(tgmc, main, spec.get("cell"), camo=prefix)[0]
+            assert len(camo_cells) == len(sheet_cells), unit
+            save_sheet(camo_cells, cell_size, os.path.join(out_dir, "sprites", f"{unit}-camo-{style}.png"))
     if icon_cells is not None:
         save_sheet(icon_cells, icon_size, os.path.join(out_dir, "sprites", f"{unit}-icon.png"))
 
@@ -2248,6 +2315,9 @@ def build_unit(tgmc, unit, spec, out_dir):
         lines += ["\tshadow:", f"\t\tFilename: sprites/{unit}-shadow.png", "\t\tStart: 0", f"\t\tFacings: -{facings}", f"\t\tZOffset: {GROUND_Z['shadow']}"]
     if has_cloth:  # the same cells on the cloth sheet
         lines += [f"{unit}-cloth:", f"\tInherits: {unit}", "\tDefaults:", f"\t\tFilename: sprites/{unit}-cloth.png"]
+    if has_camo:  # and on each camo sheet
+        for style in CAMO_STYLES:
+            lines += [f"{unit}-camo-{style}:", f"\tInherits: {unit}", "\tDefaults:", f"\t\tFilename: sprites/{unit}-camo-{style}.png"]
     with open(os.path.join(out_dir, "sequences", f"{unit}.yaml"), "w", encoding="utf-8", newline="\n") as f:
         f.write("\n".join(lines) + "\n")
 

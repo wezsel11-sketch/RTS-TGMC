@@ -116,6 +116,12 @@ MAPS = {
     "sombase": {"title": "sombase", "file": "_maps/map_files/Campaign maps/som_base/sombase.dmm", "factor": 3, "marines": (10, 28), "xenos": (160, 103)},
 }
 
+# The marines' camo on each map, from the "armor" of TGMC's own map config (_maps/*.json): jungle, ice and prison have camo sprites;
+# desert, urban, black and the default keep the plain set (TgmcCamo in tgmc/code/PlayerTint.cs). Maps not listed (campaign maps) are plain.
+CAMO = {"lv-624": "jungle", "lawankaoutpost": "jungle", "desparity": "jungle", "ice-colony": "ice", "icy-caves": "ice", "gelida-iv": "ice",
+        "bluemoon": "ice", "prison-station-fop": "prison", "metnal-operation": "prison", "daedalusprison": "prison", "deltastation": "prison",
+        "corsat": "prison"}
+
 # The same maps at TGMC's own size, one cell per tile (the ones above are shrunk to 1/2 or 1/3 so a match does not take an hour).
 for _name, _spec in list(MAPS.items()):
     MAPS[_name + "-full"] = dict(_spec, title=_spec["title"] + " (full size)", factor=1)

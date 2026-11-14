@@ -98,6 +98,84 @@
 		Index: 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14
 		OverrideFullShroud: shroudfull
 		OverrideFullFog: fogfull
+	# TGMC's armour palettes (ARMOR_PALETTE_* in code/__DEFINES/modular_armor.dm): each player's armour is gradient-mapped onto one (TgmcArmorPalette in PlayerTint.cs).
+	TgmcArmorPalette:
+		Palettes:
+			Drab: 1e1b29, 3f3725, 655f40, 87865c, b1b493
+			Wood: 1e1b29, 40282a, 6a503f, 867755, afaa87
+			Brown: 1e1b29, 43241f, 6d431f, 91643b, b29065
+			Snow: 393636, 696464, a39a8f, c8c5b6, ecece2
+			Ice: 2e3238, 565c62, 899298, b1bebf, d6e4e7
+			Storm: 2e2f38, 4a515e, 7890a3, b0cbda, e4f0f8
+			Desert: 282027, 503c43, 816562, a99582, c8c4b4
+			Black: 181928, 2c2f34, 4b4f56, 6b7478, 9faaac
+			Grey: 262626, 3f3f3f, 696969, 979696, c8c6c6
+			Silver: 191d2b, 383d59, 64738f, 91a8b2, bdcdd4
+			GunMetal: 1e1b29, 2f2e46, 535972, 79828c, b1bcbe
+			NightSlate: 1f2028, 2a374c, 475d74, 79828c, b1bcbe
+			Fall: 2f180f, 4d3427, 7e5e41, ac9060, ccc8a3
+			Steel: 151f2b, 2c3846, 515a5b, 79817e, abafac
+			SyndieBlack: 181719, 2b2930, 4a454d, 716e65, a4a39e
+			Nightshade: 16121f, 212134, 323f59, 54616d, 879696
+			PearlPink: 2e2027, 5e3a43, 9c7576, b8a9a3, efe5dc
+			Mountbatten: 28233a, 513c64, 8c7499, c0a9c0, ecdee4
+			CoralPink: 2e1932, 4b2857, 8f5182, c686ad, e8bbc9
+			AzaleaPink: 2f182d, 6a283c, ae4463, ce8499, e8b7b7
+			LightRed: 2b141c, 5d162a, 962e35, bc5f50, e1aa9c
+			BloodRed: 240416, 4d132e, 8f233d, cd4c46, df9a85
+			SyndieRed: 2a081e, 550f2b, 971725, cd5d44, e89b75
+			Alpha: 2b1119, 561919, 86382b, c4644e, df9f88
+			GorlexRed: 2b1119, 4e1433, 901e49, c1566a, e29183
+			Red: 1d1619, 451e30, 832121, b7503c, d89279
+			Copper: 1d1514, 4d2227, 7e3541, b37267, dab3a4
+			Orange: 311313, 562918, 92452a, c57b53, d5b48c
+			Hazard: 2d161f, 5c2a1f, a05a28, ce9245, ecc99a
+			Blaze: 2d161f, 561919, 9a4028, cd753a, efb077
+			Persimmon: 26111c, 551624, a33826, e56b4e, e7b698
+			Ginger: 26111c, 521f1e, 913737, c36c47, e4a574
+			Earth: 26111c, 4d2622, 8e573d, c18d65, dcbd9e
+			LightYellow: 2c1e11, 513f2e, 936b26, cfb42d, e6e8a5
+			Yellow: 2c2211, 524c25, 837e41, b5b46f, d7dcb5
+			Olive: 2c2711, 4b4b2e, 7b7a1a, aeab4e, d1d49f
+			Angelic: 2b2029, 4e3d42, 887362, cbae8a, e8e3c2
+			Bravo: 2b2029, 58371f, 856939, b8975c, dcc7a1
+			Cathay: 231d1b, 57290d, 844f1a, b58846, dbc089
+			Green: 171a13, 1b3017, 32593c, 5c8b65, 8cb9a1
+			Lime: 171a13, 33441c, 46732b, 69aa5c, 92d6a0
+			Forest: 181719, 2c322b, 515944, 7f8566, afaf96
+			Pine: 181719, 373b32, 5d6857, 819d81, aec4b8
+			Emerald: 181719, 2b392f, 2d6a4f, 64a38d, 9ed9ca
+			Mint: 1d1f22, 23413c, 216c47, 439c41, 88c77e
+			KellyGreen: 181719, 193235, 155758, 32856d, 7ebe9f
+			Leaf: 1c1421, 25283b, 3b4a5c, 51716b, 88a092
+			GreyishTurquoise: 171819, 252d36, 3e4e55, 5b7274, 83a29d
+			RifleGreen: 181719, 292e29, 40494b, 606b71, 89949a
+			Navy: 181d2b, 173062, 1a55b0, 4486c2, 6cb5df
+			LightBlue: 1a1d25, 113243, 1d5c6e, 439aa7, 75c9ca
+			Teal: 191d1c, 1b3833, 1f6362, 3f8b90, 7cafb5
+			SeaBlue: 1b1c1e, 2c3335, 455456, 6d8282, 90b5b2
+			Cloud: 27242d, 474657, 6f7389, 959fab, bbcdd7
+			Cornflower: 1f2227, 314459, 4b6f97, 71a0b8, 9ecbd9
+			StoneBlue: 1a212c, 273f54, 467287, 6ea0ae, 94d2cd
+			Delta: 151820, 212e52, 33567e, 658db3, 97b6cb
+			DarkBlue: 151520, 23294e, 314076, 4f6ca7, 79a0c1
+			SpaceCadet: 151520, 202446, 314578, 3c6da5, 65a0c5
+			Blue: 111828, 23334a, 33586d, 628ba3, 8dafc1
+			IrisPurple: 111828, 282b59, 5c5890, 9980bc, d2b7e0
+			Violet: 181719, 2b2440, 56438e, 8273bf, b0ade0
+			Heron: 171719, 2b283d, 4e486e, 7a75a3, a6b1c9
+			Lilac: 1a1725, 38213f, 65417a, 936dab, c09fc7
+			Grape: 1a1725, 2a1f42, 563e70, 806895, b9a3bc
+			Magenta: 1b0b23, 3d1836, 6f3765, 985b92, c391b6
+			Charlie: 291c43, 582366, 8d4b9f, c373bd, e6a8b9
+		# The lobby's squad colours (world.yaml PresetColors) wear their squad's palette.
+		Presets:
+			E61919: Alpha
+			FFC32D: Bravo
+			C864C8: Charlie
+			4148C8: Delta
+	# The marines' camo on this map (TgmcCamo in PlayerTint.cs): jungle by default; converted TGMC maps take their own map's.
+	TgmcCamo:
 	ColorPickerManager:
 		PreviewActor: rifleman
 		# TGMC's own colours: the eight squads (COLOR_SQUAD_* in code/__DEFINES/colors.dm: Alpha, Bravo, Charlie, Delta, Zulu, Yankee,

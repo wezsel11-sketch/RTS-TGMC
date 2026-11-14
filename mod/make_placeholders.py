@@ -1988,7 +1988,7 @@ def write_map(folder, title, size_w, size_h, placed, visibility, spawns, scripts
 
     script = bool(scripts)
     rules_line = ""
-    if scripts or faction_start:
+    if scripts or faction_start or extra_rules:
         rules_line = "Rules: rules.yaml\n\n"
         listed = [f"{name}.lua" for name in scripts]
         if music:
@@ -2095,7 +2095,12 @@ def ore_fields(tgmc, spec):
     return sorted(cells)
 
 
-def write_tgmc_map(folder, title, rows, marines, xenos, art=None, objects=None, open_variant=None, ai_test=False, fields=(), bases=2):
+def camo_rules(style):
+    """The map's camo for the marines' standard armour (TgmcCamo): TGMC's style for that map, or "" for the plain set."""
+    return f"World:\n\tTgmcCamo:\n\t\tStyle: {style}\n"
+
+
+def write_tgmc_map(folder, title, rows, marines, xenos, art=None, objects=None, open_variant=None, ai_test=False, fields=(), bases=2, camo=""):
     """A skirmish map from a converted TGMC map. Landing Zone's two bases go at the given centres, on open ground. With `art`, a function
     (x, y) -> template id (build_maptiles), a cell that was not changed shows its real TGMC picture; a carved or cleared cell shows plain dirt."""
     h, w = len(rows), len(rows[0])
@@ -2187,10 +2192,10 @@ def write_tgmc_map(folder, title, rows, marines, xenos, art=None, objects=None, 
     ground = (lambda x, y: (art(x, y) if land[y][x] == original[y][x] else dug_art(x, y), 0)) if art else (lambda x, y: (codes[land[y][x]], 0))
     if ai_test:
         # An AI-vs-AI copy of the map for tuning the bots on it (see scenarios/test-aimap.lua).
-        write_map(folder, title, w, h, actors + xeno_actors + extra, "MissionSelector", [spawn_m, spawn_x], scripts=("test-aimap",), ground=ground,
+        write_map(folder, title, w, h, actors + xeno_actors + extra, "MissionSelector", [spawn_m, spawn_x], scripts=("test-aimap",), ground=ground, extra_rules=camo_rules(camo),
                   category="Conquest", marine_bot="skirmish", xeno_bot="skirmish", fast=True, drop_conquest=False)
         return
-    write_map(folder, title, w, h, actors + xeno_actors + extra, "Lobby", [spawn_m, spawn_x] + extra_spawn, ground=ground, category="Conquest",
+    write_map(folder, title, w, h, actors + xeno_actors + extra, "Lobby", [spawn_m, spawn_x] + extra_spawn, ground=ground, extra_rules=camo_rules(camo), category="Conquest",
               faction_start=True, players=FOUR_PLAYERS if bases == 4 else None)
 
 
@@ -2248,11 +2253,11 @@ def main():
             write_tgmc_map(os.path.join(args.out, "maps", name), spec["title"], *tgmc_dmm.load(args.tgmc, spec),
                            art=tiles.art(name) if name in full else None,
                            objects=tiles.actors.get(name) if name in full else None, open_variant=tiles.open_variant,
-                           fields=ore_fields(args.tgmc, spec), bases=4 if name in full else 2)
+                           fields=ore_fields(args.tgmc, spec), bases=4 if name in full else 2, camo=tgmc_dmm.CAMO.get(name.removesuffix("-full"), ""))
             if name in full:
                 write_tgmc_map(os.path.join(dev_maps, "aimap-" + name), "AI test " + spec["title"], *tgmc_dmm.load(args.tgmc, spec),
                                art=tiles.art(name), objects=tiles.actors.get(name), open_variant=tiles.open_variant, ai_test=True,
-                               fields=ore_fields(args.tgmc, spec))
+                               fields=ore_fields(args.tgmc, spec), camo=tgmc_dmm.CAMO.get(name.removesuffix("-full"), ""))
     for name, sc in SCENARIOS.items():
         width, height = sc.get("size", (24, 24))
         write_map(os.path.join(dev_maps, name), name, width, height, sc["actors"], "MissionSelector",

@@ -21,6 +21,7 @@ Rules:
 	tgmc|rules/upgrades.yaml
 	tgmc|rules/mapobjects.yaml
 	tgmc|rules/kits.yaml
+	tgmc|rules/looks.yaml
 
 Weapons:
 	tgmc|rules/weapons.yaml

@@ -35,6 +35,7 @@ import argparse
 import json
 import math
 import os
+import re
 import sys
 
 from PIL import Image, ImageChops, ImageDraw, ImageFilter, PngImagePlugin
@@ -62,6 +63,7 @@ FEET = "icons/mob/clothing/feet.dmi"
 RIFLES = "icons/mob/inhands/guns/rifles_right_1.dmi"
 MG60 = "icons/mob/inhands/guns/machineguns_right_64.dmi"
 MARKSMAN = "icons/mob/inhands/guns/marksman_right_64.dmi"
+MARKSMAN_32 = "icons/mob/inhands/guns/marksman_right_1.dmi"
 SADAR = "icons/mob/inhands/guns/special_right_64.dmi"
 VALI = "icons/mob/inhands/weapons/vali_right.dmi"
 FLAMER = "icons/mob/inhands/guns/special_right_1.dmi"
@@ -192,9 +194,23 @@ def with_gun(body, weapon):
     return body + guns(weapon)
 
 
-def marine(uniform, weapon):
-    """Body, role uniform, armour, boots and helmet, then the weapon held in the hands."""
-    return with_gun([(HUMAN, "body_m"), (MARINE_UNIFORM, uniform, MARINE_TEAM)] + GEAR, weapon)
+class Look(list):
+    """A marine's layers, remembering the uniform and gun they were made from, so the upgrade looks (LOOKS) can be built from them."""
+    def __init__(self, layers, uniform, weapon):
+        super().__init__(layers)
+        self.uniform, self.weapon = uniform, weapon
+
+
+def marine(uniform, weapon, armor=None):
+    """Body, role uniform, armour, boots and helmet, then the weapon held in the hands. With `armor` (a Jaeger pattern), TGMC's
+    Jaeger plates in place of the standard armour and helmet: the armour upgrades (ARMOR_LOOKS)."""
+    if armor is None:
+        gear = GEAR
+    else:
+        dmi = JAEGER.format(armor)
+        # TGMC splits each piece in two: "chest" and "helm" are greyscale and take the colour, "*_no_color" (visor, fittings) keep theirs.
+        gear = [(dmi, "chest", MARINE_TEAM), (dmi, "chest_no_color"), (FEET, "marine"), (dmi, "helm", MARINE_TEAM), (dmi, "helm_no_color")]
+    return Look(with_gun([(HUMAN, "body_m"), (MARINE_UNIFORM, uniform, MARINE_TEAM)] + gear, weapon), uniform, weapon)
 
 
 JAEGER = "icons/mob/modular/mark_two/{}.dmi"
@@ -203,10 +219,7 @@ JAEGER = "icons/mob/modular/mark_two/{}.dmi"
 def jaeger(pattern, weapon):
     """A Jaeger Mk.II marine: body, uniform, the pattern's chest plate and helmet (a greyscale sheet, tinted with the team colour), boots,
     then the weapon. Patterns: scout, skirmisher, trooper (light); infantry, eva, ranger, helljumper (medium); gugnir, assault, eod (heavy)."""
-    dmi = JAEGER.format(pattern)
-    # TGMC splits each piece in two: "chest" and "helm" are greyscale and take the colour, "*_no_color" (visor, straps, fittings) keep theirs.
-    return with_gun([(HUMAN, "body_m"), (MARINE_UNIFORM, "marine_jumpsuit", MARINE_TEAM), (dmi, "chest", MARINE_TEAM), (dmi, "chest_no_color"),
-                     (FEET, "marine"), (dmi, "helm", MARINE_TEAM), (dmi, "helm_no_color")], weapon)
+    return list(marine("marine_jumpsuit", weapon, armor=pattern))
 
 
 def som(armor, helmet, weapon):
@@ -262,8 +275,6 @@ UNITS = {
         "cell": MARINE_CELL,
         "sequences": {
             "stand": marine("marine_jumpsuit", (RIFLES, "t12_w")),
-            "stand-carbine": marine("marine_jumpsuit", (RIFLES, "t18_w")),
-            "stand-m412": marine("marine_jumpsuit", (RIFLES, "m412_w")),
             "die-gib": MARINE_GIB,
             "run": "stand",
             "attack": "stand",
@@ -1687,6 +1698,63 @@ for _name in ("facehugger", "larva", "puppet"):
     UNITS[_name]["sequences"].setdefault("rest", "stand")
     UNITS[_name]["sequences"].setdefault("down", "stand")
 
+# Upgrades show on the marines. Each armour tier is a set of TGMC's Jaeger Mk.II plates (light, medium, heavy), and each weapon upgrade
+# is TGMC's sprite of that gun. Every unit drawn by marine() gets a sequence for each pair: "stand" + gun suffix + armour suffix.
+# write_looks() writes the body rules that pick one (rules/looks.yaml in the built mod). The conditions are granted in units.yaml.
+ARMOR_LOOKS = (("", None, "!armor-1 && !armor-2 && !armor-3"), ("-a1", "trooper", "armor-1"), ("-a2", "infantry", "armor-2"),
+               ("-a3", "assault", "armor-3"))
+_SMG = [("", (SMGS, "t19_w"), "!gun-m25 && !gun-t90"), ("-m25", (SMGS, "m25_w"), "gun-m25 && !gun-t90"), ("-t90", (SMGS, "t90_w"), "gun-t90")]
+_SHOTGUN = [("", (SHOTGUNS, "m37_w"), "!gun-tx15 && !gun-sh410"), ("-tx15", (SHOTGUNS, "tx15_w"), "gun-tx15 && !gun-sh410"),
+            ("-sh410", (SHOTGUNS, "sh410_w"), "gun-sh410")]
+GUN_LOOKS = {  # unit: [(suffix, weapon layer, condition)], the first is the gun it starts with
+    "rifleman": [("-carbine", (RIFLES, "t18_w"), "gun-carbine"), ("", (RIFLES, "t12_w"), "gun-ar"), ("-m412", (RIFLES, "m412_w"), "gun-m412")],
+    "medic": _SMG,
+    "engineer": _SHOTGUN,
+    "skirmisher": _SHOTGUN,
+    "sniper": [("", (MARKSMAN_32, "mosin_w"), "!gun-svd && !gun-tx8 && !gun-m42c"),
+               ("-svd", (MARKSMAN, "svd_w", None, {"big": True}), "gun-svd && !gun-tx8 && !gun-m42c"),
+               ("-tx8", (MARKSMAN_32, "tx8_w"), "gun-tx8 && !gun-m42c"), ("-m42c", (MARKSMAN_32, "m42c_w"), "gun-m42c")],
+    "rocketeer": [("", (SADAR, "sadar_100_w", None, {"big": True}), "!gun-heavy"), ("-rpg", (FLAMER, "rpg_100_w"), "gun-heavy")],
+    "flamer": [("", (FLAMER, "m240_w"), "!gun-xnapalm"), ("-tl84", (FLAMER, "tl84_w"), "gun-xnapalm")],
+    "machinegunner": [("", (MG60, "t60_w", None, {"big": True}), "!gun-minigun"), ("-minigun", (FLAMER, "minigun_w"), "gun-minigun")],
+}
+LOOK_UNITS = {}  # unit: [(sequence, condition)], filled below, read by write_looks()
+for _unit, _spec in UNITS.items():
+    _stand = _spec["sequences"].get("stand")
+    if not isinstance(_stand, Look):
+        continue
+    _guns = GUN_LOOKS.get(_unit, [("", _stand.weapon, None)])
+    LOOK_UNITS[_unit] = []
+    for _gs, _gun, _gc in _guns:
+        for _as, _pattern, _ac in ARMOR_LOOKS:
+            _name = "stand" + _gs + _as
+            _spec["sequences"][_name] = marine(_stand.uniform, _gun, armor=_pattern)
+            LOOK_UNITS[_unit].append((_name, " && ".join(c for c in (_gc, _ac) if c)))
+
+
+def write_looks(out_dir, rules_text):
+    """rules/looks.yaml: for each marine unit (an actor of the same name in the rules), one body per look, picked by its conditions."""
+    lines = ["# Generated by mod/build_sprites.py (LOOK_UNITS): the marine bodies for each armour and weapon upgrade. Do not edit."]
+    for unit, looks in sorted(LOOK_UNITS.items()):
+        if not re.search(rf"^{re.escape(unit)}:", rules_text, re.M):
+            continue
+        lines.append(f"{unit}:")
+        for i, (seq, cond) in enumerate(looks):
+            lines.append("\tWithInfantryBody:" if seq == "stand" else f"\tWithInfantryBody@{seq.replace('-', '')}:")
+            lines.append(f"\t\tRequiresCondition: !hugged && {cond}")
+            lines += [f"\t\tMoveSequence: {seq}", f"\t\tStandSequences: {seq}", f"\t\tDefaultAttackSequence: {seq}"]
+    # An actor that inherits one of these but draws another image (the SOM versions) keeps one plain body: the looks are not on its sheet.
+    for child, parent in re.findall(r"^([\w-]+):\n(?:\t.*\n|\n)*?\tInherits: ([\w-]+)\n", rules_text, re.M):
+        if parent not in LOOK_UNITS or child in LOOK_UNITS:
+            continue
+        lines += [f"{child}:", "\tWithInfantryBody:", "\t\tRequiresCondition: !hugged", "\t\tMoveSequence: run", "\t\tStandSequences: stand",
+                  "\t\tDefaultAttackSequence: attack"]
+        lines += [f"\t-WithInfantryBody@{seq.replace('-', '')}:" for seq, _ in LOOK_UNITS[parent] if seq != "stand"]
+    os.makedirs(os.path.join(out_dir, "rules"), exist_ok=True)
+    with open(os.path.join(out_dir, "rules", "looks.yaml"), "w", encoding="utf-8", newline="\n") as f:
+        f.write("\n".join(lines) + "\n")
+
+
 # Xeno units take the xeno team colour on every layer
 # A marine that dies topples over rather than becoming a husk: any unit whose stand is the marine stack and die is still the husk.
 for _unit in UNITS.values():
@@ -1814,16 +1882,27 @@ def _ramp_luma():
 
 
 TGMC_RAMP = _ramp_luma()
+# The five shades TGMC draws its colourable armour in (the Jaeger Mk.II plates), dark to light: the slots its gradient map fills.
+GAGS_TEMPLATE = {(106, 106, 123), (128, 139, 144), (148, 157, 164), (183, 195, 198), (204, 211, 216)}
 
 
 def cloth_grey(img):
     """A cloth layer as grey at TGMC's armour brightness: each pixel's brightness, read as a place on TGMC's five-slot ramp, becomes that
     slot's brightness. WithPlayerTint then gives it the player's hue at that brightness, so armour is as dark as TGMC paints it."""
-    def level(v):
-        x = v / 255 * 4
+    def at(x):
         i = min(3, int(x))
         return round(255 * (TGMC_RAMP[i] + (TGMC_RAMP[i + 1] - TGMC_RAMP[i]) * (x - i)))
-    grey = img.convert("L").point(level)
+    luma = img.convert("L")
+    alpha = img.getchannel("A")
+    colours = {p for p, a in zip(img.convert("RGB").getdata(), alpha.getdata()) if a > 0}
+    levels = sorted({round(0.299 * r + 0.587 * g + 0.114 * b) for r, g, b in colours})
+    if colours and colours <= GAGS_TEMPLATE:
+        # A piece drawn in TGMC's gradient-map template shades (the Jaeger plates): its darkest shade is the darkest palette slot
+        # and its lightest the lightest, as TGMC maps it. Other pieces (uniforms, the painted standard armour) go by brightness.
+        table = {v: at(4 * i / max(1, len(levels) - 1)) for i, v in enumerate(levels)}
+        grey = luma.point(lambda v: table.get(v, at(v / 255 * 4)))
+    else:
+        grey = luma.point(lambda v: at(v / 255 * 4))
     return Image.merge("RGBA", (grey, grey, grey, img.getchannel("A")))
 
 
@@ -2459,6 +2538,8 @@ def main():
         # copy the turret's sequences into the hull's sequence file, each with its own Filename.
         if unit.endswith("-turret") and unit[:-len("-turret")] in args.units:
             merge_turret(args.out, unit[:-len("-turret")], unit)
+    write_looks(args.out, "\n".join(open(os.path.join(args.out, "rules", n), encoding="utf-8").read()
+                                     for n in os.listdir(os.path.join(args.out, "rules")) if n.endswith(".yaml") and n != "looks.yaml"))
     with open(os.path.join(args.out, "sprites.json"), "w") as f:
         json.dump(report, f, indent=2)
 

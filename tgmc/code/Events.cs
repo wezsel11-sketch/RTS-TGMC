@@ -268,10 +268,24 @@ namespace OpenRA.Mods.TGMC.Widgets.Logic
 				return key.IsValid() ? $"{text} [{key.DisplayString()}]" : text;
 			}
 
+			// The key in the button's corner, as a label added last so that it draws over the button's picture.
+			void KeyBadge(ButtonWidget b, Func<Hotkey> key)
+			{
+				widget.AddChild(new LabelWidget(Game.ModData)
+				{
+					Font = "Tiny", Align = TextAlign.Right, VAlign = TextVAlign.Bottom, Contrast = true, IgnoreMouseOver = true,
+					Bounds = new WidgetBounds(b.Bounds.X, b.Bounds.Y, b.Bounds.Width - 3, b.Bounds.Height - 1),
+					GetText = () => key().IsValid() ? key().DisplayString() : "",
+					GetColor = () => Color.FromArgb(255, 196, 84),
+					IsVisible = () => b.IsVisible()
+				});
+			}
+
 			var stop = widget.Get<ButtonWidget>("CMD_STOP");
 			stop.GetTooltipText = () => Keyed("Stop", "Stop");
 			stop.IsDisabled = () => Selected().Count == 0;
 			stop.OnClick = () => Issue(_ => true, a => new Order("Stop", a, false));
+			KeyBadge(stop, () => Game.ModData.Hotkeys["Stop"].GetValue());
 
 			// Attack: classic attack-move, the same as the attack-move key (Ctrl for assault move, as in OpenRA).
 			var attack = widget.Get<ButtonWidget>("CMD_ATTACK");
@@ -279,6 +293,7 @@ namespace OpenRA.Mods.TGMC.Widgets.Logic
 			attack.IsHighlighted = () => world.OrderGenerator is AttackMoveOrderGenerator;
 			attack.GetTooltipText = () => Keyed("Attack-move: walk there, fighting what you meet", "AttackMove");
 			attack.OnClick = () => world.OrderGenerator = new AttackMoveOrderGenerator(world, Selected());
+			KeyBadge(attack, () => Game.ModData.Hotkeys["AttackMove"].GetValue());
 
 			// Patrol: the unit walks between where it stands and the cell you pick.
 			var patrol = widget.Get<ButtonWidget>("CMD_PATROL");
@@ -330,7 +345,8 @@ namespace OpenRA.Mods.TGMC.Widgets.Logic
 				button.IsVisible = () => Entries()[n] != null;
 				button.IsDisabled = () => Entries()[n]?.Disabled ?? true;
 				button.IsHighlighted = () => Entries()[n]?.Highlighted ?? false;
-				// The hotkey goes in the tooltip, not on the button, to keep the buttons small.
+				// The hotkey goes in the tooltip and, small, in the button's corner.
+				KeyBadge(button, () => key.GetValue());
 				// With a picture the button shows it and a small line over it with what changes (cooldown, charges, on); without one the
 				// button says its name.
 				button.GetText = () => Entries()[n] is { } e && e.Icon == null ? e.Text : "";

@@ -1,5 +1,5 @@
 -- Scenario test: the Skirmish AI on the marine player, with an Armory standing, buys the rifle upgrades from the Upgrades tab on its own
--- (UpgradeBotModule in Bots.cs), the T-12 first and then the M412. Prints "TEST ai-upgrade PASS" or "TEST ai-upgrade FAIL".
+-- (UpgradeBotModule in tgmc/code/Bots/), the T-12 first and then the M412. Prints "TEST ai-upgrade PASS" or "TEST ai-upgrade FAIL".
 -- It polls so that it finishes as soon as both are held.
 local reported = false
 

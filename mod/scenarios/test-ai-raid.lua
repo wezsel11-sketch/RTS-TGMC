@@ -1,4 +1,4 @@
--- Scenario test: RaidBotModule (Bots.cs). The xeno bot has six idle runners at its silo; the marines have no bot. The map gives
+-- Scenario test: RaidBotModule (tgmc/code/Bots/). The xeno bot has six idle runners at its silo; the marines have no bot. The map gives
 -- ThreatMemory FullVision, so the xenos know the targets without scouting (map rules cannot add a camera actor). RaidCase (set by a raid-case-*.lua beside this script) picks the check:
 --   pick:    a bare miner (30,6) and one with three sentries (30,34), equally far. By tick 1500 a runner has come within 4 cells of
 --            the bare one and none within 6 cells of the guarded one.

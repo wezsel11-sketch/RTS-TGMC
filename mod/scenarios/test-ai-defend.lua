@@ -1,4 +1,4 @@
--- Scenario test: DefendBotModule (Bots.cs). Three runners attack a marine sentry turret (on HoldFire, so it does not win
+-- Scenario test: DefendBotModule (tgmc/code/Bots/). Three runners attack a marine sentry turret (on HoldFire, so it does not win
 -- alone; in the help case the script keeps it above half health) 34 cells from the bot's base at tick 300. It has no miner guards, and the stock squads no longer protect it, so only
 -- DefendBotModule can answer.
 -- DefendCase (set by a defend-case-*.lua beside this script) picks what is checked:

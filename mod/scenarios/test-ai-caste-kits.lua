@@ -1,4 +1,4 @@
--- Scenario test: the xeno bot uses the abilities the castes' kits gained from TGMC on its own (AbilityBotModule in Bots.cs, each
+-- Scenario test: the xeno bot uses the abilities the castes' kits gained from TGMC on its own (AbilityBotModule in tgmc/code/Bots/, each
 -- ability's AiRange and AiMinTargets in units.yaml). Each caste stands beside two riflemen that hold fire; only the bot's ability module
 -- is at work. Within 600 ticks each listed slot must have been used (it is seen not ready). Prints "TEST ai-caste-kits PASS" or
 -- "TEST ai-caste-kits FAIL" with the slots never used.

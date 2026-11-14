@@ -1600,7 +1600,7 @@ SCENARIOS = {
         ("hunter", "Xenos", 23, 25, 0), ("hunter", "Xenos", 22, 23, 0), ("resin-silo", "Xenos", 44, 28, 0),
     ]},
     # Gunfire and acid damage the objects of the converted maps (see scenarios/test-objects-damage.lua): mapobj-0 is any generated map object.
-    # The xeno AI sends its idle attackers to the unclaimed ore fields (FieldBotModule in tgmc/code/Bots.cs; see scenarios/test-ai-fields.lua).
+    # The xeno AI sends its idle attackers to the unclaimed ore fields (FieldBotModule in tgmc/code/Bots/; see scenarios/test-ai-fields.lua).
     "scenario-ai-fields": {"scripts": ("test-ai-fields",), "xeno_bot": "hard", "drop_conquest": True, "fast": True, "size": (64, 40), "spawns": [(4, 4), (60, 36)], "actors": [
         ("resin-silo", "Xenos", 8, 8, 0), ("miner-field", "Neutral", 14, 9, 0), ("miner-field", "Neutral", 50, 30, 0),
     ]},

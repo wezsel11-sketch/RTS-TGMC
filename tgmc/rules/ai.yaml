@@ -131,13 +131,13 @@ Player:
 			dragon: 1
 			king: 1
 			facehugger: 6
-	# The stock unit builder queues one unit at a time; this fills the other production slots from the same list (see ParallelBuildBotModule in Bots.cs).
-	# Marine bot: while ore fields lie unclaimed it builds a couple of engineers to claim them, for the miners' income (see FieldWorkerBotModule in Bots.cs).
+	# The stock unit builder queues one unit at a time; this fills the other production slots from the same list (see ParallelBuildBotModule in tgmc/code/Bots/).
+	# Marine bot: while ore fields lie unclaimed it builds a couple of engineers to claim them, for the miners' income (see FieldWorkerBotModule in tgmc/code/Bots/).
 	FieldWorkerBotModule@marines:
 		RequiresCondition: enable-skirmish-ai && !faction-xenos
 		Workers: engineer, som_engineer
 	# Marine and xeno bots: buy upgrades from the Upgrades tab, the marines their guns and the xenos their carapace, claws and speed (see UpgradeBotModule
-	# in Bots.cs), once they field ten fighting units: an upgrade is paid ahead of the units and would stop the army growing. Easy bots stay on their starting kit.
+	# in tgmc/code/Bots/), once they field ten fighting units: an upgrade is paid ahead of the units and would stop the army growing. Easy bots stay on their starting kit.
 	UpgradeBotModule@skirmish:
 		RequiresCondition: enable-skirmish-ai && !enable-easy-ai
 		MinArmy: 10
@@ -292,7 +292,7 @@ Player:
 		ConstructionYardTypes: cryo-pod, resin-silo, forward-hive
 		ProtectionTypes: cryo-pod, vendor, resin-silo, armory, ordnance-depot, evolution-tower, maturity-tower, workshop
 	# Calls in CAS (marines) or the hive powers (xenos) when the strike is ready and a cluster of enemies is in sight. A friendly unit in the blast counts against the spot.
-	# Same Decisions as the stock module; it looks for targets around each seen actor, not on a fixed grid (see Bots.cs).
+	# Same Decisions as the stock module; it looks for targets around each seen actor, not on a fixed grid (see tgmc/code/Bots/).
 	TgmcSupportPowerBotModule:
 		RequiresCondition: enable-skirmish-ai && !enable-easy-ai
 		Decisions:
@@ -726,7 +726,7 @@ Player:
 	ScoutBotModule@xenos:
 		RequiresCondition: enable-skirmish-ai && !enable-easy-ai && faction-xenos
 		Scouts: runner, hunter
-	# Xeno bot: idle attackers go for the marines' miners. Dormant fields are left alone until a marine repairs them (see FieldBotModule in Bots.cs).
+	# Xeno bot: idle attackers go for the marines' miners. Dormant fields are left alone until a marine repairs them (see FieldBotModule in tgmc/code/Bots/).
 	FieldBotModule@xenos:
 		RequiresCondition: enable-skirmish-ai && faction-xenos
 		Attackers: runner, hunter, sentinel, warrior, mantis, nymph
@@ -734,10 +734,10 @@ Player:
 		# Raiding the miners at once sends the starting pack at turrets and rifles, and it never comes back: wait until there is a pack to send.
 		MinTick: 3000
 		EnemyOnly: true
-	# Marine bot: every miner gets sentry turrets beside it (see FieldDefenseBotModule in Bots.cs).
+	# Marine bot: every miner gets sentry turrets beside it (see FieldDefenseBotModule in tgmc/code/Bots/).
 	FieldDefenseBotModule@marines:
 		RequiresCondition: enable-skirmish-ai && !faction-xenos
-	# Marine bot: two fighters stand beside each miner, so a raid meets rifles at once (see MinerGuardBotModule in Bots.cs).
+	# Marine bot: two fighters stand beside each miner, so a raid meets rifles at once (see MinerGuardBotModule in tgmc/code/Bots/).
 	MinerGuardBotModule@marines:
 		RequiresCondition: enable-skirmish-ai && !faction-xenos && !enable-turtle-ai
 		Guards: rifleman, smartgunner, machinegunner, grenadier, flamer, som_machinegunner
@@ -745,7 +745,7 @@ Player:
 		RequiresCondition: enable-skirmish-ai && !faction-xenos && enable-turtle-ai
 		Guards: rifleman, smartgunner, machinegunner, grenadier, flamer, som_machinegunner
 		GuardsPerMiner: 3
-	# Both bots send fighters to an attacked outpost, sized to the attacker; the squad manager keeps the base buildings (see DefendBotModule in Bots.cs).
+	# Both bots send fighters to an attacked outpost, sized to the attacker; the squad manager keeps the base buildings (see DefendBotModule in tgmc/code/Bots/).
 	DefendBotModule@marines:
 		RequiresCondition: enable-skirmish-ai && !faction-xenos && !enable-turtle-ai
 		Protect: miner, sentry-turret, cade, mortar-emplacement, artillery-emplacement
@@ -768,7 +768,7 @@ Player:
 		Defenders: runner, hunter, sentinel, warrior, spitter, defender, praetorian, ravager, crusher, beetle, gorger, scorpion, pyrogen, mantis
 		BaseTypes: resin-silo
 		OvermatchPercent: 250
-	# Both bots send a few fast units at the enemy's least defended outpost, round known defences, and turn back when outmatched (see RaidBotModule in Bots.cs).
+	# Both bots send a few fast units at the enemy's least defended outpost, round known defences, and turn back when outmatched (see RaidBotModule in tgmc/code/Bots/).
 	RaidBotModule@marines:
 		RequiresCondition: enable-skirmish-ai && !faction-xenos && !enable-turtle-ai && !enable-raider-ai
 		Raiders: rifleman, blademan, som_blademan
@@ -795,14 +795,14 @@ Player:
 		Interval: 25
 		Size: 6
 		MaxThreatPercent: 100
-	# Both bots aim attack squads at the weakest valuable enemy structure they outmatch (see AttackTargetBotModule in Bots.cs).
+	# Both bots aim attack squads at the weakest valuable enemy structure they outmatch (see AttackTargetBotModule in tgmc/code/Bots/).
 	AttackTargetBotModule@marines:
 		RequiresCondition: enable-skirmish-ai && !faction-xenos
 		Targets: resin-silo, mini-silo, weed-node, resin-turret, evolution-tower, maturity-tower, forward-hive
 	AttackTargetBotModule@xenos:
 		RequiresCondition: enable-skirmish-ai && faction-xenos
 		Targets: cryo-pod, vendor, armory, medbay, workshop, ordnance-depot, miner, sentry-turret, mortar-emplacement, artillery-emplacement
-	# Marine bot: idle engineers go to the ore fields the xenos have not disabled yet and repair them (see FieldBotModule in Bots.cs).
+	# Marine bot: idle engineers go to the ore fields the xenos have not disabled yet and repair them (see FieldBotModule in tgmc/code/Bots/).
 	FieldBotModule@marines:
 		RequiresCondition: enable-skirmish-ai && !faction-xenos
 		Attackers: engineer, som_engineer

@@ -1,4 +1,4 @@
--- Scenario test: AttackTargetBotModule (Bots.cs). The marine bot (hard) gets eight riflemen, which form its attack squad. The map
+-- Scenario test: AttackTargetBotModule (tgmc/code/Bots/). The marine bot (hard) gets eight riflemen, which form its attack squad. The map
 -- gives ThreatMemory FullVision, so the bot knows every xeno structure. Xeno targets, all turrets on HoldFire:
 --   A (44,6): a mini-silo and one turret, within the squad's reach but defended;
 --   B (44,34): a bare mini-silo, as far as A;

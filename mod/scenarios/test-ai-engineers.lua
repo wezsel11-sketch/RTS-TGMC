@@ -1,5 +1,5 @@
 -- Scenario test: a marine Skirmish AI that starts with no engineer, beside an unclaimed ore field, must build an engineer on its own
--- (FieldWorkerBotModule in Bots.cs), send it to the field (FieldBotModule) and end up owning a miner. Prints "TEST ai-engineers PASS"
+-- (FieldWorkerBotModule in tgmc/code/Bots/), send it to the field (FieldBotModule) and end up owning a miner. Prints "TEST ai-engineers PASS"
 -- or "TEST ai-engineers FAIL". It polls so that it finishes as soon as the marines own a miner.
 local reported = false
 

@@ -700,7 +700,17 @@ namespace OpenRA.Mods.TGMC.Widgets
 			}
 
 			Walk(widget);
+
+			// The hive counts biomass, not requisition.
+			if (faction == "xenos" && widget.GetOrNull<LabelWidget>("CASH_LABEL") is { } cash)
+			{
+				var text = FluentProvider.GetMessage(XenoCash);
+				cash.GetText = () => text;
+			}
 		}
+
+		[FluentReference]
+		const string XenoCash = "hud-cash-xenos";
 	}
 
 	[Desc("A command card button that also takes a right click (autocast, Warcraft-style) and says when the mouse is over it (the range preview).")]

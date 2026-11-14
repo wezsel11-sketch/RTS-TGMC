@@ -36,6 +36,7 @@ tileset-tgmc = TGMC test ground
 hud-header = TGMC // COMMAND
 hud-faction = MARINES VS XENOS
 hud-cash = REQUISITION
+hud-cash-xenos = BIOMASS
 hud-build-hint = Build near your structures, builders and weeds
 hud-menu = MENU
 hud-observer-title = TGMC // OBSERVER

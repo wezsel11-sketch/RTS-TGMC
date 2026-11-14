@@ -1134,9 +1134,9 @@ workshop:
 		OrderName: OrbitalOrder
 		Name: support-orbital.name
 		Description: support-orbital.description
-		IconImage: support-icon
+		IconImage: orbital-icon
 		BlockedCursor: move-blocked
-		Icon: orbital
+		Icon: he
 		ChargeInterval: 9000
 		BeginChargeSound: ui-ping.ogg
 		EndChargeSound: ui-confirm.ogg
@@ -1154,9 +1154,9 @@ workshop:
 		OrderName: OrbitalFireOrder
 		Name: support-orbitalfire.name
 		Description: support-orbitalfire.description
-		IconImage: support-icon
+		IconImage: orbital-icon
 		BlockedCursor: move-blocked
-		Icon: orbital
+		Icon: fire
 		ChargeInterval: 9000
 		BeginChargeSound: ui-ping.ogg
 		EndChargeSound: ui-confirm.ogg
@@ -1174,9 +1174,9 @@ workshop:
 		OrderName: OrbitalClusterOrder
 		Name: support-orbitalcluster.name
 		Description: support-orbitalcluster.description
-		IconImage: support-icon
+		IconImage: orbital-icon
 		BlockedCursor: move-blocked
-		Icon: orbital
+		Icon: cluster
 		ChargeInterval: 9000
 		BeginChargeSound: ui-ping.ogg
 		EndChargeSound: ui-confirm.ogg
@@ -1198,9 +1198,9 @@ workshop:
 		OrderName: OrbitalPlasmaOrder
 		Name: support-orbitalplasma.name
 		Description: support-orbitalplasma.description
-		IconImage: support-icon
+		IconImage: orbital-icon
 		BlockedCursor: move-blocked
-		Icon: orbital
+		Icon: plasma
 		ChargeInterval: 9000
 		BeginChargeSound: ui-ping.ogg
 		EndChargeSound: ui-confirm.ogg
@@ -1218,9 +1218,9 @@ workshop:
 		OrderName: RailgunOrder
 		Name: support-railgun.name
 		Description: support-railgun.description
-		IconImage: support-icon
+		IconImage: orbital-icon
 		BlockedCursor: move-blocked
-		Icon: orbital
+		Icon: railgun
 		ChargeInterval: 1000
 		BeginChargeSound: ui-ping.ogg
 		EndChargeSound: ui-confirm.ogg

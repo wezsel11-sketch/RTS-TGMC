@@ -320,37 +320,6 @@ namespace OpenRA.Mods.TGMC.Traits
 				Kills++;
 		}
 	}
-
-	[Desc("A bar under a selected unit showing how much of its magazine is left.")]
-	public class AmmoBarInfo : TraitInfo, Requires<AmmoPoolInfo>
-	{
-		[Desc("Which ammo pool to show.")]
-		public readonly string AmmoPool = "primary";
-
-		public readonly Color Color = Color.FromArgb(235, 190, 60);
-
-		public override object Create(ActorInitializer init) { return new AmmoBar(init.Self, this); }
-	}
-
-	public class AmmoBar : ISelectionBar
-	{
-		readonly AmmoBarInfo info;
-		readonly AmmoPool pool;
-
-		public AmmoBar(Actor self, AmmoBarInfo info)
-		{
-			this.info = info;
-			pool = self.TraitsImplementing<AmmoPool>().FirstOrDefault(p => p.Info.Name == info.AmmoPool);
-		}
-
-		float ISelectionBar.GetValue()
-		{
-			return pool == null ? 0f : pool.CurrentAmmoCount / (float)Math.Max(1, pool.Info.Ammo);
-		}
-
-		Color ISelectionBar.GetColor() { return info.Color; }
-		bool ISelectionBar.DisplayWhenEmpty => true;
-	}
 }
 
 namespace OpenRA.Mods.TGMC.Traits

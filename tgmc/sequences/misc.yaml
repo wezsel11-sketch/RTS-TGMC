@@ -60,7 +60,28 @@ moveflsh:
 		Tick: 60
 		ZOffset: 2000
 
-# The CAS ammo types' palette icons, drawn by mod/make_placeholders.py (no TGMC art); frame order is CAS_ICONS there.
+# Orbital strike and CAS icons: TGMC's warhead and ship ammo sprites (POWER_ICONS in mod/build_icons.py sets the frame order).
+orbital-icon:
+	he:
+		Filename: orbital-icon.png
+		Start: 0
+		Length: 1
+	fire:
+		Filename: orbital-icon.png
+		Start: 1
+		Length: 1
+	cluster:
+		Filename: orbital-icon.png
+		Start: 2
+		Length: 1
+	plasma:
+		Filename: orbital-icon.png
+		Start: 3
+		Length: 1
+	railgun:
+		Filename: orbital-icon.png
+		Start: 4
+		Length: 1
 cas-icon:
 	cas:
 		Filename: cas-icon.png

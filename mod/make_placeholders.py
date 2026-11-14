@@ -301,60 +301,6 @@ def write_move_flash(out):
     img.save(os.path.join(out, "moveflsh.png"), pnginfo=meta)
 
 
-CAS_ICONS = ["cas", "gun", "minirocket", "flare", "widowmaker", "laser", "napalm", "fatty", "moab"]
-
-
-def write_cas_icon(out):
-    """The palette icons for the CAS ammo types (62x46 each, one row of frames in CAS_ICONS order): a card with a small drawing
-    of the ammo and its short name. No TGMC art."""
-    w, h = 62, 46
-    img = Image.new("RGBA", (w * len(CAS_ICONS), h), (0, 0, 0, 0))
-    d = ImageDraw.Draw(img)
-    red, amber, white, cyan = (240, 90, 50, 255), (255, 170, 40, 255), (240, 240, 230, 255), (90, 220, 255, 255)
-    labels = ["BOMBS", "30MM", "MINI", "FLARE", "AGM", "LASER", "NAPALM", "FATTY", "MOAB"]
-    for i, name in enumerate(CAS_ICONS):
-        ox = w * i
-        d.rectangle([ox, 0, ox + w - 1, h - 1], fill=(24, 26, 30, 255), outline=(90, 96, 104, 255))
-        cx, cy = ox + 31, 19
-        if name == "cas":
-            for dx in (-16, -8, 0, 8, 16):
-                d.ellipse([cx + dx - 3, cy - 3, cx + dx + 3, cy + 3], fill=red)
-        elif name == "gun":
-            for dx in range(-18, 19, 6):
-                d.line([cx + dx, cy - 6, cx + dx, cy + 6], fill=amber, width=2)
-        elif name == "minirocket":
-            for dx in (-14, 0, 14):
-                d.polygon([(cx + dx, cy - 9), (cx + dx - 3, cy + 5), (cx + dx + 3, cy + 5)], fill=amber)
-        elif name == "flare":
-            d.ellipse([cx - 4, cy - 4, cx + 4, cy + 4], fill=white)
-            for dx, dy in ((-12, 0), (12, 0), (0, -10), (0, 10), (-9, -8), (9, 8), (-9, 8), (9, -8)):
-                d.line([cx + dx // 2, cy + dy // 2, cx + dx, cy + dy], fill=white, width=1)
-        elif name == "widowmaker":
-            d.polygon([(cx, cy - 11), (cx - 5, cy + 7), (cx + 5, cy + 7)], fill=red)
-            d.line([cx, cy + 7, cx, cy + 13], fill=amber, width=2)
-        elif name == "laser":
-            d.line([cx - 22, cy + 6, cx + 22, cy - 6], fill=cyan, width=3)
-            d.line([cx - 22, cy + 6, cx + 22, cy - 6], fill=white, width=1)
-        elif name == "napalm":
-            d.polygon([(cx, cy - 12), (cx - 9, cy + 8), (cx, cy + 4), (cx + 9, cy + 8)], fill=(255, 120, 20, 255))
-            d.polygon([(cx, cy - 4), (cx - 4, cy + 8), (cx + 4, cy + 8)], fill=amber)
-        elif name == "fatty":
-            d.ellipse([cx - 3, cy - 3, cx + 3, cy + 3], fill=red)
-            for k in range(8):
-                import math
-                a = k * math.pi / 4
-                d.ellipse([cx + 14 * math.cos(a) - 2, cy + 11 * math.sin(a) - 2, cx + 14 * math.cos(a) + 2, cy + 11 * math.sin(a) + 2], fill=amber)
-        elif name == "moab":
-            d.ellipse([cx - 13, cy - 13, cx + 13, cy + 13], fill=red)
-            d.ellipse([cx - 7, cy - 7, cx + 7, cy + 7], fill=amber)
-            d.ellipse([cx - 3, cy - 3, cx + 3, cy + 3], fill=white)
-        d.text((ox + 31 - 3 * len(labels[i]), 33), labels[i], fill=white)
-    meta = PngImagePlugin.PngInfo()
-    meta.add_text("FrameSize", f"{w},{h}")
-    meta.add_text("FrameAmount", str(len(CAS_ICONS)))
-    img.save(os.path.join(out, "cas-icon.png"), pnginfo=meta)
-
-
 def draw_bell(d, cx, cy, body, clapper):
     """The town bell (Recall power): a bell with its clapper and two ring lines."""
     d.polygon([(cx - 4, cy - 12), (cx + 4, cy - 12), (cx + 10, cy + 6), (cx - 10, cy + 6)], fill=body)
@@ -367,7 +313,7 @@ HIVE_ICONS = ["cure", "burrowed", "rage", "bell"]
 
 
 def write_hive_icon(out):
-    """The palette icons for the hive powers (62x46 each, in HIVE_ICONS order): a card with a small drawing and a short name. No TGMC art."""
+    """The palette icons for the hive powers (62x46 each, in HIVE_ICONS order): a small drawing and a short name; the HUD tile is the card. No TGMC art."""
     w, h = 62, 46
     img = Image.new("RGBA", (w * len(HIVE_ICONS), h), (0, 0, 0, 0))
     d = ImageDraw.Draw(img)
@@ -375,7 +321,6 @@ def write_hive_icon(out):
     labels = ["CURE", "BURROW", "RAGE", "RECALL"]
     for i, name in enumerate(HIVE_ICONS):
         ox = w * i
-        d.rectangle([ox, 0, ox + w - 1, h - 1], fill=(22, 28, 24, 255), outline=(90, 110, 96, 255))
         cx, cy = ox + 31, 19
         if name == "cure":
             d.rectangle([cx - 3, cy - 11, cx + 3, cy + 11], fill=green)
@@ -445,11 +390,10 @@ def write_shockwave(out):
 
 
 def write_pod_icon(out):
-    """The palette icon of the drop pod power (62x46): a card with a pod falling in flames. No TGMC art."""
+    """The palette icon of the drop pod power (62x46): a pod falling in flames. No TGMC art."""
     w, h = 62, 46
-    img = Image.new("RGBA", (w, h), (24, 28, 36, 255))
+    img = Image.new("RGBA", (w, h), (0, 0, 0, 0))
     d = ImageDraw.Draw(img)
-    d.rectangle([0, 0, w - 1, h - 1], outline=(90, 110, 140, 255))
     cx = 31
     d.polygon([(cx, 6), (cx - 8, 24), (cx + 8, 24)], fill=(120, 150, 255, 255))
     d.rectangle([cx - 6, 20, cx + 6, 28], fill=(200, 210, 230, 255))
@@ -465,7 +409,7 @@ SUPPORT_ICONS = ["supply", "sensor", "smoke", "orbital", "sentry", "mortar", "me
 
 
 def write_support_icons(out):
-    """The palette icons of the marine support powers (62x46 each, in SUPPORT_ICONS order): a card with a small drawing and a short name. No TGMC art."""
+    """The palette icons of the marine support powers (62x46 each, in SUPPORT_ICONS order): a small drawing and a short name; the HUD tile is the card. No TGMC art."""
     import math
     w, h = 62, 46
     img = Image.new("RGBA", (w * len(SUPPORT_ICONS), h), (0, 0, 0, 0))
@@ -474,7 +418,6 @@ def write_support_icons(out):
     labels = ["SUPPLY", "SENSOR", "SMOKE", "ORBIT", "SENTRY", "MORTAR", "MECH", "RECALL"]
     for i, name in enumerate(SUPPORT_ICONS):
         ox = w * i
-        d.rectangle([ox, 0, ox + w - 1, h - 1], fill=(24, 28, 36, 255), outline=(90, 110, 140, 255))
         cx, cy = ox + 31, 19
         if name == "supply":
             d.rectangle([cx - 10, cy - 7, cx + 10, cy + 8], fill=(150, 120, 70, 255), outline=white)
@@ -2155,6 +2098,17 @@ def write_tgmc_map(folder, title, rows, marines, xenos, art=None, objects=None, 
     for target in [spawn_x] + extra_spawn:
         dig(spawn_m, target)
     codes = {"G": GRASS, "D": DIRT, "F": FORD, "W": WATER, "R": ROCK}
+    def on_foot(blocked):
+        """The cells the marine base reaches on foot, going round the blocked ones."""
+        seen, queue = {spawn_m}, [spawn_m]
+        while queue:
+            cx, cy = queue.pop()
+            for n in ((cx + 1, cy), (cx - 1, cy), (cx, cy + 1), (cx, cy - 1)):
+                if n not in seen and 1 <= n[0] < w - 1 and 1 <= n[1] < h - 1 and land[n[1]][n[0]] in walk and n not in blocked:
+                    seen.add(n)
+                    queue.append(n)
+        return seen
+
     # The objects standing on the map (Neutral actors). Blocking ones stay clear of the bases, and when they would still cut the two bases apart
     # (the match could never be won) none of them blocks.
     extra = []
@@ -2162,14 +2116,7 @@ def write_tgmc_map(folder, title, rows, marines, xenos, art=None, objects=None, 
         near = [(x, y) for _, _, x, y, _ in actors + xeno_actors]
         placed = [(n, x, y) for n, x, y in objects if 1 <= x < w - 1 and 1 <= y < h - 1]
         placed = [(open_variant(n) if any(abs(x - bx) < 8 and abs(y - by) < 8 for bx, by in near) else n, x, y) for n, x, y in placed]
-        blocked = {(x, y) for n, x, y in placed if open_variant(n) != n}
-        seen, queue = {spawn_m}, [spawn_m]
-        while queue:
-            cx, cy = queue.pop()
-            for n in ((cx + 1, cy), (cx - 1, cy), (cx, cy + 1), (cx, cy - 1)):
-                if n not in seen and 1 <= n[0] < w - 1 and 1 <= n[1] < h - 1 and land[n[1]][n[0]] in "GDF" and n not in blocked:
-                    seen.add(n)
-                    queue.append(n)
+        seen = on_foot({(x, y) for n, x, y in placed if open_variant(n) != n})
         if any(s not in seen for s in [spawn_x] + extra_spawn):
             print(f"{title}: blocking objects would cut the bases apart, so none of them blocks")
             placed = [(open_variant(n), x, y) for n, x, y in placed]
@@ -2183,14 +2130,7 @@ def write_tgmc_map(folder, title, rows, marines, xenos, art=None, objects=None, 
     # base reaches on foot. The rest (sealed rooms, drills behind TGMC's walls) are dropped. Objects in the way do not count:
     # every blocking one can be shot to pieces.
     if ore:
-        blocked = set(ore)
-        reach, queue = {spawn_m}, [spawn_m]
-        while queue:
-            cx, cy = queue.pop()
-            for n in ((cx + 1, cy), (cx - 1, cy), (cx, cy + 1), (cx, cy - 1)):
-                if n not in reach and 1 <= n[0] < w - 1 and 1 <= n[1] < h - 1 and land[n[1]][n[0]] in "GDF" and n not in blocked:
-                    reach.add(n)
-                    queue.append(n)
+        reach = on_foot(set(ore))
         kept = [(x, y) for x, y in ore if any(n in reach for n in ((x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1)))]
         # Any slot may be a marine, so every base gets a field within 40 cells: where TGMC put none, one goes on the
         # nearest open cell 6 or more cells from the base.
@@ -2243,12 +2183,11 @@ def main():
     write_shroud_tiles(args.out, tile=32)
     write_rally_marker(args.out)
     write_move_flash(args.out)
-    write_cas_icon(args.out)
     write_hive_icon(args.out)
     write_pod_icon(args.out)
     write_support_icons(args.out)
     # The power list is the tall column on the left: its icons (and clock) are a quarter smaller than the production icons.
-    for name in ("cas-icon", "hive-icon", "pod-icon", "support-icon"):
+    for name in ("hive-icon", "pod-icon", "support-icon"):
         shrink_sheet(args.out, name + ".png", name + ".png")
     shrink_sheet(args.out, "clock.png", "small-clock.png")
     write_lights(args.out)

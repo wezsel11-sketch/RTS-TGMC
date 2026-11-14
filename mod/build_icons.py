@@ -13,7 +13,7 @@ import argparse
 import os
 import sys
 
-from PIL import Image, ImageOps
+from PIL import Image, ImageDraw, ImageOps, PngImagePlugin
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import tgmc_dmi  # noqa: E402
@@ -126,9 +126,48 @@ ICONS = {
 }
 
 
+SHIP = "icons/obj/structures/prop/mainship.dmi"
+SHIP64 = "icons/obj/structures/prop/mainship_64.dmi"
+
+# Support power icons: TGMC's own sprite of the munition (the crate or rocket a pilot loads, the warhead the orbital
+# cannon fires) with a short name under it. One sheet a family, frames in this order (tgmc/sequences/misc.yaml).
+POWER_ICONS = {
+    "cas-icon.png": [
+        (SHIP64, "keeper", "BOMBS"), (SHIP, "30mm_crate", "30MM"), (SHIP, "minirocket", "MINI"), (SHIP, "minirocket_ilm", "FLARE"),
+        (SHIP64, "single", "AGM"), (SHIP, "laser_battery", "LASER"), (SHIP64, "napalm", "NAPALM"), (SHIP64, "fatty", "FATTY"),
+        (SHIP64, "monarch", "MOAB"),
+    ],
+    "orbital-icon.png": [
+        (SHIP, "ob_warhead_1", "HE"), (SHIP, "ob_warhead_2", "FIRE"), (SHIP, "ob_warhead_3", "CLUSTER"),
+        (SHIP, "ob_warhead_4", "PLASMA"), (SHIP, "30mm_crate_hv", "RAIL"),
+    ],
+}
+POWER_SIZE = (46, 34)
+
+
+def write_power_icons(tgmc, out):
+    """One 46x34 frame a power: the sprite's drawn part scaled to fit above the name. No card: the HUD tile is the card."""
+    w, h = POWER_SIZE
+    for sheet, frames in POWER_ICONS.items():
+        img = Image.new("RGBA", (w * len(frames), h), (0, 0, 0, 0))
+        d = ImageDraw.Draw(img)
+        for i, (dmi, state, label) in enumerate(frames):
+            art = tgmc_dmi.Dmi(os.path.join(tgmc, dmi)).frames(state)[0][0].convert("RGBA")
+            art = art.crop(art.getbbox())
+            scale = min((w - 4) / art.width, (h - 12) / art.height)
+            size = (max(1, round(art.width * scale)), max(1, round(art.height * scale)))
+            art = art.resize(size, Image.BOX) if scale < 1 else tgmc_dmi.nearest(art, size)
+            img.alpha_composite(art, (i * w + (w - size[0]) // 2, (h - 12 - size[1]) // 2))
+            d.text((i * w + (w - d.textlength(label)) // 2, h - 12), label, fill=(240, 240, 230, 255))
+        meta = PngImagePlugin.PngInfo()
+        meta.add_text("FrameSize", f"{w},{h}")
+        meta.add_text("FrameAmount", str(len(frames)))
+        img.save(os.path.join(out, sheet), pnginfo=meta)
+
+
 def paths():
     """The TGMC files this script reads, for the sparse checkout (tgmc_paths.py)."""
-    return sorted({sheet for sheet, _ in ICONS.values()})
+    return sorted({sheet for sheet, _ in ICONS.values()} | {SHIP, SHIP64})
 
 
 def main():
@@ -175,6 +214,7 @@ def main():
     with open(os.path.join(args.out, "ability-icons.yaml"), "w") as f:
         f.write("\n".join(lines) + "\n")
 
+    write_power_icons(args.tgmc, args.out)
     for m in missing:
         print(f"build_icons: no icon for {m}")
     print(f"build_icons: {len(icons) // 2} icons")

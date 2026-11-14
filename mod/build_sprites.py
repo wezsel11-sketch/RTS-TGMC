@@ -204,8 +204,9 @@ def jaeger(pattern, weapon):
     """A Jaeger Mk.II marine: body, uniform, the pattern's chest plate and helmet (a greyscale sheet, tinted with the team colour), boots,
     then the weapon. Patterns: scout, skirmisher, trooper (light); infantry, eva, ranger, helljumper (medium); gugnir, assault, eod (heavy)."""
     dmi = JAEGER.format(pattern)
-    return with_gun([(HUMAN, "body_m"), (MARINE_UNIFORM, "marine_jumpsuit", MARINE_TEAM), (dmi, "chest", MARINE_TEAM),
-                     (FEET, "marine"), (dmi, "helm", MARINE_TEAM)], weapon)
+    # TGMC splits each piece in two: "chest" and "helm" are greyscale and take the colour, "*_no_color" (visor, straps, fittings) keep theirs.
+    return with_gun([(HUMAN, "body_m"), (MARINE_UNIFORM, "marine_jumpsuit", MARINE_TEAM), (dmi, "chest", MARINE_TEAM), (dmi, "chest_no_color"),
+                     (FEET, "marine"), (dmi, "helm", MARINE_TEAM), (dmi, "helm_no_color")], weapon)
 
 
 def som(armor, helmet, weapon):
@@ -1793,9 +1794,36 @@ def layer_images(dmi, state, tint=None, opts=None):
     return sides
 
 
+# TGMC colours armour by gradient map: its greyscale armour has five grey levels, each swapped for one entry of a five-colour palette
+# from dark to light (ARMOR_PALETTE_* in code/__DEFINES/modular_armor.dm). These are its four squad palettes, Alpha, Bravo, Charlie, Delta.
+TGMC_SQUAD_PALETTES = ("#2b1119#561919#86382b#c4644e#df9f88", "#2b2029#58371f#856939#b8975c#dcc7a1",
+                       "#291c43#582366#8d4b9f#c373bd#e6a8b9", "#151820#212e52#33567e#658db3#97b6cb")
+
+
+def _ramp_luma():
+    """The brightness of each of the five palette slots, averaged over the squad palettes (0 to 1)."""
+    slots = []
+    for i in range(5):
+        lum = 0
+        for pal in TGMC_SQUAD_PALETTES:
+            h = pal.split("#")[1 + i]
+            r, g, b = (int(h[k:k + 2], 16) / 255 for k in (0, 2, 4))
+            lum += 0.299 * r + 0.587 * g + 0.114 * b
+        slots.append(lum / len(TGMC_SQUAD_PALETTES))
+    return slots
+
+
+TGMC_RAMP = _ramp_luma()
+
+
 def cloth_grey(img):
-    """A cloth layer as light grey, so the player colour multiplied over it reads as that colour and not as a dark mud."""
-    grey = img.convert("L").point(lambda v: 90 + round(165 * (v / 255) ** 0.5))
+    """A cloth layer as grey at TGMC's armour brightness: each pixel's brightness, read as a place on TGMC's five-slot ramp, becomes that
+    slot's brightness. WithPlayerTint then gives it the player's hue at that brightness, so armour is as dark as TGMC paints it."""
+    def level(v):
+        x = v / 255 * 4
+        i = min(3, int(x))
+        return round(255 * (TGMC_RAMP[i] + (TGMC_RAMP[i + 1] - TGMC_RAMP[i]) * (x - i)))
+    grey = img.convert("L").point(level)
     return Image.merge("RGBA", (grey, grey, grey, img.getchannel("A")))
 
 
@@ -1803,14 +1831,17 @@ def composite(layers, cloth=None):
     """layers: list of (dmi, state, sides) -> {side or '*': [composited frames]}.
     With `cloth` (one flag a layer) only the flagged layers are drawn, in grey, and every other layer cuts its shape out of them."""
     names = set(k for _, _, sides in layers for k in sides)
+    if names - {"*"}:
+        names.discard("*")  # a one-view layer (TGMC draws some fittings with a single view) is drawn on every side
     out = {}
     for name in names:
-        frame_count = len(layers[0][2][name])
+        frame_count = len(layers[0][2].get(name, layers[0][2].get("*")))
         stacked = []
         for f in range(frame_count):
             base = None
             for i, (dmi, state, sides) in enumerate(layers):
-                img = sides[name][f]
+                frames = sides.get(name, sides.get("*"))
+                img = frames[min(f, len(frames) - 1)]
                 if cloth:
                     if base is None:
                         base = Image.new("RGBA", img.size, (0, 0, 0, 0))

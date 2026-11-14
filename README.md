@@ -544,7 +544,7 @@ afford it (`HotkeyPaletteWidget`). Still to come from the design: faction skins,
 - The pounce, the stun, the facehugger drop and the egg are only checked by scenarios (`scenario-pounce`, `scenario-infest`,
   `scenario-infest-cure`, `scenario-egg`) that count health and units. The building ghost snapping, tile-by-tile movement, the lobby
   options, the CAS icon, the selection card, repeat build and the keypad stepping were built and load without errors, but nobody has used them with a mouse.
-- Marines take their owner's colour, toned down (60% saturation, 75% brightness: `ClothSaturation`, `ClothBrightness`), on uniform, armour and helmet: `mod/build_sprites.py` writes those layers to a
+- Marines take their owner's colour as TGMC colours armour: the armour layer's greys are mapped onto the brightness of TGMC's squad palettes (`cloth_grey`), and the player gives only the hue, at half saturation (`ClothSaturation`, `ClothBrightness`). Jaeger armour also draws TGMC's fixed-colour `chest_no_color` and `helm_no_color` layers. Uniform, armour and helmet: `mod/build_sprites.py` writes those layers to a
   `<unit>-cloth` sheet and `WithPlayerTint` (`tgmc/code/PlayerTint.cs`) draws it over the unit in the player colour. Skin, boots
   and gun keep their own colours. A unit with no cloth sheet (xenos, vehicles) has its whole sprite tinted. Seen in one
   screenshot (`shot-miner`), not with two humans in a lobby, and the scenario suite has not been run on this build.

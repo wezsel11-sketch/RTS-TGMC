@@ -22,10 +22,11 @@ namespace OpenRA.Mods.TGMC.Traits
 		public readonly int Strength = 65;
 
 		[Desc("How much of the player colour's saturation the cloth (armour, uniform, helmet) keeps, 0 to 100. Lower is greyer.")]
-		public readonly int ClothSaturation = 60;
+		public readonly int ClothSaturation = 50;
 
-		[Desc("How bright the cloth colour is, 0 to 100 of the colour at full brightness. Lower is darker.")]
-		public readonly int ClothBrightness = 75;
+		[Desc("The cloth tint's brightness, in percent: 100 keeps the brightness the cloth sheet was built with (TGMC's armour ramp, " +
+			"cloth_grey in mod/build_sprites.py), so only the hue comes from the player.")]
+		public readonly int ClothBrightness = 100;
 
 		public override object Create(ActorInitializer init) { return new WithPlayerTint(this); }
 	}
@@ -90,10 +91,13 @@ namespace OpenRA.Mods.TGMC.Traits
 				var full = new Vector3((float)c.R / max, (float)c.G / max, (float)c.B / max);
 				if (cloth.Count > 0)
 				{
-					// Armour in the player colour, but toned down: part way to its own grey, then dimmed. Full strength glared.
+					// TGMC's way: the cloth sheet already holds the armour's brightness (a gradient-map ramp); the player gives the hue.
+					// Part way to grey, then scaled so the tint itself has brightness 1 and the sheet's brightness comes through as built.
 					var grey = 0.299f * full.X + 0.587f * full.Y + 0.114f * full.Z;
 					var sat = info.ClothSaturation / 100f;
-					tint = (new Vector3(grey) * (1 - sat) + full * sat) * (info.ClothBrightness / 100f);
+					var hue = new Vector3(grey) * (1 - sat) + full * sat;
+					var luma = System.Math.Max(0.05f, 0.299f * hue.X + 0.587f * hue.Y + 0.114f * hue.Z);
+					tint = hue * (info.ClothBrightness / 100f / luma);
 				}
 				else
 				{

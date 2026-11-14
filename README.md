@@ -281,7 +281,12 @@ the commits this mod was tested against (see the top of `mod/bootstrap.py`), so 
     pays a little requisition. Marines need not destroy it to win. The **Resin Trap** (60) holds a marine who comes close for three
     seconds and stings him, then recovers in ten seconds (`scenario-hive`).
   - **Evade.** The Runner's evade lasts 1.6 seconds with a 16 second cooldown and takes 30 percent less damage (it was 2.4 s, 10 s and 60 percent).
-  - **Helmets** carry the same blue team tint as the armour.
+  - **Helmets** carry the same team colour as the armour.
+  - **Team armour colours.** Armour is coloured the way TGMC does it: its colourable pieces are a five-shade ramp filled from one of TGMC's
+    `ARMOR_PALETTE_*` sets (`TgmcArmorPalette` in `rules/world.yaml`). The lobby's squad colours take their squad's set (Alpha, Bravo, Charlie,
+    Delta); any other colour takes the set nearest in hue. Arm and leg pieces are drawn a shade darker (`LimbShade`).
+  - **Map camo.** Standard armour and helmets wear the camo TGMC's map config names: jungle, ice or prison (`TgmcCamo`, set per converted map
+    in `mod/tgmc_dmm.py`). Other maps keep the plain set.
   - **Building ghost.** The ghost of a building snaps to the nearest cell within 4 where it fits and is allowed.
   - **Selection.** Selected units and buildings get brackets, a health bar and a green ring that breathes, plus bars for ammunition, the
     embryo's growth, ability recharge and xeno age. The sidebar card shows a portrait, health, ammunition, xeno tier and infection.

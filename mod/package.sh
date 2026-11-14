@@ -10,13 +10,14 @@
 # The packages hold TGMC-derived art and sound, which are under TGMC's non-commercial licences: see PLAYING.txt in each.
 # Not -u: OpenRA's packaging helpers loop on unset positional parameters.
 set -e
+# The mod assembly must not differ from the launcher (TGMC.dll) by case only: Windows file names ignore case.
 
 HERE=$(cd "$(dirname "$0")" && pwd)
 ROOT=$(cd "$HERE/.." && pwd)
 OPENRA_DIR=$(cd "${OPENRA_DIR:-$ROOT/build/OpenRA}" && pwd)
 VERSION=${1:-$(git -C "$ROOT" describe --tags --always)}
 MOD="$ROOT/build/mod/tgmc"
-DLL="$ROOT/build/tgmc-dll/Tgmc.dll"
+DLL="$ROOT/build/tgmc-dll/OpenRA.Mods.Tgmc.dll"
 OUT="$ROOT/build/package"
 [ -d "$ROOT/build/tools/dotnet" ] && export PATH="$ROOT/build/tools/dotnet:$PATH" DOTNET_ROOT="$ROOT/build/tools/dotnet"
 [ -f "$MOD/mod.yaml" ] && [ -f "$DLL" ] || { echo "package: build the mod first (mod/setup.sh)"; exit 1; }

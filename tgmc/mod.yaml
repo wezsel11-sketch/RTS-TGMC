@@ -216,7 +216,7 @@ Chrome:
 	tgmc|chrome.yaml
 	tgmc|ability-icons.yaml
 
-Assemblies: OpenRA.Mods.Common.dll, Tgmc.dll
+Assemblies: OpenRA.Mods.Common.dll, OpenRA.Mods.Tgmc.dll
 
 ChromeLayout:
 	tgmc|chrome/ingame.yaml

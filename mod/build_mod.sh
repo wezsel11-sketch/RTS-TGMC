@@ -23,7 +23,7 @@ cp -R "$ROOT/tgmc/." "$OUT/"
 # The mod's C# traits (tgmc/code) compile against the built engine, so the mod DLL is built only when OPENRA_DIR has bin/.
 if [ -n "${OPENRA_DIR:-}" ] && [ -d "$OPENRA_DIR/bin" ] && command -v dotnet >/dev/null 2>&1; then
 	dotnet build "$ROOT/tgmc/code/Tgmc.csproj" -c Release -o "$ROOT/build/tgmc-dll" -p:OPENRA_BIN="$OPENRA_DIR/bin" -nologo
-	cp "$ROOT/build/tgmc-dll/Tgmc.dll" "$OPENRA_DIR/bin/Tgmc.dll"
+	cp "$ROOT/build/tgmc-dll/OpenRA.Mods.Tgmc.dll" "$OPENRA_DIR/bin/OpenRA.Mods.Tgmc.dll"
 fi
 
 "$PY" -I "$HERE/build_sprites.py" --tgmc "$TGMC" --out "$OUT"

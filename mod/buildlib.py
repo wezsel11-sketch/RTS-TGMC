@@ -103,7 +103,7 @@ def build_mod():
         dll_dir = os.path.join(BUILD, "tgmc-dll")
         subprocess.run(["dotnet", "build", os.path.join(ROOT, "tgmc", "code", "Tgmc.csproj"), "-c", "Release", "-o", dll_dir,
                         "-p:OPENRA_BIN=" + os.path.join(OPENRA_DIR, "bin"), "-nologo"], check=True)
-        shutil.copy(os.path.join(dll_dir, "Tgmc.dll"), os.path.join(OPENRA_DIR, "bin", "Tgmc.dll"))
+        shutil.copy(os.path.join(dll_dir, "OpenRA.Mods.Tgmc.dll"), os.path.join(OPENRA_DIR, "bin", "OpenRA.Mods.Tgmc.dll"))
 
     py("build_sprites.py", "--tgmc", TGMC, "--out", MOD_OUT)
     py("build_sounds.py", "--tgmc", TGMC, "--out", os.path.join(MOD_OUT, "audio"))

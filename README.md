@@ -187,8 +187,8 @@ the commits this mod was tested against (see the top of `mod/bootstrap.py`), so 
     `WeedEdges` with `Corners`), so a line, a corner or a ring reads as one wall.
   - **Resting and knocked down.** A hurt xeno left idle on weeds for two seconds curls up (TGMC's `Sleeping` picture) and mends 3 more a
     second; any order gets it up. A stunned xeno lies knocked flat (`Knocked Down`). Facehugger, larva and puppet have no such pictures.
-  - **Upgrades show on the marines.** Each armour upgrade puts every marine in TGMC's Jaeger Mk.II plates: Light the trooper set, Medium the
-    infantry set, Heavy the assault set. Each weapon upgrade swaps in TGMC's sprite of that gun (T-19, M25, T-90; M37, TX-15, SH-410;
+  - **Upgrades show on the marines.** Each armour upgrade puts every marine in TGMC's Jaeger Mk.II plates: each role its own set at each weight
+    (`ROLE_ARMOR`: a rifleman goes trooper, infantry, assault; a sniper scout, ranger, gugnir; and so on). Each weapon upgrade swaps in TGMC's sprite of that gun (T-19, M25, T-90; M37, TX-15, SH-410;
     Mosin, SVD, TX-8, M42C; SADAR, RPG; M240, TL-84; SG-60, minigun; carbine, T-12, M412). `GUN_LOOKS` and `ARMOR_LOOKS` in
     `mod/build_sprites.py` make a sequence for every pair and write the body rules that pick one (`rules/looks.yaml` in the built mod).
   - **Healing on weeds.** As in TGMC, a xeno standing on weeds mends 2 health a second once it has gone five seconds without being hit

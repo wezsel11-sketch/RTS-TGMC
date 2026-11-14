@@ -1701,6 +1701,7 @@ for _name in ("facehugger", "larva", "puppet"):
 # Upgrades show on the marines. Each armour tier is a set of TGMC's Jaeger Mk.II plates (light, medium, heavy), and each weapon upgrade
 # is TGMC's sprite of that gun. Every unit drawn by marine() gets a sequence for each pair: "stand" + gun suffix + armour suffix.
 # write_looks() writes the body rules that pick one (rules/looks.yaml in the built mod). The conditions are granted in units.yaml.
+# The pattern here is the default; ROLE_ARMOR picks each role's own.
 ARMOR_LOOKS = (("", None, "!armor-1 && !armor-2 && !armor-3"), ("-a1", "trooper", "armor-1"), ("-a2", "infantry", "armor-2"),
                ("-a3", "assault", "armor-3"))
 _SMG = [("", (SMGS, "t19_w"), "!gun-m25 && !gun-t90"), ("-m25", (SMGS, "m25_w"), "gun-m25 && !gun-t90"), ("-t90", (SMGS, "t90_w"), "gun-t90")]
@@ -1718,6 +1719,15 @@ GUN_LOOKS = {  # unit: [(suffix, weapon layer, condition)], the first is the gun
     "flamer": [("", (FLAMER, "m240_w"), "!gun-xnapalm"), ("-tl84", (FLAMER, "tl84_w"), "gun-xnapalm")],
     "machinegunner": [("", (MG60, "t60_w", None, {"big": True}), "!gun-minigun"), ("-minigun", (FLAMER, "minigun_w"), "gun-minigun")],
 }
+# Each role wears its own pieces of TGMC's Jaeger Mk.II family at each weight, so a mixed squad does not look cloned:
+# light (scout, skirmisher, trooper), medium (infantry, eva, ranger, helljumper), heavy (gugnir, assault, eod).
+ROLE_ARMOR = {
+    "rifleman": ("trooper", "infantry", "assault"), "medic": ("skirmisher", "eva", "assault"), "engineer": ("trooper", "ranger", "eod"),
+    "skirmisher": ("skirmisher", "helljumper", "assault"), "sniper": ("scout", "ranger", "gugnir"),
+    "rocketeer": ("trooper", "helljumper", "eod"), "flamer": ("skirmisher", "infantry", "gugnir"),
+    "machinegunner": ("trooper", "infantry", "gugnir"), "grenadier": ("skirmisher", "eva", "eod"), "bomber": ("scout", "helljumper", "eod"),
+    "blademan": ("scout", "ranger", "assault"), "mortarman": ("trooper", "eva", "eod"), "smartgunner": ("skirmisher", "infantry", "gugnir"),
+}
 LOOK_UNITS = {}  # unit: [(sequence, condition)], filled below, read by write_looks()
 for _unit, _spec in UNITS.items():
     _stand = _spec["sequences"].get("stand")
@@ -1726,7 +1736,9 @@ for _unit, _spec in UNITS.items():
     _guns = GUN_LOOKS.get(_unit, [("", _stand.weapon, None)])
     LOOK_UNITS[_unit] = []
     for _gs, _gun, _gc in _guns:
-        for _as, _pattern, _ac in ARMOR_LOOKS:
+        for _tier, (_as, _pattern, _ac) in enumerate(ARMOR_LOOKS):
+            if _pattern is not None and _unit in ROLE_ARMOR:
+                _pattern = ROLE_ARMOR[_unit][_tier - 1]
             _name = "stand" + _gs + _as
             _spec["sequences"][_name] = marine(_stand.uniform, _gun, armor=_pattern)
             LOOK_UNITS[_unit].append((_name, " && ".join(c for c in (_gc, _ac) if c)))

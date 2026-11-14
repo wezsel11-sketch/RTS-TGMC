@@ -218,15 +218,20 @@ def marine(uniform, weapon, armor=None):
         # Arms and legs take the team palette a shade darker (CLOTH_LIMB).
         dmi = JAEGER_MK1.format(armor[4:])
         gear = [(FEET, "marine"), (dmi, "leg", CLOTH_LIMB), (dmi, "leg_no_color"), (dmi, "chest", MARINE_TEAM), (dmi, "chest_no_color"),
-                (dmi, "arm", CLOTH_LIMB), (dmi, "arm_no_color"), (dmi, "helm", MARINE_TEAM), (dmi, "helm_no_color")]
+                (dmi, "arm", CLOTH_LIMB), (dmi, "arm_no_color"), (dmi, "helm", MARINE_TEAM), (dmi, "helm_no_color"),
+                (VISORS, armor[4:] + ("_old" if armor[4:] in VISORS_OLD else ""))]
     else:
         dmi = JAEGER.format(armor)
         # TGMC splits each piece in two: "chest" and "helm" are greyscale and take the colour, "*_no_color" (visor, fittings) keep theirs.
-        gear = [(dmi, "chest", MARINE_TEAM), (dmi, "chest_no_color"), (FEET, "marine"), (dmi, "helm", MARINE_TEAM), (dmi, "helm_no_color")]
+        gear = [(dmi, "chest", MARINE_TEAM), (dmi, "chest_no_color"), (FEET, "marine"), (dmi, "helm", MARINE_TEAM), (dmi, "helm_no_color"),
+                (VISORS, armor)]
     return Look(with_gun([(HUMAN, "body_m"), (MARINE_UNIFORM, uniform, MARINE_TEAM)] + gear, weapon), uniform, weapon)
 
 
 JAEGER = "icons/mob/modular/mark_two/{}.dmi"
+# The helmets' visors are a sheet of their own in TGMC, one state per set; the Mk.I sets in VISORS_OLD have a "<set>_old" visor.
+VISORS = "icons/mob/modular/visors.dmi"
+VISORS_OLD = ("scout", "skirmisher", "infantry", "eva", "eod", "assault")
 JAEGER_MK1 = "icons/mob/modular/mark_one/{}.dmi"
 
 

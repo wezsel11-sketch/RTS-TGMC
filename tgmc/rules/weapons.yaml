@@ -2349,6 +2349,14 @@ TGMCTankCannon:
 	Inherits: TGMCSadar
 	Range: 11c0
 	ReloadDelay: 110
+	# A tank round, not the SADAR's rocket it inherits from: fast and flat, a bright tracer with a short streak, no rocket whistle.
+	Projectile: Shell
+		Speed: 1000
+		Image: fx-bullet
+		Sequences: large
+		WhistleSounds:
+		ContrailLength: 5
+		TrailImage:
 	Warhead@1Dam: SpreadDamage
 		Damage: 160
 		Spread: 1c256
@@ -2363,5 +2371,5 @@ TGMCCoilgun:
 	Inherits: TGMCTankCannon
 	ReloadDelay: 90
 	Projectile: Shell
-		Speed: 600
+		Speed: 1200
 		Image: fx-laser

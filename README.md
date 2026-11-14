@@ -534,7 +534,7 @@ log top left, the minimap top right with the Codex, help and Menu buttons under 
 selection card with its group grid bottom left, one production bar bottom centre (four tabs, nine icons a row) and the orders and
 abilities bottom right (`tgmc/chrome/ingame-player.yaml`). The panels are near-black rounded tiles with a thin light edge, amber for
 whatever is selected, drawn by `mod/make_chrome.py`. The map fills the whole window under it. Evolve and Devolve show only for the xeno
-side; Medic and Infected only for the marines. Laid out for a window 1280 wide or more. Each production cell shows its hotkey and its cost, red when you cannot
+side; Medic and Infected only for the marines. The bottom row fits a 1024x768 window (OpenRA's default); at most 142 px tall. Each production cell shows its hotkey and its cost, red when you cannot
 afford it (`HotkeyPaletteWidget`). Still to come from the design: faction skins, a round minimap. `docs/hud-designs/` keeps the three mockups (A, B, C).
 
 ## Known gaps

@@ -582,9 +582,9 @@ Container@PLAYER_WIDGETS:
 			Height: WINDOW_HEIGHT
 			Children:
 				Background@BUILD_PANEL:
-					X: WINDOW_WIDTH / 2 - 320
+					X: 258
 					Y: WINDOW_HEIGHT - 116
-					Width: 640
+					Width: 522
 					# Ends above the command card and its next-type button.
 					Height: 106
 					Background: tgui-window
@@ -627,7 +627,7 @@ Container@PLAYER_WIDGETS:
 								LogicTicker@PRODUCTION_TICKER:
 								HotkeyPalette@PRODUCTION_PALETTE:
 									X: 62
-									Columns: 9
+									Columns: 7
 									IconSize: 62, 46
 									IconMargin: 1, 1
 									TooltipContainer: TOOLTIP_CONTAINER
@@ -762,76 +762,77 @@ Container@PLAYER_WIDGETS:
 						Background@SELECTION_PANEL:
 							Logic: SelectionReadoutLogic
 							X: 0
-							Y: 36
-							Width: 300
-							Height: 150
+							Y: 74
+							Width: 240
+							Height: 112
 							Background: tgui-card
 							Children:
 								Sprite@SEL_PORTRAIT:
-									X: 10
-									Y: 10
+									X: 8
+									Y: 8
 									Width: 62
 									Height: 46
 								Label@SEL_NAME:
-									X: 84
-									Y: 6
-									Width: 206
-									Height: 22
+									X: 78
+									Y: 4
+									Width: 156
+									Height: 20
 									Font: Bold
 								Label@SEL_HEALTH:
-									X: 84
-									Y: 28
-									Width: 206
-									Height: 16
+									X: 78
+									Y: 24
+									Width: 156
+									Height: 14
 									Font: Tiny
 								ProgressBar@SEL_HPBAR:
-									X: 84
-									Y: 46
-									Width: 200
-									Height: 7
+									X: 78
+									Y: 40
+									Width: 152
+									Height: 6
 									BarMargin: 1, 1
 								Label@SEL_AMMO:
-									X: 84
-									Y: 60
-									Width: 206
-									Height: 16
+									X: 78
+									Y: 50
+									Width: 156
+									Height: 14
 									Font: Tiny
 								Label@SEL_STATUS:
-									X: 10
-									Y: 62
-									Width: 70
-									Height: 16
+									X: 8
+									Y: 58
+									Width: 66
+									Height: 14
 									Font: TinyBold
 									Align: Left
 								Label@SEL_RANK:
-									X: 10
-									Y: 84
-									Width: 280
-									Height: 16
+									X: 8
+									Y: 70
+									Width: 226
+									Height: 14
 									Font: TinyBold
 								ProgressBar@SEL_XPBAR:
-									X: 10
-									Y: 102
-									Width: 280
-									Height: 5
+									X: 8
+									Y: 86
+									Width: 222
+									Height: 4
 									BarMargin: 1, 1
 								Label@SEL_WEAPON:
-									X: 10
-									Y: 110
-									Width: 280
-									Height: 16
+									X: 8
+									Y: 92
+									Width: 226
+									Height: 14
 									Font: Tiny
 								Label@SEL_RECORD:
-									X: 10
-									Y: 128
-									Width: 280
-									Height: 16
+									X: 0
+									Y: 0
+									Width: 0
+									Height: 0
+									Visible: false
 									Font: Tiny
 						Background@GROUP_PANEL:
 							Logic: GroupGridLogic
-							X: 18
-							Y: 120
-							Width: 264
+							X: 8
+							Y: 122
+							Width: 224
 							Height: 60
 							Background: tgui-card
 							Children:
@@ -1126,10 +1127,10 @@ Container@PLAYER_WIDGETS:
 						Background@COMMAND_CARD:
 							Logic: CommandCardLogic
 							Background: tgui-card
-							X: PARENT_WIDTH - 265
-							Y: 50
-							Width: 259
-							Height: 136
+							X: PARENT_WIDTH - 216
+							Y: 74
+							Width: 216
+							Height: 112
 							Children:
 								Button@CMD_NEXTTYPE:
 									X: PARENT_WIDTH - 130
@@ -1144,77 +1145,77 @@ Container@PLAYER_WIDGETS:
 								Button@CMD_ATTACK:
 									X: 5
 									Y: 5
-									Width: 60
-									Height: 40
+									Width: 50
+									Height: 32
 									Background: sidebar-button
 									Font: TinyBold
 									Text: cmd-attack
 									TooltipContainer: TOOLTIP_CONTAINER
 									TooltipTemplate: SIMPLE_TOOLTIP
 								Button@CMD_STOP:
-									X: 68
+									X: 57
 									Y: 5
-									Width: 60
-									Height: 40
+									Width: 50
+									Height: 32
 									Background: sidebar-button
 									Font: TinyBold
 									Text: cmd-stop
 									TooltipContainer: TOOLTIP_CONTAINER
 									TooltipTemplate: SIMPLE_TOOLTIP
 								Button@CMD_PATROL:
-									X: 131
+									X: 109
 									Y: 5
-									Width: 60
-									Height: 40
+									Width: 50
+									Height: 32
 									Background: sidebar-button
 									Font: TinyBold
 									Text: cmd-patrol
 									TooltipContainer: TOOLTIP_CONTAINER
 									TooltipTemplate: SIMPLE_TOOLTIP
 								Button@CMD_STANCE:
-									X: 194
+									X: 161
 									Y: 5
-									Width: 60
-									Height: 40
+									Width: 50
+									Height: 32
 									Background: sidebar-button
 									Font: TinyBold
 									TooltipContainer: TOOLTIP_CONTAINER
 									TooltipTemplate: SIMPLE_TOOLTIP
 								AbilityButton@CMD_SLOT1:
 									X: 5
-									Y: 48
-									Width: 60
-									Height: 40
+									Y: 40
+									Width: 50
+									Height: 32
 									Background: sidebar-button
 									Font: TinyBold
 									Key: TgmcAbility1
 									TooltipContainer: TOOLTIP_CONTAINER
 									TooltipTemplate: SIMPLE_TOOLTIP
 								AbilityButton@CMD_SLOT2:
-									X: 68
-									Y: 48
-									Width: 60
-									Height: 40
+									X: 57
+									Y: 40
+									Width: 50
+									Height: 32
 									Background: sidebar-button
 									Font: TinyBold
 									Key: TgmcAbility2
 									TooltipContainer: TOOLTIP_CONTAINER
 									TooltipTemplate: SIMPLE_TOOLTIP
 								AbilityButton@CMD_SLOT3:
-									X: 131
-									Y: 48
-									Width: 60
-									Height: 40
+									X: 109
+									Y: 40
+									Width: 50
+									Height: 32
 									Background: sidebar-button
 									Font: TinyBold
 									Key: TgmcAbility3
 									TooltipContainer: TOOLTIP_CONTAINER
 									TooltipTemplate: SIMPLE_TOOLTIP
 								AbilityButton@CMD_SLOT4:
-									X: 194
-									Y: 48
-									Width: 60
-									Height: 40
+									X: 161
+									Y: 40
+									Width: 50
+									Height: 32
 									Background: sidebar-button
 									Font: TinyBold
 									Key: TgmcAbility4
@@ -1222,168 +1223,168 @@ Container@PLAYER_WIDGETS:
 									TooltipTemplate: SIMPLE_TOOLTIP
 								AbilityButton@CMD_SLOT5:
 									X: 5
-									Y: 91
-									Width: 60
-									Height: 40
+									Y: 75
+									Width: 50
+									Height: 32
 									Background: sidebar-button
 									Font: TinyBold
 									Key: TgmcAbility5
 									TooltipContainer: TOOLTIP_CONTAINER
 									TooltipTemplate: SIMPLE_TOOLTIP
 								AbilityButton@CMD_SLOT6:
-									X: 68
-									Y: 91
-									Width: 60
-									Height: 40
+									X: 57
+									Y: 75
+									Width: 50
+									Height: 32
 									Background: sidebar-button
 									Font: TinyBold
 									Key: TgmcAbility6
 									TooltipContainer: TOOLTIP_CONTAINER
 									TooltipTemplate: SIMPLE_TOOLTIP
 								AbilityButton@CMD_SLOT7:
-									X: 131
-									Y: 91
-									Width: 60
-									Height: 40
+									X: 109
+									Y: 75
+									Width: 50
+									Height: 32
 									Background: sidebar-button
 									Font: TinyBold
 									Key: TgmcAbility7
 									TooltipContainer: TOOLTIP_CONTAINER
 									TooltipTemplate: SIMPLE_TOOLTIP
 								AbilityButton@CMD_SLOT8:
-									X: 194
-									Y: 91
-									Width: 60
-									Height: 40
+									X: 161
+									Y: 75
+									Width: 50
+									Height: 32
 									Background: sidebar-button
 									Font: TinyBold
 									Key: TgmcAbility8
 									TooltipContainer: TOOLTIP_CONTAINER
 									TooltipTemplate: SIMPLE_TOOLTIP
 								Image@CMD_SLOT1_ICON:
-									X: 19
-									Y: 52
-									Width: 32
-									Height: 32
+									X: 18
+									Y: 44
+									Width: 24
+									Height: 24
 									ImageCollection: ability-icons
 									IgnoreMouseOver: true
 								Image@CMD_SLOT2_ICON:
-									X: 82
-									Y: 52
-									Width: 32
-									Height: 32
+									X: 70
+									Y: 44
+									Width: 24
+									Height: 24
 									ImageCollection: ability-icons
 									IgnoreMouseOver: true
 								Image@CMD_SLOT3_ICON:
-									X: 145
-									Y: 52
-									Width: 32
-									Height: 32
+									X: 122
+									Y: 44
+									Width: 24
+									Height: 24
 									ImageCollection: ability-icons
 									IgnoreMouseOver: true
 								Image@CMD_SLOT4_ICON:
-									X: 208
-									Y: 52
-									Width: 32
-									Height: 32
+									X: 174
+									Y: 44
+									Width: 24
+									Height: 24
 									ImageCollection: ability-icons
 									IgnoreMouseOver: true
 								Image@CMD_SLOT5_ICON:
-									X: 19
-									Y: 95
-									Width: 32
-									Height: 32
+									X: 18
+									Y: 79
+									Width: 24
+									Height: 24
 									ImageCollection: ability-icons
 									IgnoreMouseOver: true
 								Image@CMD_SLOT6_ICON:
-									X: 82
-									Y: 95
-									Width: 32
-									Height: 32
+									X: 70
+									Y: 79
+									Width: 24
+									Height: 24
 									ImageCollection: ability-icons
 									IgnoreMouseOver: true
 								Image@CMD_SLOT7_ICON:
-									X: 145
-									Y: 95
-									Width: 32
-									Height: 32
+									X: 122
+									Y: 79
+									Width: 24
+									Height: 24
 									ImageCollection: ability-icons
 									IgnoreMouseOver: true
 								Image@CMD_SLOT8_ICON:
-									X: 208
-									Y: 95
-									Width: 32
-									Height: 32
+									X: 174
+									Y: 79
+									Width: 24
+									Height: 24
 									ImageCollection: ability-icons
 									IgnoreMouseOver: true
 								Label@CMD_SLOT1_STATUS:
 									X: 7
-									Y: 74
-									Width: 56
-									Height: 12
+									Y: 60
+									Width: 46
+									Height: 10
 									Font: TinyBold
 									Align: Center
 									Contrast: true
 									IgnoreMouseOver: true
 								Label@CMD_SLOT2_STATUS:
-									X: 70
-									Y: 74
-									Width: 56
-									Height: 12
+									X: 59
+									Y: 60
+									Width: 46
+									Height: 10
 									Font: TinyBold
 									Align: Center
 									Contrast: true
 									IgnoreMouseOver: true
 								Label@CMD_SLOT3_STATUS:
-									X: 133
-									Y: 74
-									Width: 56
-									Height: 12
+									X: 111
+									Y: 60
+									Width: 46
+									Height: 10
 									Font: TinyBold
 									Align: Center
 									Contrast: true
 									IgnoreMouseOver: true
 								Label@CMD_SLOT4_STATUS:
-									X: 196
-									Y: 74
-									Width: 56
-									Height: 12
+									X: 163
+									Y: 60
+									Width: 46
+									Height: 10
 									Font: TinyBold
 									Align: Center
 									Contrast: true
 									IgnoreMouseOver: true
 								Label@CMD_SLOT5_STATUS:
 									X: 7
-									Y: 117
-									Width: 56
-									Height: 12
+									Y: 95
+									Width: 46
+									Height: 10
 									Font: TinyBold
 									Align: Center
 									Contrast: true
 									IgnoreMouseOver: true
 								Label@CMD_SLOT6_STATUS:
-									X: 70
-									Y: 117
-									Width: 56
-									Height: 12
+									X: 59
+									Y: 95
+									Width: 46
+									Height: 10
 									Font: TinyBold
 									Align: Center
 									Contrast: true
 									IgnoreMouseOver: true
 								Label@CMD_SLOT7_STATUS:
-									X: 133
-									Y: 117
-									Width: 56
-									Height: 12
+									X: 111
+									Y: 95
+									Width: 46
+									Height: 10
 									Font: TinyBold
 									Align: Center
 									Contrast: true
 									IgnoreMouseOver: true
 								Label@CMD_SLOT8_STATUS:
-									X: 196
-									Y: 117
-									Width: 56
-									Height: 12
+									X: 163
+									Y: 95
+									Width: 46
+									Height: 10
 									Font: TinyBold
 									Align: Center
 									Contrast: true

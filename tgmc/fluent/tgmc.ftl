@@ -409,6 +409,7 @@ help-9 = Weeds spread from Weed Nodes. Xenos build near weeds; marines near thei
 help-10 = Lobby options switch friendly fire, facehuggers, maturity and tile movement.
 event-facehugged = Marine facehugged
 event-under-attack = Under attack
+event-alamo-down = The Alamo is groundside
 event-miner-under-attack = Miner under attack
 event-outpost-under-attack = Weeds under attack
 event-burst = Marine burst
@@ -461,6 +462,9 @@ weather-ash = Ash storm
 weather-snow = Snow storm
 weather-acidrain = Acid rain
 
+checkbox-tgmc-landingintro =
+    .label = Landing intro
+    .description = Marines and SOM arrive by dropship: the Alamo lands at their base, the squad walks out and the ship leaves.
 checkbox-tgmc-night =
     .label = Night
     .description = The fight happens at night: the ground is dark, and only flashlights, base lamps, fires, gunfire and blasts light it. Only a picture; sight ranges stay the same.

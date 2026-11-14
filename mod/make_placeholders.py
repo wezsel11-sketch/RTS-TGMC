@@ -1775,6 +1775,11 @@ SCENARIOS = {
     "scenario-field-contest": {"scripts": ("test-field-contest",), "size": (32, 24), "drop_conquest": True, "actors": [
         ("runner", "Xenos", 8, 10, 256), ("miner-field", "Neutral", 11, 10, 0), ("engineer", "Marines", 28, 20, 0),
     ]},
+    # The landing intro (FactionStart): the squad rides the Alamo down and walks out; the buildings stand from the start
+    # (see scenarios/test-landing-intro.lua).
+    "scenario-landing-intro": {"scripts": ("test-landing-intro",), "size": (32, 40), "spawns": [(16, 24), (28, 36)], "drop_conquest": True,
+                               "extra_rules": "World:\n\tFactionStart:\n\t\tMarines: cryo-pod|-2|-2|512, rifleman|0|2|256, rifleman|1|2|256, medic|0|3|256\n",
+                               "actors": [("rifleman", "Marines", 16, 26, 256), ("resin-silo", "Xenos", 28, 36, 0)]},
     # An engineer repairs an ore field: it turns into the marines' miner (see scenarios/test-miner-field.lua).
     "scenario-miner-field": {"scripts": ("test-miner-field",), "size": (32, 24), "drop_conquest": True, "actors": [
         ("engineer", "Marines", 8, 10, 256), ("miner-field", "Neutral", 11, 10, 0), ("resin-silo", "Xenos", 28, 20, 0),

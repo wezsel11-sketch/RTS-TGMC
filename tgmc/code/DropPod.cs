@@ -160,7 +160,9 @@ namespace OpenRA.Mods.TGMC.Traits
 				landed = true;
 				world.AddFrameEndTask(x =>
 				{
+					// World.Remove leaves a sprite effect in the screen map, where it would still be drawn: take it out of both.
 					x.Remove(falling);
+					x.ScreenMap.Remove(falling);
 					wreck = new SpriteEffect(target, x, info.Image, info.LandedSequence, info.Palette);
 					x.Add(wreck);
 					Fx.Sound(x, target, info.LandSounds);
@@ -192,7 +194,10 @@ namespace OpenRA.Mods.TGMC.Traits
 				world.AddFrameEndTask(x =>
 				{
 					if (wreck != null)
+					{
 						x.Remove(wreck);
+						x.ScreenMap.Remove(wreck);
+					}
 
 					x.Remove(this);
 				});

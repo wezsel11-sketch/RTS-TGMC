@@ -30,6 +30,9 @@ namespace OpenRA.Mods.TGMC.Traits
 		[Desc("Granted once down, until it starts to climb away. None by default.")]
 		public readonly string LandedCondition = null;
 
+		[Desc("Fly in even when placed at the very start of the game (the landing intro). Otherwise a ship there at tick 0 is already down.")]
+		public readonly bool LandAtStart = false;
+
 		public override object Create(ActorInitializer init) { return new Dropship(init.Self, this); }
 	}
 
@@ -43,7 +46,7 @@ namespace OpenRA.Mods.TGMC.Traits
 			: base(info)
 		{
 			// Placed by the map at the start: already down.
-			landing = self.World.WorldTick == 0 ? info.LandTicks : 0;
+			landing = self.World.WorldTick == 0 && !info.LandAtStart ? info.LandTicks : 0;
 		}
 
 		public bool Landed => landing >= Info.LandTicks && launching < 0;

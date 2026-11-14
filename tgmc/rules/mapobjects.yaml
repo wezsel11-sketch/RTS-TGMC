@@ -135,3 +135,13 @@ alamo:
 	# Flies in when the mission calls it, and on launch climbs away and is gone (Dropship in Dropship.cs).
 	Dropship:
 		RequiresCondition: launch
+
+# The ship of the landing intro (FactionStart): it brings the marines' or SOM's squad down at the start, and leaves. Nobody can order it.
+alamo-drop:
+	Inherits: alamo
+	-Selectable:
+	-SelectionDecorations:
+	-GrantConditionOnDeploy:
+	Interactable:
+	Dropship:
+		LandAtStart: true

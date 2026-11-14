@@ -22,6 +22,7 @@ namespace OpenRA.Mods.TGMC
 		public const string FloatingText = "tgmc-floatingtext";
 		public const string Weather = "tgmc-weather";
 		public const string Night = "tgmc-night";
+		public const string LandingIntro = "tgmc-landingintro";
 
 		/// <summary>A dropdown option's value, or the default when there is no lobby.</summary>
 		public static string Value(World world, string id, string defaultValue)
@@ -43,6 +44,7 @@ namespace OpenRA.Mods.TGMC
 					TileStep => info.TileStepDefault,
 					FloatingText => info.FloatingTextDefault,
 					Night => info.NightDefault,
+					LandingIntro => info.LandingIntroDefault,
 					_ => defaultValue
 				};
 
@@ -65,6 +67,9 @@ namespace OpenRA.Mods.TGMC.Traits
 		public readonly bool TileStepDefault = false;
 		public readonly bool FloatingTextDefault = true;
 		public readonly bool NightDefault = false;
+
+		[Desc("Marines and SOM arrive by dropship at the start: the Alamo lands, the squad walks out, the ship leaves.")]
+		public readonly bool LandingIntroDefault = true;
 
 		[Desc("Weather when there is no lobby, and the lobby's default: clear, rain, dust, ash, snow or acidrain.")]
 		public readonly string WeatherDefault = "clear";
@@ -118,6 +123,9 @@ namespace OpenRA.Mods.TGMC.Traits
 
 			yield return new LobbyBooleanOption(map, Options.Night,
 				"checkbox-tgmc-night.label", "checkbox-tgmc-night.description", true, 17, NightDefault, false);
+
+			yield return new LobbyBooleanOption(map, Options.LandingIntro,
+				"checkbox-tgmc-landingintro.label", "checkbox-tgmc-landingintro.description", true, 18, LandingIntroDefault, false);
 
 			yield return new LobbyBooleanOption(map, Options.TileStep,
 				"checkbox-tgmc-tilestep.label", "checkbox-tgmc-tilestep.description", true, 13, TileStepDefault, false);

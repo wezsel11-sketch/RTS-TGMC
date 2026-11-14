@@ -305,7 +305,8 @@ namespace OpenRA.Mods.TGMC.Widgets.Logic
 			// One stance button that steps through the four; the four stance keys still set one directly (zero-size buttons).
 			var stance = widget.Get<ButtonWidget>("CMD_STANCE");
 			stance.IsDisabled = () => !Selected().Any(a => a.TraitOrDefault<AutoTarget>() != null);
-			stance.GetText = () => "Stance\n" + Stances.FirstOrDefault(s => s.Stance == CurrentStance()).Name;
+			// First word only: "Aggressive" and "Return fire" are wider than the button.
+			stance.GetText = () => "Stance\n" + Stances.FirstOrDefault(s => s.Stance == CurrentStance()).Name.Split(' ')[0].Replace("Aggressive", "Aggro");
 			stance.GetTooltipText = () => "Cycle the stance: Aggressive, Guard, Return fire, Hold fire";
 			stance.OnClick = () => SetStance(Stances[(Array.FindIndex(Stances, s => s.Stance == CurrentStance()) + 1) % Stances.Length].Stance);
 			foreach (var (id, s) in new[] { ("CMD_AGGRESSIVE", UnitStance.AttackAnything), ("CMD_GUARD", UnitStance.Defend),

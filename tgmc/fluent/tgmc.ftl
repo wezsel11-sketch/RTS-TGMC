@@ -515,6 +515,7 @@ menu-news-head = NEW IN THIS VERSION
 menu-news-1 = The Alamo lands and your squad walks out.
 menu-news-2 = Support powers in four tiles by family.
 menu-news-3 = Air and orbital strikes wear TGMC's own art.
+label-picker-facts = { $width } x { $height } cells  ·  { $bases } bases  ·  { $ore } ore fields
 menu-card-singleplayer = Skirmish, waves, missions
 menu-card-multiplayer = Join or host a game
 menu-card-settings = Video, sound, keys

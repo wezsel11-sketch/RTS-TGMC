@@ -270,8 +270,15 @@ the commits this mod was tested against (see the top of `mod/bootstrap.py`), so 
     pictures instead of flat ground: `mod/tgmc_turfs.py` reads which picture each turf shows from TGMC's DM code (walls pick their picture from their neighbours),
     `mod/build_maptiles.py` cuts the pictures out as tiles. Void is black. The objects on the map (tables, beds, vending machines, computers, barricades, plants, doors, decals; `mod/tgmc_objects.py`) are baked into the floor tile under them, so the maps show their furniture too. Tables, racks, closets, crates, fences, windows and barricades are actors of the Neutral player instead: they block movement until they are destroyed (gunfire, acid, claws, explosions and fire all damage them, from either side; gas does not, and units do not shoot at them on their own, only with force-fire (Ctrl)), and so do beds, computers and vending machines, which do not block. Blocking ones stay clear of the bases, and none block if one would cut the two bases apart. Objects wider than one tile (big trees) are left out. The smaller maps keep the plain ground.
   - **Bleeding.** Marines leave red blood and xenos green blood on the floor where they are hit, bigger for heavy hits, and drip while badly hurt. Blood lies for about half a minute.
-  - **Terminal menus.** The main menu, lobby, settings and dialogs use a green-on-black terminal look with an intel panel; the in-game HUD stays blue glass.
-    `docs/menu-designs/` keeps the three templates it was chosen from.
+  - **Command deck menus.** The main menu, lobby, map picker, settings and dialogs wear the in-game HUD's dark glass and amber
+    (`menu_style` in `mod/make_chrome.py`); the green terminal is gone. The menu's battle shows behind them.
+    - *Lobby* (`tgmc/chrome/lobby.yaml`): players on the left, the map and the option list on the right, chat along the bottom, an amber
+      Start. The options are always in view, the mod's own first.
+    - *Map picker* (`tgmc/chrome/map-chooser.yaml`): the maps as a list, the selected one large on the right with its size, bases, ore
+      fields and a line about it (`MapBrief`, written per map by `mod/make_placeholders.py`).
+    - `TGMC_MENU_SHOT=SINGLEPLAYER_BUTTON,SKIRMISH_BUTTON,CHANGEMAP_BUTTON` clicks those buttons in turn and takes a screenshot: how the
+      menus are checked headless.
+    `docs/menu-designs/` keeps the three templates the look was chosen from.
   - **Lighting.** Muzzle flashes, blasts, acid splashes, rockets in flight, burning ground, acid pools and gas clouds give off a soft additive glow
     that brightens the ground around them (`fx-light` in `tgmc/sequences/misc.yaml`, `MuzzleGlow` in `tgmc/code/Lights.cs`).
   - **Gas clouds.** The Defiler lobs canisters (10 cells) that burst into a green cloud of neurotoxin lasting 12 seconds. Enemies inside take

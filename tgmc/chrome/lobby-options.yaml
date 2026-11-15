@@ -1,0 +1,53 @@
+# TGMC lobby options. Derived from OpenRA's mods/common/chrome/lobby-options.yaml (GPL-3.0).
+# One column (LobbyOptionsLogic fills as many columns as a row template has), drawn to the right of the map preview:
+# LobbyLogic loads this into TOP_PANELS_ROOT (743 wide), so X steps past it into MAP_PANEL. See tgmc/chrome/lobby.yaml.
+
+Container@LOBBY_OPTIONS_BIN:
+	X: 982
+	Y: 0 - 4
+	Width: 237
+	Height: 336
+	Children:
+		Label@TITLE:
+			Y: 0 - 24
+			Width: PARENT_WIDTH
+			Height: 25
+			Font: Bold
+			TextColor: FFC454
+			Text: label-lobby-options-bin-title
+		ScrollPanel:
+			Logic: LobbyOptionsLogic
+			Width: PARENT_WIDTH
+			Height: PARENT_HEIGHT
+			Children:
+				Container@LOBBY_OPTIONS:
+					Y: 8
+					Width: PARENT_WIDTH - 24
+					Children:
+						Container@CHECKBOX_ROW_TEMPLATE:
+							Width: PARENT_WIDTH
+							Height: 26
+							Children:
+								Checkbox@A:
+									X: 8
+									Width: PARENT_WIDTH - 16
+									Height: 20
+									Visible: False
+									TooltipContainer: TOOLTIP_CONTAINER
+						Container@DROPDOWN_ROW_TEMPLATE:
+							Height: 56
+							Width: PARENT_WIDTH
+							Children:
+								LabelForInput@A_DESC:
+									X: 8
+									Width: PARENT_WIDTH - 16
+									Height: 20
+									Visible: False
+									For: A
+								DropDownButton@A:
+									X: 8
+									Width: PARENT_WIDTH - 16
+									Y: 22
+									Height: 25
+									Visible: False
+									TooltipContainer: TOOLTIP_CONTAINER

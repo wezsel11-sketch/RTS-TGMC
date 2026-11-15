@@ -1894,7 +1894,7 @@ def faction_start_rules():
 
 def write_map(folder, title, size_w, size_h, placed, visibility, spawns, scripts=(), ground=flat_ground,
               category="Skirmish", drop_conquest=False, xeno_bot=None, marine_bot=None, fast=False, extra_rules="",
-              music=False, faction_start=False, players=None):
+              music=False, faction_start=False, players=None, brief=""):
     # A scenario map has no slot for the xenos: they are a scripted player, so Lua can find them and they never act.
     os.makedirs(folder, exist_ok=True)
     cells = size_w * size_h
@@ -1937,6 +1937,10 @@ def write_map(folder, title, size_w, size_h, placed, visibility, spawns, scripts
         # The factions place their own start (FactionStart): the map keeps only what is neutral.
         placed = [a for a in placed if a[1] not in ("Marines", "Xenos")]
         extra_rules += faction_start_rules()
+    if "Lobby" in visibility:
+        # What the map picker shows under the preview (MapBrief, read by MapPickerInfoLogic).
+        brief = brief or ("A wave mission: hold out against the hive." if "MissionSelector" in visibility else "Built for this mod: open ground, a base at each end.")
+        extra_rules += f"World:\n\tMapBrief:\n\t\tOreFields: {sum(a[0] == 'miner-field' for a in placed)}\n\t\tDescription: {brief}\n"
     placed = [("mpspawn", "Neutral", x, y, 0) for x, y in spawns] + list(placed)
     for i, (name, owner, x, y, facing) in enumerate(placed):
         actors.append(f"\tActor{i}: {name}\n\t\tOwner: {owner}\n\t\tLocation: {x},{y}\n\t\tFacing: {facing}\n")
@@ -2181,7 +2185,8 @@ def write_tgmc_map(folder, title, rows, marines, xenos, art=None, objects=None, 
                   category="Conquest", marine_bot="skirmish", xeno_bot="skirmish", fast=True, drop_conquest=False)
         return
     write_map(folder, title, w, h, actors + xeno_actors + extra, "Lobby", [spawn_m, spawn_x] + extra_spawn, ground=ground, extra_rules=camo_rules(camo), category="Conquest",
-              faction_start=True, players=FOUR_PLAYERS if bases == 4 else None)
+              faction_start=True, players=FOUR_PLAYERS if bases == 4 else None,
+              brief="TGMC's own map at full size, with its floors and walls." if bases == 4 else "TGMC's own map, shrunk for a quick match.")
 
 
 def main():

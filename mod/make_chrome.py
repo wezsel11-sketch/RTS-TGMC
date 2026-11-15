@@ -27,8 +27,8 @@ SLATE = (20, 30, 44, 215)
 OLIVE = (30, 46, 68, 235)
 OLIVE_HI = (52, 86, 128, 245)
 OLIVE_DARK = (14, 22, 34, 235)
-AMBER = (79, 179, 255, 255)
-AMBER_DIM = (60, 110, 170, 255)
+AMBER = (255, 159, 67, 255)  # design C amber; was the blue of the old glass HUD
+AMBER_DIM = (170, 106, 45, 255)
 RED = (150, 44, 44, 255)
 GREY = (70, 72, 74, 255)
 GREY_DIM = (48, 49, 50, 255)
@@ -54,7 +54,7 @@ PANEL_COLLECTIONS = [
     # The selection card's rank (gold) and maturity (purple) bars.
     "progressbar-thumb-xp", "progressbar-thumb-maturity",
     "panel-bg", "panel-header", "panel-rule", "panel-thinborder", "panel-thinborder-light",
-    "textfield-hover", "textfield-focused", "textfield-disabled",
+    "textfield-hover", "textfield-focused", "textfield-disabled", "dim",
 ]
 BUTTON_COLLECTIONS = [
     "button", "button-hover", "button-pressed", "button-disabled",
@@ -68,6 +68,7 @@ BUTTON_COLLECTIONS = [
     "checkbox-toggle", "checkbox-toggle-hover", "checkbox-toggle-pressed",
     "checkbox-toggle-highlighted", "checkbox-pressed", "checkbox-disabled",
     "tgui-tab", "tgui-tab-hover", "tgui-tab-pressed", "tgui-tab-disabled", "tgui-tab-active",
+    "tgui-start", "tgui-start-hover", "tgui-start-pressed", "tgui-start-disabled",
     "term-tab", "term-tab-hover", "term-tab-pressed", "term-tab-disabled", "term-tab-active",
     "scrollitem-hover", "scrollitem-pressed", "scrollitem-highlighted", "scrollheader-highlighted",
     "observer-scrollitem-hover", "observer-scrollitem-pressed", "observer-scrollitem-highlighted",
@@ -82,40 +83,30 @@ BUTTON_COLLECTIONS = [
 ]
 
 
-# The menus, lobby, settings and dialogs wear a green terminal look: near-black panels with square corners and a thin green edge. The in-game HUD
-# (sidebar, tgmc-*, bars) keeps the blue glass above.
-T_BODY = (5, 14, 8, 238)
-T_BODY_HI = (14, 44, 24, 245)
-T_BODY_DARK = (3, 9, 5, 240)
-T_EDGE = (45, 138, 69, 255)
-T_EDGE_HI = (125, 255, 154, 255)
-T_EDGE_DIM = (30, 84, 46, 255)
-T_OFF = (10, 18, 12, 235)
-T_OFF_EDGE = (36, 56, 42, 255)
+# The menus, lobby, settings and dialogs wear the HUD's design C (dark glass, amber): menu_style below. Was a green terminal.
 HUD_PREFIXES = ("sidebar", "tgmc-", "tgui-", "progressbar", "tooltip-separator", "separator")
+CLEAR = (0, 0, 0, 0)
 
 
 def is_hud(name):
     return name.startswith(HUD_PREFIXES)
 
 
-def term_style(name):
-    """Fill and edge for a menu or dialog collection."""
-    if "disabled" in name:
-        return T_OFF, T_OFF_EDGE
-    if name in ("term-window", "dialog", "dialog2", "dialog3", "dialog4", "dialog5", "panel-bg", "scrollpanel-bg", "mainmenu-border"):
-        return T_BODY, T_EDGE
-    if name in ("term-titlebar", "tgui-rail", "panel-header", "scrollheader", "tgui-card-header"):
-        return T_BODY_DARK, T_EDGE_DIM
-    if "highlighted" in name or name.endswith("active"):
-        return T_BODY_HI, T_EDGE_HI
-    if "pressed" in name:
-        return T_BODY_DARK, T_EDGE
-    if "hover" in name:
-        return T_BODY_HI, T_EDGE_HI
+def menu_style(name):
+    """(fill, kind, edge) of a menu or dialog collection, in the colours of tgui_style."""
+    if name == "dim":  # the veil between the menu's battle and a full-screen panel such as the lobby
+        return (0, 0, 0, 120), "flat", CLEAR
+    if name in ("scrollitem", "scrollitem-nohover", "observer-scrollitem"):
+        return CLEAR, "panel", CLEAR
     if name.startswith("textfield"):
-        return T_BODY_DARK, T_EDGE
-    return T_BODY, T_EDGE
+        edge = G_AMBER if "focused" in name else (255, 255, 255, 70 if "hover" in name else 14 if "disabled" in name else 40)
+        return (8, 11, 15, 240), "button", edge
+    if name in ("dialog", "dialog2", "dialog3", "dialog4", "dialog5", "panel-bg", "scrollpanel-bg", "mainmenu-border", "term-window",
+                "table", "panel-thinborder", "panel-thinborder-light", "slider-track"):
+        return G_PANEL, "panel", G_EDGE
+    if name in ("term-titlebar", "panel-header", "scrollheader", "observer-scrollheader", "panel-rule"):
+        return G_TITLE, "panel", G_EDGE
+    return tgui_style(name)
 
 
 # Soft glass (the translucent concept): white at low alpha over the map, a faint white edge, and an accent-blue state for
@@ -161,6 +152,10 @@ def tgui_style(name):
     """(fill, kind, edge) of an in-game HUD collection; kind is panel, title or button."""
     if name in G_PANELS:
         return G_PANEL, "panel", G_EDGE
+    if name.startswith("tgui-start"):  # the lobby's Start: solid amber
+        if "disabled" in name:
+            return (70, 52, 34, 230), "button", (255, 255, 255, 14)
+        return ((255, 181, 104, 255) if "hover" in name else (214, 128, 48, 255) if "pressed" in name else G_AMBER), "button", G_AMBER
     if name in ("tgui-card", "tgmc-selection"):
         return G_SECTION, "panel", G_EDGE
     if name in G_TITLES:
@@ -248,13 +243,10 @@ def flat_tile(fill):
     return Image.new("RGBA", (TILE, TILE), fill)
 
 
-def draw_tile(fill, border, square=False):
-    """A rounded glass tile: a one pixel edge, a faint lighter line along the top, no heavy bevel. Terminal tiles (square) have sharp corners and no sheen."""
+def draw_tile(fill, border):
+    """A rounded glass tile: a one pixel edge, a faint lighter line along the top, no heavy bevel."""
     img = Image.new("RGBA", (TILE, TILE), (0, 0, 0, 0))
     d = ImageDraw.Draw(img)
-    if square:
-        d.rectangle([0, 0, TILE - 1, TILE - 1], fill=fill, outline=border, width=1)
-        return img
     d.rounded_rectangle([0, 0, TILE - 1, TILE - 1], radius=CORNER - 1, fill=fill, outline=border, width=1)
     sheen = tuple(min(255, c + 22) for c in fill[:3]) + (min(255, fill[3] + 10),)
     d.line([(CORNER, 1), (TILE - CORNER - 1, 1)], fill=sheen)
@@ -637,12 +629,14 @@ def main():
     lines = ["# Generated by mod/make_chrome.py. Do not edit."]
     for i, name in enumerate(names):
         x, y = (i % COLS) * TILE, (i // COLS) * TILE
-        square = not is_hud(name)
-        fill, border = term_style(name) if square else style_for(name)
-        if is_hud(name) and not name.startswith(("progressbar", "tgui-bar", "separator", "tooltip-separator")):
+        if not is_hud(name):
+            fill, kind, edge = menu_style(name)
+            tile = flat_tile(fill) if kind == "flat" else draw_tgui_tile(fill, kind, edge)
+        elif not name.startswith(("progressbar", "tgui-bar", "separator", "tooltip-separator")):
             tile = draw_tgui_tile(*tgui_style(name))
         else:
-            tile = flat_tile(fill) if name.startswith('progressbar') else draw_tile(fill, border, square)
+            fill, border = style_for(name)
+            tile = flat_tile(fill) if name.startswith('progressbar') else draw_tile(fill, border)
         atlas.paste(tile, (x, y))
         lines.append(f"{name}:")
         lines.append("\tImage: chrome.png")

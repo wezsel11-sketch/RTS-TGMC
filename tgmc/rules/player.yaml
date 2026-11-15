@@ -10,6 +10,7 @@ Player:
 	PlayerResources:
 		SelectableCash: 500, 1000, 2500, 5000
 		DefaultCash: 1000
+		DefaultCashDropdownDisplayOrder: -30
 	PlayerRadarTerrain:
 	# Faction prerequisites: the marines' units and the SOM's units each show only for their own faction (~ hides what is not available).
 	ProvidesPrerequisite@marines:

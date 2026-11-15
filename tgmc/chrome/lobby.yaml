@@ -1,5 +1,10 @@
+# TGMC lobby. Derived from OpenRA's mods/common/chrome/lobby.yaml (GPL-3.0). Widget IDs are unchanged so LobbyLogic still finds them.
+# Command deck (docs/menu-designs/m2-lobby.png): the menu's battle shows behind a veil; players on the left, the map and the
+# option list on the right, chat along the bottom, Back bottom left and an amber Start bottom right.
+# Changes: the options are always in view (TgmcLobbyLogic), so the Options tab is hidden; LOBBY_FRAME holds the layout.
+
 Background@SERVER_LOBBY:
-	Logic: LobbyLogic
+	Logic: LobbyLogic, TgmcLobbyLogic
 		ChatTemplates:
 			Chat: CHAT_LINE_TEMPLATE
 			Join: SYSTEM_LINE_TEMPLATE
@@ -7,143 +12,153 @@ Background@SERVER_LOBBY:
 			System: SYSTEM_LINE_TEMPLATE
 			Mission: CHAT_LINE_TEMPLATE
 			Feedback: TRANSIENT_LINE_TEMPLATE
-	X: (WINDOW_WIDTH - WIDTH) / 2
-	Y: (WINDOW_HEIGHT - HEIGHT) / 2
-	Width: 990
-	Height: 708
+	Width: WINDOW_WIDTH
+	Height: WINDOW_HEIGHT
+	Background: dim
 	Children:
-		Label@SERVER_NAME:
-			Y: 19
-			Align: Center
-			Width: PARENT_WIDTH
-			Height: 30
-			Font: Bold
-		Container@MAP_PREVIEW_ROOT:
-			X: PARENT_WIDTH - 22 - WIDTH
-			Y: 79
-			Width: 191
-			Height: 295
-		DropDownButton@SLOTS_DROPDOWNBUTTON:
-			X: 22
-			Y: 343
-			Width: 204
-			Height: 30
-			Font: Bold
-			Text: dropdownbutton-server-lobby-slots
-		Button@RESET_OPTIONS_BUTTON:
-			X: 22
-			Y: 343
-			Width: 204
-			Height: 30
-			Font: Bold
-			Text: button-server-lobby-reset-options
-		Container@SKIRMISH_TABS:
-			X: 765 - WIDTH
-			Width: 535
-			Visible: False
+		Container@LOBBY_FRAME:
+			X: (WINDOW_WIDTH - WIDTH) / 2
+			Y: (WINDOW_HEIGHT - HEIGHT) / 2
+			Width: 1240
+			Height: 660
 			Children:
-				Button@PLAYERS_TAB:
-					Y: 336
-					Width: 178
-					Height: 37
-					Font: Bold
-					Text: button-skirmish-tabs-players-tab
-				Button@OPTIONS_TAB:
-					X: 178
-					Y: 336
-					Width: 178
-					Height: 37
-					Font: Bold
-					Text: button-skirmish-tabs-options-tab
-				Button@MUSIC_TAB:
-					X: 2 * 178
-					Y: 336
-					Width: 178
-					Height: 37
-					Font: Bold
-					Text: label-music-title
-		Container@MULTIPLAYER_TABS:
-			X: 765 - WIDTH
-			Width: 535
-			Visible: False
-			Children:
-				Button@PLAYERS_TAB:
-					Y: 336
-					Width: 133
-					Height: 37
-					Font: Bold
-					Text: button-multiplayer-tabs-players-tab
-				Button@OPTIONS_TAB:
-					X: 133
-					Y: 336
-					Width: 134
-					Height: 37
-					Font: Bold
-					Text: button-multiplayer-tabs-options-tab
-				Button@MUSIC_TAB:
-					X: 267
-					Y: 336
-					Width: 133
-					Height: 37
-					Font: Bold
-					Text: label-music-title
-				Button@SERVERS_TAB:
-					X: 400
-					Y: 336
-					Width: 134
-					Height: 37
-					Font: Bold
-					Text: button-multiplayer-tabs-servers-tab
-		Container@TOP_PANELS_ROOT:
-			X: 22
-			Y: 79
-			Width: 743
-			Height: 258
-		Button@CHANGEMAP_BUTTON:
-			X: PARENT_WIDTH - WIDTH - 22
-			Y: 343
-			Width: 191
-			Height: 30
-			Text: button-server-lobby-changemap
-			Font: Bold
-		Container@LOBBYCHAT:
-			X: 22
-			Y: PARENT_HEIGHT - HEIGHT - 24
-			Width: PARENT_WIDTH - 44
-			Height: 306
-			Children:
-				ScrollPanel@CHAT_DISPLAY:
+				Label@SERVER_NAME:
 					Width: PARENT_WIDTH
-					Height: PARENT_HEIGHT - 35
-					TopBottomSpacing: 2
-					ItemSpacing: 2
-				Button@CHAT_MODE:
-					Y: PARENT_HEIGHT - HEIGHT
-					Width: 55
+					Height: 36
+					Font: BigBold
+					TextColor: FFC454
+					Contrast: true
+				Background@PLAYERS_PANEL:
+					Y: 44
+					Width: 760
+					Height: 380
+					Background: tgui-window
+				Background@MAP_PANEL:
+					X: 776
+					Y: 44
+					Width: 464
+					Height: 380
+					Background: tgui-window
+				Background@CHAT_PANEL:
+					Y: 440
+					Width: PARENT_WIDTH
+					Height: 160
+					Background: tgui-window
+				Container@MAP_PREVIEW_ROOT:
+					X: 788
+					Y: 56
+					Width: 191
+					Height: 295
+				Button@CHANGEMAP_BUTTON:
+					X: 788
+					Y: 346
+					Width: 191
 					Height: 30
-					Text: button-lobbychat-chat-mode.label
+					Text: button-server-lobby-changemap
 					Font: Bold
-					Key: ToggleChatMode
-					TooltipText: button-lobbychat-chat-mode.tooltip
-					TooltipContainer: TOOLTIP_CONTAINER
-				TextField@CHAT_TEXTFIELD:
-					X: 61
-					Y: PARENT_HEIGHT - HEIGHT
-					Width: PARENT_WIDTH - 286 - 61
+				Button@RESET_OPTIONS_BUTTON:
+					X: 788
+					Y: 382
+					Width: 191
 					Height: 30
-		Button@START_GAME_BUTTON:
-			X: PARENT_WIDTH - WIDTH - 165
-			Y: PARENT_HEIGHT - HEIGHT - 24
-			Width: 132
-			Height: 30
-			Text: button-server-lobby-start-game
-			Font: Bold
-		Button@DISCONNECT_BUTTON:
-			X: PARENT_WIDTH - WIDTH - 22
-			Y: PARENT_HEIGHT - HEIGHT - 24
-			Width: 132
-			Height: 30
-			Text: button-server-lobby-disconnect
-			Font: Bold
+					Font: Bold
+					Text: button-server-lobby-reset-options
+				DropDownButton@SLOTS_DROPDOWNBUTTON:
+					X: 9
+					Y: 384
+					Width: 204
+					Height: 30
+					Font: Bold
+					Text: dropdownbutton-server-lobby-slots
+				Container@SKIRMISH_TABS:
+					X: 751 - WIDTH
+					Y: 384
+					Width: 240
+					Visible: False
+					Children:
+						Button@PLAYERS_TAB:
+							Width: 120
+							Height: 30
+							Font: Bold
+							Text: button-skirmish-tabs-players-tab
+						Button@OPTIONS_TAB:
+							Visible: False
+						Button@MUSIC_TAB:
+							X: 120
+							Width: 120
+							Height: 30
+							Font: Bold
+							Text: label-music-title
+				Container@MULTIPLAYER_TABS:
+					X: 751 - WIDTH
+					Y: 384
+					Width: 360
+					Visible: False
+					Children:
+						Button@PLAYERS_TAB:
+							Width: 120
+							Height: 30
+							Font: Bold
+							Text: button-multiplayer-tabs-players-tab
+						Button@OPTIONS_TAB:
+							Visible: False
+						Button@MUSIC_TAB:
+							X: 120
+							Width: 120
+							Height: 30
+							Font: Bold
+							Text: label-music-title
+						Button@SERVERS_TAB:
+							X: 240
+							Width: 120
+							Height: 30
+							Font: Bold
+							Text: button-multiplayer-tabs-servers-tab
+				# The option list (tgmc/chrome/lobby-options.yaml) is loaded in here too and draws to the right of it, in MAP_PANEL.
+				Container@TOP_PANELS_ROOT:
+					X: 9
+					Y: 80
+					Width: 743
+					Height: 296
+				Container@LOBBYCHAT:
+					X: 9
+					Y: 449
+					Width: PARENT_WIDTH - 18
+					Height: 142
+					Children:
+						ScrollPanel@CHAT_DISPLAY:
+							Width: PARENT_WIDTH
+							Height: PARENT_HEIGHT - 35
+							TopBottomSpacing: 2
+							ItemSpacing: 2
+						Button@CHAT_MODE:
+							Y: PARENT_HEIGHT - HEIGHT
+							Width: 55
+							Height: 30
+							Text: button-lobbychat-chat-mode.label
+							Font: Bold
+							Key: ToggleChatMode
+							TooltipText: button-lobbychat-chat-mode.tooltip
+							TooltipContainer: TOOLTIP_CONTAINER
+						TextField@CHAT_TEXTFIELD:
+							X: 61
+							Y: PARENT_HEIGHT - HEIGHT
+							Width: PARENT_WIDTH - 61
+							Height: 30
+				Button@DISCONNECT_BUTTON:
+					Y: PARENT_HEIGHT - HEIGHT
+					Width: 160
+					Height: 44
+					Text: button-back
+					Font: Bold
+				Button@START_GAME_BUTTON:
+					X: PARENT_WIDTH - WIDTH
+					Y: PARENT_HEIGHT - HEIGHT
+					Width: 220
+					Height: 48
+					Text: button-server-lobby-start-game
+					Font: BigBold
+					TextColor: 14181C
+					Background: tgui-start
 		Container@FACTION_DROPDOWN_PANEL_ROOT:
 		TooltipContainer@TOOLTIP_CONTAINER:

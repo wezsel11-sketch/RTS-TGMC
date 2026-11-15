@@ -823,18 +823,110 @@ namespace OpenRA.Mods.TGMC.Widgets
 	}
 }
 
+namespace OpenRA.Mods.TGMC.Traits
+{
+	[TraitLocation(SystemActors.World | SystemActors.EditorWorld)]
+	[Desc("Facts the map picker shows under the preview (MapPickerInfoLogic). Written into each lobby map by mod/make_placeholders.py.")]
+	public class MapBriefInfo : TraitInfo<MapBrief>
+	{
+		public readonly int OreFields = 0;
+		public readonly string Description = "";
+	}
+
+	public class MapBrief { }
+}
+
 namespace OpenRA.Mods.TGMC.Widgets.Logic
 {
 	using OpenRA.Mods.Common.Widgets.Logic;
 
-	[Desc("Dev aid: with the environment variable TGMC_MENU_SHOT set, takes a screenshot of the main menu a few seconds after it opens.")]
+	[Desc("Dev aid: with the environment variable TGMC_MENU_SHOT set, takes a screenshot of the main menu a few seconds after it opens.",
+		"A value that lists button ids (SINGLEPLAYER_BUTTON,SKIRMISH_BUTTON) clicks each in turn first, three seconds apart.")]
 	public class MenuShotLogic : ChromeLogic
 	{
 		[ObjectCreator.UseCtor]
 		public MenuShotLogic(Widget widget)
 		{
-			if (System.Environment.GetEnvironmentVariable("TGMC_MENU_SHOT") != null)
-				Game.RunAfterDelay(4000, Game.TakeScreenshot);
+			var steps = System.Environment.GetEnvironmentVariable("TGMC_MENU_SHOT");
+			if (steps == null)
+				return;
+
+			var delay = 4000;
+			foreach (var id in steps.Split(',').Where(s => s.Contains('_')))
+			{
+				Game.RunAfterDelay(delay, () =>
+				{
+					var button = Ui.Root.GetOrNull<ButtonWidget>(id);
+					System.Console.WriteLine($"MENU_SHOT {id} {(button == null ? "MISSING" : button.IsDisabled() ? "DISABLED" : "click")}");
+					if (button != null && !button.IsDisabled())
+						button.OnClick();
+				});
+				delay += 3000;
+			}
+
+			Game.RunAfterDelay(delay, Game.TakeScreenshot);
+		}
+	}
+
+	[Desc("The main menu's title, news and version show only while one of its menus does: MainMenuLogic hides every menu",
+		"when the lobby, settings or another screen opens over it.")]
+	public class MenuDeckLogic : ChromeLogic
+	{
+		[ObjectCreator.UseCtor]
+		public MenuDeckLogic(Widget widget)
+		{
+			Widget menus = null;
+			widget.IsVisible = () => (menus ??= Ui.Root.Get("MENUS")).Children.Any(c => c.IsVisible());
+		}
+	}
+
+	[Desc("The map picker's right side: the selected map large, and under it its size, bases, ore fields and a line about it.")]
+	public class MapPickerInfoLogic : ChromeLogic
+	{
+		[FluentReference("width", "height", "bases", "ore")]
+		const string Facts = "label-picker-facts";
+
+		readonly Widget panes;
+		readonly ModData modData;
+		MapPreview map;
+		string facts = "", about = "";
+
+		[ObjectCreator.UseCtor]
+		public MapPickerInfoLogic(Widget widget, ModData modData)
+		{
+			this.modData = modData;
+			panes = widget.Get("MAP_TAB_PANES");
+			widget.Get<MapPreviewWidget>("PICK_PREVIEW").Preview = () => map;
+			widget.Get<LabelWidget>("PICK_TITLE").GetText = () => map?.Title ?? "";
+			widget.Get<LabelWidget>("PICK_FACTS").GetText = () => facts;
+			widget.Get<LabelWidget>("PICK_ABOUT").GetText = () => about;
+		}
+
+		// MapChooserLogic keeps its selection private: the selected row of the open tab's list says which map it is.
+		public override void Tick()
+		{
+			var uid = panes.Children.Where(c => c.IsVisible())
+				.SelectMany(c => c.GetOrNull<ScrollPanelWidget>("MAP_LIST")?.Children ?? [])
+				.OfType<ScrollItemWidget>().FirstOrDefault(i => i.IsSelected())?.ItemKey;
+			if (uid == null || uid == map?.Uid)
+				return;
+
+			map = modData.MapCache[uid];
+			var brief = map.WorldActorInfo?.TraitInfoOrDefault<OpenRA.Mods.TGMC.Traits.MapBriefInfo>();
+			facts = FluentProvider.GetMessage(Facts, "width", map.Bounds.Width, "height", map.Bounds.Height,
+				"bases", map.PlayerCount, "ore", brief?.OreFields ?? 0);
+			about = brief?.Description ?? "";
+		}
+	}
+
+	[Desc("The lobby keeps its option list in view beside the players: LobbyLogic shows it, and the reset button, only on the Options tab.")]
+	public class TgmcLobbyLogic : ChromeLogic
+	{
+		[ObjectCreator.UseCtor]
+		public TgmcLobbyLogic(Widget widget)
+		{
+			widget.Get("LOBBY_OPTIONS_BIN").IsVisible = () => true;
+			widget.Get("RESET_OPTIONS_BUTTON").IsVisible = () => true;
 		}
 	}
 }

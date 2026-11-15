@@ -91,19 +91,20 @@ namespace OpenRA.Mods.TGMC.Traits
 
 		public override object Create(ActorInitializer init) { return new TgmcOptions(init.Self, this); }
 
+		// Display orders are negative so the mod's own options lead the lobby's list (the engine's sit at 0).
 		IEnumerable<LobbyOption> ILobbyOptions.LobbyOptions(MapPreview map)
 		{
 			yield return new LobbyBooleanOption(map, Options.FriendlyFire,
-				"checkbox-tgmc-friendlyfire.label", "checkbox-tgmc-friendlyfire.description", true, 10, FriendlyFireDefault, false);
+				"checkbox-tgmc-friendlyfire.label", "checkbox-tgmc-friendlyfire.description", true, -18, FriendlyFireDefault, false);
 
 			yield return new LobbyBooleanOption(map, Options.Infestation,
-				"checkbox-tgmc-infestation.label", "checkbox-tgmc-infestation.description", true, 11, InfestationDefault, false);
+				"checkbox-tgmc-infestation.label", "checkbox-tgmc-infestation.description", true, -17, InfestationDefault, false);
 
 			yield return new LobbyBooleanOption(map, Options.Maturity,
-				"checkbox-tgmc-maturity.label", "checkbox-tgmc-maturity.description", true, 12, MaturityDefault, false);
+				"checkbox-tgmc-maturity.label", "checkbox-tgmc-maturity.description", true, -16, MaturityDefault, false);
 
 			yield return new LobbyOption(map, Options.BurstTime,
-				"dropdown-tgmc-bursttime.label", "dropdown-tgmc-bursttime.description", true, 14,
+				"dropdown-tgmc-bursttime.label", "dropdown-tgmc-bursttime.description", true, -19,
 				new Dictionary<string, string>
 				{
 					{ "30", "bursttime-30" }, { "60", "bursttime-60" },
@@ -111,10 +112,10 @@ namespace OpenRA.Mods.TGMC.Traits
 				}, "60", false);
 
 			yield return new LobbyBooleanOption(map, Options.FloatingText,
-				"checkbox-tgmc-floatingtext.label", "checkbox-tgmc-floatingtext.description", true, 15, FloatingTextDefault, false);
+				"checkbox-tgmc-floatingtext.label", "checkbox-tgmc-floatingtext.description", true, -14, FloatingTextDefault, false);
 
 			yield return new LobbyOption(map, Options.Weather,
-				"dropdown-tgmc-weather.label", "dropdown-tgmc-weather.description", true, 16,
+				"dropdown-tgmc-weather.label", "dropdown-tgmc-weather.description", true, -20,
 				new Dictionary<string, string>
 				{
 					{ "clear", "weather-clear" }, { "rain", "weather-rain" }, { "dust", "weather-dust" },
@@ -122,13 +123,13 @@ namespace OpenRA.Mods.TGMC.Traits
 				}, WeatherDefault, false);
 
 			yield return new LobbyBooleanOption(map, Options.Night,
-				"checkbox-tgmc-night.label", "checkbox-tgmc-night.description", true, 17, NightDefault, false);
+				"checkbox-tgmc-night.label", "checkbox-tgmc-night.description", true, -20, NightDefault, false);
 
 			yield return new LobbyBooleanOption(map, Options.LandingIntro,
-				"checkbox-tgmc-landingintro.label", "checkbox-tgmc-landingintro.description", true, 18, LandingIntroDefault, false);
+				"checkbox-tgmc-landingintro.label", "checkbox-tgmc-landingintro.description", true, -19, LandingIntroDefault, false);
 
 			yield return new LobbyBooleanOption(map, Options.TileStep,
-				"checkbox-tgmc-tilestep.label", "checkbox-tgmc-tilestep.description", true, 13, TileStepDefault, false);
+				"checkbox-tgmc-tilestep.label", "checkbox-tgmc-tilestep.description", true, -15, TileStepDefault, false);
 		}
 	}
 

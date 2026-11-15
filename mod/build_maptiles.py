@@ -39,6 +39,35 @@ def terrain_of(turf, kind):
 
 COLOURS = {}  # template id -> the picture's average colour, for the map preview
 
+# The maps built by hand in make_placeholders.py (SKIRMISH_MAPS) wear TGMC's floor pictures too, by theme and role: several
+# pictures for a role are mixed cell by cell. Rock and wall keep the repo's own joined cave pieces. Lava blocks like water;
+# ice and the lava catwalk are fords. "pad" and "edge" are the landing pad beside every base (the same in each theme).
+_G, _D, _L = "icons/turf/ground_map.dmi", "icons/turf/desertdam_map.dmi", "icons/turf/lava.dmi"
+_PAD = {"pad": [("icons/turf/concrete.dmi", f"concrete{i}") for i in range(4)], "edge": [("icons/turf/asphalt.dmi", "asphalt")]}
+THEMES = {
+    "jungle": dict(_PAD, ground=[(_G, "grass1"), (_G, "grass2"), (_G, "grass3")], road=[(_G, "dirt")], water=[(_G, "seadeep")], ford=[(_G, "seashallow")]),
+    "desert": dict(_PAD, ground=[(_D, "desert"), (_D, "desert_3"), (_D, "desert_6")], road=[(_D, "sunbleached_asphalt")],
+                   water=[(_D, "shallow_to_deep_clean_water")], ford=[(_D, "shallow_water_clean2")]),
+    "snow": dict(_PAD, ground=[("icons/turf/snow.dmi", "snow"), ("icons/turf/snow.dmi", "snow0_0"), ("icons/turf/snow.dmi", "snow1_0")],
+                 road=[("icons/turf/snow.dmi", "gravsnow")], water=[(_G, "seadeep")], ford=[("icons/turf/ice.dmi", "ice_floor")]),
+    "lava": dict(_PAD, ground=[(_L, "basalt")], road=[(_L, "brock")], water=[(_L, "full")], ford=[(_L, "lavacatwalk")]),
+}
+ROLE_TERRAIN = {"ground": "Clear", "road": "Clear", "pad": "Clear", "edge": "Clear", "water": "Water", "ford": "Ford"}
+# Props for the built maps: name -> (sheet, state, hit points, blocks movement, stops bullets). 32x32 pictures only.
+_JF, _DF, _SF = "icons/obj/flora/jungleflora.dmi", "icons/obj/flora/desert_flora.dmi", "icons/obj/flora/snowflora.dmi"
+PROPS = {
+    "rock": (_JF, "rock", 400, True, True), "bush": (_JF, "bush", 40, False, False), "fern": (_JF, "bush_4", 40, False, False),
+    "leaves": (_JF, "grass_2", 40, False, False),
+    "boulder": ("icons/obj/structures/boulder_small.dmi", "bouldersmalldark1", 500, True, True),
+    "cactus": (_DF, "tall_cactus", 120, True, False), "shortcactus": (_DF, "short_cactus", 40, False, False),
+    "drygrass": (_DF, "drygrass_3", 40, False, False), "leafy": (_DF, "leafy_plant", 40, False, False),
+    "snowbush": (_SF, "snowbush", 40, False, False), "snowgrass": (_SF, "snowgrassall", 40, False, False),
+    "basalt": ("icons/obj/flora/rocks2.dmi", "basalt", 500, True, True), "lavarocks": ("icons/obj/flora/rocks2.dmi", "lavarocks", 40, False, False),
+    "crate": ("icons/obj/structures/crates.dmi", "closed_basic", 140, True, True), "ammocrate": ("icons/obj/structures/crates.dmi", "closed_ammo", 140, True, True),
+    "supplycrate": ("icons/obj/structures/crates.dmi", "closed_supply", 140, True, True),
+    "barricade": ("icons/obj/structures/barricades/metal.dmi", "metal_0", 300, True, True),
+}
+
 
 class Tiles:
     def __init__(self):
@@ -176,6 +205,17 @@ def prepare(tgmc, out, names):
             rows.append(row)
         tiles.cell_ids[name] = rows
         tiles.maps[name] = (x0, y0, x1 - x0, y1 - y0, grid)
+
+    # The built maps' theme tiles and props. The empty tuple keeps a theme tile apart from the same picture on a converted
+    # map, whose terrain type may differ.
+    tiles.themes = {theme: {role: [tiles.id_for((pic, ()), ROLE_TERRAIN[role]) for pic in pics if pic[1] in states(pic[0])]
+                            for role, pics in roles.items()} for theme, roles in THEMES.items()}
+    for theme, roles in tiles.themes.items():
+        assert all(roles.values()), f"theme {theme}: no picture found for {[r for r, ids in roles.items() if not ids]}"
+    tiles.props = {}
+    for prop, (sheet_path, state, hp, blocks, cover) in PROPS.items():
+        assert state in states(sheet_path) and sheets[sheet_path].icon_w == 32, f"prop {prop}: {sheet_path} {state} is missing or not 32 wide"
+        tiles.props[prop] = tiles.object_type(tiles.pictures.setdefault((sheet_path, state, 0), len(tiles.pictures)), hp, blocks, cover)
 
     # The pictures
     os.makedirs(os.path.join(out, "tiles"), exist_ok=True)

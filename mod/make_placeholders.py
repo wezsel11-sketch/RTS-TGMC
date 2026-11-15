@@ -143,11 +143,11 @@ def _road(x, y, row, x0, x1):
 
 
 def canyon_run_ground(x, y):
-    """52x28. Water walls leave a six-wide lane down the middle and two two-wide trails along the edges: one choke, two flanks."""
+    """52x28. Canyon walls of rock leave a six-wide lane down the middle and two two-wide trails along the edges: one choke, two flanks."""
     if 15 <= x <= 36:
         if 11 <= y <= 16:
             return (DIRT if y in (13, 14) else GRASS), 0
-        return (GRASS, 0) if y in (3, 4, 23, 24) else (WATER, 0)
+        return (GRASS, 0) if y in (3, 4, 23, 24) else (ROCK, 0)
     return (DIRT, 0) if _road(x, y, 13, 6, 45) else (GRASS, 0)
 
 
@@ -155,7 +155,7 @@ def jungle_crossing_ground(x, y):
     """44x28. A lake in the middle: go round it by the north or south shore, or wade the causeway through the centre."""
     if _ellipse(x, y, 22, 13.5, 7, 9):
         return (FORD, 0) if y in (13, 14) else (WATER, 0)
-    if any(_ellipse(x, y, cx, cy, 2, 2) for cx, cy in ((12, 5), (12, 22), (32, 5), (32, 22))):
+    if any(_ellipse(x, y, cx, cy, 2, 2) for cx, cy in ((12, 22), (32, 22))):  # none in the north: the landing pads are there
         return WATER, 0
     return (DIRT, 0) if _road(x, y, 13, 6, 38) else (GRASS, 0)
 
@@ -216,6 +216,52 @@ def broken_bridge_ground(x, y):
     if abs(d) <= 3.5 and not bridges:
         return ROCK, 0
     return (DIRT, 0) if y in (23, 24) and 6 <= x <= 58 else (GRASS, 0)
+
+
+def crossroads_ground(x, y):
+    """96x96, four bases, one toward each corner. Two roads cross in a walled yard in the middle (four gates); each road fords a lake
+    on its way in, and a rock outcrop stands between each base and the yard."""
+    road_x, road_y = x in (47, 48), y in (47, 48)
+    if 40 <= x <= 55 and 40 <= y <= 55:
+        return (WALL if (x in (40, 55) or y in (40, 55)) and not (road_x or road_y) else DIRT), 0
+    if any(_ellipse(x, y, *lake) for lake in ((47.5, 22, 7, 4), (47.5, 73, 7, 4), (22, 47.5, 4, 7), (73, 47.5, 4, 7))):
+        return (FORD if road_x or road_y else WATER), 0
+    if any(_ellipse(x, y, cx, cy, 3, 3) for cx, cy in ((30, 30), (65, 30), (30, 65), (65, 65))):
+        return ROCK, 0
+    return (DIRT if (road_y and 6 <= x <= 89) or (road_x and 6 <= y <= 89) else GRASS), 0
+
+
+def desert_outpost_ground(x, y):
+    """72x56. A walled compound in the middle, on the road between the bases, with a gate in each side; rock mesas north and south of the road."""
+    road = y in (28, 29)
+    if 30 <= x <= 41 and 22 <= y <= 35:
+        return (WALL if (x in (30, 41) or y in (22, 35)) and not road and x not in (35, 36) else DIRT), 0
+    if any(_ellipse(x, y, *mesa) for mesa in ((20, 14, 5, 3), (20, 43, 5, 3), (51, 14, 5, 3), (51, 43, 5, 3), (36, 9, 4, 2), (36, 48, 4, 2))):
+        return ROCK, 0
+    return (DIRT if road and 8 <= x <= 63 else GRASS), 0
+
+
+def ice_shelf_ground(x, y):
+    """72x48. Two ice walls run north to south, each with three passes; frozen lakes (fords: slow, no cover) lie in the open, and two
+    cracks of open water flank the middle."""
+    if x in (18, 19, 52, 53) and not (10 <= y <= 13 or 23 <= y <= 26 or 34 <= y <= 37):
+        return ROCK, 0
+    if _ellipse(x, y, 36, 10, 2, 3) or _ellipse(x, y, 36, 38, 2, 3):
+        return WATER, 0
+    if any(_ellipse(x, y, *lake) for lake in ((24, 12, 6, 4), (47, 36, 6, 4), (36, 24, 5, 3))):
+        return FORD, 0
+    return (DIRT if y in (24, 25) and 8 <= x <= 63 else GRASS), 0
+
+
+def lava_fields_ground(x, y):
+    """72x56. Two winding rivers of lava between the bases, three bridges over each; rock outcrops north and south of the middle."""
+    import math
+    bridge = 9 <= y <= 11 or 27 <= y <= 30 or 45 <= y <= 47
+    if any(abs(x - centre) <= 1.5 for centre in (24 + 3 * math.sin(y / 6), 47 + 3 * math.sin(y / 6 + 2))):
+        return (FORD if bridge else WATER), 0
+    if _ellipse(x, y, 36, 14, 4, 3) or _ellipse(x, y, 36, 42, 4, 3):
+        return ROCK, 0
+    return (DIRT if y in (28, 29) and 8 <= x <= 63 else GRASS), 0
 
 
 def palette_entries():
@@ -742,20 +788,125 @@ EVAC = [
 EVAC_RULES = "Player:\n\tThreatMemory:\n\t\tFullVision: true\n"
 
 
-def _skirmish_actors(xeno_dx, dy):
-    """Landing Zone's two bases, the xeno one moved by xeno_dx and both by dy."""
-    return [(n, o, x + (xeno_dx if o == "Xenos" else 0), y + dy, f) for n, o, x, y, f in LANDING_ZONE]
+def _base_actors(spawns):
+    """Landing Zone's two bases, moved to the map's first two spawn points (marines, then xenos)."""
+    (mx, my), (xx, xy) = spawns[:2]
+    return [(n, o, x + (xx - 33 if o == "Xenos" else mx - 6), y + (xy - 13 if o == "Xenos" else my - 14), f) for n, o, x, y, f in LANDING_ZONE]
 
 
-# name: (title, width, height, xeno base shift, vertical shift of both bases, ground). Marines west, xenos east, like Landing Zone.
+def _scramble(a, b):
+    """A fixed scramble of two numbers, so a map builds the same every time."""
+    n = (a * 374761393 + b * 668265263) & 0xFFFFFFFF
+    n = ((n ^ (n >> 13)) * 1274126177) & 0xFFFFFFFF
+    return n ^ (n >> 16)
+
+
+def _pad(spawns, x, y):
+    """The landing pad north of every base, where the Alamo of the landing intro sets down (FactionStart's TransportOffset is 13 cells
+    north of the base; the pad is the one shell_ground draws for the menu). 0 off the pads, 1 on a pad's edge, 2 inside one."""
+    for sx, sy in spawns:
+        x0, x1, y0, y1 = sx - 5, sx + 5, max(1, sy - 23), sy - 2
+        if x0 <= x <= x1 and y0 <= y <= y1:
+            return 1 if x in (x0, x1) or y in (y0, y1) else 2
+    return 0
+
+
+# The marines' camo for a theme (TgmcCamo), and what the theme scatters: (props that block, props to walk over), see build_maptiles.PROPS.
+THEME_CAMO = {"jungle": "jungle", "desert": "", "snow": "ice", "lava": ""}
+THEME_PROPS = {"jungle": (("rock", "boulder"), ("bush", "fern", "leaves")), "desert": (("cactus", "boulder"), ("drygrass", "shortcactus", "leafy")),
+               "snow": (("boulder",), ("snowbush", "snowgrass")), "lava": (("basalt",), ("lavarocks",))}
+
+
+def built_map(name, m, tiles):
+    """A built map's ground function in its theme's TGMC pictures, and its neutral actors: ore fields, cover and scattered props.
+    `tiles` is build_maptiles.prepare's result, or None without a TGMC checkout: then the flat templates, a dirt pad and no props."""
+    raw, spawns, (w, h) = m["ground"], m["spawns"], m["size"]
+    ids = tiles.themes[m["theme"]] if tiles else None
+    roles = {GRASS: "ground", DIRT: "road", WATER: "water", FORD: "ford"}
+
+    def ground(x, y):
+        pad, kind = _pad(spawns, x, y), raw(x, y)[0]
+        if not ids:
+            return (DIRT if pad else kind), 0
+        role = ("edge" if pad == 1 else "pad") if pad else roles.get(kind)
+        if role is None:  # rock and wall: the repo's joined cave pieces
+            return kind, 0
+        return ids[role][_scramble(x, y) % len(ids[role])], 0
+
+    def open_ground(x, y):
+        return 1 <= x < w - 1 and 1 <= y < h - 1 and (_pad(spawns, x, y) or raw(x, y)[0] in (GRASS, DIRT, FORD))
+
+    # Every base and every ore field must be reachable on foot from the first base.
+    reach, todo = {spawns[0]}, [spawns[0]]
+    while todo:
+        x, y = todo.pop()
+        for n in ((x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1)):
+            if n not in reach and open_ground(*n):
+                reach.add(n)
+                todo.append(n)
+    for spawn in spawns:
+        assert spawn in reach, f"{name}: the base at {spawn} cannot be reached from the base at {spawns[0]}"
+    for x, y in m["fields"]:
+        assert raw(x, y)[0] in (GRASS, DIRT) and not _pad(spawns, x, y), f"{name}: the ore field at {x},{y} is not on open ground"
+        assert any(n in reach for n in ((x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1))), f"{name}: no way to the ore field at {x},{y}"
+        assert all(max(abs(x - sx), abs(y - sy)) >= 5 for sx, sy in spawns), f"{name}: the ore field at {x},{y} sits in a base"
+    actors = [("miner-field", "Neutral", x, y, 0) for x, y in m["fields"]]
+    if not tiles:
+        return ground, actors
+    taken = set(m["fields"])
+    for prop, x, y in m.get("cover", ()):
+        assert raw(x, y)[0] in (GRASS, DIRT) and not _pad(spawns, x, y) and (x, y) not in taken, f"{name}: {prop} at {x},{y} is not on free open ground"
+        taken.add((x, y))
+        actors.append((tiles.props[prop], "Neutral", x, y, 0))
+    # Scattered props, on the theme's plain ground only: clear of the bases, the pads, the roads and the ore fields. One that
+    # blocks stands only in the open (plain ground two cells around), so it never plugs a trail.
+    blocking, plain = THEME_PROPS[m["theme"]]
+    for y in range(2, h - 2):
+        for x in range(2, w - 2):
+            if raw(x, y)[0] != GRASS or _pad(spawns, x, y) or any(max(abs(x - sx), abs(y - sy)) <= 8 for sx, sy in spawns) \
+                    or any(abs(x - fx) <= 1 and abs(y - fy) <= 1 for fx, fy in taken):
+                continue
+            n = _scramble(x * 7 + 3, y * 13 + 1)
+            if n % 90 == 0 and all(raw(x + dx, y + dy)[0] == GRASS and not _pad(spawns, x + dx, y + dy) for dx in range(-2, 3) for dy in range(-2, 3)):
+                actors.append((tiles.props[blocking[n // 90 % len(blocking)]], "Neutral", x, y, 0))
+            elif n % 30 == 1:
+                actors.append((tiles.props[plain[n // 30 % len(plain)]], "Neutral", x, y, 0))
+    return ground, actors
+
+
+# The maps built by hand. spawns: the marine base, the xeno base, then any further bases (a map with four is a four-player map).
+# fields: the ore fields (miner-field). cover: (prop, x, y) placed by hand. brief: the line under the map picker's preview.
 SKIRMISH_MAPS = {
-    "canyon-run": ("Canyon Run", 52, 28, 12, 0, canyon_run_ground),
-    "jungle-crossing": ("Jungle Crossing", 44, 28, 4, 0, jungle_crossing_ground),
-    "close-quarters": ("Close Quarters", 34, 28, -6, 0, close_quarters_ground),
-    "great-plains": ("Great Plains", 64, 40, 24, 6, great_plains_ground),
-    "twin-rivers": ("Twin Rivers", 64, 48, 24, 10, twin_rivers_ground),
-    "quarry-pit": ("Quarry Pit", 64, 48, 24, 10, quarry_pit_ground),
-    "broken-bridge": ("Broken Bridge", 64, 48, 24, 10, broken_bridge_ground),
+    "landing-zone": dict(title="Landing Zone", size=(40, 28), spawns=[(6, 14), (33, 13)], ground=landing_zone_ground, theme="jungle", weather="clear",
+                         fields=[(11, 22), (28, 22)], brief="Jungle river with three fords. Short and direct: the first map to learn on."),
+    "canyon-run": dict(title="Canyon Run", size=(52, 28), spawns=[(6, 14), (45, 13)], ground=canyon_run_ground, theme="desert", weather="dust",
+                       fields=[(13, 23), (38, 23)], brief="Desert canyon: one wide lane down the middle, a narrow trail along each wall."),
+    "jungle-crossing": dict(title="Jungle Crossing", size=(44, 28), spawns=[(6, 14), (37, 13)], ground=jungle_crossing_ground, theme="jungle", weather="rain",
+                            fields=[(13, 20), (30, 20)], brief="A lake in the rain: wade the causeway or go round by either shore."),
+    "close-quarters": dict(title="Close Quarters", size=(34, 28), spawns=[(6, 14), (27, 13)], ground=close_quarters_ground, theme="snow", weather="snow",
+                           fields=[(10, 23), (23, 23)], cover=[("barricade", 14, 12), ("barricade", 14, 15), ("barricade", 19, 12), ("barricade", 19, 15)],
+                           brief="Bases thirteen cells apart across a frozen stream. Over in minutes."),
+    "great-plains": dict(title="Great Plains", size=(64, 40), spawns=[(6, 20), (57, 19)], ground=great_plains_ground, theme="jungle", weather="clear",
+                         fields=[(12, 30), (51, 30), (30, 12), (34, 27)],
+                         cover=[("crate", 36, 15), ("ammocrate", 37, 15), ("supplycrate", 27, 22), ("crate", 28, 22)],
+                         brief="Open grass and ponds, six ore fields: a long walk, so economy and walls decide it."),
+    "twin-rivers": dict(title="Twin Rivers", size=(64, 48), spawns=[(6, 24), (57, 23)], ground=twin_rivers_ground, theme="jungle", weather="rain",
+                        fields=[(12, 34), (51, 34), (32, 20), (32, 28)], brief="Two rivers whose fords do not line up; two ore fields on the island between."),
+    "quarry-pit": dict(title="Quarry Pit", size=(64, 48), spawns=[(6, 24), (57, 23)], ground=quarry_pit_ground, theme="desert", weather="dust",
+                       fields=[(12, 34), (51, 34), (32, 21)], brief="A rock ring round a pit with an ore field in it: hold the pit, see all four roads."),
+    "broken-bridge": dict(title="Broken Bridge", size=(64, 48), spawns=[(6, 24), (57, 23)], ground=broken_bridge_ground, theme="lava", weather="ash",
+                          fields=[(12, 34), (51, 34), (30, 30), (38, 18)], brief="A rift of lava with three bridges, or the long way round its ends."),
+    "desert-outpost": dict(title="Desert Outpost", size=(72, 56), spawns=[(8, 29), (63, 28)], ground=desert_outpost_ground, theme="desert", weather="dust",
+                           fields=[(33, 25), (38, 25), (33, 32), (12, 36), (59, 36)], cover=[("crate", 34, 31), ("ammocrate", 37, 33), ("supplycrate", 39, 26)],
+                           brief="A walled compound on the road holds three ore fields. Its walls come down to heavy weapons."),
+    "ice-shelf": dict(title="Ice Shelf", size=(72, 48), spawns=[(8, 25), (63, 24)], ground=ice_shelf_ground, theme="snow", weather="snow",
+                      fields=[(12, 33), (59, 33), (36, 16), (36, 32)], brief="Two ice walls with three passes each; frozen lakes slow whoever crosses them."),
+    "lava-fields": dict(title="Lava Fields", size=(72, 56), spawns=[(8, 29), (63, 28)], ground=lava_fields_ground, theme="lava", weather="ash", night=True,
+                        fields=[(12, 38), (59, 38), (36, 22), (36, 34)], brief="Night and falling ash. Two rivers of lava, three bridges over each."),
+    "crossroads": dict(title="Crossroads", size=(96, 96), spawns=[(14, 27), (81, 78), (81, 27), (14, 78)], ground=crossroads_ground, theme="jungle", weather="clear",
+                       fields=[(43, 43), (52, 43), (43, 52), (52, 52), (22, 33), (73, 33), (22, 84), (73, 84)],
+                       cover=[("crate", 45, 45), ("ammocrate", 50, 45), ("supplycrate", 45, 50), ("crate", 50, 50)],
+                       brief="Four bases. Two roads cross in a walled yard with four ore fields."),
 }
 
 SCENARIOS = {
@@ -2228,21 +2379,26 @@ def main():
     write_map(os.path.join(args.out, "maps", "shell-landing"), "Landing (menu backdrop)", 56, 36, [], "Shellmap",
               [(28, 26), (51, 7)], scripts=("shell-landing",), ground=shell_ground, faction_start=True,
               marine_bot="skirmish", xeno_bot="skirmish", extra_rules="World:\n\tShellmapRestart:\n")
-    write_map(os.path.join(args.out, "maps", "landing-zone"), "Landing Zone", 40, 28, LANDING_ZONE, "Lobby", [(6, 14), (33, 13)],
-              ground=landing_zone_ground, category="Conquest, Small", faction_start=True)
-    for name, (title, w, h, xeno_dx, dy, ground) in SKIRMISH_MAPS.items():
-        actors = _skirmish_actors(xeno_dx, dy)
-        for _, _, x, y, _ in actors:
-            assert 2 <= x <= w - 3 and 2 <= y <= h - 3 and ground(x, y)[0] != WATER, f"{name}: actor at {x},{y} is off the map or in water"
-        write_map(os.path.join(args.out, "maps", name), title, w, h, actors, "Lobby", [(6, 14 + dy), (33 + xeno_dx, 13 + dy)],
-                  ground=ground, category="Conquest, Small", faction_start=True)
+    # TGMC's floor and wall pictures, for the full-size converted maps (a cell of a shrunk one is several TGMC tiles) and, by theme,
+    # for the built maps.
+    full = [n for n, spec in tgmc_dmm.MAPS.items() if spec["factor"] == 1]
+    tiles = build_maptiles.prepare(args.tgmc, args.out, full) if args.tgmc else None
+    for name, m in SKIRMISH_MAPS.items():
+        w, h = m["size"]
+        spawns = m["spawns"]
+        ground, extra = built_map(name, m, tiles)
+        bases = _base_actors(spawns)
+        for _, _, x, y, _ in bases:
+            assert 2 <= x <= w - 3 and 2 <= y <= h - 3 and m["ground"](x, y)[0] in (GRASS, DIRT), f"{name}: actor at {x},{y} is off the map or not on open ground"
+        rules = camo_rules(THEME_CAMO[m["theme"]]) + f"World:\n\tTgmcOptions:\n\t\tWeatherDefault: {m['weather']}\n" + ("\t\tNightDefault: true\n" if m.get("night") else "")
+        four = len(spawns) == 4
+        write_map(os.path.join(args.out, "maps", name), m["title"], w, h, bases + extra, "Lobby", spawns, ground=ground,
+                  category="Conquest, Full size" if four else "Conquest, Small", faction_start=True, players=FOUR_PLAYERS if four else None,
+                  extra_rules=rules, brief=m["brief"])
         # An AI-vs-AI copy for tuning the bots on the map (see scenarios/test-aimap.lua); it stays out of the game's menus.
-        write_map(os.path.join(dev_maps, "aimap-" + name), "AI test " + title, w, h, actors, "MissionSelector", [(6, 14 + dy), (33 + xeno_dx, 13 + dy)],
-                  scripts=("test-aimap",), ground=ground, category="Conquest", marine_bot="skirmish", xeno_bot="skirmish", fast=True)
+        write_map(os.path.join(dev_maps, "aimap-" + name), "AI test " + m["title"], w, h, bases + extra, "MissionSelector", spawns[:2],
+                  scripts=("test-aimap",), ground=ground, category="Conquest", marine_bot="skirmish", xeno_bot="skirmish", fast=True, extra_rules=rules)
     if args.tgmc:
-        # The full-size maps wear TGMC's own floor and wall pictures; the shrunk ones cannot, a cell there is several TGMC tiles.
-        full = [n for n, spec in tgmc_dmm.MAPS.items() if spec["factor"] == 1]
-        tiles = build_maptiles.prepare(args.tgmc, args.out, full)
         for name, spec in tgmc_dmm.MAPS.items():
             write_tgmc_map(os.path.join(args.out, "maps", name), spec["title"], *tgmc_dmm.load(args.tgmc, spec),
                            art=tiles.art(name) if name in full else None,

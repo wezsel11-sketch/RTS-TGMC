@@ -273,9 +273,14 @@ the commits this mod was tested against (see the top of `mod/bootstrap.py`), so 
   - **Command deck menus.** The main menu, lobby, map picker, settings and dialogs wear the in-game HUD's dark glass and amber
     (`menu_style` in `mod/make_chrome.py`); the green terminal is gone. The menu's battle shows behind them.
     - *Lobby* (`tgmc/chrome/lobby.yaml`): players on the left, the map and the option list on the right, chat along the bottom, an amber
-      Start. The options are always in view, the mod's own first.
+      Start. The options are always in view, the mod's own first. In a window narrower than 1280 they go back on an Options tab.
     - *Map picker* (`tgmc/chrome/map-chooser.yaml`): the maps as a list, the selected one large on the right with its size, bases, ore
       fields and a line about it (`MapBrief`, written per map by `mod/make_placeholders.py`).
+      Tabs above the preview filter the list: all, conquest, survival, small, full size.
+    - *Backdrop*: the menu's battle starts again when one side has lost, or after eight minutes (`ShellmapRestart`), while the main
+      menu's cards are showing.
+    - The Windows package is checked under Wine on a virtual display: `Xvfb :99` (unpacked from its .deb, no root needed), then
+      `DISPLAY=:99 wine TGMC.exe` with `TGMC_MENU_SHOT` as below.
     - `TGMC_MENU_SHOT=SINGLEPLAYER_BUTTON,SKIRMISH_BUTTON,CHANGEMAP_BUTTON` clicks those buttons in turn and takes a screenshot: how the
       menus are checked headless.
     `docs/menu-designs/` keeps the three templates the look was chosen from.

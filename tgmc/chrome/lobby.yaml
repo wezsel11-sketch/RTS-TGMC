@@ -2,6 +2,8 @@
 # Command deck (docs/menu-designs/m2-lobby.png): the menu's battle shows behind a veil; players on the left, the map and the
 # option list on the right, chat along the bottom, Back bottom left and an amber Start bottom right.
 # Changes: the options are always in view (TgmcLobbyLogic), so the Options tab is hidden; LOBBY_FRAME holds the layout.
+# A window narrower than 1280 has no room for the option list beside the map: the frame is 984 wide there and the options
+# go back on their tab, over the players ((WINDOW_WIDTH >= 1280) is 1 or 0).
 
 Background@SERVER_LOBBY:
 	Logic: LobbyLogic, TgmcLobbyLogic
@@ -19,7 +21,7 @@ Background@SERVER_LOBBY:
 		Container@LOBBY_FRAME:
 			X: (WINDOW_WIDTH - WIDTH) / 2
 			Y: (WINDOW_HEIGHT - HEIGHT) / 2
-			Width: 1240
+			Width: 984 + 256 * (WINDOW_WIDTH >= 1280)
 			Height: 660
 			Children:
 				Label@SERVER_NAME:
@@ -36,7 +38,7 @@ Background@SERVER_LOBBY:
 				Background@MAP_PANEL:
 					X: 776
 					Y: 44
-					Width: 464
+					Width: PARENT_WIDTH - 776
 					Height: 380
 					Background: tgui-window
 				Background@CHAT_PANEL:
@@ -73,18 +75,23 @@ Background@SERVER_LOBBY:
 				Container@SKIRMISH_TABS:
 					X: 751 - WIDTH
 					Y: 384
-					Width: 240
+					Width: 360
 					Visible: False
 					Children:
+						Button@OPTIONS_TAB:
+							X: 0
+							Width: 120
+							Height: 30
+							Font: Bold
+							Text: button-skirmish-tabs-options-tab
 						Button@PLAYERS_TAB:
+							X: 120
 							Width: 120
 							Height: 30
 							Font: Bold
 							Text: button-skirmish-tabs-players-tab
-						Button@OPTIONS_TAB:
-							Visible: False
 						Button@MUSIC_TAB:
-							X: 120
+							X: 240
 							Width: 120
 							Height: 30
 							Font: Bold
@@ -92,24 +99,29 @@ Background@SERVER_LOBBY:
 				Container@MULTIPLAYER_TABS:
 					X: 751 - WIDTH
 					Y: 384
-					Width: 360
+					Width: 480
 					Visible: False
 					Children:
+						Button@OPTIONS_TAB:
+							X: 0
+							Width: 120
+							Height: 30
+							Font: Bold
+							Text: button-multiplayer-tabs-options-tab
 						Button@PLAYERS_TAB:
+							X: 120
 							Width: 120
 							Height: 30
 							Font: Bold
 							Text: button-multiplayer-tabs-players-tab
-						Button@OPTIONS_TAB:
-							Visible: False
 						Button@MUSIC_TAB:
-							X: 120
+							X: 240
 							Width: 120
 							Height: 30
 							Font: Bold
 							Text: label-music-title
 						Button@SERVERS_TAB:
-							X: 240
+							X: 360
 							Width: 120
 							Height: 30
 							Font: Bold

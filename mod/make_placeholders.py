@@ -2184,7 +2184,8 @@ def write_tgmc_map(folder, title, rows, marines, xenos, art=None, objects=None, 
         write_map(folder, title, w, h, actors + xeno_actors + extra, "MissionSelector", [spawn_m, spawn_x], scripts=("test-aimap",), ground=ground, extra_rules=camo_rules(camo),
                   category="Conquest", marine_bot="skirmish", xeno_bot="skirmish", fast=True, drop_conquest=False)
         return
-    write_map(folder, title, w, h, actors + xeno_actors + extra, "Lobby", [spawn_m, spawn_x] + extra_spawn, ground=ground, extra_rules=camo_rules(camo), category="Conquest",
+    write_map(folder, title, w, h, actors + xeno_actors + extra, "Lobby", [spawn_m, spawn_x] + extra_spawn, ground=ground, extra_rules=camo_rules(camo),
+              category="Conquest, Full size" if bases == 4 else "Conquest, Small",  # the map picker's filter tabs
               faction_start=True, players=FOUR_PLAYERS if bases == 4 else None,
               brief="TGMC's own map at full size, with its floors and walls." if bases == 4 else "TGMC's own map, shrunk for a quick match.")
 
@@ -2226,15 +2227,15 @@ def main():
     # The menu's backdrop: Landing Zone with a bot on each side, so the Alamo lands, the squad walks out and a fight follows.
     write_map(os.path.join(args.out, "maps", "shell-landing"), "Landing (menu backdrop)", 56, 36, [], "Shellmap",
               [(28, 26), (51, 7)], scripts=("shell-landing",), ground=shell_ground, faction_start=True,
-              marine_bot="skirmish", xeno_bot="skirmish")
+              marine_bot="skirmish", xeno_bot="skirmish", extra_rules="World:\n\tShellmapRestart:\n")
     write_map(os.path.join(args.out, "maps", "landing-zone"), "Landing Zone", 40, 28, LANDING_ZONE, "Lobby", [(6, 14), (33, 13)],
-              ground=landing_zone_ground, category="Conquest", faction_start=True)
+              ground=landing_zone_ground, category="Conquest, Small", faction_start=True)
     for name, (title, w, h, xeno_dx, dy, ground) in SKIRMISH_MAPS.items():
         actors = _skirmish_actors(xeno_dx, dy)
         for _, _, x, y, _ in actors:
             assert 2 <= x <= w - 3 and 2 <= y <= h - 3 and ground(x, y)[0] != WATER, f"{name}: actor at {x},{y} is off the map or in water"
         write_map(os.path.join(args.out, "maps", name), title, w, h, actors, "Lobby", [(6, 14 + dy), (33 + xeno_dx, 13 + dy)],
-                  ground=ground, category="Conquest", faction_start=True)
+                  ground=ground, category="Conquest, Small", faction_start=True)
         # An AI-vs-AI copy for tuning the bots on the map (see scenarios/test-aimap.lua); it stays out of the game's menus.
         write_map(os.path.join(dev_maps, "aimap-" + name), "AI test " + title, w, h, actors, "MissionSelector", [(6, 14 + dy), (33 + xeno_dx, 13 + dy)],
                   scripts=("test-aimap",), ground=ground, category="Conquest", marine_bot="skirmish", xeno_bot="skirmish", fast=True)

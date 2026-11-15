@@ -834,6 +834,46 @@ namespace OpenRA.Mods.TGMC.Traits
 	}
 
 	public class MapBrief { }
+
+	[TraitLocation(SystemActors.World)]
+	[Desc("The menu's backdrop starts again when one side has lost or after MaxTicks, so the menu never shows an empty field.",
+		"It waits while a sub-menu, the lobby or another screen is open: loading the backdrop resets the menu.")]
+	public class ShellmapRestartInfo : TraitInfo
+	{
+		[Desc("Start again after this many ticks even when both sides still stand.")]
+		public readonly int MaxTicks = 12000;
+
+		[Desc("Ticks the result stays on screen before the restart.")]
+		public readonly int Delay = 250;
+
+		public override object Create(ActorInitializer init) { return new ShellmapRestart(this); }
+	}
+
+	public class ShellmapRestart : ITick
+	{
+		readonly ShellmapRestartInfo info;
+		int due = -1;
+		bool restarting;
+
+		public ShellmapRestart(ShellmapRestartInfo info) { this.info = info; }
+
+		void ITick.Tick(Actor self)
+		{
+			var world = self.World;
+			if (world.Type != WorldType.Shellmap || restarting || world.WorldTick % 25 != 0)
+				return;
+
+			if (due < 0 && (world.WorldTick >= info.MaxTicks || world.Players.Any(p => !p.NonCombatant && p.WinState != WinState.Undefined)))
+				due = world.WorldTick + info.Delay;
+
+			if (due < 0 || world.WorldTick < due || Ui.Root.GetOrNull("MAIN_MENU")?.IsVisible() != true)
+				return;
+
+			restarting = true;
+			Console.WriteLine($"SHELLMAP restart at tick {world.WorldTick}");
+			Game.RunAfterTick(Game.LoadShellMap);
+		}
+	}
 }
 
 namespace OpenRA.Mods.TGMC.Widgets.Logic
@@ -900,6 +940,27 @@ namespace OpenRA.Mods.TGMC.Widgets.Logic
 			widget.Get<LabelWidget>("PICK_TITLE").GetText = () => map?.Title ?? "";
 			widget.Get<LabelWidget>("PICK_FACTS").GetText = () => facts;
 			widget.Get<LabelWidget>("PICK_ABOUT").GetText = () => about;
+
+			// shortcut: MapChooserLogic keeps its category filter private, so the tabs set it by reflection (the engine is pinned
+			// in build/OpenRA); if a field is renamed the tabs hide and the dropdown still filters. Upgrade when the engine exposes it.
+			const System.Reflection.BindingFlags Private = System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic;
+			var category = typeof(MapChooserLogic).GetField("category", Private);
+			var currentTab = typeof(MapChooserLogic).GetField("currentTab", Private);
+			var enumerate = typeof(MapChooserLogic).GetMethod("EnumerateMaps", Private);
+			MapChooserLogic chooser = null;
+			MapChooserLogic Chooser() => chooser ??= (widget.LogicObjects.IsDefault ? null : widget.LogicObjects.OfType<MapChooserLogic>().FirstOrDefault());
+			var tabs = widget.Get("PICK_TABS");
+			tabs.IsVisible = () => category != null && currentTab != null && enumerate != null && Chooser() != null;
+			foreach (var (id, name) in new[] { ("ALL", null), ("CONQUEST", "Conquest"), ("SURVIVAL", "Survival"), ("SMALL", "Small"), ("FULL", "Full size") })
+			{
+				var tab = tabs.Get<ButtonWidget>("PICK_TAB_" + id);
+				tab.IsHighlighted = () => (string)category.GetValue(Chooser()) == name;
+				tab.OnClick = () =>
+				{
+					category.SetValue(Chooser(), name);
+					enumerate.Invoke(Chooser(), [currentTab.GetValue(Chooser())]);
+				};
+			}
 		}
 
 		// MapChooserLogic keeps its selection private: the selected row of the open tab's list says which map it is.
@@ -925,6 +986,14 @@ namespace OpenRA.Mods.TGMC.Widgets.Logic
 		[ObjectCreator.UseCtor]
 		public TgmcLobbyLogic(Widget widget)
 		{
+			// Narrower than 1280 there is no room beside the map (see lobby.yaml): the options stay on their tab, as LobbyLogic has them.
+			var wide = Game.Renderer.Resolution.Width >= 1280;
+			foreach (var tab in new[] { "SKIRMISH_TABS", "MULTIPLAYER_TABS" })
+				widget.Get(tab).Get("OPTIONS_TAB").IsVisible = () => !wide;
+
+			if (!wide)
+				return;
+
 			widget.Get("LOBBY_OPTIONS_BIN").IsVisible = () => true;
 			widget.Get("RESET_OPTIONS_BUTTON").IsVisible = () => true;
 		}

@@ -1,9 +1,10 @@
 # TGMC lobby options. Derived from OpenRA's mods/common/chrome/lobby-options.yaml (GPL-3.0).
 # One column (LobbyOptionsLogic fills as many columns as a row template has), drawn to the right of the map preview:
-# LobbyLogic loads this into TOP_PANELS_ROOT (743 wide), so X steps past it into MAP_PANEL. See tgmc/chrome/lobby.yaml.
+# LobbyLogic loads this into TOP_PANELS_ROOT (743 wide), so X steps past it into MAP_PANEL;
+# in a window narrower than 1280 it stays over the players, on its tab. See tgmc/chrome/lobby.yaml.
 
 Container@LOBBY_OPTIONS_BIN:
-	X: 982
+	X: 982 * (WINDOW_WIDTH >= 1280)
 	Y: 0 - 4
 	Width: 237
 	Height: 336

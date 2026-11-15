@@ -508,14 +508,17 @@ hotkey-description-tgmcselectidle = Select all idle combat units
 hotkey-description-tgmcselectwounded = Select all wounded or infected units
 hotkey-description-tgmcselectalloftype = Select every unit of the selected type, anywhere on the map
 
-menu-header = TERRAGOV MARINE CORPS // TACNET
-menu-title = MARINES VS XENOMORPHS
-menu-subtitle = > SYSTEM ONLINE
-menu-intel-head = INTEL
-menu-intel-1 = > Hive activity detected on LV-624.
-menu-intel-2 = > Armour: three plate tiers, bought in the Upgrades tab.
-menu-intel-3 = > Xeno hive powers: CURE, BURROWED, RAGE.
-menu-intel-4 = > Recommend: scout before engaging.
+menu-header = OPERATION
+menu-title = MARINES VS XENOS
+menu-subtitle = Hold the line or take the hive.
+menu-news-head = NEW IN THIS VERSION
+menu-news-1 = The Alamo lands and your squad walks out.
+menu-news-2 = Support powers in four tiles by family.
+menu-news-3 = Air and orbital strikes wear TGMC's own art.
+menu-card-singleplayer = Skirmish, waves, missions
+menu-card-multiplayer = Join or host a game
+menu-card-settings = Video, sound, keys
+menu-card-extras = Replays, music, credits
 
 support-droppod =
     .name = Drop Pod

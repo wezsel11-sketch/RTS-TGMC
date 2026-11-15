@@ -35,14 +35,14 @@ Container@INGAME_MENU:
 			Y: (WINDOW_HEIGHT - HEIGHT) / 2
 			Width: 200
 			Height: 120
-			Background: term-window
+			Background: tgui-window
 			Children:
 				Background@MENU_TITLE_BAR:
 					X: 0
 					Y: 0
 					Width: PARENT_WIDTH
 					Height: 52
-					Background: term-titlebar
+					Background: tgui-titlebar
 				Label@LABEL_TITLE:
 					X: (PARENT_WIDTH - WIDTH) / 2
 					Y: 20
@@ -59,4 +59,4 @@ Container@INGAME_MENU:
 					Height: 30
 					Font: Bold
 					TextColor: 7DFF9A
-					Background: term-tab
+					Background: sidebar-button

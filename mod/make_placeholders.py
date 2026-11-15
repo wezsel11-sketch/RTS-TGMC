@@ -104,6 +104,13 @@ def flat_ground(x, y):
     return GRASS, 0
 
 
+def shell_ground(x, y):
+    """The menu backdrop: a dirt landing pad where the Alamo sets down, and a track from it toward the hive."""
+    if (23 <= x <= 33 and 3 <= y <= 24) or (y in (26, 27) and 33 <= x <= 55):
+        return DIRT, 0
+    return flat_ground(x, y)
+
+
 def landing_zone_ground(x, y):
     """A two-cell river down the middle with three fords, and a dirt road linking the two bases."""
     if x in (19, 20):
@@ -1960,9 +1967,14 @@ def write_map(folder, title, size_w, size_h, placed, visibility, spawns, scripts
                             os.path.join(folder, f"{name}.lua"))
 
     xeno_bot_line = f"\t\tBot: {xeno_bot}\n" if xeno_bot else ""
+    # A bot written into the map has no lobby slot to give it a spawn point: FactionStart needs its home said here.
+    if faction_start and xeno_bot:
+        xeno_bot_line += f"\t\tHomeLocation: {spawns[1][0]},{spawns[1][1]}\n"
     # The lobby maps let each side pick its faction (marines, SOM or xenos); scenario maps keep them fixed.
     lock_faction = "False" if "Lobby" in visibility else "True"
     marine_bot_line = f"\t\tBot: {marine_bot}\n" if marine_bot else ""
+    if faction_start and marine_bot:
+        marine_bot_line += f"\t\tHomeLocation: {spawns[0][0]},{spawns[0][1]}\n"
     # A map needs one playable slot even when both sides are bots. This one has no units and never wins or loses.
     observer_block = ("\tPlayerReference@Observer:\n\t\tName: Observer\n\t\tPlayable: True\n\t\tNonCombatant: True\n"
                       "\t\tFaction: marines\n\t\tLockFaction: True\n") if marine_bot else ""
@@ -2205,7 +2217,11 @@ def main():
     if args.tgmc:
         write_tgmc_miner_art(args.out, args.tgmc)
     write_miner_upgrade_icons(args.out)
-    write_map(os.path.join(args.out, "maps", "test-field"), "TGMC test field", 24, 24, TEST_FIELD, "Lobby, Shellmap", [(10, 12), (14, 12)])
+    write_map(os.path.join(args.out, "maps", "test-field"), "TGMC test field", 24, 24, TEST_FIELD, "Lobby", [(10, 12), (14, 12)])
+    # The menu's backdrop: Landing Zone with a bot on each side, so the Alamo lands, the squad walks out and a fight follows.
+    write_map(os.path.join(args.out, "maps", "shell-landing"), "Landing (menu backdrop)", 56, 36, [], "Shellmap",
+              [(28, 26), (51, 7)], scripts=("shell-landing",), ground=shell_ground, faction_start=True,
+              marine_bot="skirmish", xeno_bot="skirmish")
     write_map(os.path.join(args.out, "maps", "landing-zone"), "Landing Zone", 40, 28, LANDING_ZONE, "Lobby", [(6, 14), (33, 13)],
               ground=landing_zone_ground, category="Conquest", faction_start=True)
     for name, (title, w, h, xeno_dx, dy, ground) in SKIRMISH_MAPS.items():

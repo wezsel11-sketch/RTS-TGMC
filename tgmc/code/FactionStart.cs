@@ -65,8 +65,9 @@ namespace OpenRA.Mods.TGMC.Traits
 
 		void IWorldLoaded.WorldLoaded(World w, OpenRA.Graphics.WorldRenderer wr)
 		{
-			var intro = w.Type == WorldType.Regular && Options.Enabled(w, Options.LandingIntro, true) && w.Map.Rules.Actors.ContainsKey(info.Transport);
-			foreach (var p in w.Players.Where(pl => pl.Playable && !pl.NonCombatant && pl.HomeLocation != CPos.Zero))
+			var intro = w.Type != WorldType.Editor && Options.Enabled(w, Options.LandingIntro, true) && w.Map.Rules.Actors.ContainsKey(info.Transport);
+			// A bot written into the map (the menu's backdrop) is not Playable; it counts when the map gives it a home.
+			foreach (var p in w.Players.Where(pl => !pl.NonCombatant && pl.HomeLocation != CPos.Zero))
 			{
 				var faction = p.Faction.InternalName;
 				var entries = faction switch

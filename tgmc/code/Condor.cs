@@ -288,9 +288,16 @@ namespace OpenRA.Mods.TGMC.Traits
 		void IEffect.Tick(World world)
 		{
 			ticks++;
+			// TGMC's order: the warning over the target at the call, then the cannon's shot and the whistle, timed to end on the blast.
+			if (!fired && ticks == Math.Max(1, info.FallDelay - info.IncomingLead))
+			{
+				Fx.Sound(world, target, info.PassSounds);
+				Fx.Sound(world, target, info.IncomingSounds);
+			}
+
 			if (!fired && ticks == 1)
 			{
-				Fx.Sound(world, target, info.IncomingSounds);
+				Fx.Sound(world, target, info.DropSounds);
 				// A box on the ground where the shells will fall (telegraph_96x96.dmi), blinking faster as they come.
 				GroundFx.Marker(world, target, "fx-telegraph", "box", info.FallDelay);
 			}

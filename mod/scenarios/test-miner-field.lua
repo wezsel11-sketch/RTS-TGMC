@@ -1,4 +1,4 @@
--- Scenario test: an engineer repairs an ore field (MinerField). Once it is back to full health it is the engineer's
+-- Scenario test: an engineer repairs an ore field (MinerField), by a forced attack: only the torch may fire, not its shotgun. Once it is back to full health it is the engineer's
 -- side's miner and the field is gone. Prints "TEST miner-field PASS" or "TEST miner-field FAIL".
 WorldLoaded = function()
 	local marines = Player.GetPlayer("Marines")

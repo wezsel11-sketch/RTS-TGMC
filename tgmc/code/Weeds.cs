@@ -3,6 +3,8 @@
 // the same licence as OpenRA, whose traits this file extends.
 #endregion
 
+using System.Collections.Generic;
+using System.Linq;
 using OpenRA.Effects;
 using OpenRA.Graphics;
 using OpenRA.Mods.Common;
@@ -29,6 +31,10 @@ namespace OpenRA.Mods.TGMC.Traits
 		[Desc("Random cells tried each time before the reach grows by one.")]
 		public readonly int Attempts = 6;
 
+		[Desc("While the actor's UpgradeFlag of this name is on (an upgrade), its weeds grow at FastInterval instead.")]
+		public readonly string FastFlag = "fast-weeds";
+		public readonly int FastInterval = 36;
+
 		public override object Create(ActorInitializer init) { return new SpreadWeeds(this); }
 	}
 
@@ -39,6 +45,7 @@ namespace OpenRA.Mods.TGMC.Traits
 		readonly SpreadWeedsInfo info;
 		int countdown;
 		int reach = 1;
+		UpgradeFlag fast;
 
 		public SpreadWeeds(SpreadWeedsInfo info)
 		{
@@ -73,7 +80,8 @@ namespace OpenRA.Mods.TGMC.Traits
 			if (--countdown > 0)
 				return;
 
-			countdown = info.Interval;
+			fast ??= UpgradeFlag.Find(self, info.FastFlag);
+			countdown = fast != null && !fast.IsTraitDisabled ? info.FastInterval : info.Interval;
 
 			var world = self.World;
 			var ai = world.Map.Rules.Actors[info.Actor];
@@ -245,5 +253,152 @@ namespace OpenRA.Mods.TGMC.Traits
 		}
 
 		void INotifyRemovedFromWorld.RemovedFromWorld(Actor self) { RefreshAround(self, self.Location); }
+	}
+	[Desc("Grants a condition while a weed (an actor named in Weeds, owned by an ally) lies on this actor's cell or beside it. " +
+		"A corrupted miner on weeds pays more, so marines starve it by burning the weeds off.")]
+	public class OnWeedsConditionInfo : TraitInfo
+	{
+		[GrantedConditionReference]
+		public readonly string Condition = "on-weeds";
+
+		[ActorReference]
+		public readonly HashSet<string> Weeds = ["weeds", "weed-node", "forward-hive", "resin-silo"];
+
+		[Desc("Ticks between looks.")]
+		public readonly int Interval = 25;
+
+		[Desc("Cells around the actor's own that count: 1 for a building (a neighbour cell), 0 for a unit (the cell it stands on).")]
+		public readonly int Radius = 1;
+
+		[Desc("Whose weeds count: Ally for the hive's own, Enemy for a marine wading through them.")]
+		public readonly PlayerRelationship Relationships = PlayerRelationship.Ally;
+
+		[Desc("Only weeds that are targetable as this type count (weeds are StickyWeeds once their owner has the sticky upgrade). Empty for any.")]
+		public readonly string RequiredTargetType = null;
+
+		public override object Create(ActorInitializer init) { return new OnWeedsCondition(this); }
+	}
+
+	public class OnWeedsCondition : ITick
+	{
+		readonly OnWeedsConditionInfo info;
+		int token = Actor.InvalidConditionToken;
+		int countdown;
+
+		public OnWeedsCondition(OnWeedsConditionInfo info) { this.info = info; }
+
+		void ITick.Tick(Actor self)
+		{
+			// The first look is spread over the interval by actor id, so a whole army does not look on the same tick.
+			if (countdown == 0)
+				countdown = 1 + (int)(self.ActorID % (uint)info.Interval);
+
+			if (--countdown > 0)
+				return;
+
+			countdown = info.Interval;
+			var influence = self.World.WorldActor.Trait<BuildingInfluence>();
+			var fed = false;
+			for (var dx = -info.Radius; dx <= info.Radius && !fed; dx++)
+				for (var dy = -info.Radius; dy <= info.Radius && !fed; dy++)
+					fed = influence.GetBuildingsAt(self.Location + new CVec(dx, dy))
+						.Any(a => a != self && !a.IsDead && info.Weeds.Contains(a.Info.Name)
+							&& info.Relationships.HasRelationship(self.Owner.RelationshipWith(a.Owner))
+							&& (info.RequiredTargetType == null || a.GetEnabledTargetTypes().Contains(info.RequiredTargetType)));
+
+			if (fed && token == Actor.InvalidConditionToken)
+				token = self.GrantCondition(info.Condition);
+			else if (!fed && token != Actor.InvalidConditionToken)
+				token = self.RevokeCondition(token);
+		}
+	}
+
+	[Desc("A weed node counts toward the hive's territory: with enough living nodes their owner has the prerequisites named in Tiers " +
+		"(node count, then prerequisite), which gate the big castes. Marines delay those castes by killing nodes.")]
+	public class WeedNodeTechInfo : TraitInfo, ITechTreePrerequisiteInfo
+	{
+		public readonly Dictionary<int, string> Tiers = new() { { 4, "hive-territory-1" }, { 8, "hive-territory-2" } };
+
+		IEnumerable<string> ITechTreePrerequisiteInfo.Prerequisites(ActorInfo info) { return Tiers.Values; }
+
+		public override object Create(ActorInitializer init) { return new WeedNodeTech(init.Self, this); }
+	}
+
+	public class WeedNodeTech : ITechTreePrerequisite
+	{
+		readonly Actor self;
+		readonly WeedNodeTechInfo info;
+
+		public WeedNodeTech(Actor self, WeedNodeTechInfo info)
+		{
+			this.self = self;
+			this.info = info;
+		}
+
+		public static int Count(Player owner)
+		{
+			return owner.World.ActorsHavingTrait<WeedNodeTech>().Count(a => a.Owner == owner && a.IsInWorld && !a.IsDead);
+		}
+
+		// The tech tree looks again whenever a node is added or removed (it watches every actor with this trait's info).
+		IEnumerable<string> ITechTreePrerequisite.ProvidesPrerequisites
+		{
+			get
+			{
+				var nodes = Count(self.Owner);
+				return info.Tiers.Where(t => nodes >= t.Key).Select(t => t.Value);
+			}
+		}
+	}
+	[Desc("Fire on the ground burns the weed carpet off its own cell: every Interval ticks the weeds there die. A living node " +
+		"grows them back; with the node dead the ground stays clear.")]
+	public class BurnsWeedsInfo : TraitInfo
+	{
+		[ActorReference]
+		public readonly HashSet<string> Weeds = ["weeds"];
+
+		public readonly int Interval = 25;
+
+		public override object Create(ActorInitializer init) { return new BurnsWeeds(this); }
+	}
+
+	public class BurnsWeeds : ITick
+	{
+		readonly BurnsWeedsInfo info;
+		int countdown;
+
+		public BurnsWeeds(BurnsWeedsInfo info) { this.info = info; }
+
+		void ITick.Tick(Actor self)
+		{
+			if (--countdown > 0)
+				return;
+
+			countdown = info.Interval;
+			var cell = self.World.Map.CellContaining(self.CenterPosition);
+			foreach (var weed in self.World.WorldActor.Trait<BuildingInfluence>().GetBuildingsAt(cell).ToList())
+				if (!weed.IsDead && info.Weeds.Contains(weed.Info.Name))
+					weed.Kill(self);
+		}
+	}
+	[Desc("A switch other traits read: enabled while its RequiresCondition holds (an upgrade's GrantConditionOnPrerequisite). " +
+		"Plasma looks for the flag \"veil\" and SpreadWeeds for \"fast-weeds\", so neither has to ask the tech tree on a timer.")]
+	public class UpgradeFlagInfo : ConditionalTraitInfo
+	{
+		[FieldLoader.Require]
+		public readonly string Flag = null;
+
+		public override object Create(ActorInitializer init) { return new UpgradeFlag(this); }
+	}
+
+	public class UpgradeFlag : ConditionalTrait<UpgradeFlagInfo>
+	{
+		public UpgradeFlag(UpgradeFlagInfo info)
+			: base(info) { }
+
+		public static UpgradeFlag Find(Actor self, string flag)
+		{
+			return self.TraitsImplementing<UpgradeFlag>().FirstOrDefault(f => f.Info.Flag == flag);
+		}
 	}
 }

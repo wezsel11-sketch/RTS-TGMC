@@ -229,6 +229,11 @@ DESTROYABLE = (
 )
 
 
+def smashable(path):
+    """Fences and windows: the heavy xeno castes walk through them and break them (Crushable, written by build_maptiles.py)."""
+    return path.startswith(("/obj/structure/fence", "/obj/structure/window")) and not path.startswith("/obj/structure/window_frame")
+
+
 def destroyable(path):
     """(hit points, blocks, cover) for an object that can be destroyed, or None."""
     if path.startswith("/obj/structure/window_frame"):

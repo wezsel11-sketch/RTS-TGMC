@@ -18,6 +18,9 @@ end
 
 WorldLoaded = function()
 	local own = Player.GetPlayer("Xenos")
+	-- The primordial abilities need their upgrades.
+	Actor.Create("upgrade-primordial-1", true, { Owner = own })
+	Actor.Create("upgrade-primordial-2", true, { Owner = own })
 	local foes = Player.GetPlayer("Marines").GetActorsByType("rifleman")
 	Utils.Do(foes, function(f) f.Stance = "HoldFire" end)
 	-- A hurt xeno for the heals to work on.
@@ -45,7 +48,8 @@ WorldLoaded = function()
 					local ok, used = pcall(UseSlot, unit, slot, foe, friend)
 					if ok and used ~= nil then
 						count = count + 1
-						if not used then bad[#bad + 1] = t .. ":" .. slot end
+						-- Organic Bomb needs a puppet, and the puppets (slot 1) come after it in this order: test-xeno-kit2.lua covers it.
+						if not used and not (t == "puppeteer" and slot == 5) then bad[#bad + 1] = t .. ":" .. slot end
 					end
 				end
 				if count == 0 then bad[#bad + 1] = t .. ":none" end

@@ -234,7 +234,17 @@ SOUNDS = {
     "door-open": ("sound/machines/airlock.ogg", "fx", 1.5),
     "door-close": ("sound/machines/door_close.ogg", "fx", 1.5),
     "smoke-bomb": (f"{EF}/smoke_bomb.ogg", "fx", 3.0),
-    "ob-incoming": (f"{EF}/OB_incoming.ogg", "fx", 4.0),
+    # The orbital cannon, in TGMC's order (orbital_cannon.dm): the alarm and the announcement, the cannon firing, the whistle, the blast
+    "ob-incoming": (f"{EF}/OB_incoming.ogg", "fx", 5.1),
+    "ob-alarm": (f"{EF}/obalarm.ogg", "ui", 8.2),
+    "ob-announce": (f"{EF}/OB_warning_announce.ogg", "speech", 10.0),
+    "ob-fire": (f"{EF}/obfire.ogg", "fx", 8.9),
+    "ob-blast": (f"{EF}/explosion/large2.ogg", "fx", 6.0),
+    # The SOM blink drive (blink_drive.dm)
+    "blink-drive": ("sound/effects/EMPulse.ogg", "fx", 1.5),
+    # The rail gun's two firing sounds (ship_rail_gun)
+    "railgun-fire-1": (f"{G}/tank_smokelauncher.ogg", "fx"),
+    "railgun-fire-2": (f"{G}/pred_plasma_shot.ogg", "fx"),
     # Shells and rockets in flight, and the big guns that fire them
     "mortar-whistle": (f"{M}/mortar_whistle.ogg", "fx", 3.0),
     "mortar-travel": (f"{M}/mortar_travel.ogg", "fx", 3.0),
@@ -334,7 +344,22 @@ for _clip, _numbers in MARINE_CLIPS.items():
             SOUNDS[f"marine-{_tag}-{_clip}-{_n}"] = (f"{V}/human/{_dir}/{_clip}_{_n}.ogg", "voice")
 for _tag, _dir in (("m", "male"), ("f", "female")):
     SOUNDS[f"marine-{_tag}-medic-1"] = (f"{V}/human/{_dir}/medic.ogg", "voice")
+    # Selected or sent somewhere: a burst of radio static, not a shout (TGMC's marines have no spoken acknowledgements).
+    # The same clip under both prefixes, because a voice set's prefix goes before every clip name.
+    SOUNDS[f"marine-{_tag}-radio"] = (f"{EF}/radiostatic.ogg", "voice", 0.5)
+    for _n in (1, 2):
+        SOUNDS[f"marine-{_tag}-facehugged-{_n}"] = (f"{V}/human/{_dir}/facehugged{_n}.ogg", "voice")
+# The synthetic: TGMC's robot voice.
+SOUNDS["synth-yes"] = ("sound/machines/synth/synth_yes.ogg", "voice")
+for _clip in ("warcry", "pain", "scream"):
+    for _n in (1, 2, 3):
+        SOUNDS[f"robot-{_clip}-{_n}"] = (f"{V}/robot/robot_{_clip}{_n}.ogg", "voice")
 
+
+# Round-end stings (TGMC's own), played once by tgmc/scripts/music.lua when the local player wins or loses.
+for _n in (1, 2):
+    SOUNDS[f"sting-win-{_n}"] = (f"sound/theme/winning_triumph{_n}.ogg", "music")
+    SOUNDS[f"sting-loss-{_n}"] = (f"sound/theme/sad_loss{_n}.ogg", "music")
 
 OPEN_MUSIC = {
     "score-intrepid": "Intrepid",

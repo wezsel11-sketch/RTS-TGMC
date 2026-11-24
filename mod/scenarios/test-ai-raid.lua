@@ -78,7 +78,10 @@ WorldLoaded = function()
 			end
 		elseif RaidCase == "rich" then
 			local m = marines.GetActorsByType("miner")[1]
-			if m.Health * 100 <= m.MaxHealth * 30 then
+			-- A miner knocked to its floor is a free field again (MinerField), so no miner left is the raid's success too.
+			if m == nil then
+				report(true, "miner knocked back to a free field by tick " .. ticks)
+			elseif m.Health * 100 <= m.MaxHealth * 30 then
 				report(true, "miner brought down by tick " .. ticks)
 			elseif ticks >= 2500 then
 				report(false, "miner at " .. m.Health .. " of " .. m.MaxHealth .. " at tick 2500")

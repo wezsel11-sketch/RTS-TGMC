@@ -249,3 +249,218 @@ upgrade-hive-speed:
 		Name: actor-upgrade-hive-speed.name
 	Valued:
 		Cost: 400
+
+# Second wave (2026-11): gun attachments and field works for the marines, weeds and resin for the hive. Each is a number change
+# switched on by GrantConditionOnPrerequisite on the units and structures named in its description.
+upgrade-attach-barrel:
+	Inherits: ^Upgrade
+	Buildable:
+		Prerequisites: armory, ~faction-marines
+		BuildPaletteOrder: 30
+		Description: actor-upgrade-attach-barrel.description
+	Tooltip:
+		Name: actor-upgrade-attach-barrel.name
+	Valued:
+		Cost: 400
+
+upgrade-attach-bayonet:
+	Inherits: ^Upgrade
+	Buildable:
+		Prerequisites: armory, ~faction-marines
+		BuildPaletteOrder: 31
+		Description: actor-upgrade-attach-bayonet.description
+	Tooltip:
+		Name: actor-upgrade-attach-bayonet.name
+	Valued:
+		Cost: 300
+
+upgrade-attach-harness:
+	Inherits: ^Upgrade
+	Buildable:
+		Prerequisites: ordnance-depot, ~faction-marines
+		BuildPaletteOrder: 32
+		Description: actor-upgrade-attach-harness.description
+	Tooltip:
+		Name: actor-upgrade-attach-harness.name
+	Valued:
+		Cost: 500
+
+upgrade-attach-scope:
+	Inherits: ^Upgrade
+	Buildable:
+		Prerequisites: armory, ~faction-marines
+		BuildPaletteOrder: 33
+		Description: actor-upgrade-attach-scope.description
+	Tooltip:
+		Name: actor-upgrade-attach-scope.name
+	Valued:
+		Cost: 400
+
+upgrade-plasteel-cades:
+	Inherits: ^Upgrade
+	Buildable:
+		Prerequisites: workshop, ~faction-marines
+		BuildPaletteOrder: 34
+		Description: actor-upgrade-plasteel-cades.description
+	Tooltip:
+		Name: actor-upgrade-plasteel-cades.name
+	Valued:
+		Cost: 400
+
+upgrade-sentry:
+	Inherits: ^Upgrade
+	Buildable:
+		Prerequisites: ordnance-depot, ~faction-marines
+		BuildPaletteOrder: 35
+		Description: actor-upgrade-sentry.description
+	Tooltip:
+		Name: actor-upgrade-sentry.name
+	Valued:
+		Cost: 500
+
+upgrade-thick-weeds:
+	Inherits: ^Upgrade
+	Buildable:
+		Prerequisites: evolution-tower, ~faction-xenos
+		BuildPaletteOrder: 40
+		Description: actor-upgrade-thick-weeds.description
+	Tooltip:
+		Name: actor-upgrade-thick-weeds.name
+	Valued:
+		Cost: 300
+
+upgrade-sticky-weeds:
+	Inherits: ^Upgrade
+	Buildable:
+		Prerequisites: maturity-tower, ~faction-xenos
+		BuildPaletteOrder: 41
+		Description: actor-upgrade-sticky-weeds.description
+	Tooltip:
+		Name: actor-upgrade-sticky-weeds.name
+	Valued:
+		Cost: 500
+
+upgrade-fast-weeds:
+	Inherits: ^Upgrade
+	Buildable:
+		Prerequisites: evolution-tower, ~faction-xenos
+		BuildPaletteOrder: 42
+		Description: actor-upgrade-fast-weeds.description
+	Tooltip:
+		Name: actor-upgrade-fast-weeds.name
+	Valued:
+		Cost: 300
+
+upgrade-hardened-resin:
+	Inherits: ^Upgrade
+	Buildable:
+		Prerequisites: evolution-tower, ~faction-xenos
+		BuildPaletteOrder: 43
+		Description: actor-upgrade-hardened-resin.description
+	Tooltip:
+		Name: actor-upgrade-hardened-resin.name
+	Valued:
+		Cost: 400
+
+upgrade-turret-reach:
+	Inherits: ^Upgrade
+	Buildable:
+		Prerequisites: maturity-tower, ~faction-xenos
+		BuildPaletteOrder: 44
+		Description: actor-upgrade-turret-reach.description
+	Tooltip:
+		Name: actor-upgrade-turret-reach.name
+	Valued:
+		Cost: 400
+
+# The SOM line: charger cells, the longer blink, shield modules.
+
+upgrade-som-cells:
+	Inherits: ^Upgrade
+	Buildable:
+		Prerequisites: armory, ~faction-som
+		BuildPaletteOrder: 50
+		Description: actor-upgrade-som-cells.description
+	Tooltip:
+		Name: actor-upgrade-som-cells.name
+	Valued:
+		Cost: 400
+
+upgrade-som-blink:
+	Inherits: ^Upgrade
+	Buildable:
+		Prerequisites: armory, ~faction-som
+		BuildPaletteOrder: 51
+		Description: actor-upgrade-som-blink.description
+	Tooltip:
+		Name: actor-upgrade-som-blink.name
+	Valued:
+		Cost: 300
+
+upgrade-som-shield:
+	Inherits: ^Upgrade
+	Buildable:
+		Prerequisites: ordnance-depot, ~faction-som
+		BuildPaletteOrder: 52
+		Description: actor-upgrade-som-shield.description
+	Tooltip:
+		Name: actor-upgrade-som-shield.name
+	Valued:
+		Cost: 600
+
+# Mutations (TGMC's shell, spur and veil lines, as hive-wide number changes) and the primordial abilities. All need territory.
+
+upgrade-mutation-shell:
+	Inherits: ^Upgrade
+	Buildable:
+		Prerequisites: evolution-tower, hive-territory-1, ~faction-xenos
+		BuildPaletteOrder: 45
+		Description: actor-upgrade-mutation-shell.description
+	Tooltip:
+		Name: actor-upgrade-mutation-shell.name
+	Valued:
+		Cost: 500
+
+upgrade-mutation-spur:
+	Inherits: ^Upgrade
+	Buildable:
+		Prerequisites: evolution-tower, hive-territory-1, ~faction-xenos
+		BuildPaletteOrder: 46
+		Description: actor-upgrade-mutation-spur.description
+	Tooltip:
+		Name: actor-upgrade-mutation-spur.name
+	Valued:
+		Cost: 500
+
+upgrade-mutation-veil:
+	Inherits: ^Upgrade
+	Buildable:
+		Prerequisites: maturity-tower, hive-territory-1, ~faction-xenos
+		BuildPaletteOrder: 47
+		Description: actor-upgrade-mutation-veil.description
+	Tooltip:
+		Name: actor-upgrade-mutation-veil.name
+	Valued:
+		Cost: 500
+
+upgrade-primordial-1:
+	Inherits: ^Upgrade
+	Buildable:
+		Prerequisites: maturity-tower, hive-territory-1, ~faction-xenos
+		BuildPaletteOrder: 48
+		Description: actor-upgrade-primordial-1.description
+	Tooltip:
+		Name: actor-upgrade-primordial-1.name
+	Valued:
+		Cost: 700
+
+upgrade-primordial-2:
+	Inherits: ^Upgrade
+	Buildable:
+		Prerequisites: upgrade-primordial-1, hive-territory-2, ~faction-xenos
+		BuildPaletteOrder: 49
+		Description: actor-upgrade-primordial-2.description
+	Tooltip:
+		Name: actor-upgrade-primordial-2.name
+	Valued:
+		Cost: 1000

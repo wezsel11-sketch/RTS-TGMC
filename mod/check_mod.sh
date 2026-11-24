@@ -29,6 +29,24 @@ for block in re.split(r"^(?=\S)", open(root + "/audio/voices.yaml").read(), flag
 sys.exit(bad and 1)
 EOF
 
+# Every explosion damages walls: a weapon with an ExplosiveDamage warhead must carry (or inherit) a DamageWalls one.
+python3 -I - "$ROOT/tgmc" <<'EOF'
+import re, sys
+weapons = {}
+for name in ("weapons.yaml", "kit-weapons.yaml"):
+    for block in re.split(r"^(?=\S)", open(sys.argv[1] + "/rules/" + name).read(), flags=re.M):
+        m = re.match(r"([\w^-]+):", block)
+        if m:
+            weapons[m.group(1)] = (re.findall(r"^\tInherits(?:@\w+)?: (\S+)", block, re.M), set(re.findall(r"^\tWarhead@?\w*: (\w+)", block, re.M)) | ({"DamageWalls"} if "\n\t-Warhead@5Walls:" in block else set()))
+def warheads(name):
+    parents, own = weapons.get(name, ((), set()))
+    return own.union(*(warheads(p) for p in parents))
+bad = [w for w in weapons if "ExplosiveDamage" in warheads(w) and "DamageWalls" not in warheads(w)]
+for w in bad:
+    print(f"{w}: an ExplosiveDamage warhead and no DamageWalls (a flare or smoke says so with -Warhead@5Walls:)")
+sys.exit(1 if bad else 0)
+EOF
+
 cd "$OPENRA_DIR"
 sh utility.sh tgmc --check-yaml
 sh utility.sh tgmc --check-missing-sprites

@@ -50,7 +50,7 @@ Player:
 		Factions: xenos
 	UnitBuilderBotModule@skirmish:
 		RequiresCondition: enable-skirmish-ai
-		UnitQueues: Infantry, Xeno
+		UnitQueues: Infantry, Vehicle, Xeno
 		ProductionMinCashRequirement: 60
 		UnitsToBuild:
 			rifleman: 70
@@ -58,19 +58,16 @@ Player:
 			som_corpsman: 15
 			som_engineer: 15
 			som_veteran: 25
+			som_pointman: 12
+			som_breacher: 10
+			som_caliver: 15
 			som_squad_leader: 8
-			som_field_commander: 4
-			som_smartgunner: 25
 			som_flamer: 18
-			som_grenadier: 20
 			som_machinegunner: 15
 			som_blademan: 12
 			som_scout: 15
-			som_mortarman: 10
 			som_heavygunner: 10
 			som_rocketeer: 12
-			som_demolitionist: 8
-			som_assault: 10
 			som_mech: 6
 			medic: 15
 			engineer: 15
@@ -80,15 +77,10 @@ Player:
 			synth: 8
 			smartgunner: 25
 			grenadier: 20
-			skirmisher: 12
 			sniper: 15
 			rocketeer: 12
-			blademan: 12
-			mortarman: 10
 			flamer: 18
 			machinegunner: 15
-			heavygunner: 10
-			demolitionist: 8
 			mech: 6
 			tank: 4
 			som-tank: 4
@@ -111,16 +103,11 @@ Player:
 			wraith: 8
 			bull: 8
 			behemoth: 4
-			nymph: 15
-			mantis: 15
-			baneling: 12
 			defender: 12
-			beetle: 10
 			gorger: 10
 			hivelord: 4
 			puppeteer: 8
 			pyrogen: 10
-			scorpion: 12
 			dragon: 3
 			king: 3
 			queen: 30
@@ -136,6 +123,11 @@ Player:
 	FieldWorkerBotModule@marines:
 		RequiresCondition: enable-skirmish-ai && !faction-xenos
 		Workers: engineer, som_engineer
+	# Xeno bot: drones claim fields too (they corrupt them), and the weed module keeps two of them for it.
+	FieldWorkerBotModule@xenos:
+		RequiresCondition: enable-skirmish-ai && faction-xenos
+		Workers: drone
+		Wanted: 4
 	# Marine and xeno bots: buy upgrades from the Upgrades tab, the marines their guns and the xenos their carapace, claws and speed (see UpgradeBotModule
 	# in tgmc/code/Bots/), once they field ten fighting units: an upgrade is paid ahead of the units and would stop the army growing. Easy bots stay on their starting kit.
 	UpgradeBotModule@skirmish:
@@ -167,7 +159,6 @@ Player:
 		# balance-aivai; at 8 it won 42% (30 runs each, 2026-11-07).
 		# Marines fight with cades and sentries: they are built often and up to a good number, so the miners and the bases get guarded.
 		BuildingFractions:
-			miner: 25
 			weed-node: 25
 			vendor: 20
 			cryo-pod: 6
@@ -187,7 +178,6 @@ Player:
 			egg: 10
 			cade: 25
 		BuildingLimits:
-			miner: 6
 			weed-node: 24
 			vendor: 8
 			cryo-pod: 4
@@ -676,29 +666,29 @@ Player:
 		Counters:
 			swarm:
 				Enemies: runner, hunter, facehugger, larva, sentinel, warrior
-				Units: flamer, machinegunner, grenadier, smartgunner, skirmisher
+				Units: flamer, machinegunner, grenadier, smartgunner
 				Bonus: 150
 			heavy:
 				Enemies: crusher, praetorian, behemoth, bull, ravager
-				Units: rocketeer, demolitionist, heavygunner, mortarman
+				Units: rocketeer
 				Bonus: 150
 			ranged:
 				Enemies: spitter, boiler, defiler, widow, warlock, shrike, wraith, carrier
-				Units: sniper, rifleman, blademan, mech
+				Units: sniper, rifleman, mech
 				Bonus: 120
 	CounterPickBotModule@xenos:
 		RequiresCondition: enable-skirmish-ai && !enable-easy-ai && faction-xenos
 		Counters:
 			infantry:
-				Enemies: rifleman, smartgunner, medic, engineer, blademan, flamer
+				Enemies: rifleman, smartgunner, medic, engineer, flamer
 				Units: runner, hunter, warrior, ravager, facehugger
 				Bonus: 150
 			heavy:
-				Enemies: mech, heavygunner, demolitionist, rocketeer, grenadier
+				Enemies: mech, rocketeer, grenadier
 				Units: crusher, behemoth, bull, boiler, defiler
 				Bonus: 150
 			guns:
-				Enemies: sniper, machinegunner, mortarman, sentry-turret, mortar-emplacement, artillery-emplacement
+				Enemies: sniper, machinegunner, sentry-turret, mortar-emplacement, artillery-emplacement
 				Units: runner, hunter, shrike, widow, wraith
 				Bonus: 120
 	# Xeno units evolve when there is cash to spare. The workers, larvae and the queen stay as they are.
@@ -729,11 +719,25 @@ Player:
 	# Xeno bot: idle attackers go for the marines' miners. Dormant fields are left alone until a marine repairs them (see FieldBotModule in tgmc/code/Bots/).
 	FieldBotModule@xenos:
 		RequiresCondition: enable-skirmish-ai && faction-xenos
-		Attackers: runner, hunter, sentinel, warrior, mantis, nymph
+		Attackers: runner, hunter, sentinel, warrior
 		Target: miner
 		# Raiding the miners at once sends the starting pack at turrets and rifles, and it never comes back: wait until there is a pack to send.
 		MinTick: 3000
 		EnemyOnly: true
+	# Xeno bot: idle drones go to the free ore fields and corrupt them, for the biomass (the drone's resin is its ForceAttack on a field).
+	FieldBotModule@xenos-corrupt:
+		RequiresCondition: enable-skirmish-ai && faction-xenos
+		Attackers: drone
+		Order: ForceAttack
+		AvoidNear: cryo-pod
+	# Marine bot: idle fighters go and knock down the xenos' corrupted miners, which frees the field for an engineer.
+	FieldBotModule@marines-retake:
+		RequiresCondition: enable-skirmish-ai && !faction-xenos
+		Attackers: rifleman, smartgunner, grenadier, som_trooper, som_veteran
+		Target: corrupted-miner
+		EnemyOnly: true
+		Order: AttackMove
+		MinTick: 3000
 	# Marine bot: every miner gets sentry turrets beside it (see FieldDefenseBotModule in tgmc/code/Bots/).
 	FieldDefenseBotModule@marines:
 		RequiresCondition: enable-skirmish-ai && !faction-xenos
@@ -749,34 +753,34 @@ Player:
 	DefendBotModule@marines:
 		RequiresCondition: enable-skirmish-ai && !faction-xenos && !enable-turtle-ai
 		Protect: miner, sentry-turret, cade, mortar-emplacement, artillery-emplacement
-		Defenders: rifleman, smartgunner, machinegunner, grenadier, flamer, som_machinegunner, blademan, som_blademan
+		Defenders: rifleman, smartgunner, machinegunner, grenadier, flamer, som_machinegunner, som_blademan
 		BaseTypes: cryo-pod
 	DefendBotModule@marines-turtle:
 		RequiresCondition: enable-skirmish-ai && !faction-xenos && enable-turtle-ai
 		Protect: miner, sentry-turret, cade, mortar-emplacement, artillery-emplacement
-		Defenders: rifleman, smartgunner, machinegunner, grenadier, flamer, som_machinegunner, blademan, som_blademan
+		Defenders: rifleman, smartgunner, machinegunner, grenadier, flamer, som_machinegunner, som_blademan
 		BaseTypes: cryo-pod
 		OvermatchPercent: 250
 	DefendBotModule@xenos:
 		RequiresCondition: enable-skirmish-ai && faction-xenos && !enable-turtle-ai
 		Protect: mini-silo, weed-node, resin-turret, forward-hive
-		Defenders: runner, hunter, sentinel, warrior, spitter, defender, praetorian, ravager, crusher, beetle, gorger, scorpion, pyrogen, mantis
+		Defenders: runner, hunter, sentinel, warrior, spitter, defender, praetorian, ravager, crusher, gorger, pyrogen
 		BaseTypes: resin-silo
 	DefendBotModule@xenos-turtle:
 		RequiresCondition: enable-skirmish-ai && faction-xenos && enable-turtle-ai
 		Protect: mini-silo, weed-node, resin-turret, forward-hive
-		Defenders: runner, hunter, sentinel, warrior, spitter, defender, praetorian, ravager, crusher, beetle, gorger, scorpion, pyrogen, mantis
+		Defenders: runner, hunter, sentinel, warrior, spitter, defender, praetorian, ravager, crusher, gorger, pyrogen
 		BaseTypes: resin-silo
 		OvermatchPercent: 250
 	# Both bots send a few fast units at the enemy's least defended outpost, round known defences, and turn back when outmatched (see RaidBotModule in tgmc/code/Bots/).
 	RaidBotModule@marines:
 		RequiresCondition: enable-skirmish-ai && !faction-xenos && !enable-turtle-ai && !enable-raider-ai
-		Raiders: rifleman, blademan, som_blademan
+		Raiders: rifleman, som_blademan
 		Targets: mini-silo, weed-node, forward-hive
 		BaseTypes: cryo-pod
 	RaidBotModule@marines-raider:
 		RequiresCondition: enable-skirmish-ai && !faction-xenos && enable-raider-ai
-		Raiders: rifleman, blademan, som_blademan
+		Raiders: rifleman, som_blademan
 		Targets: mini-silo, weed-node, forward-hive
 		BaseTypes: cryo-pod
 		Interval: 25
@@ -784,12 +788,12 @@ Player:
 		MaxThreatPercent: 100
 	RaidBotModule@xenos:
 		RequiresCondition: enable-skirmish-ai && faction-xenos && !enable-turtle-ai && !enable-raider-ai
-		Raiders: runner, hunter, mantis
+		Raiders: runner, hunter
 		Targets: miner, engineer
 		BaseTypes: resin-silo
 	RaidBotModule@xenos-raider:
 		RequiresCondition: enable-skirmish-ai && faction-xenos && enable-raider-ai
-		Raiders: runner, hunter, mantis
+		Raiders: runner, hunter
 		Targets: miner, engineer
 		BaseTypes: resin-silo
 		Interval: 25
@@ -806,13 +810,14 @@ Player:
 	FieldBotModule@marines:
 		RequiresCondition: enable-skirmish-ai && !faction-xenos
 		Attackers: engineer, som_engineer
-		Order: ForceAttack
+		# Not ForceAttack: that fires the engineer's shotgun at the field as well as the torch, and the repair crawls.
+		Order: Attack
 		# A field beside the hive is lost to the first raid: leave it.
 		AvoidNear: resin-silo, forward-hive
 	# Marine bot: weed nodes can only be force-fired, so no squad ever picks one, yet they must fall for a win. Idle marines go and bash them with their rifle butts.
 	FieldBotModule@sweep:
 		RequiresCondition: enable-skirmish-ai && !faction-xenos
-		Attackers: rifleman, smartgunner, grenadier, blademan, som_blademan
+		Attackers: rifleman, smartgunner, grenadier, som_blademan
 		Target: weed-node
 		EnemyOnly: true
 		Order: AttackMove
@@ -822,6 +827,9 @@ Player:
 		RequiresCondition: enable-skirmish-ai && faction-xenos
 		Drones: drone
 		Weeds: weeds, weed-node, forward-hive, resin-silo
+		# Two idle drones stay home while a free field is left: the field module sends them to corrupt it (without this every drone went
+		# out to the weed edge and the hive held 0 or 1 fields on the big maps, against the marines' 3 to 7).
+		Spare: 2
 	# The xeno AI uses its caste abilities: attacks when marines are close, heals and cries when its xenos are hurt or gathered.
 	AbilityBotModule@xenos:
 		RequiresCondition: enable-skirmish-ai && !enable-easy-ai && faction-xenos

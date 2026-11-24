@@ -2,7 +2,7 @@
 
 Nothing here is TGMC art. It writes:
   tgmc.pal                      a flat grey 256-colour palette (OpenRA needs one for its palette setup)
-  cursor.png                    a plain arrow for the default cursor
+  cursor.png                    the cursors: arrow, move, blocked, attack, heal, repair, ability, enter
   shroud.png, fog.png           14 edge tiles each for unexplored and out-of-sight cells; shroudfull.png and fogfull.png
   rally-flag.png, rally-circles.png  the rally point marker: a waving flag and pulsing ground rings
   clock.png                     production-icon clock overlay frames (62x46, a dark wedge that sweeps away)
@@ -274,14 +274,72 @@ def write_palette(path):
         f.write(bytes(c for rgb in palette_entries() for c in rgb))
 
 
+# The cursor sheet's frames, in order (tgmc/cursors.yaml names them by Start). The arrow's tip is its hot spot; the others point with their centre.
+CURSOR_FRAMES = ("default", "move", "blocked", "attack", "attack-far", "heal", "repair", "ability", "enter")
+
+
 def write_cursor(path):
-    """A plain arrow, drawn here so the mod has a cursor without any TGMC art."""
-    img = Image.new("RGBA", (16, 16), (0, 0, 0, 0))
-    px = img.load()
-    for y in range(12):
-        for x in range(min(y + 1, 8)):
-            px[x, y] = (255, 255, 255, 255) if x == 0 or x == y or y == 11 else (0, 0, 0, 255)
-    img.save(path)
+    """The cursors, drawn here so the mod has them without any TGMC art: one 24 px frame for each name in CURSOR_FRAMES, so the
+    player sees what a click will do. default: a white arrow. move: green chevrons. blocked: a barred circle. attack: a red
+    crosshair (orange when the target is out of range, purple for an ability). heal: a green cross. repair: a yellow wrench.
+    enter: a blue arrow into a bracket. A heal or repair target out of reach keeps its own picture: the unit walks there and does it."""
+    size, c = 24, 12
+    sheet = Image.new("RGBA", (size * len(CURSOR_FRAMES), size), (0, 0, 0, 0))
+
+    def frame(draw_it):
+        # Drawn twice: a black copy one pixel wider underneath, so the cursor reads on any ground.
+        im = Image.new("RGBA", (size, size), (0, 0, 0, 0))
+        draw_it(ImageDraw.Draw(im), None, 3)
+        draw_it(ImageDraw.Draw(im), True, 1)
+        return im
+
+    def cross(colour):
+        def f(d, top, w):
+            col = colour if top else (0, 0, 0, 255)
+            d.ellipse([c - 7, c - 7, c + 7, c + 7], outline=col, width=w)
+            for a, b in (((c, 1), (c, 8)), ((c, 15), (c, 22)), ((1, c), (8, c)), ((15, c), (22, c))):
+                d.line([a, b], fill=col, width=w)
+        return f
+
+    def arrow(d, top, w):
+        pts = [(1, 1), (1, 16), (5, 12), (8, 19), (11, 18), (8, 11), (13, 11)]
+        d.polygon(pts, fill=(255, 255, 255, 255) if top else (0, 0, 0, 255), outline=(0, 0, 0, 255))
+
+    def move(d, top, w):
+        col = (90, 230, 110, 255) if top else (0, 0, 0, 255)
+        for dy in (0, 7):
+            d.line([(c - 7, 5 + dy), (c, 12 + dy), (c + 7, 5 + dy)], fill=col, width=w + 1)
+
+    def blocked(d, top, w):
+        col = (230, 70, 60, 255) if top else (0, 0, 0, 255)
+        d.ellipse([c - 8, c - 8, c + 8, c + 8], outline=col, width=w + 1)
+        d.line([(c - 5, c + 5), (c + 5, c - 5)], fill=col, width=w + 1)
+
+    def heal(d, top, w):
+        col = (90, 230, 110, 255) if top else (0, 0, 0, 255)
+        g = 0 if top else 1
+        d.rectangle([c - 3 - g, c - 9 - g, c + 3 + g, c + 9 + g], fill=col)
+        d.rectangle([c - 9 - g, c - 3 - g, c + 9 + g, c + 3 + g], fill=col)
+
+    def repair(d, top, w):
+        col = (250, 205, 60, 255) if top else (0, 0, 0, 255)
+        d.line([(6, 18), (15, 9)], fill=col, width=w + 2)
+        d.arc([11, 2, 21, 12], start=20, end=250, fill=col, width=w + 2)
+
+    def enter(d, top, w):
+        col = (90, 170, 250, 255) if top else (0, 0, 0, 255)
+        d.line([(c, 2), (c, 14)], fill=col, width=w + 1)
+        d.line([(c - 5, 9), (c, 14), (c + 5, 9)], fill=col, width=w + 1)
+        d.line([(4, 15), (4, 21), (20, 21), (20, 15)], fill=col, width=w + 1)
+
+    drawers = {"default": arrow, "move": move, "blocked": blocked, "attack": cross((240, 60, 50, 255)), "attack-far": cross((250, 160, 50, 255)),
+               "heal": heal, "repair": repair, "ability": cross((190, 110, 250, 255)), "enter": enter}
+    for i, name in enumerate(CURSOR_FRAMES):
+        sheet.paste(frame(drawers[name]), (size * i, 0))
+    meta = PngImagePlugin.PngInfo()
+    meta.add_text("FrameSize", f"{size},{size}")
+    meta.add_text("FrameAmount", str(len(CURSOR_FRAMES)))
+    sheet.save(path, pnginfo=meta)
 
 
 def write_shroud_tiles(out, tile=32):
@@ -539,6 +597,47 @@ def write_overlay(out):
     img.save(os.path.join(out, "overlay.png"), pnginfo=meta)
 
 
+def write_ability_props(out):
+    """The wraith's portal (4 frames of a violet ring that swells and shrinks) and the behemoth's rock pillar, both 32x32 and
+    drawn here, not cut from TGMC."""
+    frames = 4
+    img = Image.new("RGBA", (32 * frames, 32), (0, 0, 0, 0))
+    for i in range(frames):
+        layer = Image.new("RGBA", (32, 32), (0, 0, 0, 0))
+        d = ImageDraw.Draw(layer)
+        r = 11 + (i if i < 3 else 1)
+        d.ellipse([16 - r // 2 - 2, 16 - r, 16 + r // 2 + 2, 16 + r], fill=(40, 10, 70, 190), outline=(200, 120, 255, 255), width=2)
+        d.ellipse([16 - r // 4, 16 - r // 2, 16 + r // 4, 16 + r // 2], fill=(150, 80, 230, 150))
+        img.paste(layer, (32 * i, 0))
+    meta = PngImagePlugin.PngInfo()
+    meta.add_text("FrameSize", "32,32")
+    meta.add_text("FrameAmount", str(frames))
+    img.save(os.path.join(out, "wraith-portal.png"), pnginfo=meta)
+    rock = Image.new("RGBA", (32, 32), (0, 0, 0, 0))
+    d = ImageDraw.Draw(rock)
+    d.polygon([(8, 30), (5, 14), (11, 3), (20, 2), (27, 12), (25, 30)], fill=(104, 96, 88, 255), outline=(50, 46, 42, 255))
+    d.polygon([(11, 3), (20, 2), (17, 16), (9, 15)], fill=(140, 132, 122, 255))
+    d.line([(17, 16), (19, 30)], fill=(60, 56, 52, 255))
+    rock.save(os.path.join(out, "earth-pillar.png"))
+    # Resin strands that hang over a corrupted miner (32x48, the miner's own size): dark purple ropes with pale knots.
+    strands = Image.new("RGBA", (32, 48), (0, 0, 0, 0))
+    d = ImageDraw.Draw(strands)
+    for x0, y0, x1, y1 in ((3, 44, 14, 12), (29, 44, 18, 10), (8, 46, 24, 22), (24, 46, 9, 26), (2, 30, 30, 34)):
+        d.line([(x0, y0), (x1, y1)], fill=(58, 24, 78, 230), width=3)
+        d.line([(x0, y0), (x1, y1)], fill=(140, 80, 170, 255), width=1)
+    for x, y in ((14, 12), (18, 10), (16, 34), (9, 26), (24, 22)):
+        d.ellipse([x - 2, y - 2, x + 2, y + 2], fill=(190, 140, 215, 255), outline=(58, 24, 78, 255))
+    strands.save(os.path.join(out, "resin-strands.png"))
+    # The mound a burrowed widow leaves: a low heap of dug earth.
+    mound = Image.new("RGBA", (32, 32), (0, 0, 0, 0))
+    d = ImageDraw.Draw(mound)
+    d.ellipse([3, 14, 29, 30], fill=(88, 66, 44, 255), outline=(48, 36, 24, 255))
+    d.ellipse([9, 17, 23, 26], fill=(40, 28, 18, 255))
+    for x, y in ((6, 20), (25, 22), (12, 15), (20, 16), (15, 28)):
+        d.point((x, y), fill=(140, 110, 80, 255))
+    mound.save(os.path.join(out, "burrow-mound.png"))
+
+
 def write_acid_pool(out):
     """The puddle a dead xeno leaves: 4 frames of a green blob that swells and shrinks, 32x32 (made here, not from TGMC)."""
     frames = 4
@@ -716,6 +815,62 @@ def write_miner_upgrade_icons(out):
     shield.save(os.path.join(out, "upgrade-miner-housing.png"))
 
 
+# upgrade actor -> (whose icon it borrows from build_sprites' sprites/<name>-icon.png, badge text, badge colour)
+BADGE_UPGRADES = {
+    "upgrade-mutation-shell": ("defender", "SHL", (84, 140, 214)),
+    "upgrade-mutation-spur": ("ravager", "SPR", (255, 90, 90)),
+    "upgrade-mutation-veil": ("warlock", "VEL", (200, 120, 255)),
+    "upgrade-primordial-1": ("hunter", "P1", (255, 206, 64)),
+    "upgrade-primordial-2": ("king", "P2", (255, 206, 64)),
+    "upgrade-som-cells": ("som_trooper", "+20", (255, 122, 24)),
+    "upgrade-som-blink": ("som_blademan", "10", (120, 200, 255)),
+    "upgrade-som-shield": ("som_veteran", "SHD", (84, 140, 214)),
+    "upgrade-attach-barrel": ("rifleman", "RNG", (120, 200, 255)),
+    "upgrade-attach-bayonet": ("rifleman", "BAY", (220, 220, 220)),
+    "upgrade-attach-harness": ("rifleman", "RLD", (255, 206, 64)),
+    "upgrade-attach-scope": ("sniper", "SCP", (120, 200, 255)),
+    "upgrade-plasteel-cades": ("cade", "x2", (84, 140, 214)),
+    "upgrade-sentry": ("sentry-turret", "UP", (255, 206, 64)),
+    "upgrade-thick-weeds": ("weed-node", "+HP", (110, 230, 110)),
+    "upgrade-sticky-weeds": ("weed-node", "SLW", (200, 120, 255)),
+    "upgrade-fast-weeds": ("weed-node", ">>", (255, 206, 64)),
+    "upgrade-hardened-resin": ("resin-wall", "+", (84, 140, 214)),
+    "upgrade-turret-reach": ("resin-turret", "RNG", (120, 200, 255)),
+}
+
+
+def write_badge_upgrade_icons(out):
+    """Palette icons for BADGE_UPGRADES (tgmc/sequences/misc.yaml): the borrowed icon with a short badge in the lower right corner.
+    Without the borrowed icon (no TGMC checkout) the card is plain dark, so the build still has every file."""
+    for name, (base, text, colour) in BADGE_UPGRADES.items():
+        path = os.path.join(out, "sprites", f"{base}-icon.png")
+        # build_sprites pads its icon sheets to a power of two: the icon itself is the first 62x46 frame.
+        icon = Image.open(path).convert("RGBA").crop((0, 0, 62, 46)) if os.path.exists(path) else Image.new("RGBA", (62, 46), (24, 24, 28, 255))
+        d = ImageDraw.Draw(icon)
+        w = 6 * len(text) + 5
+        d.rectangle([icon.width - w - 2, icon.height - 13, icon.width - 2, icon.height - 2], fill=(16, 16, 16, 235), outline=colour + (255,))
+        d.text((icon.width - w + 1, icon.height - 13), text, fill=colour + (255,))
+        icon.save(os.path.join(out, f"{name}.png"))
+
+
+def sweep_actors():
+    """Every actor of units.yaml and structures.yaml (templates, upgrades and the few that cannot stand on a map left out), six
+    cells apart on a grid, for the crash sweep map. Ore fields and a platinum vein go in too."""
+    import re
+    rules = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "tgmc", "rules")
+    names = []
+    for name in ("units.yaml", "structures.yaml"):
+        names += re.findall(r"^([a-z][\w-]*):", open(os.path.join(rules, name), encoding="utf-8").read(), re.M)
+    names = [n for n in names if n not in SWEEP_SKIP]
+    placed = [(n, "Marines", 6 + (i % 14) * 6, 6 + (i // 14) * 6, 0) for i, n in enumerate(names)]
+    row = 6 + (len(names) // 14 + 1) * 6
+    return placed + [("miner-field", "Neutral", 6, row, 0), ("miner-field", "Neutral", 12, row, 0), ("platinum-vein", "Neutral", 12, row, 0)]
+
+
+# Not for the sweep map: actors that are never placed on their own.
+SWEEP_SKIP = set()
+
+
 def write_miner_art(out):
     """The marine miner and the ore field, drawn here rather than cut from TGMC's 32x48 drill (too tall for a cell). Both are one cell
     (32 px) and the miner's icon is 44 px. miner.png: 4 frames of the spinning bit. miner-icon.png: the sidebar picture.
@@ -820,8 +975,15 @@ THEME_PROPS = {"jungle": (("rock", "boulder"), ("bush", "fern", "leaves")), "des
 def built_map(name, m, tiles):
     """A built map's ground function in its theme's TGMC pictures, and its neutral actors: ore fields, cover and scattered props.
     `tiles` is build_maptiles.prepare's result, or None without a TGMC checkout: then the flat templates, a dirt pad and no props."""
-    raw, spawns, (w, h) = m["ground"], m["spawns"], m["size"]
+    spawns, (w, h) = m["spawns"], m["size"]
     ids = tiles.themes[m["theme"]] if tiles else None
+
+    def cells(rects):
+        return {(x, y) for x0, y0, x1, y1 in rects for x in range(x0, x1 + 1) for y in range(y0, y1 + 1)}
+    walls, fences = cells(m.get("walls") or ()), cells(m.get("fences", ()))
+
+    def raw(x, y):
+        return (WALL, 0) if (x, y) in walls else m["ground"](x, y)
     roles = {GRASS: "ground", DIRT: "road", WATER: "water", FORD: "ford"}
 
     def ground(x, y):
@@ -829,12 +991,14 @@ def built_map(name, m, tiles):
         if not ids:
             return (DIRT if pad else kind), 0
         role = ("edge" if pad == 1 else "pad") if pad else roles.get(kind)
-        if role is None:  # rock and wall: the repo's joined cave pieces
+        if kind == WALL:  # TGMC's wall of the theme, joined to the wall cells beside it
+            return ids["wall"][sum(bit for bit, (dx, dy) in ((1, (0, -1)), (2, (0, 1)), (4, (1, 0)), (8, (-1, 0))) if raw(x + dx, y + dy)[0] == WALL)], 0
+        if role is None:  # rock: the repo's joined cave pieces
             return kind, 0
         return ids[role][_scramble(x, y) % len(ids[role])], 0
 
     def open_ground(x, y):
-        return 1 <= x < w - 1 and 1 <= y < h - 1 and (_pad(spawns, x, y) or raw(x, y)[0] in (GRASS, DIRT, FORD))
+        return 1 <= x < w - 1 and 1 <= y < h - 1 and (x, y) not in fences and (_pad(spawns, x, y) or raw(x, y)[0] in (GRASS, DIRT, FORD))
 
     # Every base and every ore field must be reachable on foot from the first base.
     reach, todo = {spawns[0]}, [spawns[0]]
@@ -851,9 +1015,21 @@ def built_map(name, m, tiles):
         assert any(n in reach for n in ((x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1))), f"{name}: no way to the ore field at {x},{y}"
         assert all(max(abs(x - sx), abs(y - sy)) >= 5 for sx, sy in spawns), f"{name}: the ore field at {x},{y} sits in a base"
     actors = [("miner-field", "Neutral", x, y, 0) for x, y in m["fields"]]
+    # Platinum (pays half as much again, see platinum-vein in mapobjects.yaml) lies under the contested fields: those about as far
+    # from their nearest base as from the next one (within a quarter).
+    for x, y in m["fields"]:
+        near, next_one = sorted(max(abs(x - sx), abs(y - sy)) for sx, sy in spawns)[:2]
+        if near * 4 >= next_one * 3:
+            actors.append(("platinum-vein", "Neutral", x, y, 0))
     if not tiles:
         return ground, actors
     taken = set(m["fields"])
+    # Fence lines: a rectangle taller than wide runs north-south. They stand with no wall broken in the reachability check above.
+    for x0, y0, x1, y1 in m.get("fences", ()):
+        for x, y in sorted(cells([(x0, y0, x1, y1)])):
+            assert raw(x, y)[0] in (GRASS, DIRT, FORD) and not _pad(spawns, x, y) and (x, y) not in taken, f"{name}: fence at {x},{y} is not on free open ground"
+            taken.add((x, y))
+            actors.append((tiles.props["fence_ns" if y1 - y0 > x1 - x0 else "fence_ew"], "Neutral", x, y, 0))
     for prop, x, y in m.get("cover", ()):
         assert raw(x, y)[0] in (GRASS, DIRT) and not _pad(spawns, x, y) and (x, y) not in taken, f"{name}: {prop} at {x},{y} is not on free open ground"
         taken.add((x, y))
@@ -875,35 +1051,49 @@ def built_map(name, m, tiles):
 
 
 # The maps built by hand. spawns: the marine base, the xeno base, then any further bases (a map with four is a four-player map).
-# fields: the ore fields (miner-field). cover: (prop, x, y) placed by hand. brief: the line under the map picker's preview.
+# fields: the ore fields (miner-field): two safe ones by each base and contested ones between them (platinum goes under the furthest). cover: (prop, x, y) placed by hand. brief: the line under the map picker's preview.
+# walls, fences: rectangles (x0, y0, x1, y1) of breakable wall cells and of fence. Each closes a shortcut, never the only way: the
+# bases and fields must be reachable with all of them standing. A map whose ground function draws walls itself has walls=[].
 SKIRMISH_MAPS = {
-    "landing-zone": dict(title="Landing Zone", size=(40, 28), spawns=[(6, 14), (33, 13)], ground=landing_zone_ground, theme="jungle", weather="clear",
-                         fields=[(11, 22), (28, 22)], brief="Jungle river with three fords. Short and direct: the first map to learn on."),
-    "canyon-run": dict(title="Canyon Run", size=(52, 28), spawns=[(6, 14), (45, 13)], ground=canyon_run_ground, theme="desert", weather="dust",
-                       fields=[(13, 23), (38, 23)], brief="Desert canyon: one wide lane down the middle, a narrow trail along each wall."),
-    "jungle-crossing": dict(title="Jungle Crossing", size=(44, 28), spawns=[(6, 14), (37, 13)], ground=jungle_crossing_ground, theme="jungle", weather="rain",
-                            fields=[(13, 20), (30, 20)], brief="A lake in the rain: wade the causeway or go round by either shore."),
-    "close-quarters": dict(title="Close Quarters", size=(34, 28), spawns=[(6, 14), (27, 13)], ground=close_quarters_ground, theme="snow", weather="snow",
-                           fields=[(10, 23), (23, 23)], cover=[("barricade", 14, 12), ("barricade", 14, 15), ("barricade", 19, 12), ("barricade", 19, 15)],
+    "landing-zone": dict(walls=[(15, 10, 15, 11), (15, 16, 15, 17), (24, 10, 24, 11), (24, 16, 24, 17)], fences=[(17, 10, 17, 11), (22, 16, 22, 17)],
+        title="Landing Zone", size=(40, 28), spawns=[(6, 14), (33, 13)], ground=landing_zone_ground, theme="jungle", weather="clear",
+                         fields=[(11, 22), (28, 22), (12, 6), (27, 6), (21, 14)], brief="Jungle river with three fords. Short and direct: the first map to learn on."),
+    "canyon-run": dict(walls=[(25, 5, 26, 10), (25, 17, 26, 22)], fences=[(26, 3, 26, 4), (26, 23, 26, 24)],
+        title="Canyon Run", size=(52, 28), spawns=[(6, 14), (45, 13)], ground=canyon_run_ground, theme="desert", weather="dust",
+                       fields=[(13, 23), (38, 23), (13, 5), (38, 5), (26, 14)], brief="Desert canyon: one wide lane down the middle, a narrow trail along each wall."),
+    "jungle-crossing": dict(walls=[(22, 23, 22, 26)], fences=[(22, 1, 22, 4)],
+        title="Jungle Crossing", size=(44, 28), spawns=[(6, 14), (37, 13)], ground=jungle_crossing_ground, theme="jungle", weather="rain",
+                            fields=[(13, 20), (30, 20), (13, 7), (30, 7), (20, 4), (21, 24)], brief="A lake in the rain: wade the causeway or go round by either shore."),
+    "close-quarters": dict(walls=[(15, 2, 15, 5), (18, 2, 18, 5)], fences=[(15, 22, 15, 25), (18, 22, 18, 25)],
+        title="Close Quarters", size=(34, 28), spawns=[(6, 14), (27, 13)], ground=close_quarters_ground, theme="snow", weather="snow",
+                           fields=[(10, 23), (23, 23), (12, 4), (21, 3), (18, 14)], cover=[("barricade", 14, 12), ("barricade", 14, 15), ("barricade", 19, 12), ("barricade", 19, 15)],
                            brief="Bases thirteen cells apart across a frozen stream. Over in minutes."),
-    "great-plains": dict(title="Great Plains", size=(64, 40), spawns=[(6, 20), (57, 19)], ground=great_plains_ground, theme="jungle", weather="clear",
-                         fields=[(12, 30), (51, 30), (30, 12), (34, 27)],
+    "great-plains": dict(walls=[(34, 13, 37, 13), (26, 21, 29, 21)], fences=[(29, 10, 31, 10), (33, 29, 35, 29)],
+        title="Great Plains", size=(64, 40), spawns=[(6, 20), (57, 19)], ground=great_plains_ground, theme="jungle", weather="clear",
+                         fields=[(12, 30), (51, 30), (30, 12), (34, 27), (12, 10), (51, 10)],
                          cover=[("crate", 36, 15), ("ammocrate", 37, 15), ("supplycrate", 27, 22), ("crate", 28, 22)],
                          brief="Open grass and ponds, six ore fields: a long walk, so economy and walls decide it."),
-    "twin-rivers": dict(title="Twin Rivers", size=(64, 48), spawns=[(6, 24), (57, 23)], ground=twin_rivers_ground, theme="jungle", weather="rain",
-                        fields=[(12, 34), (51, 34), (32, 20), (32, 28)], brief="Two rivers whose fords do not line up; two ore fields on the island between."),
-    "quarry-pit": dict(title="Quarry Pit", size=(64, 48), spawns=[(6, 24), (57, 23)], ground=quarry_pit_ground, theme="desert", weather="dust",
-                       fields=[(12, 34), (51, 34), (32, 21)], brief="A rock ring round a pit with an ore field in it: hold the pit, see all four roads."),
-    "broken-bridge": dict(title="Broken Bridge", size=(64, 48), spawns=[(6, 24), (57, 23)], ground=broken_bridge_ground, theme="lava", weather="ash",
-                          fields=[(12, 34), (51, 34), (30, 30), (38, 18)], brief="A rift of lava with three bridges, or the long way round its ends."),
-    "desert-outpost": dict(title="Desert Outpost", size=(72, 56), spawns=[(8, 29), (63, 28)], ground=desert_outpost_ground, theme="desert", weather="dust",
-                           fields=[(33, 25), (38, 25), (33, 32), (12, 36), (59, 36)], cover=[("crate", 34, 31), ("ammocrate", 37, 33), ("supplycrate", 39, 26)],
+    "twin-rivers": dict(walls=[(24, 9, 24, 13), (39, 40, 39, 44)], fences=[(24, 35, 24, 39), (39, 4, 39, 8)],
+        title="Twin Rivers", size=(64, 48), spawns=[(6, 24), (57, 23)], ground=twin_rivers_ground, theme="jungle", weather="rain",
+                        fields=[(12, 34), (51, 34), (32, 20), (32, 28), (12, 14), (51, 14)], brief="Two rivers whose fords do not line up; two ore fields on the island between."),
+    "quarry-pit": dict(walls=[(24, 19, 25, 19), (39, 19, 40, 19), (24, 29, 25, 29), (39, 29, 40, 29)], fences=[(30, 15, 34, 15), (30, 33, 34, 33)],
+        title="Quarry Pit", size=(64, 48), spawns=[(6, 24), (57, 23)], ground=quarry_pit_ground, theme="desert", weather="dust",
+                       fields=[(12, 34), (51, 34), (32, 21), (12, 14), (51, 14)], brief="A rock ring round a pit with an ore field in it: hold the pit, see all four roads."),
+    "broken-bridge": dict(walls=[(22, 10, 22, 13), (41, 36, 42, 38)], fences=[(37, 17, 39, 17)],
+        title="Broken Bridge", size=(64, 48), spawns=[(6, 24), (57, 23)], ground=broken_bridge_ground, theme="lava", weather="ash",
+                          fields=[(12, 34), (51, 34), (30, 30), (38, 18), (12, 14), (51, 14)], brief="A rift of lava with three bridges, or the long way round its ends."),
+    "desert-outpost": dict(walls=[], fences=[(35, 22, 36, 22), (35, 35, 36, 35)],
+        title="Desert Outpost", size=(72, 56), spawns=[(8, 29), (63, 28)], ground=desert_outpost_ground, theme="desert", weather="dust",
+                           fields=[(33, 25), (38, 25), (33, 32), (12, 36), (59, 36), (14, 20), (57, 20)], cover=[("crate", 34, 31), ("ammocrate", 37, 33), ("supplycrate", 39, 26)],
                            brief="A walled compound on the road holds three ore fields. Its walls come down to heavy weapons."),
-    "ice-shelf": dict(title="Ice Shelf", size=(72, 48), spawns=[(8, 25), (63, 24)], ground=ice_shelf_ground, theme="snow", weather="snow",
-                      fields=[(12, 33), (59, 33), (36, 16), (36, 32)], brief="Two ice walls with three passes each; frozen lakes slow whoever crosses them."),
-    "lava-fields": dict(title="Lava Fields", size=(72, 56), spawns=[(8, 29), (63, 28)], ground=lava_fields_ground, theme="lava", weather="ash", night=True,
-                        fields=[(12, 38), (59, 38), (36, 22), (36, 34)], brief="Night and falling ash. Two rivers of lava, three bridges over each."),
-    "crossroads": dict(title="Crossroads", size=(96, 96), spawns=[(14, 27), (81, 78), (81, 27), (14, 78)], ground=crossroads_ground, theme="jungle", weather="clear",
+    "ice-shelf": dict(walls=[(18, 18, 19, 19), (52, 30, 53, 31)], fences=[(17, 9, 17, 14), (54, 9, 54, 14)],
+        title="Ice Shelf", size=(72, 48), spawns=[(8, 25), (63, 24)], ground=ice_shelf_ground, theme="snow", weather="snow",
+                      fields=[(12, 33), (59, 33), (36, 16), (36, 32), (14, 15), (57, 15)], brief="Two ice walls with three passes each; frozen lakes slow whoever crosses them."),
+    "lava-fields": dict(walls=[(27, 45, 27, 47), (46, 45, 46, 47)], fences=[(27, 9, 27, 11), (46, 9, 46, 11)],
+        title="Lava Fields", size=(72, 56), spawns=[(8, 29), (63, 28)], ground=lava_fields_ground, theme="lava", weather="ash", night=True,
+                        fields=[(12, 38), (59, 38), (36, 22), (36, 34), (14, 18), (57, 18)], brief="Night and falling ash. Two rivers of lava, three bridges over each."),
+    "crossroads": dict(walls=[], fences=[(47, 40, 48, 40), (47, 55, 48, 55)],
+        title="Crossroads", size=(96, 96), spawns=[(14, 27), (81, 78), (81, 27), (14, 78)], ground=crossroads_ground, theme="jungle", weather="clear",
                        fields=[(43, 43), (52, 43), (43, 52), (52, 52), (22, 33), (73, 33), (22, 84), (73, 84)],
                        cover=[("crate", 45, 45), ("ammocrate", 50, 45), ("supplycrate", 45, 50), ("crate", 50, 50)],
                        brief="Four bases. Two roads cross in a walled yard with four ore fields."),
@@ -1456,7 +1646,10 @@ SCENARIOS = {
     ]},
     # A full match, AI against AI, on the Landing Zone layout. Both sides are scripted players with the Skirmish AI.
     "balance-aivai": {"scripts": ("test-aivai",), "xeno_bot": "skirmish", "marine_bot": "skirmish", "fast": True,
-                       "size": (40, 28), "spawns": [(6, 14), (33, 13)], "ground": "landing_zone", "actors": LANDING_ZONE},
+                       "size": (40, 28), "spawns": [(6, 14), (33, 13)], "ground": "landing_zone",
+                       # Landing Zone's ore fields too (SKIRMISH_MAPS): without them neither bot has an income to speak of.
+                       "actors": LANDING_ZONE + [("miner-field", "Neutral", x, y, 0) for x, y in ((11, 22), (28, 22), (12, 6), (27, 6), (21, 14))]
+                       + [("platinum-vein", "Neutral", 21, 14, 0)]},
     # Hold the Line with a marine bot that stays home (its squad module is removed), to see if six waves are survivable.
     "balance-holdline": {"scripts": ("wave-survival", "test-holdline"), "marine_bot": "skirmish", "fast": True,
                          "drop_conquest": True, "size": (40, 28), "spawns": [(6, 14), (33, 13)], "ground": "landing_zone",
@@ -1627,7 +1820,7 @@ SCENARIOS = {
         ("runner", "Xenos", 9, 9, 0), ("rifleman", "Marines", 3, 20, 0),
     ]},
     "scenario-hive-powers": {"scripts": ("test-hive-powers",), "xeno_bot": "skirmish", "size": (48, 32), "drop_conquest": True,
-                             "extra_rules": "Player:\n\t-SquadManagerBotModule@xenos-easy:\n\t-SquadManagerBotModule@xenos-normal:\n\t-SquadManagerBotModule@xenos-hard:\n^Infantry:\n\tAutoTarget:\n\t\tInitialStance: HoldFire\nevolution-tower:\n\tGrantExternalConditionPower@cure:\n\t\tChargeInterval: 60\n\tCallOfTheBurrowedPower@burrowed:\n\t\tChargeInterval: 60\n", "actors": [
+                             "extra_rules": "Player:\n\t-SquadManagerBotModule@xenos-easy:\n\t-SquadManagerBotModule@xenos-normal:\n\t-SquadManagerBotModule@xenos-hard:\n^Infantry:\n\tAutoTarget:\n\t\tInitialStance: HoldFire\nevolution-tower:\n\tGrantExternalConditionPower@cure:\n\t\tChargeInterval: 60\n\tCallOfTheBurrowedPower@burrowed:\n\t\tChargeInterval: 60\nrifleman:\n\tHealth:\n\t\tHP: 5000\n", "actors": [
         ("evolution-tower", "Xenos", 6, 6, 0), ("maturity-tower", "Xenos", 10, 6, 0),
         ("hunter", "Xenos", 24, 20, 0), ("hunter", "Xenos", 25, 21, 0), ("hunter", "Xenos", 24, 22, 0), ("hunter", "Xenos", 26, 20, 0), ("hunter", "Xenos", 26, 22, 0),
         ("rifleman", "Marines", 30, 22, 512), ("rifleman", "Marines", 31, 24, 512),
@@ -1715,6 +1908,10 @@ SCENARIOS = {
     "scenario-podcarry": {"scripts": ("test-podcarry",), "drop_conquest": True, "size": (32, 24), "ground": "walls", "actors": [
         ("cryo-pod", "Marines", 6, 6, 0), ("rifleman", "Marines", 10, 12, 0), ("rifleman", "Marines", 20, 12, 0),
         ("hunter", "Xenos", 17, 10, 0), ("hunter", "Xenos", 17, 13, 0), ("resin-silo", "Xenos", 28, 20, 0),
+    ]},
+    # A SOM player's drop pod lands SOM troops, not marines (see scenarios/test-som-pod.lua).
+    "scenario-som-pod": {"scripts": ("test-som-pod",), "drop_conquest": True, "size": (32, 24), "human_faction": "som", "actors": [
+        ("cryo-pod", "Marines", 6, 6, 0), ("resin-silo", "Xenos", 28, 20, 0),
     ]},
     # A unit walks through a door in a wall (see scenarios/test-door.lua): mapdoor-0 is any generated door.
     "scenario-door": {"scripts": ("test-door",), "drop_conquest": True, "size": (32, 24), "ground": "doorline", "actors": [
@@ -1812,10 +2009,12 @@ SCENARIOS = {
     "scenario-kits-marines": {"scripts": ("test-kits-marines",), "drop_conquest": True, "size": (48, 32), "extra_rules": "runner:\n\tHealth:\n\t\tHP: 50000\n", "actors": [
         ("rifleman", "Marines", 6, 10, 512), ("medic", "Marines", 9, 10, 512), ("engineer", "Marines", 12, 10, 512), ("synth", "Marines", 15, 10, 512), ("skirmisher", "Marines", 18, 10, 512), ("smartgunner", "Marines", 21, 10, 512), ("sniper", "Marines", 24, 10, 512), ("rocketeer", "Marines", 27, 10, 512), ("blademan", "Marines", 30, 10, 512), ("mortarman", "Marines", 33, 10, 512), ("flamer", "Marines", 6, 13, 512), ("machinegunner", "Marines", 9, 13, 512), ("bomber", "Marines", 12, 13, 512), ("squad_leader", "Marines", 15, 13, 512), ("field_commander", "Marines", 18, 13, 512), ("grenadier", "Marines", 21, 13, 512), ("mech", "Marines", 24, 13, 512), ("heavygunner", "Marines", 27, 13, 512), ("demolitionist", "Marines", 30, 13, 512), ("mortar-emplacement", "Marines", 8, 20, 0), ("artillery-emplacement", "Marines", 14, 20, 0), ("runner", "Xenos", 8, 16, 0), ("runner", "Xenos", 12, 16, 0), ("runner", "Xenos", 16, 16, 0), ("runner", "Xenos", 20, 16, 0), ("runner", "Xenos", 24, 16, 0), ("runner", "Xenos", 28, 16, 0), ("cryo-pod", "Marines", 3, 3, 0), ("resin-silo", "Xenos", 44, 28, 0),
     ]},
-    "scenario-kits-xenos": {"scripts": ("test-kits-xenos",), "drop_conquest": True, "size": (48, 32), "extra_rules": "rifleman:\n\tHealth:\n\t\tHP: 50000\n^Xeno:\n\tPlasma:\n\t\tStartPercent: 100\n", "actors": [
+    "scenario-kits-xenos": {"scripts": ("test-kits-xenos",), "drop_conquest": True, "size": (48, 32), "extra_rules": "rifleman:\n\tHealth:\n\t\tHP: 50000\n^Xeno:\n\tPlasma:\n\t\tStartPercent: 100\n\t\tMax: 1000\n", "actors": [
         ("runner", "Xenos", 6, 10, 512), ("hunter", "Xenos", 9, 10, 512), ("sentinel", "Xenos", 12, 10, 512), ("facehugger", "Xenos", 15, 10, 512), ("drone", "Xenos", 18, 10, 512), ("warrior", "Xenos", 21, 10, 512), ("queen", "Xenos", 24, 10, 512), ("spitter", "Xenos", 27, 10, 512), ("praetorian", "Xenos", 30, 10, 512), ("crusher", "Xenos", 33, 10, 512), ("ravager", "Xenos", 6, 13, 512), ("defiler", "Xenos", 9, 13, 512), ("boiler", "Xenos", 12, 13, 512), ("carrier", "Xenos", 15, 13, 512), ("warlock", "Xenos", 18, 13, 512), ("shrike", "Xenos", 21, 13, 512), ("widow", "Xenos", 24, 13, 512), ("wraith", "Xenos", 27, 13, 512), ("bull", "Xenos", 30, 13, 512), ("behemoth", "Xenos", 33, 13, 512), ("mantis", "Xenos", 9, 19, 512), ("baneling", "Xenos", 12, 19, 512), ("defender", "Xenos", 15, 19, 512), ("beetle", "Xenos", 18, 19, 512), ("gorger", "Xenos", 21, 19, 512), ("hivelord", "Xenos", 24, 19, 512), ("puppeteer", "Xenos", 27, 19, 512), ("pyrogen", "Xenos", 30, 19, 512), ("scorpion", "Xenos", 33, 19, 512), ("dragon", "Xenos", 6, 22, 512), ("king", "Xenos", 9, 22, 512), ("larva", "Xenos", 4, 20, 0), ("rifleman", "Marines", 8, 16, 0), ("rifleman", "Marines", 12, 16, 0), ("rifleman", "Marines", 16, 16, 0), ("rifleman", "Marines", 20, 16, 0), ("rifleman", "Marines", 24, 16, 0), ("rifleman", "Marines", 28, 16, 0), ("cryo-pod", "Marines", 44, 28, 0), ("resin-silo", "Xenos", 3, 3, 0),
     ]},
     "scenario-kits-som": {"scripts": ("test-kits-som",), "drop_conquest": True, "size": (48, 32), "extra_rules": "runner:\n\tHealth:\n\t\tHP: 50000\n", "actors": [
+        # A beacon for the Blink veteran's Recall.
+        ("som-beacon", "Marines", 40, 26, 0),
         ("som_trooper", "Marines", 6, 10, 512), ("som_veteran", "Marines", 9, 10, 512), ("som_corpsman", "Marines", 12, 10, 512), ("som_engineer", "Marines", 15, 10, 512), ("som_squad_leader", "Marines", 18, 10, 512), ("som_field_commander", "Marines", 21, 10, 512), ("som_smartgunner", "Marines", 24, 10, 512), ("som_flamer", "Marines", 27, 10, 512), ("som_grenadier", "Marines", 30, 10, 512), ("som_machinegunner", "Marines", 33, 10, 512), ("som_blademan", "Marines", 6, 13, 512), ("som_scout", "Marines", 9, 13, 512), ("som_mortarman", "Marines", 12, 13, 512), ("som_heavygunner", "Marines", 15, 13, 512), ("som_rocketeer", "Marines", 18, 13, 512), ("som_demolitionist", "Marines", 21, 13, 512), ("som_assault", "Marines", 24, 13, 512), ("som_bomber", "Marines", 27, 13, 512), ("som_mech", "Marines", 30, 13, 512), ("runner", "Xenos", 8, 16, 0), ("runner", "Xenos", 12, 16, 0), ("runner", "Xenos", 16, 16, 0), ("runner", "Xenos", 20, 16, 0), ("runner", "Xenos", 24, 16, 0), ("runner", "Xenos", 28, 16, 0), ("cryo-pod", "Marines", 3, 3, 0), ("resin-silo", "Xenos", 44, 28, 0),
     ]},
     # The bots use the new ability kinds (scenarios/test-ai-kits.lua): squads only, no squad manager, so they fight where they stand.
@@ -1835,6 +2034,10 @@ SCENARIOS = {
     # A claimed marine miner pays its income (see scenarios/test-miner-income.lua).
     "scenario-miner-income": {"scripts": ("test-miner-income",), "drop_conquest": True, "size": (32, 24), "actors": [
         ("miner", "Marines", 8, 10, 0), ("resin-silo", "Xenos", 28, 20, 0),
+    ]},
+    # A miner on a platinum vein pays half as much again (see scenarios/test-miner-platinum.lua).
+    "scenario-miner-platinum": {"scripts": ("test-miner-platinum",), "drop_conquest": True, "size": (32, 24), "actors": [
+        ("miner", "Marines", 8, 10, 0), ("platinum-vein", "Neutral", 8, 10, 0), ("resin-silo", "Xenos", 28, 20, 0),
     ]},
     # The economy upgrades (see scenarios/test-miner-upgrades.lua): a miner and the Armory they need.
     "scenario-miner-upgrades": {"scripts": ("test-miner-upgrades",), "drop_conquest": True, "size": (32, 24), "actors": [
@@ -1865,6 +2068,8 @@ SCENARIOS = {
     "scenario-ai-upgrade": {"scripts": ("test-ai-upgrade",), "marine_bot": "skirmish", "drop_conquest": True, "fast": True, "size": (32, 28),
                             "extra_rules": "Player:\n\tPlayerResources:\n\t\tDefaultCash: 2000\n", "actors": [
         ("cryo-pod", "Marines", 6, 4, 0), ("armory", "Marines", 12, 4, 0), ("rifleman", "Marines", 8, 8, 256),
+        # Miners are capture points now: the bot's income is the ore fields it claims, so the map needs some.
+        ("miner-field", "Neutral", 10, 10, 0), ("miner-field", "Neutral", 16, 8, 0),
         ("resin-silo", "Xenos", 28, 24, 0),
     ]},
     "scenario-upgrade": {"scripts": ("test-upgrade",), "drop_conquest": True, "size": (32, 28), "actors": [
@@ -1922,6 +2127,11 @@ SCENARIOS = {
     "scenario-miner-disabled-income": {"scripts": ("test-miner-disabled-income",), "drop_conquest": True, "size": (32, 24), "actors": [
         ("miner", "Marines", 8, 10, 0), ("hunter", "Xenos", 9, 10, 0),
     ]},
+    # The same with a miner so weak that one claw hit would take it to 0: the hit is cut down at the floor, the miner lives.
+    "scenario-miner-big-hit": {"scripts": ("test-miner-disabled-income",), "drop_conquest": True, "size": (32, 24),
+                               "extra_rules": "miner:\n\tHealth:\n\t\tHP: 20\n", "actors": [
+        ("miner", "Marines", 8, 10, 0), ("hunter", "Xenos", 9, 10, 0),
+    ]},
     # A sentry turret against one runner, and against three (see scenarios/test-turret-holds.lua).
     "scenario-turret-1": {"scripts": ("test-turret-holds",), "drop_conquest": True, "size": (32, 24), "actors": [
         ("sentry-turret", "Marines", 10, 10, 0), ("runner", "Xenos", 18, 10, 256),
@@ -1938,6 +2148,66 @@ SCENARIOS = {
     "scenario-landing-intro": {"scripts": ("test-landing-intro",), "size": (32, 40), "spawns": [(16, 24), (28, 36)], "drop_conquest": True,
                                "extra_rules": "World:\n\tFactionStart:\n\t\tMarines: cryo-pod|-2|-2|512, rifleman|0|2|256, rifleman|1|2|256, medic|0|3|256\n",
                                "actors": [("rifleman", "Marines", 16, 26, 256), ("resin-silo", "Xenos", 28, 36, 0)]},
+    # The order a right-click gives: engineer on a damaged miner and on a free field, drone on a free field (see scenarios/test-click-repair.lua).
+    "scenario-click-repair": {"scripts": ("test-click-repair",), "size": (32, 24), "drop_conquest": True, "actors": [
+        ("engineer", "Marines", 8, 10, 256), ("rifleman", "Marines", 8, 12, 256), ("miner-field", "Neutral", 10, 14, 0), ("miner", "Marines", 10, 14, 0),
+        ("miner-field", "Neutral", 12, 10, 0), ("drone", "Xenos", 14, 10, 256), ("resin-silo", "Xenos", 28, 20, 0),
+    ]},
+    # The SOM blade unit's blink drive (see scenarios/test-blink.lua).
+    "scenario-blink": {"scripts": ("test-blink",), "size": (32, 24), "drop_conquest": True, "human_faction": "som", "actors": [
+        ("som_blademan", "Marines", 8, 10, 256), ("hunter", "Xenos", 14, 10, 768), ("resin-silo", "Xenos", 28, 20, 0),
+    ]},
+    # Portal, Rewind and Drain (see scenarios/test-xeno-kit.lua).
+    "scenario-xeno-kit": {"scripts": ("test-xeno-kit",), "size": (32, 24), "drop_conquest": True, "actors": [
+        ("wraith", "Xenos", 8, 6, 256), ("runner", "Xenos", 4, 6, 256), ("wraith", "Xenos", 8, 12, 256), ("rifleman", "Marines", 11, 12, 256),
+        ("gorger", "Xenos", 8, 18, 256), ("rifleman", "Marines", 9, 18, 256), ("resin-silo", "Xenos", 28, 20, 0), ("cryo-pod", "Marines", 26, 4, 0),
+    ]},
+    # What the newer xeno abilities do, one caste per row (see scenarios/test-xeno-kit2.lua).
+    "scenario-xeno-kit2": {"scripts": ("test-xeno-kit2",), "size": (48, 32), "drop_conquest": True,
+                           "extra_rules": "rifleman:\n\tHealth:\n\t\tHP: 5000\n^Xeno:\n\tPlasma:\n\t\tStartPercent: 100\n\t\tMax: 1000\n", "actors": [
+        ("warrior", "Xenos", 8, 4, 256), ("rifleman", "Marines", 9, 4, 256), ("shrike", "Xenos", 8, 7, 256), ("rifleman", "Marines", 7, 7, 256),
+        ("rifleman", "Marines", 9, 7, 256), ("behemoth", "Xenos", 8, 10, 256), ("hunter", "Xenos", 8, 13, 256), ("defender", "Xenos", 8, 16, 256),
+        ("gorger", "Xenos", 8, 19, 256), ("runner", "Xenos", 10, 19, 256), ("queen", "Xenos", 8, 22, 256), ("drone", "Xenos", 10, 22, 256),
+        ("puppeteer", "Xenos", 8, 25, 256), ("widow", "Xenos", 8, 28, 256), ("dragon", "Xenos", 24, 6, 256), ("rifleman", "Marines", 25, 6, 256),
+        ("resin-silo", "Xenos", 42, 26, 0), ("cryo-pod", "Marines", 42, 4, 0),
+    ]},
+    # Weeds as territory: the node gate on tier 3 castes, a corrupted miner fed by weeds, fire burning weeds (see scenarios/test-territory.lua).
+    "scenario-territory": {"scripts": ("test-territory",), "size": (40, 24), "drop_conquest": True, "actors": [
+        ("resin-silo", "Xenos", 34, 18, 0), ("evolution-tower", "Xenos", 34, 4, 0), ("warrior", "Xenos", 4, 4, 256),
+        ("weed-node", "Xenos", 14, 4, 0), ("weed-node", "Xenos", 20, 4, 0), ("weed-node", "Xenos", 26, 4, 0),
+        ("corrupted-miner", "Xenos", 8, 18, 0), ("weeds", "Xenos", 9, 18, 0),
+        ("weeds", "Xenos", 20, 14, 0), ("weeds", "Xenos", 26, 14, 0), ("flame-patch", "Marines", 20, 14, 0), ("rifleman", "Marines", 38, 12, 0),
+    ]},
+    # The second-wave upgrades: prerequisites, Thick Weeds and Sticky Weeds (see scenarios/test-upgrades2.lua). Two strips of weeds for
+    # the two marines to cross (off the spawn row; a weed strip over a spawn cell was checked on 2026-11-17 and loads fine), and one cell under the runner.
+    "scenario-upgrades2": {"scripts": ("test-upgrades2",), "size": (40, 24), "drop_conquest": True, "actors": [
+        ("resin-silo", "Xenos", 34, 18, 0), ("cryo-pod", "Marines", 32, 2, 0), ("runner", "Xenos", 6, 20, 256), ("weeds", "Xenos", 6, 20, 0),
+        ("rifleman", "Marines", 6, 5, 768), ("rifleman", "Marines", 6, 11, 768),
+        ("weeds", "Xenos", 6, 5, 0), ("weeds", "Xenos", 7, 5, 0), ("weeds", "Xenos", 8, 5, 0), ("weeds", "Xenos", 9, 5, 0), ("weeds", "Xenos", 10, 5, 0), ("weeds", "Xenos", 11, 5, 0), ("weeds", "Xenos", 12, 5, 0), ("weeds", "Xenos", 13, 5, 0), ("weeds", "Xenos", 14, 5, 0), ("weeds", "Xenos", 15, 5, 0), ("weeds", "Xenos", 16, 5, 0), ("weeds", "Xenos", 17, 5, 0), ("weeds", "Xenos", 18, 5, 0), ("weeds", "Xenos", 6, 11, 0), ("weeds", "Xenos", 7, 11, 0), ("weeds", "Xenos", 8, 11, 0), ("weeds", "Xenos", 9, 11, 0), ("weeds", "Xenos", 10, 11, 0), ("weeds", "Xenos", 11, 11, 0), ("weeds", "Xenos", 12, 11, 0), ("weeds", "Xenos", 13, 11, 0), ("weeds", "Xenos", 14, 11, 0), ("weeds", "Xenos", 15, 11, 0), ("weeds", "Xenos", 16, 11, 0), ("weeds", "Xenos", 17, 11, 0), ("weeds", "Xenos", 18, 11, 0), 
+    ]},
+    # SOM heat, Recall and the beacon's drop pod bonus (see scenarios/test-som-kit.lua).
+    "scenario-som-kit": {"scripts": ("test-som-kit",), "drop_conquest": True, "size": (48, 24), "human_faction": "som",
+                         "extra_rules": "runner:\n\tHealth:\n\t\tHP: 5000\n", "actors": [
+        ("cryo-pod", "Marines", 4, 4, 0), ("som-beacon", "Marines", 10, 16, 0), ("som_blademan", "Marines", 42, 4, 256),
+        ("som_trooper", "Marines", 24, 12, 768), ("runner", "Xenos", 28, 12, 256), ("resin-silo", "Xenos", 42, 18, 0),
+    ]},
+    # Formation movement: a fast and a slow unit sent to one cell arrive together and in shape (see scenarios/test-formation.lua).
+    "scenario-formation": {"scripts": ("test-formation",), "size": (40, 24), "drop_conquest": True, "actors": [
+        ("runner", "Xenos", 6, 10, 768), ("crusher", "Xenos", 6, 12, 768), ("resin-silo", "Xenos", 34, 18, 0), ("rifleman", "Marines", 2, 2, 0),
+    ]},
+    # Crash sweep (Not a test, run by mod/shots.sh): every unit and structure of the rules stands on one map, owned by the player, and
+    # ScreenshotAt's Sweep selects each in turn with the HUD drawn. The actors are filled in by sweep_actors() below.
+    "shot-sweep": {"scripts": ("shot",), "size": (96, 72), "drop_conquest": True,
+                   "extra_rules": "World:\n\tScreenshotAt:\n\t\tSweep: true\n^Unit:\n\tAutoTarget:\n\t\tInitialStance: HoldFire\n", "actors": "sweep"},
+    # The rosters: what each human faction can build with every tech building standing (see scenarios/test-roster.lua).
+    "scenario-roster": {"scripts": ("test-roster",), "size": (32, 24), "drop_conquest": True, "actors": [("cryo-pod", "Marines", 6, 6, 0), ("armory", "Marines", 10, 6, 0), ("medbay", "Marines", 14, 6, 0), ("ordnance-depot", "Marines", 18, 6, 0), ("workshop", "Marines", 22, 6, 0), ("resin-silo", "Xenos", 28, 20, 0)]},
+    "scenario-roster-som": {"scripts": ("test-roster",), "size": (32, 24), "drop_conquest": True, "human_faction": "som", "actors": [("cryo-pod", "Marines", 6, 6, 0), ("armory", "Marines", 10, 6, 0), ("medbay", "Marines", 14, 6, 0), ("ordnance-depot", "Marines", 18, 6, 0), ("workshop", "Marines", 22, 6, 0), ("resin-silo", "Xenos", 28, 20, 0)]},
+    # Capture points: a drone corrupts a free field, riflemen free it, an engineer claims it (see scenarios/test-capture.lua).
+    "scenario-capture": {"scripts": ("test-capture",), "size": (32, 24), "drop_conquest": True, "actors": [
+        ("drone", "Xenos", 14, 10, 256), ("miner-field", "Neutral", 16, 10, 0), ("engineer", "Marines", 24, 12, 0),
+        ("rifleman", "Marines", 22, 9, 768), ("rifleman", "Marines", 22, 10, 768), ("rifleman", "Marines", 22, 11, 768),
+        ("resin-silo", "Xenos", 4, 20, 0),
+    ]},
     # An engineer repairs an ore field: it turns into the marines' miner (see scenarios/test-miner-field.lua).
     "scenario-miner-field": {"scripts": ("test-miner-field",), "size": (32, 24), "drop_conquest": True, "actors": [
         ("engineer", "Marines", 8, 10, 256), ("miner-field", "Neutral", 11, 10, 0), ("resin-silo", "Xenos", 28, 20, 0),
@@ -1949,6 +2219,25 @@ SCENARIOS = {
     # A bomb run knocks a wall down (see scenarios/test-walls.lua): a wall of three cells thick, the CAS depot beside it.
     "scenario-walls": {"scripts": ("test-walls",), "drop_conquest": True, "size": (32, 24), "ground": "walls", "actors": [
         ("ordnance-depot", "Marines", 6, 6, 0), ("rifleman", "Marines", 10, 12, 0), ("resin-silo", "Xenos", 28, 20, 0),
+    ]},
+    # Every explosion chips walls (see scenarios/test-wall-grenade.lua): grenades on a resin wall that stands against it.
+    "scenario-wall-grenade": {"scripts": ("test-wall-grenade",), "drop_conquest": True, "size": (32, 24), "ground": "walls",
+                              "extra_rules": "resin-wall:\n\tHealth:\n\t\tHP: 30000\n", "actors": [
+        ("grenadier", "Marines", 7, 10, 0), ("grenadier", "Marines", 7, 11, 0), ("grenadier", "Marines", 7, 12, 0),
+        ("resin-wall", "Xenos", 13, 11, 0), ("resin-silo", "Xenos", 28, 20, 0),
+    ]},
+    # Unit control: what a click orders on an enemy, the ground, a fence and a wall cell (see scenarios/test-click-force.lua).
+    "scenario-click-force": {"scripts": ("test-click-force",), "drop_conquest": True, "size": (32, 24), "ground": "walls", "actors": [
+        ("rifleman", "Marines", 8, 10, 256), ("grenadier", "Marines", 10, 11, 256), ("hunter", "Xenos", 8, 16, 0),
+        ("prop:fence_ns", "Neutral", 6, 12, 0), ("resin-silo", "Xenos", 28, 20, 0),
+    ]},
+    # The heavy castes break fences by walking through them (see scenarios/test-fence-smash.lua). "prop:" names a built-map prop.
+    "scenario-fence-smash": {"scripts": ("test-fence-smash",), "drop_conquest": True, "size": (32, 24), "actors": [
+        ("crusher", "Xenos", 6, 8, 0), ("hunter", "Xenos", 6, 14, 0), ("rifleman", "Marines", 28, 20, 0),
+    ] + [("prop:fence_ns", "Neutral", 14, y, 0) for y in range(1, 23)]},
+    # The only support power building dies with the HUD drawn (see scenarios/test-power-lost.lua).
+    "scenario-power-lost": {"scripts": ("test-power-lost",), "drop_conquest": True, "actors": [
+        ("ordnance-depot", "Marines", 6, 6, 0), ("rifleman", "Marines", 10, 12, 0), ("resin-silo", "Xenos", 19, 19, 0),
     ]},
     "scenario-boiler": {"scripts": ("test-boiler",), "size": (48, 24), "drop_conquest": True, "extra_rules": "^Infantry:\n\tAutoTarget:\n\t\tInitialStance: HoldFire\n", "actors": [
         ("boiler", "Xenos", 6, 10, 0), ("rifleman", "Marines", 17, 10, 0),
@@ -2045,7 +2334,7 @@ def faction_start_rules():
 
 def write_map(folder, title, size_w, size_h, placed, visibility, spawns, scripts=(), ground=flat_ground,
               category="Skirmish", drop_conquest=False, xeno_bot=None, marine_bot=None, fast=False, extra_rules="",
-              music=False, faction_start=False, players=None, brief=""):
+              music=False, faction_start=False, players=None, brief="", human_faction="marines"):
     # A scenario map has no slot for the xenos: they are a scripted player, so Lua can find them and they never act.
     os.makedirs(folder, exist_ok=True)
     cells = size_w * size_h
@@ -2159,7 +2448,7 @@ Players:
 	PlayerReference@Marines:
 		Name: Marines
 		Playable: {not marine_bot}
-{marine_bot_line}		Faction: marines
+{marine_bot_line}		Faction: {human_faction}
 		LockFaction: {lock_faction}
 		Enemies: Xenos
 		Spawn: 1
@@ -2195,8 +2484,9 @@ Actors:
     preview.save(os.path.join(folder, "map.png"))
 
 
-def ore_fields(tgmc, spec):
-    """The cells of a converted map's ore fields (TGMC's ore drills), in the cells tgmc_dmm.load makes: the same crop, shrunk by the factor."""
+def ore_fields(tgmc, spec, kind="/obj/machinery/miner"):
+    """The cells of a converted map's ore fields (TGMC's ore drills), in the cells tgmc_dmm.load makes: the same crop, shrunk by the factor.
+    `kind` narrows it to one drill type, such as the platinum ones."""
     path = os.path.join(tgmc, spec["file"])
     width, height, grid = tgmc_dmm.parse(path)
     _, _, things = tgmc_dmm.parse_objects(path)
@@ -2205,7 +2495,7 @@ def ore_fields(tgmc, spec):
     cells = set()
     for x in range(x0, width):
         for y in range(y0, height):
-            if any(p.startswith("/obj/machinery/miner") for p, _ in things[x][y]):
+            if any(p.startswith(kind) for p, _ in things[x][y]):
                 cells.add(((x - x0) // f, (y - y0) // f))
     return sorted(cells)
 
@@ -2215,7 +2505,7 @@ def camo_rules(style):
     return f"World:\n\tTgmcCamo:\n\t\tStyle: {style}\n"
 
 
-def write_tgmc_map(folder, title, rows, marines, xenos, art=None, objects=None, open_variant=None, ai_test=False, fields=(), bases=2, camo=""):
+def write_tgmc_map(folder, title, rows, marines, xenos, art=None, objects=None, open_variant=None, ai_test=False, fields=(), bases=2, camo="", platinum=()):
     """A skirmish map from a converted TGMC map. Landing Zone's two bases go at the given centres, on open ground. With `art`, a function
     (x, y) -> template id (build_maptiles), a cell that was not changed shows its real TGMC picture; a carved or cleared cell shows plain dirt."""
     h, w = len(rows), len(rows[0])
@@ -2319,6 +2609,7 @@ def write_tgmc_map(folder, title, rows, marines, xenos, art=None, objects=None, 
         print(f"{title}: {len(kept)} ore fields, {len(ore) + added - len(kept)} unreachable dropped, {added} added beside a base")
         ore = kept
     extra += [("miner-field", "Neutral", x, y, 0) for x, y in ore]
+    extra += [("platinum-vein", "Neutral", x, y, 0) for x, y in ore if (x, y) in set(platinum)]
     original = rows
     def dug_art(x, y):
         """A tunnel cell dug through rock wears the picture of the nearest ordinary ground cell, not the repo's flat dirt tile."""
@@ -2368,12 +2659,14 @@ def main():
     write_shockwave(args.out)
     write_overlay(args.out)
     write_acid_pool(args.out)
+    write_ability_props(args.out)
     write_repair_fx(args.out)
     write_rank_chevrons(args.out)
     write_miner_art(args.out)
     if args.tgmc:
         write_tgmc_miner_art(args.out, args.tgmc)
     write_miner_upgrade_icons(args.out)
+    write_badge_upgrade_icons(args.out)
     write_map(os.path.join(args.out, "maps", "test-field"), "TGMC test field", 24, 24, TEST_FIELD, "Lobby", [(10, 12), (14, 12)])
     # The menu's backdrop: Landing Zone with a bot on each side, so the Alamo lands, the squad walks out and a fight follows.
     write_map(os.path.join(args.out, "maps", "shell-landing"), "Landing (menu backdrop)", 56, 36, [], "Shellmap",
@@ -2394,7 +2687,7 @@ def main():
         four = len(spawns) == 4
         write_map(os.path.join(args.out, "maps", name), m["title"], w, h, bases + extra, "Lobby", spawns, ground=ground,
                   category="Conquest, Full size" if four else "Conquest, Small", faction_start=True, players=FOUR_PLAYERS if four else None,
-                  extra_rules=rules, brief=m["brief"])
+                  extra_rules=rules, brief=m["brief"] + " Blasts breach its walls.")
         # An AI-vs-AI copy for tuning the bots on the map (see scenarios/test-aimap.lua); it stays out of the game's menus.
         write_map(os.path.join(dev_maps, "aimap-" + name), "AI test " + m["title"], w, h, bases + extra, "MissionSelector", spawns[:2],
                   scripts=("test-aimap",), ground=ground, category="Conquest", marine_bot="skirmish", xeno_bot="skirmish", fast=True, extra_rules=rules)
@@ -2403,18 +2696,23 @@ def main():
             write_tgmc_map(os.path.join(args.out, "maps", name), spec["title"], *tgmc_dmm.load(args.tgmc, spec),
                            art=tiles.art(name) if name in full else None,
                            objects=tiles.actors.get(name) if name in full else None, open_variant=tiles.open_variant,
-                           fields=ore_fields(args.tgmc, spec), bases=4 if name in full else 2, camo=tgmc_dmm.CAMO.get(name.removesuffix("-full"), ""))
+                           fields=ore_fields(args.tgmc, spec), platinum=ore_fields(args.tgmc, spec, "/obj/machinery/miner/damaged/platinum"), bases=4 if name in full else 2, camo=tgmc_dmm.CAMO.get(name.removesuffix("-full"), ""))
             if name in full:
                 write_tgmc_map(os.path.join(dev_maps, "aimap-" + name), "AI test " + spec["title"], *tgmc_dmm.load(args.tgmc, spec),
                                art=tiles.art(name), objects=tiles.actors.get(name), open_variant=tiles.open_variant, ai_test=True,
-                               fields=ore_fields(args.tgmc, spec), camo=tgmc_dmm.CAMO.get(name.removesuffix("-full"), ""))
+                               fields=ore_fields(args.tgmc, spec), platinum=ore_fields(args.tgmc, spec, "/obj/machinery/miner/damaged/platinum"), camo=tgmc_dmm.CAMO.get(name.removesuffix("-full"), ""))
     for name, sc in SCENARIOS.items():
         width, height = sc.get("size", (24, 24))
-        write_map(os.path.join(dev_maps, name), name, width, height, sc["actors"], "MissionSelector",
+        # "prop:<name>" is a built-map prop (a mapobj-<n> actor); without a TGMC checkout there are none and it is left out.
+        if sc["actors"] == "sweep":
+            sc["actors"] = sweep_actors()
+        placed = [((tiles.props[a[0][5:]],) + a[1:] if a[0].startswith("prop:") else a) for a in sc["actors"] if tiles or not a[0].startswith("prop:")]
+        write_map(os.path.join(dev_maps, name), name, width, height, placed, "MissionSelector",
                   sc.get("spawns", [(10, 8), (19, 17)]), scripts=sc["scripts"],
                   drop_conquest=sc.get("drop_conquest", False), xeno_bot=sc.get("xeno_bot"),
                   marine_bot=sc.get("marine_bot"), fast=sc.get("fast", True),
                   extra_rules=sc.get("extra_rules", ""),
+                  human_faction=sc.get("human_faction", "marines"),
                   ground={"landing_zone": landing_zone_ground, "walls": walls_ground, "doorline": doorline_ground, "evac": evac_ground}.get(sc.get("ground"), flat_ground))
     write_map(os.path.join(args.out, "maps", "hold-the-line"), "Hold the Line", 40, 28, HOLD_THE_LINE, "Lobby, MissionSelector",
               [(6, 14), (33, 13)], scripts=("wave-survival",), ground=landing_zone_ground, category="Survival",

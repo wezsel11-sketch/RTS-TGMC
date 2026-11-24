@@ -93,10 +93,49 @@ the commits this mod was tested against (see the top of `mod/bootstrap.py`), so 
   | Grenadier | Ordnance Depot (needs an Armory) | Warrior | Maturity Tower (needs an Evolution Tower) |
   | Rifleman, Corpsman, Engineer | nothing | Runner, Drone | nothing |
 
-- **Supplies.** The vendor and silos now give only a small trickle. The real income is the **Miner** (marines) and the
-  **Weed Node** (xenos), up to six of each. **Cade** (marines) and **Resin Wall** (xenos) are the cheap walls.
+- **Supplies.** The vendor and silos give only a small trickle. The real income is the **ore fields**, which are capture
+  points: an Engineer repairs a free field into a **Miner**, a Drone covers it in resin into a **Corrupted Miner** that pays the
+  hive. A miner is never destroyed: knocked down, it is a free field again for whoever claims it next. Miners are not on the
+  build list. A **platinum field** (pale blue, in the contested ground) pays half as much again. The top bar shows the
+  points you hold out of all on the map. **Weed Nodes** are cheap, unlimited and pay nothing: weeds are territory (healing, build area), not money.
+  **Cade** (marines) and **Resin Wall** (xenos) are the cheap walls.
+- **Weeds are territory.** A Corrupted Miner with weeds beside it pays 11 biomass a tick-pair, 7 without: fire on the ground
+  (flamers, incendiaries, napalm) burns the weed carpet off until a living node grows it back. Weed nodes gate the big castes:
+  four living nodes open TGMC's tier 3 castes, eight the tier 4 ones (the top bar shows `Nodes n`), so marines delay them by
+  bashing nodes.
+- **SOM plays its own way.** Its energy guns set infantry and xenos burning for four seconds (3 damage a second, 6 for a xeno
+  standing on weeds). The **Teleporter Beacon** (120, four at most) is where the Blink Assault Veteran's Recall lands, and a
+  drop pod called within six cells of one brings two more Infantrymen.
+- **More upgrades.** Marines: Extended Barrels, Bayonets (weed nodes fall twice as fast), Magnetic Harness, Rail Scopes,
+  Plasteel Cades, Sentry Upgrade. SOM: Charger Cells, Blink Drive Mk II, Shield Modules. Xenos: Thick, Sticky and Creeping
+  Weeds, Hardened Resin, Far-Reaching Turrets; the Shell, Spur and Veil mutations (TGMC's three lines, as hive-wide number
+  changes); Primordial I and II, which unlock each caste's late ability (Mirage, toxic grenade, Centrifugal Force, Flurry;
+  Primal Wrath, Psychic Vortex, Zero-Form Beam). Mutations and primordials need territory.
+- **Formation movement** (a lobby option, on by default): units sent to one spot together keep their shape and walk at the
+  speed of the slowest.
+- **Capture points on the minimap** are diamonds in their holder's colour, grey while free, larger on platinum.
+- **Xeno abilities follow TGMC's action lists** (base strain of each caste). Wraith: Time Stop, **Portal** (two linked
+  ends; any unit of either side that steps on one comes out of the other) and **Rewind** (five seconds later the clicked
+  unit is back where it stood, at the health it had). Gorger: Feast, Drain, Transfusion, Carnage. Sentinel: Toxic Slash,
+  Drain Sting, toxic grenade. Hunter gets **Mirage** (the squad leader no longer has it). Also new: Defile (Defiler),
+  Nightfall and Off-Guard (King), Backhand (Dragon), Earth Riser (Behemoth), Leash Ball (Widow), Unrelenting Force
+  (Shrike), Crest Defense and Regenerate Skin (Defender), Grapple Toss (Warrior), Bulwark (Queen), Dreadful Presence
+  and Organic Bomb (Puppeteer), Resin Walker (Hivelord), Reagent Slash (Defiler), Grab (Dragon), Burrow (Widow).
+  `mod/audit_abilities.py --tgmc <checkout>` lists every mapped ability's cooldown and plasma cost beside TGMC's and marks
+  the ones more than twice or less than half of it. Gone, because they belong to other strains: the Runner's Acid Missile, the
+  Praetorian's Dodge, the Sentinel's Neurotoxin sting, the Wraith's Blink.
+- **Rosters.** Each human side fields fourteen kinds of unit on the infantry tab or fewer, and its mechs and tanks on a
+  **Vehicles** tab of their own (the Workshop builds them).
+  - **Marines** (12): Rifleman, Squad Leader, Field Commander, Medic, Synth, Engineer, Smartgunner, Flamer, Machinegunner,
+    Sniper, Rocketeer, Grenadier. Vehicles: Mech, APC, Tank. The Blademan, Bomber, Heavy Gunner, Demolitionist, Skirmisher and
+    Mortarman are no longer built.
+  - **Sons of Mars** (14), after TGMC's SOM quick loadouts: V-31 Infantryman, Squad Leader, Medic, Engineer, V-21 Scout,
+    V-51 Pointman, Charger Infantryman, V-62 Flamethrower Operator, V-41 Machinegunner, Caliver Veteran, Blink Assault
+    Veteran (an energy sword and a blink drive that teleports him next to the nearest enemy within 7 cells), Breacher,
+    V-71 Rocket Veteran, Culverin Veteran. Vehicles: SOM Mech, SOM Tank. A SOM drop pod lands SOM troops.
+  - **Xenos**: the NPC minions of TGMC (Beetle, Mantis, Scorpion, Baneling, Nymph) are no longer hatched.
 - **Controls** are OpenRA's: left-click or drag to select, right-click to move or attack, `A` then click to attack-move,
-  `S` to stop, `Ctrl`+number to group, and right-click a production building to set where new units gather (rally point).
+  `S` to stop, `Ctrl`+click to force an attack on a fence, or on a wall with a weapon that can break it, `Ctrl`+number to group, and right-click a production building to set where new units gather (rally point).
   The game speed option "fastest" is the one the balance tests ran at.
 - **Newer mechanics** (all in `tgmc/code` and the YAML; tested by the `scenario-*` maps):
   - **Weeds spread by themselves.** A Weed Node grows free walkable weeds around it, out to 3 cells. Weeds extend the xeno build area.
@@ -150,6 +189,11 @@ the commits this mod was tested against (see the top of `mod/bootstrap.py`), so 
     the rock stay as they are. Heavy weapons damage the wall cells around where they land (howitzer, bomb run, MOAB, Fatty, mortar a little, SADAR, the demolitionist's grenade
     and the mech's rocket, RPG and missile). A cell that runs out turns into rubble that units walk over, and the pathfinding follows. The picture of the neighbouring
     wall pieces is not redrawn, so a hole can look a little ragged.
+    Every explosion chips walls, as TGMC's `ex_act` does: grenades, the Condor's gun run, mini-rockets, Widowmaker, laser and cluster
+    do a little, the heavy weapons above a lot (`mod/check_mod.sh` fails on an `ExplosiveDamage` weapon with no `DamageWalls`; a flare
+    or smoke opts out with `-Warhead@5Walls:`). A damaged wall cell wears TGMC's damage overlay (`overlay_damage` of
+    `icons/turf/walls.dmi`), darker in eight steps as in `walls.dm`. Fences and windows fall to any blast, and the heavy xeno castes
+    (crusher, bull, behemoth, king, dragon: the `heavy` locomotor) walk straight through them and break them.
   - **Vision.** Marines on foot see 10 cells through the fog and xenos 9 (both 7 before); scouts see 13 and rangers 12. Bullets that miss still chip the furniture around where they land.
   - **Armour.** The Jaeger scout, trooper, ranger and assault are gone. Marines get armour as three upgrades instead (Light, Medium, Heavy Armour in the Upgrades tab), and the
     Gungnir heavy gunner and EOD demolitionist stay as the heavy units. Heavy armour takes 55 percent from claws and acid.
@@ -242,7 +286,7 @@ the commits this mod was tested against (see the top of `mod/bootstrap.py`), so 
     in pairs, the first two built, then the next two: right-click a tunnel with a xeno and it comes out of the other one. The AI uses the powers.
   - **Throws and shake.** A Crusher's charge hurls a marine five cells away and a Warrior's lunge three: he flies in an arc, takes damage when he lands
     (more if a wall or unit stops him early) and stays stunned. Big blasts shake the screen harder the closer they are and, for the biggest, flash it.
-  - **Plasma.** Every xeno has a plasma pool (100, a purple bar under it; it starts at 60 percent) that its abilities spend: 15 for the Sentinel's neurotoxin or the Spitter's
+  - **Plasma.** Every xeno has a plasma pool (100, a purple bar under it; it starts at 60 percent) that its abilities spend: 15 for the Sentinel's Toxic Slash or the Spitter's
     burst up to 50 for the Wraith's time stop, the Behemoth's stomp and the Queen's cry. It refills slowly, and more than twice as fast on weeds, so fighting near the hive is stronger.
     The button shows the cost in brackets and is greyed out when there is not enough.
   - **Caste abilities and controls.** Selected xenos get two ability buttons on the command card (keys R and T): the Ravager has Rage and Endure, the
@@ -274,6 +318,8 @@ the commits this mod was tested against (see the top of `mod/bootstrap.py`), so 
     floor pictures (jungle, desert, snow, lava: `THEMES` in `mod/build_maptiles.py`), a landing pad north of every base where the Alamo
     sets down, ore fields, scattered props (rocks and crates block and give cover, plants do not), a weather default and a line in the
     map picker. The generator refuses to build a map whose bases or ore fields cannot be reached on foot. Crossroads has four bases.
+    Each has stretches of breakable wall in TGMC's wall of its theme (`THEME_WALLS`) and lines of fence (`walls`, `fences` in
+    `SKIRMISH_MAPS`): they close a shortcut, a ford or a gate, never the only way, and the generator checks that with all of them standing.
     The radar still shows terrain types (green ground, blue water or lava), as on the converted maps.
   - **Command deck menus.** The main menu, lobby, map picker, settings and dialogs wear the in-game HUD's dark glass and amber
     (`menu_style` in `mod/make_chrome.py`); the green terminal is gone. The menu's battle shows behind them.
@@ -308,7 +354,7 @@ the commits this mod was tested against (see the top of `mod/bootstrap.py`), so 
   - **Selection.** Selected units and buildings get brackets, a health bar and a green ring that breathes, plus bars for ammunition, the
     embryo's growth, ability recharge and xeno age. The sidebar card shows a portrait, health, ammunition, xeno tier and infection.
   - **HUD.**
-    - A top bar shows income per minute and army size (and waiting larvae).
+    - A top bar shows income per minute, army size (and waiting larvae) and the capture points held.
     - The `?` button or the `/` key opens a controls overlay.
     - An event log on the left lists facehuggings, bursts, evolutions, hatched eggs and CAS strikes; click one to jump there.
     - The minimap runs whenever you own a building and pings infections and CAS targets.
@@ -469,7 +515,7 @@ six timed waves of Runners, Hunters and Sentinels coming from the east, and win 
 `mod/scenarios/wave-survival.lua`; its `Config` table at the top sets the spawn cells, wave sizes and delays.
 **Landing Zone** (40x28) is a skirmish map: marines in the west with a cryo pod
 and vendor, xenos in the east with a resin silo. Pick a faction in the lobby and build units from the
-sidebar palette. Cash comes from a starting amount, a small trickle from the vendor and the silos, and the Miners and Weed Nodes you build.
+sidebar palette. Cash comes from a starting amount, a small trickle from the vendor and the silos, and the ore fields you hold (Miners, Corrupted Miners).
 The **test field** is a 24x24 map with three marines and three Runners at facings
 north, east, and south, plus a corpsman, an engineer, and one of each structure. The main menu
 opens, but the test field is the quickest way in: launch it with `Launch.Map`.
@@ -501,8 +547,13 @@ On a headless machine, run OpenRA under Xvfb with Mesa software GL
 ## Sound
 
 - **Marines** have a male and a female recording of every voice clip, and each marine keeps one voice (picked by actor id
-  through the voice set's `Prefixes`). Select, move, attack and death each have their own pool: warcries, grenade shouts,
-  screams and gored cries. The corpsman says "medic" when selected.
+  through the voice set's `Prefixes`). As in TGMC, where marines are players, there are no spoken acknowledgements:
+  a click or a move order is answered with a burst of radio static, and a warcry is shouted only on an attack order. A hit
+  can draw a pain cry, a marine taken to heavy damage with no medic within six cells calls "medic", and a facehugger
+  latching on has its own cry (`CriesInPain` in `tgmc/code/Pain.cs`). The Synth has TGMC's robot voice.
+  An attack shout is heard at most once every four seconds, however often the group is sent. A sound the mod plays from a
+  place you cannot see (abilities, blasts, pods, falling walls) plays at 40 percent; gun reports are the engine's and only
+  fade with distance. A win or a loss ends the music with one of TGMC's round-end stings.
 - **Xenos** have a voice set per caste. Runner: small shrieks and pounces. Hunter: growls and heavy roars, with the long
   death scream. Sentinel: talking, hisses and its spit. Drone: chatter and cries for help.
 - **Hits.** Rifles thud on aliens and structures, and now and then an alien cries out; claws thud on armour and marines

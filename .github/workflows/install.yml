@@ -1,0 +1,64 @@
+# Installs the mod the way the README tells a player to, on a fresh Windows and a fresh Ubuntu machine, and checks it.
+# Nothing is published: the built mod holds TGMC-derived art and sound (see the README's non-commercial section).
+# When a step fails, the last lines of its log are posted as an annotation, readable on the run's page without the full log.
+name: install
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  install:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Prerequisites (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          choco install ffmpeg -y --no-progress
+          python -m pip install --upgrade pillow
+
+      - name: Prerequisites (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -y -q ffmpeg make
+          python -m pip install --upgrade pillow
+
+      - name: Setup (Windows, setup.cmd)
+        if: runner.os == 'Windows'
+        shell: cmd
+        run: call setup.cmd > setup.log 2>&1
+
+      - name: Setup (Linux, mod/setup.sh)
+        if: runner.os == 'Linux'
+        run: sh mod/setup.sh > setup.log 2>&1
+
+      - name: Start a match (Linux, mod/smoke.sh)
+        if: runner.os == 'Linux'
+        run: OPENRA_DIR=$PWD/build/OpenRA sh mod/smoke.sh landing-zone 40 > smoke.log 2>&1
+
+      - name: Report
+        if: always()
+        shell: python
+        run: |
+          import os
+          for name in ("setup.log", "smoke.log"):
+              if not os.path.exists(name):
+                  continue
+              lines = open(name, encoding="utf-8", errors="replace").read().splitlines()
+              steps = [l for l in lines if l.startswith("==>")]
+              tail = "%0A".join(l.replace("%", "%25") for l in lines[-40:])
+              print(f"::notice title={os.environ['RUNNER_OS']} {name} steps::" + " | ".join(steps)[:900])
+              print(f"::warning title={os.environ['RUNNER_OS']} {name} last lines::{tail}")

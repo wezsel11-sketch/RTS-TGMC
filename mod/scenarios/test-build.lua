@@ -1,6 +1,6 @@
 -- Scenario test (see mod/test_scenarios.sh): the tech tree and the supply generators of the building system.
 --   * the marine and xeno tech structures are not prerequisites until they exist, then they are (so the gated units unlock)
---   * a Miner and a Weed Node each add requisition on top of the starting base's trickle
+--   * a Miner adds requisition on top of the starting base's trickle; a Weed Node adds none
 -- Placing from the Build tab goes through the sidebar and engine orders, which a script cannot drive, so that part is checked
 -- by hand (see README). Prints "TEST build PASS" or "TEST build FAIL".
 local reported = false
@@ -55,9 +55,10 @@ WorldLoaded = function()
 			if marineGain < 16 then
 				return fail("the Miner added only " .. marineGain)
 			end
-			-- The silo alone gives at most 6 x 5 in this time; with the Weed Node's 7 per 50 ticks it is well over 40.
-			if xenoGain < 40 then
-				return fail("the silo and Weed Node added only " .. xenoGain)
+			-- The silo gives 11 every 50 ticks (3 to 5 payouts in this window). A Weed Node pays nothing (weeds are territory), so
+			-- the gain stays at the silo's.
+			if xenoGain < 33 or xenoGain > 55 then
+				return fail("the silo should add 33 to 55 and the Weed Node nothing, got " .. xenoGain)
 			end
 			reported = true
 			print("TEST build PASS (marines +" .. marineGain .. ", xenos +" .. xenoGain .. ")")

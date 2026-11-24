@@ -25,7 +25,10 @@ namespace OpenRA.Mods.TGMC
 			if (names == null || names.Length == 0)
 				return;
 
-			Game.Sound.Play(SoundType.World, names[world.LocalRandom.Next(names.Length)], pos);
+			// A sound from a place the viewer cannot see plays at 40%: the fight behind the wall or in the fog is heard, not felt.
+			// (Gun reports are played by the engine and are not touched; they already fade with distance.)
+			var unseen = world.RenderPlayer != null && world.FogObscures(pos);
+			Game.Sound.Play(SoundType.World, names[world.LocalRandom.Next(names.Length)], pos, unseen ? 0.4f : 1f);
 		}
 
 		public static void Sprite(World world, WPos pos, string image, string sequence, string palette)
@@ -177,6 +180,8 @@ namespace OpenRA.Mods.TGMC.Traits
 			cryCountdown = info.CryInterval;
 			token = self.GrantCondition(info.Condition);
 			Fx.Sound(self.World, self.CenterPosition, info.InfectSounds);
+			if (self.HasVoice("Hugged"))
+				self.PlayVoiceLocal("Hugged", 1f);
 
 			// Tell the host's side, so a facehugged marine is not missed in the middle of a fight.
 			TextNotificationsManager.AddTransientLine(self.Owner, "notification-infected");

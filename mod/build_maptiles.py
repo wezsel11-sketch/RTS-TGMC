@@ -52,6 +52,10 @@ THEMES = {
                  road=[("icons/turf/snow.dmi", "gravsnow")], water=[(_G, "seadeep")], ford=[("icons/turf/ice.dmi", "ice_floor")]),
     "lava": dict(_PAD, ground=[(_L, "basalt")], road=[(_L, "brock")], water=[(_L, "full")], ford=[(_L, "lavacatwalk")]),
 }
+# A built map's breakable walls (terrain type Wall): TGMC's wall of the theme, one picture for each way a cell joins the walls
+# north (1), south (2), east (4) and west (8) of it.
+THEME_WALLS = {"jungle": ("icons/turf/walls/lvwall.dmi", "lvwall"), "desert": ("icons/turf/walls/adobe.dmi", "wall"),
+               "snow": ("icons/turf/walls/frostwall.dmi", "frostwall"), "lava": ("icons/turf/walls/basaltwall.dmi", "basaltwall")}
 ROLE_TERRAIN = {"ground": "Clear", "road": "Clear", "pad": "Clear", "edge": "Clear", "water": "Water", "ford": "Ford"}
 # Props for the built maps: name -> (sheet, state, hit points, blocks movement, stops bullets). 32x32 pictures only.
 _JF, _DF, _SF = "icons/obj/flora/jungleflora.dmi", "icons/obj/flora/desert_flora.dmi", "icons/obj/flora/snowflora.dmi"
@@ -66,6 +70,8 @@ PROPS = {
     "crate": ("icons/obj/structures/crates.dmi", "closed_basic", 140, True, True), "ammocrate": ("icons/obj/structures/crates.dmi", "closed_ammo", 140, True, True),
     "supplycrate": ("icons/obj/structures/crates.dmi", "closed_supply", 140, True, True),
     "barricade": ("icons/obj/structures/barricades/metal.dmi", "metal_0", 300, True, True),
+    # A chain-link fence, running east-west or north-south (TGMC's smoothing: 1 north, 2 south, 4 east, 8 west).
+    "fence_ew": ("icons/obj/smooth_objects/fence.dmi", "fence-12", 90, True, False), "fence_ns": ("icons/obj/smooth_objects/fence.dmi", "fence-3", 90, True, False),
 }
 
 
@@ -73,6 +79,7 @@ class Tiles:
     def __init__(self):
         self.pictures = {}   # (sheet, state, direction) -> index in sprites/mapobjects.png
         self.types = {}      # (picture, hit points, blocks) -> actor name mapobj-<n>
+        self.smash = set()   # actor names the heavy xeno castes walk through and break (fences, windows)
         self.actors = {}     # map name -> [(actor type, x, y)] in the cropped map
         self.doors = {}      # (sheet, closed state, half, wide) -> (actor type, animation states, starts open)
 
@@ -80,10 +87,12 @@ class Tiles:
         self.terrain = {}   # key -> terrain type
         self.maps = {}      # map name -> (x0, y0, width, height, grid, keys)
 
-    def object_type(self, picture, hp, blocks, cover=False):
+    def object_type(self, picture, hp, blocks, cover=False, smash=False):
         key = (picture, hp, blocks, cover and blocks)
         if key not in self.types:
             self.types[key] = f"mapobj-{len(self.types)}"
+        if smash and blocks:
+            self.smash.add(self.types[key])
         return self.types[key]
 
     def open_variant(self, name):
@@ -198,7 +207,7 @@ def prepare(tgmc, out, names):
                                 blocks = blocks and kind in "GDF" and not solid_here
                                 solid_here = solid_here or blocks
                                 pic = tiles.pictures.setdefault(layer, len(tiles.pictures))
-                                tiles.actors.setdefault(name, []).append((tiles.object_type(pic, hp, blocks, cover), x - x0, y - y0))
+                                tiles.actors.setdefault(name, []).append((tiles.object_type(pic, hp, blocks, cover, tgmc_objects.smashable(path)), x - x0, y - y0))
                             else:
                                 on.append(layer)
                 row.append(tiles.id_for((key, tuple(on)) if on else key, terrain_of(turf, kind)))
@@ -212,10 +221,13 @@ def prepare(tgmc, out, names):
                             for role, pics in roles.items()} for theme, roles in THEMES.items()}
     for theme, roles in tiles.themes.items():
         assert all(roles.values()), f"theme {theme}: no picture found for {[r for r, ids in roles.items() if not ids]}"
+        sheet_path, base = THEME_WALLS[theme]
+        assert all(f"{base}-{j}" in states(sheet_path) for j in range(16)), f"theme {theme}: {sheet_path} lacks a {base}-0 to {base}-15 piece"
+        roles["wall"] = [tiles.id_for(((sheet_path, f"{base}-{j}"), ()), "Wall") for j in range(16)]
     tiles.props = {}
     for prop, (sheet_path, state, hp, blocks, cover) in PROPS.items():
         assert state in states(sheet_path) and sheets[sheet_path].icon_w == 32, f"prop {prop}: {sheet_path} {state} is missing or not 32 wide"
-        tiles.props[prop] = tiles.object_type(tiles.pictures.setdefault((sheet_path, state, 0), len(tiles.pictures)), hp, blocks, cover)
+        tiles.props[prop] = tiles.object_type(tiles.pictures.setdefault((sheet_path, state, 0), len(tiles.pictures)), hp, blocks, cover, prop.startswith("fence"))
 
     # The pictures
     os.makedirs(os.path.join(out, "tiles"), exist_ok=True)
@@ -289,7 +301,7 @@ def prepare(tgmc, out, names):
         f.write(open(os.path.join(ROOT, "tgmc", "rules", "mapobjects.yaml"), encoding="utf-8").read().rstrip("\n") + "\n")
         layer_of = {index: layer for layer, index in tiles.pictures.items()}
         for (picture, hp, blocks, cover), n in tiles.types.items():
-            f.write(f"\n{n}:\n\tInherits: {'^MapObjectCover' if cover else '^MapObjectBlocking' if blocks else '^MapObjectOpen'}\n\tHealth:\n\t\tHP: {hp}\n\tWithSpriteBody:\n\t\tSequence: o{picture}\n")
+            f.write(f"\n{n}:\n\tInherits: {'^MapObjectCover' if cover else '^MapObjectBlocking' if blocks else '^MapObjectOpen'}\n\tHealth:\n\t\tHP: {hp}\n\tWithSpriteBody:\n\t\tSequence: o{picture}\n" + ("\tCrushable:\n\t\tCrushClasses: fence\n\t\tWarnProbability: 0\n" if n in tiles.smash else ""))
             # A barricade only covers whoever is on the side it faces (the picture's direction: south, north, east, west).
             sheet_path, state, direction = layer_of[picture]
             if cover and "barricade" in (sheet_path + state).lower():

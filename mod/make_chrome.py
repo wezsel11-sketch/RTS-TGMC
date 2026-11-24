@@ -488,7 +488,17 @@ def chevrons(colour):
     return outlined(draw, colour)
 
 
-PICTOGRAMS = {"infantry": rifle, "xeno": claw, "build": hammer, "upgrade": chevrons}
+def tank(colour):
+    def draw(d, c):
+        d.rectangle([2, 10, 17, 15], fill=c)                         # hull
+        d.rectangle([6, 6, 12, 10], fill=c)                          # turret
+        d.line([(12, 8), (18, 8)], fill=c, width=2)                  # gun
+        for x in (4, 8, 12, 15):
+            d.point((x, 16), fill=c)                                 # tracks
+    return outlined(draw, colour)
+
+
+PICTOGRAMS = {"infantry": rifle, "xeno": claw, "build": hammer, "upgrade": chevrons, "vehicle": tank}
 
 
 def production_icon(name):
@@ -551,7 +561,8 @@ ICONS = {
               "Random": lambda: flag("?", SLATE), "spectator": lambda: flag("O", SLATE)},
     "production-icons": {n: (lambda n=n: production_icon(n)) for n in
                          ["infantry", "infantry-disabled", "infantry-alert", "xeno", "xeno-disabled", "xeno-alert",
-                          "build", "build-disabled", "build-alert", "upgrade", "upgrade-disabled", "upgrade-alert"]},
+                          "build", "build-disabled", "build-alert", "upgrade", "upgrade-disabled", "upgrade-alert",
+                          "vehicle", "vehicle-disabled", "vehicle-alert"]},
 }
 
 # The highlighted checkbox state looks up its own mark collection; it reuses the plain one.

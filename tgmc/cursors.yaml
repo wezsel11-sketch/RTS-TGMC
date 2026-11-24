@@ -1,34 +1,66 @@
+# The cursors (cursor.png, drawn by mod/make_placeholders.py write_cursor: one 24 px frame each, CURSOR_FRAMES gives the order).
+# A heal or repair target out of reach keeps the heal or repair picture: the unit walks there and does it.
 Cursors:
 	cursor.png: cursor
 		default:
 			Start: 0
 		move:
-			Start: 0
+			Start: 1
+			X: 12
+			Y: 12
 		move-blocked:
-			Start: 0
+			Start: 2
+			X: 12
+			Y: 12
 		attackmove:
-			Start: 0
+			Start: 3
+			X: 12
+			Y: 12
 		attackmove-blocked:
-			Start: 0
+			Start: 2
+			X: 12
+			Y: 12
 		assaultmove:
-			Start: 0
+			Start: 3
+			X: 12
+			Y: 12
 		assaultmove-blocked:
-			Start: 0
+			Start: 2
+			X: 12
+			Y: 12
 		attack:
-			Start: 0
+			Start: 3
+			X: 12
+			Y: 12
 		attackoutsiderange:
-			Start: 0
+			Start: 4
+			X: 12
+			Y: 12
 		heal:
-			Start: 0
+			Start: 5
+			X: 12
+			Y: 12
 		heal-blocked:
-			Start: 0
+			Start: 5
+			X: 12
+			Y: 12
 		repair:
-			Start: 0
+			Start: 6
+			X: 12
+			Y: 12
 		repair-blocked:
-			Start: 0
+			Start: 6
+			X: 12
+			Y: 12
 		ability:
-			Start: 0
+			Start: 7
+			X: 12
+			Y: 12
 		enter:
-			Start: 0
+			Start: 8
+			X: 12
+			Y: 12
 		enter-blocked:
-			Start: 0
+			Start: 2
+			X: 12
+			Y: 12

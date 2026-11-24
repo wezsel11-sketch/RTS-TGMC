@@ -3,6 +3,7 @@
 
 # Mortar shells. HE is the mortar's own TGMCMortar.
 TGMCMortarIncendiary:
+	ValidTargets: Ground, Water, Wall
 	Inherits: TGMCMortar
 	Warhead@1Wave: Shockwave
 		Damage: 35
@@ -25,6 +26,7 @@ TGMCMortarSmoke:
 
 # Plasma-drain: a purple burst that empties the plasma of the xenos it catches (TGMC's plasma loss shell).
 TGMCMortarPlasma:
+	ValidTargets: Ground, Water, Wall
 	Inherits: TGMCMortar
 	Warhead@1Wave: Shockwave
 		Damage: 25
@@ -55,6 +57,7 @@ TGMCMortarFlare:
 		Actor: flare-light
 
 TGMCMortarEmplacementIncendiary:
+	ValidTargets: Ground, Water, Wall
 	Inherits: TGMCMortarIncendiary
 	Range: 24c0
 	MinRange: 5c0
@@ -65,12 +68,14 @@ TGMCMortarEmplacementSmoke:
 	MinRange: 5c0
 
 TGMCMortarEmplacementPlasma:
+	ValidTargets: Ground, Water, Wall
 	Inherits: TGMCMortarPlasma
 	Range: 24c0
 	MinRange: 5c0
 
 # Howitzer shells. HE is TGMCHowitzer.
 TGMCHowitzerIncendiary:
+	ValidTargets: Ground, Water, Wall
 	Inherits: TGMCHowitzer
 	Warhead@1Wave: Shockwave
 		Damage: 70
@@ -85,6 +90,7 @@ TGMCHowitzerIncendiary:
 
 # White phosphorus: a wide splash of blue fire and a cloud of white smoke.
 TGMCHowitzerWP:
+	ValidTargets: Ground, Water, Wall
 	Inherits: TGMCHowitzer
 	Warhead@1Wave: Shockwave
 		Damage: 50
@@ -95,6 +101,7 @@ TGMCHowitzerWP:
 		Actor: smoke-shell-cloud
 
 TGMCHowitzerPlasma:
+	ValidTargets: Ground, Water, Wall
 	Inherits: TGMCHowitzer
 	Warhead@1Wave: Shockwave
 		Damage: 60
@@ -109,6 +116,7 @@ TGMCHowitzerPlasma:
 
 # SADAR rockets. HEAT is TGMCSadar.
 TGMCSadarAP:
+	ValidTargets: Ground, Water, Wall
 	Inherits: TGMCSadar
 	Warhead@1Dam: ExplosiveDamage
 		Damage: 140
@@ -118,6 +126,7 @@ TGMCSadarAP:
 			HeavyMarine: 130
 
 TGMCSadarWP:
+	ValidTargets: Ground, Water, Wall
 	Inherits: TGMCSadar
 	Warhead@1Dam: ExplosiveDamage
 		Damage: 45
@@ -137,6 +146,7 @@ TGMCSadarSmoke:
 
 # Grenade launcher: incendiary and smoke grenades besides the frag.
 TGMCGrenadeIncendiary:
+	ValidTargets: Ground, Water, Wall
 	Inherits: TGMCGrenade
 	Warhead@1Dam: ExplosiveDamage
 		Damage: 20
@@ -151,6 +161,7 @@ TGMCGrenadeIncendiary:
 
 TGMCGrenadeSmoke:
 	Inherits: TGMCGrenade
+	-Warhead@5Walls:
 	-Warhead@1Dam:
 	Warhead@3Smoke: SpawnActor
 		Actor: smoke-shell-cloud
@@ -179,6 +190,7 @@ TGMCAssaultArmor:
 
 # The mech's rocket barrage: the rocket pod emptied on one spot.
 TGMCMechBarrage:
+	ValidTargets: Ground, Water, Wall
 	Inherits: TGMCMechRocket
 	Range: 10c0
 	Warhead@1Dam: ExplosiveDamage
@@ -194,6 +206,7 @@ TGMCAimedShot:
 
 # The demolitionist's charge: a big blast on a building.
 TGMCPlantedCharge:
+	ValidTargets: Ground, Water, Wall
 	Inherits: TGMCSadar
 	Range: 1c512
 	Report: bang.ogg
@@ -221,6 +234,7 @@ TGMCRepairBurst:
 
 # The flamer's wall of fire: a wide patch of burning ground where it is aimed.
 TGMCFireWall:
+	ValidTargets: Ground, Water, Wall
 	Inherits: TGMCGrenade
 	Range: 5c0
 	Report: flamer-fire-1.ogg, flamer-fire-2.ogg
@@ -237,15 +251,6 @@ TGMCFireWall:
 		Radius: 2
 
 # Xeno abilities.
-
-# The runner's acidic missile: a glob of acid lobbed at a spot.
-TGMCAcidMissile:
-	Inherits: TGMCAcid
-	Range: 7c0
-	Warhead@1Dam: SpreadDamage
-		Damage: 45
-	Warhead@3Pool: SpawnActor
-		Actor: acid-pool
 
 # Hunter's Silence: a psychic hush on a spot; marines there cannot use abilities and fire slower for a few seconds.
 TGMCSilence:
@@ -343,7 +348,8 @@ TGMCAcidGrenade:
 
 # The queen's heal on one xeno, and her plasma gift.
 TGMCQueenHeal:
-	Inherits: TGMCMend
+	# TGMCMend only mends structures (the Repair target type); a hurt xeno is a XenoHeal target, as for the Recovery Pylon.
+	Inherits: TGMCPylonHeal
 	Range: 4c0
 	Warhead@1Dam: TargetDamage
 		Damage: -200
@@ -374,6 +380,7 @@ TGMCScreechFx:
 
 # SOM rockets.
 TGMCSomThermobaric:
+	ValidTargets: Ground, Water, Wall
 	Inherits: TGMCSadar
 	Warhead@1Dam: ExplosiveDamage
 		Damage: 90
@@ -383,9 +390,21 @@ TGMCSomThermobaric:
 		Radius: 2
 
 TGMCSomRadiation:
+	ValidTargets: Ground, Water, Wall
 	Inherits: TGMCSadar
 	Warhead@1Dam: ExplosiveDamage
 		Damage: 40
 	Warhead@3Gas: SpawnActor
 		Actor: gas-cloud
 		Radius: 1
+
+# Widow, Leash Ball: a thrown ball of web; marines where it lands are stuck fast.
+TGMCLeashBall:
+	Inherits: TGMCToxicGrenade
+	-Warhead@3Gas:
+	Warhead@9Stun: GrantExternalCondition
+		Condition: stunned
+		Duration: 75
+		Range: 1c768
+		ValidRelationships: Enemy
+		ValidTargets: Human

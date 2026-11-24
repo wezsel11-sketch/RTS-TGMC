@@ -86,7 +86,7 @@ namespace OpenRA.Mods.TGMC.Widgets
 			var rb = RenderBounds;
 			var step = TileSize.Y + TileMargin;
 			tiles.Clear();
-			foreach (var family in spm.Powers.Values.Where(p => !p.Disabled).GroupBy(Family).OrderBy(g => g.Key))
+			foreach (var family in spm.Powers.Values.Where(p => !p.Disabled && p.Info != null).GroupBy(Family).OrderBy(g => g.Key))
 				tiles.Add((new Rectangle(rb.X, rb.Y + tiles.Count * step, TileSize.X, TileSize.Y),
 					family.OrderBy(p => p.Info.SupportPowerPaletteOrder).ThenBy(p => p.Info.OrderName, StringComparer.Ordinal).ToList()));
 
@@ -135,11 +135,17 @@ namespace OpenRA.Mods.TGMC.Widgets
 
 		public override void Draw()
 		{
+			// Widgets tick before the world: a power whose building died this tick is still in the lists, without its Info.
 			foreach (var (rect, powers) in tiles)
-				DrawTile(rect, powers.MinBy(Wait), powers.Count > 1 ? $"{powers.Count(p => p.Ready)}/{powers.Count}" : null);
+			{
+				var live = powers.Where(p => p.Info != null).ToList();
+				if (live.Count > 0)
+					DrawTile(rect, live.MinBy(Wait), powers.Count > 1 ? $"{live.Count(p => p.Ready)}/{live.Count}" : null);
+			}
 
 			foreach (var (rect, power) in row)
-				DrawTile(rect, power, null);
+				if (power.Info != null)
+					DrawTile(rect, power, null);
 
 			// The name of the power under the mouse, above the open row (its right end sits over the tile).
 			if (hovered != null && row.Count > 0)
@@ -154,6 +160,9 @@ namespace OpenRA.Mods.TGMC.Widgets
 		void Fire(SupportPowerInstance p)
 		{
 			open = -1;
+			if (p.Info == null)
+				return;
+
 			if (p.Active)
 			{
 				p.Target();

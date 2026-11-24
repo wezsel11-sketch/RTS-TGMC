@@ -54,6 +54,18 @@ Player:
 		LimitedAudio: BuildingInProgress
 		OnHoldAudio: OnHold
 		CancelledAudio: Cancelled
+	# Mechs and tanks have their own tab, so the infantry tab fits two rows. Built at the Workshop.
+	MultiProductionQueue@Vehicle:
+		Type: Vehicle
+		BuildDurationModifier: 280
+		Factions: marines, som
+		DisplayOrder: 2
+		ReadyAudio: UnitReady
+		QueuedAudio: Training
+		BlockedAudio: NoBuild
+		LimitedAudio: BuildingInProgress
+		OnHoldAudio: OnHold
+		CancelledAudio: Cancelled
 	MultiProductionQueue@Xeno:
 		Type: Xeno
 		BuildDurationModifier: 200

@@ -29,7 +29,7 @@
 		LoopSequence: loop
 		Palette: effect
 		Offset: 0, 0, 400
-	Voiced:
+	TgmcVoiced:
 		VoiceSet: MarineStructureVoice
 	DeathSounds:
 	# Any building keeps the minimap running, so the radar panel is never blank while you have a base.
@@ -119,6 +119,13 @@
 # ---------------------------------------------------------------- xeno
 
 resin-turret:
+	# Far-reaching turrets (upgrades.yaml).
+	GrantConditionOnPrerequisite@reach:
+		Condition: turret-reach
+		Prerequisites: upgrade-turret-reach
+	RangeMultiplier@reach:
+		RequiresCondition: turret-reach
+		Modifier: 120
 	Inherits: ^Structure
 	Inherits@build: ^XenoMinorBuildable
 	Buildable:
@@ -126,7 +133,7 @@ resin-turret:
 		BuildPaletteOrder: 30
 		Prerequisites: evolution-tower
 		Description: actor-resin-turret.description
-	Voiced:
+	TgmcVoiced:
 		VoiceSet: XenoStructureVoice
 	Health:
 		HP: 400
@@ -178,7 +185,7 @@ resin-silo:
 	GivesBuildableArea@bot:
 		RequiresCondition: bot-owned
 		AreaTypes: xeno-minor, xeno-major
-	Voiced:
+	TgmcVoiced:
 		VoiceSet: XenoStructureVoice
 	ProvidesRadar:
 	Building:
@@ -198,9 +205,12 @@ resin-silo:
 		Cost: 400
 	WithIdleAnimation:
 		Sequences: idle
+	# The hive's own income. Weed nodes pay nothing. Tuned by bot matches on 2026-11-17, once the xeno bot claimed fields too: with the
+	# silo at 11, mini-silos 5 and corrupted miners 7 (11 on weeds), the marine bot won 8 of 12 decided on balance-aivai and 10 of 17 over
+	# ten big maps. At 17 (and corrupted miners 4) it won 2 of 14 on balance-aivai, 13 of 19 on the big maps: income moved to the fields.
 	CashTrickler:
 		Interval: 50
-		Amount: 6
+		Amount: 11
 	Exit@1:
 		SpawnOffset: 0,1024,0
 		ExitCell: 1,3
@@ -223,7 +233,7 @@ mini-silo:
 		BuildPaletteOrder: 40
 		Prerequisites: queen
 		Description: actor-mini-silo.description
-	Voiced:
+	TgmcVoiced:
 		VoiceSet: XenoStructureVoice
 	Building:
 		Footprint: xx xx
@@ -247,7 +257,7 @@ mini-silo:
 		Sequences: idle
 	CashTrickler:
 		Interval: 50
-		Amount: 3
+		Amount: 5
 
 weed-node:
 	# Outlying weeds warn the hive when raided (a ping and an event), like a marine miner does.
@@ -266,40 +276,49 @@ weed-node:
 	Buildable:
 		Queue: XenoBuild
 		BuildPaletteOrder: 10
-		BuildLimit: 14
 		Description: actor-weed-node.description
-	Voiced:
+	TgmcVoiced:
 		VoiceSet: XenoStructureVoice
 	Health:
 		HP: 160
 	Tooltip:
 		Name: actor-weed-node.name
+	# Weeds are territory, not money: a node is cheap, pays nothing and has no limit. The hive's income is its own trickle and the
+	# ore fields its drones corrupt (corrupted-miner).
 	Valued:
-		Cost: 120
+		Cost: 40
 	WithIdleAnimation:
 		Sequences: idle
-	CashTrickler:
-		Interval: 50
-		Amount: 7
 	# Marines destroy a weed sack in melee: it is not a Ground or Structure target, so no gun shoots it, only the rifle butt (TGMCButt) hits it,
 	# on its own or when the marine bot sends a unit (see FieldBotModule@sweep in ai.yaml).
 	Targetable:
 		TargetTypes: WeedNode
 	# Creeps out on its own, so xenos do not have to place weeds one by one.
+	# Creeping Weeds (upgrades.yaml): SpreadWeeds reads this flag and grows faster.
+	GrantConditionOnPrerequisite@fastweeds:
+		Condition: fast-weeds
+		Prerequisites: upgrade-fast-weeds
+	UpgradeFlag@fastweeds:
+		Flag: fast-weeds
+		RequiresCondition: fast-weeds
 	SpreadWeeds:
 		MaxRadius: 5
 		Interval: 60
 	# The node sits on a cell of carpet with the same ragged edge as the weeds around it.
 	WeedEdges:
 		Image: weeds
+	# Territory: 4 living nodes open the tier 3 castes, 8 the tier 4 ones (WeedNodeTech in tgmc/code/Weeds.cs).
+	WeedNodeTech:
 
 weeds:
 	Inherits: weed-node
-	-CashTrickler:
 	# The carpet's edge is ragged where no weed lies beyond it (see WeedEdges). Here the carpet is the body itself.
 	-WithIdleAnimation:
 	-SpreadWeeds:
 	-MustBeDestroyed:
+	-WeedNodeTech:
+	-GrantConditionOnPrerequisite@fastweeds:
+	-UpgradeFlag@fastweeds:
 	-AppearsOnRadar:
 	RevealsShroud:
 		Type: CenterPosition
@@ -324,8 +343,16 @@ weeds:
 	GivesBuildableArea:
 		AreaTypes: xeno-minor
 	# Marines do not shoot the carpet: it dies with the node that grew it. (Not Ground or Structure, so no weapon picks it.)
+	# Fire is the exception: a burning patch of ground kills the weeds under it (BurnsWeeds on flame-patch), until the node grows them back.
 	Targetable:
 		TargetTypes: Weeds
+	# Sticky weeds (upgrades.yaml): marines standing on these are slowed (OnWeedsCondition@sticky on ^Infantry looks for this type).
+	GrantConditionOnPrerequisite@sticky:
+		Condition: sticky-weeds
+		Prerequisites: upgrade-sticky-weeds
+	Targetable@sticky:
+		TargetTypes: StickyWeeds
+		RequiresCondition: sticky-weeds
 
 # A hugger egg: when a marine comes near it opens and a facehugger hops out; it regrows one in about 25 seconds.
 egg:
@@ -336,7 +363,7 @@ egg:
 		BuildPaletteOrder: 15
 		Prerequisites: evolution-tower
 		Description: actor-egg.description
-	Voiced:
+	TgmcVoiced:
 		VoiceSet: XenoStructureVoice
 	Health:
 		HP: 60
@@ -358,7 +385,7 @@ egg:
 # The carrier's trap: a hidden hole with a facehugger in it. Not built: the carrier digs it (Place Trap).
 hugger-trap:
 	Inherits: ^Structure
-	Voiced:
+	TgmcVoiced:
 		VoiceSet: XenoStructureVoice
 	RevealsShroud:
 		Range: 2c0
@@ -385,13 +412,20 @@ hugger-trap:
 		CloakedAlpha: 0.4
 
 resin-wall:
+	# Hardened resin (upgrades.yaml): a third less damage taken.
+	GrantConditionOnPrerequisite@hardened:
+		Condition: hardened
+		Prerequisites: upgrade-hardened-resin
+	DamageMultiplier@hardened:
+		RequiresCondition: hardened
+		Modifier: 67
 	Inherits: ^Wall
 	Inherits@build: ^XenoMinorBuildable
 	Buildable:
 		Queue: XenoBuild
 		BuildPaletteOrder: 20
 		Description: actor-resin-wall.description
-	Voiced:
+	TgmcVoiced:
 		VoiceSet: XenoStructureVoice
 	Tooltip:
 		Name: actor-resin-wall.name
@@ -404,13 +438,20 @@ resin-wall:
 # Resin door (TGMC's /obj/structure/mineral_door/resin): xenos and their allies walk through, it opens for them and closes ten
 # seconds after the last one has gone; marines have to break it down. With resin walls it lets the hive wall itself in.
 resin-door:
+	# Hardened resin (upgrades.yaml): a third less damage taken.
+	GrantConditionOnPrerequisite@hardened:
+		Condition: hardened
+		Prerequisites: upgrade-hardened-resin
+	DamageMultiplier@hardened:
+		RequiresCondition: hardened
+		Modifier: 67
 	Inherits: ^Structure
 	Inherits@build: ^XenoMinorBuildable
 	Buildable:
 		Queue: XenoBuild
 		BuildPaletteOrder: 21
 		Description: actor-resin-door.description
-	Voiced:
+	TgmcVoiced:
 		VoiceSet: XenoStructureVoice
 	Tooltip:
 		Name: actor-resin-door.name
@@ -462,7 +503,7 @@ sticky-resin:
 		Queue: XenoBuild
 		BuildPaletteOrder: 23
 		Description: actor-sticky-resin.description
-	Voiced:
+	TgmcVoiced:
 		VoiceSet: XenoStructureVoice
 	Tooltip:
 		Name: actor-sticky-resin.name
@@ -504,7 +545,7 @@ evolution-tower:
 		BuildLimit: 1
 		Prerequisites: queen
 		Description: actor-evolution-tower.description
-	Voiced:
+	TgmcVoiced:
 		VoiceSet: XenoStructureVoice
 	Health:
 		HP: 500
@@ -557,7 +598,7 @@ recovery-pylon:
 		BuildPaletteOrder: 55
 		Prerequisites: evolution-tower
 		Description: actor-recovery-pylon.description
-	Voiced:
+	TgmcVoiced:
 		VoiceSet: XenoStructureVoice
 	Health:
 		HP: 350
@@ -591,7 +632,7 @@ gargoyle:
 		BuildPaletteOrder: 56
 		Prerequisites: evolution-tower
 		Description: actor-gargoyle.description
-	Voiced:
+	TgmcVoiced:
 		VoiceSet: XenoStructureVoice
 	Health:
 		HP: 250
@@ -616,7 +657,7 @@ maturity-tower:
 		BuildLimit: 1
 		Prerequisites: evolution-tower
 		Description: actor-maturity-tower.description
-	Voiced:
+	TgmcVoiced:
 		VoiceSet: XenoStructureVoice
 	Health:
 		HP: 600
@@ -667,7 +708,7 @@ forward-hive:
 		BuildLimit: 4
 		Prerequisites: evolution-tower
 		Description: actor-forward-hive.description
-	Voiced:
+	TgmcVoiced:
 		VoiceSet: XenoStructureVoice
 	-MustBeDestroyed:
 	Health:
@@ -682,6 +723,13 @@ forward-hive:
 	ProvidesRadar:
 	GivesBuildableArea:
 		AreaTypes: xeno-minor, xeno-major
+	# Creeping Weeds (upgrades.yaml): SpreadWeeds reads this flag and grows faster.
+	GrantConditionOnPrerequisite@fastweeds:
+		Condition: fast-weeds
+		Prerequisites: upgrade-fast-weeds
+	UpgradeFlag@fastweeds:
+		Flag: fast-weeds
+		RequiresCondition: fast-weeds
 	SpreadWeeds:
 		Interval: 60
 		MaxRadius: 6
@@ -716,7 +764,7 @@ resin-trap:
 		BuildPaletteOrder: 22
 		Prerequisites: evolution-tower
 		Description: actor-resin-trap.description
-	Voiced:
+	TgmcVoiced:
 		VoiceSet: XenoStructureVoice
 	-MustBeDestroyed:
 	-AppearsOnRadar:
@@ -747,7 +795,7 @@ tunnel:
 		BuildLimit: 6
 		Prerequisites: evolution-tower
 		Description: actor-tunnel.description
-	Voiced:
+	TgmcVoiced:
 		VoiceSet: XenoStructureVoice
 	-MustBeDestroyed:
 	-AppearsOnRadar:
@@ -770,11 +818,14 @@ miner:
 		PingColor: FF3030
 	Inherits: ^Structure
 	Inherits@build: ^MarineBuildable
-	Buildable:
-		Queue: MarineBuild
-		BuildPaletteOrder: 10
-		BuildLimit: 6
-		Description: actor-miner.description
+	-AppearsOnRadar:
+	# On the minimap a capture point is a diamond in its holder's colour (grey while free), larger on platinum.
+	PointRadarSignature:
+		RequiresCondition: !platinum
+	PointRadarSignature@platinum:
+		Radius: 2
+		RequiresCondition: platinum
+	# A capture point: a miner stands only on an ore field, claimed by repairing the field (MinerField). It is not on the build list.
 	AmbientSound:
 		SoundFiles: amb-hum.ogg
 	Health:
@@ -784,8 +835,20 @@ miner:
 	# Xenos can disable a miner but never destroy it: it stays at 25% until a marine repairs it (see MinerField in tgmc/code/MinerField.cs).
 	MinerField:
 		DisabledCondition: miner-disabled
+		FieldActor: miner-field
 	Tooltip:
 		Name: actor-miner.name
+	# On a platinum vein (mapobjects.yaml): half as much again.
+	ExternalCondition@platinum:
+		Condition: platinum
+	WithColoredOverlay@platinum:
+		Color: C8E6FF50
+		RequiresCondition: platinum
+	CashTrickler@platinum:
+		Interval: 50
+		Amount: 5
+		ShowTicks: false
+		RequiresCondition: platinum && !miner-disabled
 	Valued:
 		Cost: 150
 	WithIdleAnimation:
@@ -812,7 +875,67 @@ miner:
 		RequiresCondition: miner-housing
 		Modifier: 67
 
+# The xenos' miner: an ore field a drone has corrupted with resin (MinerField's FactionIntoActors in mapobjects.yaml). It pays the hive
+# biomass on top of its own income, less than a marine miner pays. Knocked down to its floor it is a free field again.
+corrupted-miner:
+	AlertOnDamage:
+		Event: event-miner-under-attack
+		PingColor: FF3030
+	Inherits: ^Structure
+	-AppearsOnRadar:
+	# On the minimap a capture point is a diamond in its holder's colour (grey while free), larger on platinum.
+	PointRadarSignature:
+		RequiresCondition: !platinum
+	PointRadarSignature@platinum:
+		Radius: 2
+		RequiresCondition: platinum
+	TgmcVoiced:
+		VoiceSet: XenoStructureVoice
+	RenderSprites:
+		Image: miner
+	# Resin grown over the drill: strands drawn on top (mod/make_placeholders.py), and a faint purple cast.
+	WithIdleOverlay@resin:
+		Image: resin-strands
+		Sequence: idle
+	WithColoredOverlay:
+		Color: 9A40C038
+	Health:
+		HP: 250
+	-MustBeDestroyed:
+	MinerField:
+		FieldActor: miner-field
+	Tooltip:
+		Name: actor-corrupted-miner.name
+	ExternalCondition@platinum:
+		Condition: platinum
+	CashTrickler@platinum:
+		Interval: 50
+		Amount: 3
+		ShowTicks: false
+		RequiresCondition: platinum
+	Valued:
+		Cost: 150
+	WithIdleAnimation:
+		Sequences: idle
+	CashTrickler:
+		Interval: 50
+		Amount: 7
+	# Fed by weeds: with weeds on a cell beside it, it pays 4 more (11 in all). Marines starve it by burning the weeds off.
+	OnWeedsCondition:
+	CashTrickler@weeds:
+		Interval: 50
+		Amount: 4
+		ShowTicks: false
+		RequiresCondition: on-weeds
+
 cade:
+	# Plasteel cades (upgrades.yaml): half the damage taken, which is twice the hit points.
+	GrantConditionOnPrerequisite@plasteel:
+		Condition: plasteel
+		Prerequisites: upgrade-plasteel-cades
+	DamageMultiplier@plasteel:
+		RequiresCondition: plasteel
+		Modifier: 50
 	Inherits: ^Wall
 	Inherits@build: ^MarineBuildable
 	-NightLight:
@@ -913,6 +1036,11 @@ cryo-pod:
 		BlockedCursor: move-blocked
 		ChargeInterval: 3600
 		Actors: rifleman, rifleman, rifleman, rifleman, engineer, medic
+		# SOM pods hold SOM troops.
+		FactionActors:
+			som: som_trooper, som_trooper, som_trooper, som_trooper, som_veteran, som_scout
+		Beacon: som-beacon
+		BeaconActors: som_trooper, som_trooper
 		Radius: 2
 		FallSounds: bomb-fall.ogg
 		LandSounds: slam-1.ogg, explosion-1.ogg
@@ -1052,7 +1180,7 @@ medbay:
 		BuildPaletteOrder: 62
 		Prerequisites: armory
 		Description: actor-medbay.description
-	Voiced:
+	TgmcVoiced:
 		VoiceSet: MarineStructureVoice
 	Health:
 		HP: 300
@@ -1084,7 +1212,7 @@ ammo-station:
 		BuildPaletteOrder: 63
 		Prerequisites: armory
 		Description: actor-ammo-station.description
-	Voiced:
+	TgmcVoiced:
 		VoiceSet: MarineStructureVoice
 	Health:
 		HP: 250
@@ -1096,6 +1224,30 @@ ammo-station:
 		Condition: resupplied
 		Range: 4c0
 
+# Teleporter beacon (SOM): the Blink Assault Veteran recalls to the nearest one, and a drop pod called within six cells of one
+# brings two more infantrymen. It wears the ammo station's body with an orange glow.
+som-beacon:
+	Inherits: ^Structure
+	Inherits@build: ^MarineBuildable
+	Buildable:
+		Queue: MarineBuild
+		BuildPaletteOrder: 64
+		Prerequisites: ~faction-som
+		BuildLimit: 4
+		Description: actor-som-beacon.description
+	TgmcVoiced:
+		VoiceSet: MarineStructureVoice
+	RenderSprites:
+		Image: ammo-station
+	WithColoredOverlay@beacon:
+		Color: FF7A1840
+	Health:
+		HP: 150
+	Tooltip:
+		Name: actor-som-beacon.name
+	Valued:
+		Cost: 120
+
 # Workshop: builds the mech.
 workshop:
 	Inherits: ^Structure
@@ -1106,7 +1258,7 @@ workshop:
 		Prerequisites: ordnance-depot
 		BuildLimit: 2
 		Description: actor-workshop.description
-	Voiced:
+	TgmcVoiced:
 		VoiceSet: MarineStructureVoice
 	AmbientSound:
 		SoundFiles: amb-hum.ogg
@@ -1142,10 +1294,13 @@ workshop:
 		EndChargeSound: ui-confirm.ogg
 		Weapon: TGMCOrbital
 		Jet: false
-		PassSounds: sonic-boom.ogg
-		DropSounds: cas-voice-bomb.ogg
+		PassSounds: ob-fire.ogg
+		DropSounds: ob-announce.ogg
 		IncomingSounds: ob-incoming.ogg
-		LaunchSound: ui-ping.ogg
+		LaunchSound: ob-alarm.ogg
+		IncomingSound: ob-alarm.ogg
+		# The whistle is five seconds long and ends on the blast.
+		IncomingLead: 125
 		Pattern: Single
 		FallDelay: 250
 		WarningRadius: 12c0
@@ -1162,10 +1317,13 @@ workshop:
 		EndChargeSound: ui-confirm.ogg
 		Weapon: TGMCOrbitalFire
 		Jet: false
-		PassSounds: sonic-boom.ogg
-		DropSounds: cas-voice-bomb.ogg
+		PassSounds: ob-fire.ogg
+		DropSounds: ob-announce.ogg
 		IncomingSounds: ob-incoming.ogg
-		LaunchSound: ui-ping.ogg
+		LaunchSound: ob-alarm.ogg
+		IncomingSound: ob-alarm.ogg
+		# The whistle is five seconds long and ends on the blast.
+		IncomingLead: 125
 		Pattern: Single
 		FallDelay: 250
 		WarningRadius: 12c0
@@ -1182,10 +1340,13 @@ workshop:
 		EndChargeSound: ui-confirm.ogg
 		Weapon: TGMCOrbitalClusterBlast
 		Jet: false
-		PassSounds: sonic-boom.ogg
-		DropSounds: cas-voice-bomb.ogg
+		PassSounds: ob-fire.ogg
+		DropSounds: ob-announce.ogg
 		IncomingSounds: ob-incoming.ogg
-		LaunchSound: ui-ping.ogg
+		LaunchSound: ob-alarm.ogg
+		IncomingSound: ob-alarm.ogg
+		# The whistle is five seconds long and ends on the blast.
+		IncomingLead: 125
 		FallDelay: 250
 		WarningRadius: 12c0
 		Pattern: Cluster
@@ -1206,10 +1367,13 @@ workshop:
 		EndChargeSound: ui-confirm.ogg
 		Weapon: TGMCOrbitalPlasma
 		Jet: false
-		PassSounds: sonic-boom.ogg
-		DropSounds: cas-voice-bomb.ogg
+		PassSounds: ob-fire.ogg
+		DropSounds: ob-announce.ogg
 		IncomingSounds: ob-incoming.ogg
-		LaunchSound: ui-ping.ogg
+		LaunchSound: ob-alarm.ogg
+		IncomingSound: ob-alarm.ogg
+		# The whistle is five seconds long and ends on the blast.
+		IncomingLead: 125
 		Pattern: Single
 		FallDelay: 250
 		WarningRadius: 12c0
@@ -1226,8 +1390,8 @@ workshop:
 		EndChargeSound: ui-confirm.ogg
 		Weapon: TGMCRailgun
 		Jet: false
-		PassSounds: sonic-boom.ogg
-		DropSounds: cas-voice-bomb.ogg
+		PassSounds: railgun-fire-1.ogg
+		DropSounds: railgun-fire-2.ogg
 		LaunchSound: ui-ping.ogg
 		Pattern: Single
 		FallDelay: 40
@@ -1248,6 +1412,16 @@ workshop:
 		Cost: 400
 
 sentry-turret:
+	# Sentry upgrade (upgrades.yaml): more reach and a faster cycle.
+	GrantConditionOnPrerequisite@sentryup:
+		Condition: sentry-up
+		Prerequisites: upgrade-sentry
+	RangeMultiplier@sentryup:
+		RequiresCondition: sentry-up
+		Modifier: 120
+	ReloadDelayMultiplier@sentryup:
+		RequiresCondition: sentry-up
+		Modifier: 80
 	Inherits: ^Structure
 	Inherits@build: ^MarineBuildable
 	Buildable:

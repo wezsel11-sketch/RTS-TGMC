@@ -3,6 +3,7 @@
 // the same licence as OpenRA, whose traits this file extends.
 #endregion
 
+using System;
 using System.Collections.Generic;
 using OpenRA.GameRules;
 using OpenRA.Mods.Common.Warheads;
@@ -23,16 +24,30 @@ namespace OpenRA.Mods.TGMC.Traits
 		public readonly int[] Rubble = [4];
 
 		public readonly string[] Sounds = [];
+		[WeaponReference]
+		[Desc("Goes off where a wall cell falls: looks only (flying rubble), no damage.")]
+		public readonly string BreakWeapon = null;
+
 		public readonly string DustImage = "fx-dust-tile";
 		public readonly string DustSequence = "dust";
+
+		[Desc("TGMC's wall damage overlay (overlay_damage of icons/turf/walls.dmi), drawn over a damaged cell in DamageSteps steps of opacity.")]
+		public readonly string DamageImage = "fx-wall-damage";
+		public readonly string DamageSequence = "idle";
+		public readonly string DamagePalette = "effect";
+		public readonly int DamageSteps = 8;
 
 		public override object Create(ActorInitializer init) { return new DestructibleWalls(init.Self, this); }
 	}
 
-	public class DestructibleWalls : IWorldLoaded
+	public class DestructibleWalls : IWorldLoaded, IRenderAboveWorld
 	{
 		readonly DestructibleWallsInfo info;
 		readonly Dictionary<CPos, int> health = [];
+
+		// Damaged cells -> how far gone (1 to DamageSteps), as update_overlays in TGMC's walls.dm.
+		readonly Dictionary<CPos, int> damaged = [];
+		OpenRA.Graphics.Sprite damageSprite;
 
 		public DestructibleWalls(Actor self, DestructibleWallsInfo info) { this.info = info; }
 
@@ -42,6 +57,9 @@ namespace OpenRA.Mods.TGMC.Traits
 			foreach (var cell in map.AllCells)
 				if (info.Health.TryGetValue(map.GetTerrainInfo(cell).Type, out var hp))
 					health[cell] = hp;
+
+			if (!string.IsNullOrEmpty(info.DamageImage))
+				damageSprite = map.Sequences.GetSequence(info.DamageImage, info.DamageSequence).GetSprite(0);
 		}
 
 		public void Hit(World world, CPos cell, int damage)
@@ -53,21 +71,46 @@ namespace OpenRA.Mods.TGMC.Traits
 			if (hp > 0)
 			{
 				health[cell] = hp;
+				var full = info.Health[world.Map.GetTerrainInfo(cell).Type];
+				damaged[cell] = Math.Min(info.DamageSteps, (full - hp) * info.DamageSteps / full + 1);
 				return;
 			}
 
 			health.Remove(cell);
+			damaged.Remove(cell);
 			var random = world.SharedRandom;
 			world.Map.Tiles[cell] = new TerrainTile((ushort)info.Rubble[random.Next(info.Rubble.Length)], 0);
 			Fx.Sprite(world, world.Map.CenterOfCell(cell), info.DustImage, info.DustSequence, "effect");
 			Fx.Sound(world, world.Map.CenterOfCell(cell), info.Sounds);
+			if (info.BreakWeapon != null)
+				world.Map.Rules.Weapons[info.BreakWeapon.ToLowerInvariant()].Impact(Target.FromPos(world.Map.CenterOfCell(cell)), world.WorldActor);
+		}
+
+		// Drawn before the shroud, so an unexplored wall shows nothing.
+		void IRenderAboveWorld.RenderAboveWorld(Actor self, OpenRA.Graphics.WorldRenderer wr)
+		{
+			if (damageSprite == null || damaged.Count == 0)
+				return;
+
+			var palette = wr.Palette(info.DamagePalette);
+			var tl = wr.Viewport.TopLeft;
+			var br = wr.Viewport.BottomRight;
+			foreach (var (cell, step) in damaged)
+			{
+				var pos = self.World.Map.CenterOfCell(cell);
+				var px = wr.ScreenPxPosition(pos);
+				if (px.X < tl.X - 32 || px.Y < tl.Y - 32 || px.X > br.X + 32 || px.Y > br.Y + 32)
+					continue;
+
+				new OpenRA.Graphics.SpriteRenderable(damageSprite, pos, WVec.Zero, 0, palette, 1f, step / (float)info.DamageSteps,
+					System.Numerics.Vector3.One, OpenRA.Graphics.TintModifiers.None, false).PrepareRender(wr).Render(wr);
+			}
 		}
 	}
 }
 
 namespace OpenRA.Mods.TGMC.Warheads
 {
-	using System;
 	using OpenRA.Mods.TGMC.Traits;
 
 	[Desc("Damages the destructible wall cells (see DestructibleWalls) around the impact: Damage at the middle, less toward the edge of Radius.")]

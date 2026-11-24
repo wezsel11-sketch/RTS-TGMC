@@ -131,6 +131,39 @@
 	WithColoredOverlay@screechfrenzy:
 		RequiresCondition: screech-frenzy
 		Color: 50FF3020
+	# Xeno abilities that weaken a unit: Off-Guard and Defile (fires weakly), Dreadful Presence (slower to move and fire),
+	# Nightfall (sees half as far).
+	ExternalCondition@offguard:
+		Condition: offguard
+	FirepowerMultiplier@offguard:
+		RequiresCondition: offguard
+		Modifier: 60
+	StatusLabel@offguard:
+		RequiresCondition: offguard
+		Text: OFF GUARD
+		Color: B080FF
+		Height: 1250
+	ExternalCondition@dread:
+		Condition: dread
+	SpeedMultiplier@dread:
+		RequiresCondition: dread
+		Modifier: 70
+	ReloadDelayMultiplier@dread:
+		RequiresCondition: dread
+		Modifier: 130
+	StatusLabel@dread:
+		RequiresCondition: dread
+		Text: DREAD
+		Color: FF6060
+		Height: 1250
+	ExternalCondition@nightfall:
+		Condition: nightfall
+	RevealsShroudMultiplier@nightfall:
+		RequiresCondition: nightfall
+		Modifier: 50
+	WithColoredOverlay@nightfall:
+		RequiresCondition: nightfall
+		Color: 00001870
 	# Silenced by a hunter: slower to fire for a few seconds. Enhanced by a drone: harder hits, faster steps.
 	ExternalCondition@silenced:
 		Condition: silenced
@@ -278,6 +311,49 @@
 		Range: 2c0
 	# The armour ladder (upgrades.yaml): each tier is bought for every marine, and the best one held applies. Less damage taken stands in for
 	# more health; the heaviest plates slow a marine down.
+	# Gun attachments (upgrades.yaml): extended barrel, magnetic harness, bayonet.
+	GrantConditionOnPrerequisite@barrel:
+		Condition: attach-barrel
+		Prerequisites: upgrade-attach-barrel
+	RangeMultiplier@barrel:
+		RequiresCondition: attach-barrel
+		Modifier: 112
+	GrantConditionOnPrerequisite@harness:
+		Condition: attach-harness
+		Prerequisites: upgrade-attach-harness
+	ReloadDelayMultiplier@harness:
+		RequiresCondition: attach-harness
+		Modifier: 80
+	GrantConditionOnPrerequisite@bayonet:
+		Condition: attach-bayonet
+		Prerequisites: upgrade-attach-bayonet
+	# Sticky weeds (the hive's upgrade): wading through them is slower.
+	OnWeedsCondition@sticky:
+		Condition: on-sticky-weeds
+		Radius: 0
+		Relationships: Enemy
+		RequiredTargetType: StickyWeeds
+	SpeedMultiplier@stickyweeds:
+		RequiresCondition: on-sticky-weeds
+		Modifier: 85
+	# Volkite heat (the SOM's energy guns): burning for 3 damage a second while it lasts, for marines and SOM alike. An orange tint shows it.
+	ExternalCondition@heated:
+		Condition: heated
+	ChangesHealth@heated:
+		RequiresCondition: heated
+		Step: -3
+		Delay: 25
+		StartIfBelow: 101
+	WithColoredOverlay@heated:
+		RequiresCondition: heated
+		Color: FF7A1850
+	# SOM upgrades (upgrades.yaml): shield module, a fifth less damage taken.
+	GrantConditionOnPrerequisite@somshield:
+		Condition: som-shield
+		Prerequisites: upgrade-som-shield
+	DamageMultiplier@somshield:
+		RequiresCondition: som-shield
+		Modifier: 80
 	GrantConditionOnPrerequisite@armor1:
 		Condition: armor-1
 		Prerequisites: upgrade-armor-1, !upgrade-armor-2
@@ -350,8 +426,11 @@
 	GrantConditionOnDamageState@DAMAGED:
 		Condition: damaged
 		ValidDamageStates: Light, Medium, Heavy, Critical
-	Voiced:
+	TgmcVoiced:
 		VoiceSet: MarineVoice
+	# Pain cries, and a call for a medic when badly hurt with none near (see voices.yaml).
+	CriesInPain:
+		Healers: medic, synth, som_medic
 	DeathSounds:
 	# The body lies where it fell for three minutes, then fades away.
 	WithLingeringCorpse:
@@ -381,6 +460,12 @@
 		# "secondary" is one of the names the attack trait fires; any other name is ignored.
 		Name: secondary
 		Weapon: TGMCButt
+		RequiresCondition: !attach-bayonet
+	# Bayonet (upgrades.yaml): the same bash, twice as hard, so weed nodes fall twice as fast.
+	Armament@BAYONET:
+		Name: secondary
+		Weapon: TGMCBayonet
+		RequiresCondition: attach-bayonet
 	AutoTargetPriority@WEEDS:
 		ValidTargets: WeedNode
 		Priority: 0
@@ -480,7 +565,7 @@ medic:
 		Priority: 0
 	Health:
 		HP: 100
-	Voiced:
+	TgmcVoiced:
 		VoiceSet: CorpsmanVoice
 	Armament@PRIMARY:
 		Weapon: TGMCHeal
@@ -572,6 +657,8 @@ engineer:
 # comes close, and no facehugger can latch onto it. Built at the Medbay, two at most.
 synth:
 	Inherits: ^Infantry
+	TgmcVoiced:
+		VoiceSet: SynthVoice
 	-Targetable@INFEST:
 	-Infestable:
 	# Never hugged or infected, but the marine body traits above still read these two conditions.
@@ -665,7 +752,8 @@ skirmisher:
 		Cost: 130
 	Buildable:
 		Queue: Infantry
-		Prerequisites: armory, ~faction-marines
+		# Off the build list (the roster was cut to fourteen a side); the actor stays for what inherits from it.
+		Prerequisites: ~disabled
 		BuildAtProductionType: Infantry
 		BuildPaletteOrder: 41
 		Description: actor-skirmisher.description
@@ -706,6 +794,13 @@ smartgunner:
 		Description: actor-smartgunner.description
 
 sniper:
+	# Scope (upgrades.yaml): two more cells of reach.
+	GrantConditionOnPrerequisite@scope:
+		Condition: attach-scope
+		Prerequisites: upgrade-attach-scope
+	RangeMultiplier@scope:
+		RequiresCondition: attach-scope
+		Modifier: 115
 	Inherits: ^Infantry
 	# Heavy weapon: this one stops to shoot.
 	AttackWhileMoving:
@@ -811,7 +906,8 @@ blademan:
 		Cost: 160
 	Buildable:
 		Queue: Infantry
-		Prerequisites: armory, ~faction-marines
+		# Off the build list (the roster was cut to fourteen a side); the actor stays for what inherits from it.
+		Prerequisites: ~disabled
 		BuildAtProductionType: Infantry
 		BuildPaletteOrder: 48
 		Description: actor-blademan.description
@@ -833,7 +929,8 @@ mortarman:
 		Cost: 300
 	Buildable:
 		Queue: Infantry
-		Prerequisites: armory, ~faction-marines
+		# Off the build list (the roster was cut to fourteen a side); the actor stays for what inherits from it.
+		Prerequisites: ~disabled
 		BuildAtProductionType: Infantry
 		BuildPaletteOrder: 49
 		Description: actor-mortarman.description
@@ -940,27 +1037,27 @@ bomber:
 		Cost: 120
 	Buildable:
 		Queue: Infantry
-		Prerequisites: ordnance-depot, ~faction-marines
+		# Off the build list (the roster was cut to fourteen a side); the actor stays for what inherits from it.
+		Prerequisites: ~disabled
 		BuildPaletteOrder: 90
 		Description: actor-bomber.description
 
 # Mirage decoy (the squad leader's Mirage grenade): stands where it is put, draws fire, dies in a few hits, and fades after 30 seconds.
 mirage-decoy:
-	Inherits: ^Infantry
-	# It never moves and never fires: it only stands there to be shot at.
+	Inherits: ^Xeno
+	# The hunter's Mirage: an illusion that never moves and never bites, it only stands there to be shot at.
 	TgmcMobile:
 		Speed: 0
 	AutoTarget:
 		InitialStance: HoldFire
-	# The decoy wears a rifleman's body (its own sprite is not needed).
 	RenderSprites:
-		Image: rifleman
+		Image: hunter
 	Health:
-		HP: 60
+		HP: 40
 	Expires:
-		Ticks: 750
+		Ticks: 250
 	Tooltip:
-		Name: actor-mirage-decoy.name
+		Name: actor-hunter.name
 	# Nothing to order: it cannot be selected, only seen and shot.
 	-Selectable:
 	Interactable:
@@ -976,15 +1073,6 @@ squad_leader:
 		Aim: Self
 		Weapon: TGMCSmokeScreen
 		Cooldown: 2400
-	# Mirage decoy: a fake marine dropped four cells ahead.
-	ActiveAbility@mirage:
-		OrderName: AbilityMirage
-		Slot: 2
-		Label: Mirage
-		Aim: Forward
-		ForwardDistance: 4c0
-		Weapon: TGMCMirage
-		Cooldown: 3000
 	# Fire-support mark: the nearest enemy in range gets a sensor ping, showing it to the squad.
 	ActiveAbility@mark:
 		OrderName: AbilityMark
@@ -1049,6 +1137,13 @@ field_commander:
 
 # Sons of Mars (see the three-faction plan): the SOM core roster. Same roles as the marines, TGMC's SOM armour and a laser rifle.
 som_trooper:
+	# Charger cells (upgrades.yaml): the energy gun hits a fifth harder.
+	GrantConditionOnPrerequisite@cells:
+		Condition: charger-cells
+		Prerequisites: upgrade-som-cells
+	FirepowerMultiplier@cells:
+		RequiresCondition: charger-cells
+		Modifier: 120
 	Inherits: ^Infantry
 	Armament@PRIMARY:
 		Weapon: TGMCLaserRifle
@@ -1065,6 +1160,13 @@ som_trooper:
 		Cost: 100
 
 som_veteran:
+	# Charger cells (upgrades.yaml): the energy gun hits a fifth harder.
+	GrantConditionOnPrerequisite@cells:
+		Condition: charger-cells
+		Prerequisites: upgrade-som-cells
+	FirepowerMultiplier@cells:
+		RequiresCondition: charger-cells
+		Modifier: 120
 	Inherits: ^Infantry
 	Health:
 		HP: 200
@@ -1109,7 +1211,8 @@ som_squad_leader:
 som_field_commander:
 	Inherits: field_commander
 	Buildable:
-		Prerequisites: ~faction-som
+		# Off the build list (the roster was cut to fourteen a side); the actor stays for what inherits from it.
+		Prerequisites: ~disabled
 		Description: actor-som-field-commander.description
 	Tooltip:
 		Name: actor-som-field-commander.name
@@ -1131,7 +1234,8 @@ som_smartgunner:
 		RequiresCondition: overheat
 	Inherits: smartgunner
 	Buildable:
-		Prerequisites: ~faction-som
+		# Off the build list (the roster was cut to fourteen a side); the actor stays for what inherits from it.
+		Prerequisites: ~disabled
 		Description: actor-som-smartgunner.description
 	Tooltip:
 		Name: actor-som-smartgunner.name
@@ -1147,7 +1251,8 @@ som_flamer:
 som_grenadier:
 	Inherits: grenadier
 	Buildable:
-		Prerequisites: armory, ~faction-som
+		# Off the build list (the roster was cut to fourteen a side); the actor stays for what inherits from it.
+		Prerequisites: ~disabled
 		Description: actor-som-grenadier.description
 	Tooltip:
 		Name: actor-som-grenadier.name
@@ -1174,6 +1279,10 @@ som_machinegunner:
 		Name: actor-som-machinegunner.name
 
 som_blademan:
+	# Blink drive upgrade (upgrades.yaml): switches the short blink in kits.yaml for the long one.
+	GrantConditionOnPrerequisite@blinkup:
+		Condition: blink-up
+		Prerequisites: upgrade-som-blink
 	Inherits: blademan
 	Buildable:
 		Prerequisites: armory, ~faction-som
@@ -1181,18 +1290,83 @@ som_blademan:
 	Tooltip:
 		Name: actor-som-blademan.name
 
+# SOM loadouts from TGMC's quick vendor (code/datums/outfits/quick_load_outfits.dm, /datum/outfit/quick/som). Several reuse another SOM
+# unit's sprite set (RenderSprites: Image) until they get their own.
+# V-21 Light Infantryman: a fast scout with a submachine gun and a cloak (kits.yaml). TGMC's Aegis shield module is not modelled.
 som_scout:
-	Inherits: sniper
+	Inherits: ^Infantry
+	Health:
+		HP: 80
+	SpeedMultiplier@scout:
+		Modifier: 125
+	Armament@PRIMARY:
+		Weapon: TGMCSMG
+		MuzzleSequence: flash
+		LocalOffset: 256,0,200
 	Buildable:
-		Prerequisites: armory, ~faction-som
+		Queue: Infantry
+		Prerequisites: ~faction-som
+		BuildPaletteOrder: 35
 		Description: actor-som-scout.description
 	Tooltip:
 		Name: actor-som-scout.name
+	Valued:
+		Cost: 120
+
+# V-51 Pointman: the semi-automatic shotgun for close quarters (the marine skirmisher's kit, which the marines no longer field).
+som_pointman:
+	Inherits: skirmisher
+	RenderSprites:
+		Image: som_engineer
+	Buildable:
+		Prerequisites: armory, ~faction-som
+		Description: actor-som-pointman.description
+	Tooltip:
+		Name: actor-som-pointman.name
+
+# Breacher: Lorica heavy armour and a boarding shield that turns a third of every hit, with a one-handed V-21. Slow.
+som_breacher:
+	Inherits: som_veteran
+	RenderSprites:
+		Image: som_veteran
+	Health:
+		HP: 300
+	DamageMultiplier@shield:
+		Modifier: 67
+	SpeedMultiplier@shield:
+		Modifier: 85
+	Armament@PRIMARY:
+		Weapon: TGMCSMG
+	Buildable:
+		Prerequisites: ordnance-depot, ~faction-som
+		BuildPaletteOrder: 52
+		Description: actor-som-breacher.description
+	Tooltip:
+		Name: actor-som-breacher.name
+	Valued:
+		Cost: 300
+
+# Caliver Veteran: the volkite caliver, a harder and longer shot than the charger's.
+som_caliver:
+	Inherits: som_veteran
+	RenderSprites:
+		Image: som_smartgunner
+	Armament@PRIMARY:
+		Weapon: TGMCCaliver
+	Buildable:
+		Prerequisites: armory, ~faction-som
+		BuildPaletteOrder: 46
+		Description: actor-som-caliver.description
+	Tooltip:
+		Name: actor-som-caliver.name
+	Valued:
+		Cost: 260
 
 som_mortarman:
 	Inherits: mortarman
 	Buildable:
-		Prerequisites: armory, ~faction-som
+		# Off the build list (the roster was cut to fourteen a side); the actor stays for what inherits from it.
+		Prerequisites: ~disabled
 		Description: actor-som-mortarman.description
 	Tooltip:
 		Name: actor-som-mortarman.name
@@ -1229,7 +1403,8 @@ som_rocketeer:
 som_demolitionist:
 	Inherits: demolitionist
 	Buildable:
-		Prerequisites: ordnance-depot, ~faction-som
+		# Off the build list (the roster was cut to fourteen a side); the actor stays for what inherits from it.
+		Prerequisites: ~disabled
 		Description: actor-som-demolitionist.description
 	Tooltip:
 		Name: actor-som-demolitionist.name
@@ -1255,7 +1430,8 @@ som_assault:
 		Cost: 280
 	Buildable:
 		Queue: Infantry
-		Prerequisites: ordnance-depot, ~faction-som
+		# Off the build list (the roster was cut to fourteen a side); the actor stays for what inherits from it.
+		Prerequisites: ~disabled
 		BuildAtProductionType: Infantry
 		BuildPaletteOrder: 54
 		Description: actor-som-assault.description
@@ -1263,7 +1439,8 @@ som_assault:
 som_bomber:
 	Inherits: bomber
 	Buildable:
-		Prerequisites: ordnance-depot, ~faction-som
+		# Off the build list (the roster was cut to fourteen a side); the actor stays for what inherits from it.
+		Prerequisites: ~disabled
 		Description: actor-som-bomber.description
 	Tooltip:
 		Name: actor-som-bomber.name
@@ -1317,7 +1494,7 @@ mech:
 	GrantConditionOnDamageState@DAMAGED:
 		Condition: damaged
 		ValidDamageStates: Light, Medium, Heavy, Critical
-	Voiced:
+	TgmcVoiced:
 		VoiceSet: MarineVoice
 	Health:
 		HP: 900
@@ -1419,7 +1596,7 @@ mech:
 	Valued:
 		Cost: 800
 	Buildable:
-		Queue: Infantry
+		Queue: Vehicle
 		BuildAtProductionType: Vehicle
 		BuildPaletteOrder: 70
 		Prerequisites: workshop, ~faction-marines
@@ -1460,7 +1637,8 @@ heavygunner:
 		Cost: 450
 	Buildable:
 		Queue: Infantry
-		Prerequisites: ordnance-depot, ~faction-marines
+		# Off the build list (the roster was cut to fourteen a side); the actor stays for what inherits from it.
+		Prerequisites: ~disabled
 		BuildAtProductionType: Infantry
 		BuildPaletteOrder: 55
 		Description: actor-heavygunner.description
@@ -1487,7 +1665,8 @@ demolitionist:
 		Cost: 420
 	Buildable:
 		Queue: Infantry
-		Prerequisites: ordnance-depot, ~faction-marines
+		# Off the build list (the roster was cut to fourteen a side); the actor stays for what inherits from it.
+		Prerequisites: ~disabled
 		BuildAtProductionType: Infantry
 		BuildPaletteOrder: 56
 		Description: actor-demolitionist.description
@@ -1522,6 +1701,16 @@ demolitionist:
 		Delay: 25
 		StartIfBelow: 100
 		DamageCooldown: 125
+	# Thick weeds (upgrades.yaml): half as much healing again.
+	GrantConditionOnPrerequisite@thickweeds:
+		Condition: thick-weeds
+		Prerequisites: upgrade-thick-weeds
+	ChangesHealth@thickweeds:
+		RequiresCondition: on-weeds && thick-weeds
+		Step: 1
+		Delay: 25
+		StartIfBelow: 100
+		DamageCooldown: 125
 	# Xenos see 9 cells through the fog (the marines on foot 10).
 	RevealsShroud:
 		Range: 9c0
@@ -1549,6 +1738,12 @@ demolitionist:
 	WithColoredOverlay@psycure:
 		RequiresCondition: psycure && !rage
 		Color: 60FF6040
+	# The queen's Bulwark: a quarter less damage while it lasts.
+	ExternalCondition@bulwark:
+		Condition: bulwark
+	DamageMultiplier@bulwark:
+		RequiresCondition: bulwark
+		Modifier: 75
 	ExternalCondition@rage:
 		Condition: rage
 	FirepowerMultiplier@rage:
@@ -1562,6 +1757,49 @@ demolitionist:
 		Color: FF303050
 	# The Upgrades tab (upgrades.yaml): every xeno, new and old, takes on the upgrades the hive has bought. Carapace stacks (II comes after I) and slows
 	# a little; damage taken stands in for health, since there is no health multiplier.
+	# Volkite heat (the SOM's energy guns): burning for 3 damage a second while it lasts, and 3 more on weeds, which catch fire under it. An orange tint shows it.
+	ExternalCondition@heated:
+		Condition: heated
+	ChangesHealth@heated:
+		RequiresCondition: heated
+		Step: -3
+		Delay: 25
+		StartIfBelow: 101
+	WithColoredOverlay@heated:
+		RequiresCondition: heated
+		Color: FF7A1850
+	ChangesHealth@heatedweeds:
+		RequiresCondition: heated && on-weeds
+		Step: -3
+		Delay: 25
+		StartIfBelow: 101
+	# Mutations (upgrades.yaml, TGMC's three lines). Shell: 8 percent less damage for all, and more for the castes that say so below.
+	# Spur: claws and abilities hit a tenth harder. Veil: plasma builds half as fast again (Plasma reads the veil UpgradeFlag).
+	GrantConditionOnPrerequisite@mutshell:
+		Condition: mut-shell
+		Prerequisites: upgrade-mutation-shell
+	DamageMultiplier@mutshell:
+		RequiresCondition: mut-shell
+		Modifier: 92
+	GrantConditionOnPrerequisite@mutveil:
+		Condition: mut-veil
+		Prerequisites: upgrade-mutation-veil
+	UpgradeFlag@veil:
+		Flag: veil
+		RequiresCondition: mut-veil
+	GrantConditionOnPrerequisite@mutspur:
+		Condition: mut-spur
+		Prerequisites: upgrade-mutation-spur
+	FirepowerMultiplier@mutspur:
+		RequiresCondition: mut-spur
+		Modifier: 110
+	# Primordial abilities (upgrades.yaml): each caste's late ability is switched on by one of these.
+	GrantConditionOnPrerequisite@primordial1:
+		Condition: primordial-1
+		Prerequisites: upgrade-primordial-1
+	GrantConditionOnPrerequisite@primordial2:
+		Condition: primordial-2
+		Prerequisites: upgrade-primordial-2
 	GrantConditionOnPrerequisite@carapace1:
 		Condition: carapace-1
 		Prerequisites: upgrade-carapace-1
@@ -1717,7 +1955,7 @@ runner:
 	Evolves:
 		Next: hunter
 		Previous: larva
-	Voiced:
+	TgmcVoiced:
 		VoiceSet: RunnerVoice
 	Health:
 		HP: 120
@@ -1764,7 +2002,7 @@ hunter:
 	Evolves:
 		Next: warrior
 		Previous: runner
-	Voiced:
+	TgmcVoiced:
 		VoiceSet: HunterVoice
 	Health:
 		HP: 130
@@ -1784,25 +2022,32 @@ hunter:
 
 sentinel:
 	Inherits: ^Xeno
+	# Toxic Slash (TGMC's base sentinel): its claws drip toxin for six seconds and hit a third harder.
+	ActiveAbility@toxicslash:
+		OrderName: AbilityToxicSlash
+		Slot: 1
+		Label: Toxic Slash
+		Description: For six seconds its attacks hit a third harder.
+		PlasmaCost: 15
+		Cooldown: 300
+		Condition: toxicslash
+		Duration: 150
+		AiRange: 4c0
+		Sounds: xeno-hiss-2.ogg
+	FirepowerMultiplier@toxicslash:
+		RequiresCondition: toxicslash
+		Modifier: 133
+	WithColoredOverlay@toxicslash:
+		RequiresCondition: toxicslash
+		Color: 40FF4048
 	# Small enough for a full load of buckshot to throw it back (see TGMCShotgun).
 	Targetable@SMALL:
 		TargetTypes: SmallXeno
 	# Command card ability: neurotoxin that hurts and slows the nearest marine.
-	ActiveAbility@abilityneurotoxin:
-		OrderName: AbilityNeurotoxin
-		PlasmaCost: 15
-		Slot: 1
-		Label: Neurotoxin
-		Cooldown: 350
-		Weapon: TGMCNeurotoxin
-		Aim: Nearest
-		Range: 6c0
-		AiRange: 6c0
-		Sounds: acid-spit-1.ogg
 	Evolves:
 		Next: spitter
 		Previous: drone
-	Voiced:
+	TgmcVoiced:
 		VoiceSet: SentinelVoice
 	Health:
 		HP: 80
@@ -1824,7 +2069,7 @@ sentinel:
 
 facehugger:
 	Inherits: ^Xeno
-	Voiced:
+	TgmcVoiced:
 		VoiceSet: HuggerVoice
 	Health:
 		HP: 25
@@ -1866,7 +2111,7 @@ larva:
 	# Small enough for a full load of buckshot to throw it back (see TGMCShotgun).
 	Targetable@SMALL:
 		TargetTypes: SmallXeno
-	Voiced:
+	TgmcVoiced:
 		VoiceSet: LarvaVoice
 	Health:
 		HP: 40
@@ -1890,7 +2135,7 @@ drone:
 		TargetTypes: SmallXeno
 	Evolves:
 		Next: sentinel
-	Voiced:
+	TgmcVoiced:
 		VoiceSet: DroneVoice
 	Health:
 		HP: 70
@@ -1902,12 +2147,15 @@ drone:
 		Weapon: TGMCMend
 		Cursor: repair
 		OutsideRangeCursor: repair-blocked
-		TargetRelationships: Ally
-		ForceTargetRelationships: None
+		# An ordinary order (right-click) mends an ally or corrupts a free ore field. Auto-targeting mends only allies.
+		TargetRelationships: Ally, Neutral
+		ForceTargetRelationships: Neutral
 	AutoTarget:
 		ScanRadius: 5
 	AutoTargetPriority@DEFAULT:
 		ValidTargets: Structure
+		# Only allies: a free ore field is a Structure too, and the resin would claim it.
+		ValidRelationships: Ally
 	Production:
 		Produces: XenoBuild
 	GivesBuildableArea:
@@ -1966,7 +2214,7 @@ warrior:
 	Evolves:
 		Next: praetorian
 		Previous: hunter
-	Voiced:
+	TgmcVoiced:
 		VoiceSet: HunterVoice
 	Health:
 		HP: 260
@@ -2012,7 +2260,7 @@ queen:
 		SpawnSeek: 0
 		AiRange: 7c0
 		Sounds: egg-burst.ogg
-	Voiced:
+	TgmcVoiced:
 		VoiceSet: QueenVoice
 	Health:
 		HP: 300
@@ -2062,7 +2310,7 @@ spitter:
 	Evolves:
 		Next: boiler
 		Previous: sentinel
-	Voiced:
+	TgmcVoiced:
 		VoiceSet: HunterVoice
 	Health:
 		HP: 100
@@ -2084,23 +2332,6 @@ spitter:
 
 praetorian:
 	Inherits: ^Xeno
-	# Command card ability: Dodge, quicker and harder to hit for a moment.
-	ActiveAbility@abilitydodge:
-		OrderName: AbilityDodge
-		PlasmaCost: 20
-		Slot: 2
-		Label: Dodge
-		Cooldown: 450
-		Duration: 90
-		Condition: dodging
-		AiRange: 5c0
-		Sounds: xeno-hiss-3.ogg
-	SpeedMultiplier@dodge:
-		RequiresCondition: dodging
-		Modifier: 145
-	DamageMultiplier@dodge:
-		RequiresCondition: dodging
-		Modifier: 55
 	# Command card ability: spray acid on the ground in front of him.
 	ActiveAbility@spray:
 		OrderName: AbilityAcidSpray
@@ -2118,7 +2349,7 @@ praetorian:
 	Evolves:
 		Next: crusher
 		Previous: warrior
-	Voiced:
+	TgmcVoiced:
 		VoiceSet: HunterVoice
 	Health:
 		HP: 180
@@ -2135,7 +2366,7 @@ praetorian:
 	Buildable:
 		Queue: Xeno
 		BuildPaletteOrder: 60
-		Prerequisites: evolution-tower
+		Prerequisites: evolution-tower, hive-territory-1
 		Description: actor-praetorian.description
 
 crusher:
@@ -2185,13 +2416,14 @@ crusher:
 	Evolves:
 		Next: behemoth
 		Previous: praetorian
-	Voiced:
+	TgmcVoiced:
 		VoiceSet: HunterVoice
 	Health:
 		HP: 280
 	Selectable:
 		Bounds: 768, 768, 0, -128
 	TgmcMobile:
+		Locomotor: heavy
 		Speed: 125
 	Armament@PRIMARY:
 		Weapon: TGMCSlam
@@ -2202,11 +2434,15 @@ crusher:
 	Buildable:
 		Queue: Xeno
 		BuildPaletteOrder: 70
-		Prerequisites: maturity-tower
+		Prerequisites: maturity-tower, hive-territory-1
 		Description: actor-crusher.description
 
 ravager:
 	Inherits: ^Xeno
+	# Shell mutation (TGMC's Inward Focus): a fifth less damage while Enduring.
+	DamageMultiplier@inwardfocus:
+		RequiresCondition: endure && mut-shell
+		Modifier: 80
 	# TGMC's ravager: Charge into the nearest marine, Ravage everything just ahead.
 	ActiveAbility@charge:
 		OrderName: AbilityRavagerCharge
@@ -2279,7 +2515,7 @@ ravager:
 		Color: FFD04040
 	Evolves:
 		Next: wraith
-	Voiced:
+	TgmcVoiced:
 		VoiceSet: HunterVoice
 	Health:
 		HP: 150
@@ -2296,11 +2532,42 @@ ravager:
 	Buildable:
 		Queue: Xeno
 		BuildPaletteOrder: 80
-		Prerequisites: evolution-tower
+		Prerequisites: evolution-tower, hive-territory-1
 		Description: actor-ravager.description
 
 defiler:
 	Inherits: ^Xeno
+	# Reagent Slash (TGMC): its claws inject the reagent for a few seconds.
+	ActiveAbility@reagentslash:
+		OrderName: AbilityReagentSlash
+		Slot: 3
+		Label: Reagent Slash
+		Description: For six seconds its claws inject toxin and hit a third harder.
+		PlasmaCost: 17
+		Cooldown: 150
+		Condition: reagentslash
+		Duration: 150
+		AiRange: 3c0
+		Sounds: xeno-hiss-2.ogg
+	FirepowerMultiplier@reagentslash:
+		RequiresCondition: reagentslash
+		Modifier: 133
+	WithColoredOverlay@reagentslash:
+		RequiresCondition: reagentslash
+		Color: 40FF4048
+	# Defile (TGMC): a sting that hurts the marine beside it, slows it and leaves it firing weakly.
+	ActiveAbility@defile:
+		OrderName: AbilityDefile
+		Slot: 2
+		Label: Defile
+		Description: Sting the marine beside you. Heavy damage, and it is slowed and fires weakly for a while.
+		PlasmaCost: 17
+		Aim: Nearest
+		Range: 1c768
+		Weapon: TGMCDefile
+		Cooldown: 500
+		AiRange: 1c768
+		Sounds: acid-spit-2.ogg
 	# Command card ability: breathe out a cloud of neurotoxin, and for six seconds fill the cells around him with more as he walks.
 	ActiveAbility@abilityemitgas:
 		OrderName: AbilityEmitGas
@@ -2316,7 +2583,7 @@ defiler:
 		Sounds: acid-spit-1.ogg
 	Evolves:
 		Previous: boiler
-	Voiced:
+	TgmcVoiced:
 		VoiceSet: HunterVoice
 	Health:
 		HP: 200
@@ -2343,7 +2610,7 @@ defiler:
 	Buildable:
 		Queue: Xeno
 		BuildPaletteOrder: 90
-		Prerequisites: maturity-tower
+		Prerequisites: maturity-tower, hive-territory-1
 		Description: actor-defiler.description
 
 boiler:
@@ -2351,7 +2618,7 @@ boiler:
 	Evolves:
 		Next: defiler
 		Previous: spitter
-	Voiced:
+	TgmcVoiced:
 		VoiceSet: HunterVoice
 	Health:
 		HP: 160
@@ -2371,7 +2638,7 @@ boiler:
 	Buildable:
 		Queue: Xeno
 		BuildPaletteOrder: 100
-		Prerequisites: evolution-tower
+		Prerequisites: evolution-tower, hive-territory-1
 		Description: actor-boiler.description
 
 carrier:
@@ -2416,7 +2683,7 @@ carrier:
 		Sounds: egg-burst.ogg
 	Evolves:
 		Next: warlock
-	Voiced:
+	TgmcVoiced:
 		VoiceSet: HunterVoice
 	Health:
 		HP: 200
@@ -2488,7 +2755,7 @@ warlock:
 		Sounds: xeno-roar-2.ogg
 	Evolves:
 		Previous: carrier
-	Voiced:
+	TgmcVoiced:
 		VoiceSet: HunterVoice
 	Health:
 		HP: 170
@@ -2505,11 +2772,40 @@ warlock:
 	Buildable:
 		Queue: Xeno
 		BuildPaletteOrder: 120
-		Prerequisites: maturity-tower
+		Prerequisites: maturity-tower, hive-territory-1
 		Description: actor-warlock.description
 
 shrike:
 	Inherits: ^Xeno
+	# Psychic Vortex (TGMC's primordial). Needs the Primordial II upgrade.
+	ActiveAbility@psychicvortex:
+		OrderName: AbilityPsychicVortex
+		Slot: 4
+		Label: Vortex
+		Description: A vortex at the spot you click. Marines within two cells are hurt and held for three seconds. Primordial.
+		RequiresCondition: primordial-2
+		PlasmaCost: 40
+		Aim: Target
+		Range: 6c0
+		Weapon: TGMCPsychicVortex
+		Cooldown: 1000
+		AiRange: 6c0
+		AiMinTargets: 3
+		Sounds: xeno-roar-4.ogg
+	# Unrelenting Force (TGMC): a psychic shove that hurls the marines in front of her far back.
+	ActiveAbility@unrelentingforce:
+		OrderName: AbilityUnrelentingForce
+		Slot: 3
+		Label: Force
+		Description: Hurl the marines in front of you six cells back.
+		PlasmaCost: 30
+		Aim: Forward
+		ForwardDistance: 2c0
+		Weapon: TGMCUnrelentingForce
+		Cooldown: 1250
+		AiRange: 3c0
+		AiMinTargets: 2
+		Sounds: xeno-roar-4.ogg
 	# Command card abilities: Fling throws the nearest marine, Cure heals the xenos around her.
 	ActiveAbility@abilityfling:
 		OrderName: AbilityFling
@@ -2537,7 +2833,7 @@ shrike:
 	Evolves:
 		Next: widow
 		Previous: wraith
-	Voiced:
+	TgmcVoiced:
 		VoiceSet: HunterVoice
 	Health:
 		HP: 140
@@ -2554,11 +2850,48 @@ shrike:
 	Buildable:
 		Queue: Xeno
 		BuildPaletteOrder: 130
-		Prerequisites: evolution-tower
+		Prerequisites: evolution-tower, hive-territory-2
 		Description: actor-shrike.description
 
 widow:
 	Inherits: ^Xeno
+	# Burrow (TGMC): the widow digs in. Hidden, and she neither moves nor attacks until she comes out. A switch; the bot leaves it alone.
+	ActiveAbility@burrow:
+		OrderName: AbilityBurrow
+		Slot: 4
+		Label: Burrow
+		Description: Dig in. Hidden from sight, but she cannot move or attack. Press again to come out.
+		Toggle: true
+		Condition: burrowed
+		Cooldown: 500
+		Sounds: resin-build.ogg
+	# A mound of earth marks where she dug in (her owner sees it; the cloak hides it from the marines with her).
+	WithIdleOverlay@mound:
+		Image: burrow-mound
+		Sequence: idle
+		RequiresCondition: burrowed
+	Cloak@burrow:
+		RequiresCondition: burrowed
+		InitialDelay: 0
+		CloakDelay: 25
+		CloakedAlpha: 0.25
+	AttackWhileMoving:
+		PauseOnCondition: stunned || burrowed
+	# Leash Ball (TGMC): a ball of web thrown at the spot you click; marines around where it lands are stuck fast.
+	ActiveAbility@leashball:
+		OrderName: AbilityLeashBall
+		Slot: 3
+		Label: Leash Ball
+		Description: Throw a ball of web. Marines where it lands are stuck for three seconds.
+		PlasmaCost: 40
+		Aim: Target
+		Range: 6c0
+		Launch: true
+		Weapon: TGMCLeashBall
+		Cooldown: 600
+		AiRange: 6c0
+		AiMinTargets: 2
+		Sounds: acid-spit-2.ogg
 	# Birth Spiderling: a little spider that fights beside her for a minute.
 	ActiveAbility@abilityspiderling:
 		OrderName: AbilitySpiderling
@@ -2587,7 +2920,7 @@ widow:
 	Evolves:
 		Next: bull
 		Previous: shrike
-	Voiced:
+	TgmcVoiced:
 		VoiceSet: HunterVoice
 	Health:
 		HP: 150
@@ -2595,6 +2928,7 @@ widow:
 		Bounds: 768, 768, 0, -128
 	TgmcMobile:
 		Speed: 140
+		PauseOnCondition: stunned || burrowed
 	Armament@PRIMARY:
 		Weapon: TGMCAcid
 	Tooltip:
@@ -2604,11 +2938,41 @@ widow:
 	Buildable:
 		Queue: Xeno
 		BuildPaletteOrder: 140
-		Prerequisites: evolution-tower
+		Prerequisites: evolution-tower, hive-territory-1
 		Description: actor-widow.description
 
 wraith:
 	Inherits: ^Xeno
+	# Portal (TGMC): one end where the wraith stands, the other where you click. Any unit of either side that walks onto an end comes out of the other (tgmc/code/Portal.cs). The pair closes after a minute. The bot does not use it (AiMinTargets).
+	ActiveAbility@portal:
+		OrderName: AbilityPortal
+		Slot: 2
+		Label: Portal
+		Description: Open a portal from here to the spot you click. Any unit that steps on one end comes out of the other.
+		PlasmaCost: 12
+		Aim: Target
+		Range: 10c0
+		Weapon: TGMCPortal
+		SelfWeapon: TGMCPortal
+		Cooldown: 125
+		AiMinTargets: 99
+		Sounds: xeno-hiss-3.ogg
+	# Rewind (TGMC): five seconds later the unit you click is back where it stood, at the health it had.
+	ActiveAbility@rewind:
+		OrderName: AbilityRewind
+		Slot: 3
+		Label: Rewind
+		Description: Five seconds later the unit you click is back where it stands now, at the health it has now.
+		PlasmaCost: 30
+		Aim: TargetActor
+		TargetRelationships: Ally, Enemy
+		Range: 5c0
+		RewindTicks: 125
+		Cooldown: 500
+		AiMinTargets: 99
+		Sounds: xeno-hiss-1.ogg
+		EffectImage: fx-light
+		EffectSequence: blast
 	# Command card ability: freeze every marine around her for a moment.
 	ActiveAbility@abilitytimestop:
 		OrderName: AbilityTimestop
@@ -2621,24 +2985,10 @@ wraith:
 		AiRange: 4c0
 		AiMinTargets: 2
 		Sounds: xeno-roar-2.ogg
-	# Command card ability: blink up to nine cells, next to the nearest marine if one is that close.
-	ActiveAbility@abilityblink:
-		OrderName: AbilityBlink
-		PlasmaCost: 25
-		Slot: 2
-		Label: Blink
-		Cooldown: 300
-		TeleportDistance: 9c0
-		Aim: Self
-		AiRange: 9c0
-		AiMinTargets: 1
-		Sounds: xeno-hiss-3.ogg
-		EffectImage: fx-light
-		EffectSequence: blast
 	Evolves:
 		Next: shrike
 		Previous: ravager
-	Voiced:
+	TgmcVoiced:
 		VoiceSet: HunterVoice
 	Health:
 		HP: 140
@@ -2664,13 +3014,14 @@ bull:
 		Type: Heavy
 	Evolves:
 		Previous: widow
-	Voiced:
+	TgmcVoiced:
 		VoiceSet: HunterVoice
 	Health:
 		HP: 240
 	Selectable:
 		Bounds: 768, 768, 0, -128
 	TgmcMobile:
+		Locomotor: heavy
 		Speed: 155
 	Armament@PRIMARY:
 		Weapon: TGMCSlam
@@ -2686,6 +3037,40 @@ bull:
 
 behemoth:
 	Inherits: ^Xeno
+	# Primal Wrath (TGMC's primordial): a long rage. Needs the Primordial II upgrade.
+	ActiveAbility@primalwrath:
+		OrderName: AbilityPrimalWrath
+		Slot: 4
+		Label: Primal Wrath
+		Description: For ten seconds it hits 40% harder and moves a quarter faster. Primordial.
+		RequiresCondition: primordial-2
+		PlasmaCost: 40
+		Cooldown: 1500
+		Condition: primalwrath
+		Duration: 250
+		AiRange: 6c0
+		AiMinTargets: 2
+		Sounds: xeno-roar-1.ogg
+	FirepowerMultiplier@primalwrath:
+		RequiresCondition: primalwrath
+		Modifier: 140
+	SpeedMultiplier@primalwrath:
+		RequiresCondition: primalwrath
+		Modifier: 125
+	# Earth Riser (TGMC): a pillar of rock rises where you click and blocks the way and the bullets for twenty seconds.
+	ActiveAbility@earthriser:
+		OrderName: AbilityEarthRiser
+		Slot: 3
+		Label: Earth Riser
+		Description: Raise a rock pillar where you click. It blocks the way and bullets for twenty seconds.
+		PlasmaCost: 30
+		Aim: Target
+		Range: 5c0
+		Spawn: earth-pillar
+		Cooldown: 750
+		AiRange: 5c0
+		AiMinTargets: 3
+		Sounds: explosion-1.ogg
 	# TGMC's behemoth: Landslide charges and knocks aside everything in its path; Geocrush is one crushing blow.
 	ActiveAbility@abilitylandslide:
 		OrderName: AbilityLandslide
@@ -2719,13 +3104,14 @@ behemoth:
 		Type: Heavy
 	Evolves:
 		Previous: crusher
-	Voiced:
+	TgmcVoiced:
 		VoiceSet: HunterVoice
 	Health:
 		HP: 400
 	Selectable:
 		Bounds: 768, 768, 0, -128
 	TgmcMobile:
+		Locomotor: heavy
 		Speed: 115
 	Armament@PRIMARY:
 		Weapon: TGMCSlam
@@ -2736,7 +3122,7 @@ behemoth:
 	Buildable:
 		Queue: Xeno
 		BuildPaletteOrder: 170
-		Prerequisites: maturity-tower
+		Prerequisites: maturity-tower, hive-territory-1
 		Description: actor-behemoth.description
 
 # A cloud of gas left by a defiler or boiler. It owns itself for several seconds and chokes enemy units standing in it: damage and a slow.
@@ -2790,6 +3176,44 @@ plasma-gas:
 		Weapon: TGMCPlasmaGas
 
 # The acid a dead xeno leaves behind. It owns itself for a few seconds and hurts enemy infantry standing in it.
+# One end of a wraith's portal (see the wraith's Portal ability and tgmc/code/Portal.cs). Drawn by mod/make_placeholders.py.
+wraith-portal:
+	Portal:
+		Sounds: blink-drive.ogg
+	Expires:
+		Ticks: 1500
+	RevealsShroud:
+		Range: 2c0
+		Type: GroundPosition
+	Immobile:
+		OccupiesSpace: false
+	Interactable:
+	BodyOrientation:
+		QuantizedFacings: 1
+	Tooltip:
+		Name: actor-wraith-portal.name
+	RenderSprites:
+		Image: wraith-portal
+		Palette: effect
+	WithSpriteBody:
+
+# The behemoth's Earth Riser: a pillar of rock that blocks the way and bullets, and crumbles after twenty seconds or when shot down.
+earth-pillar:
+	Inherits: ^MapObjectCover
+	Tooltip:
+		Name: actor-earth-pillar.name
+	Health:
+		HP: 300
+	# It rises out of the ground (a short fade) and dies when its time is up, so it crumbles like one shot down.
+	FadesInOnBuild:
+		Duration: 12
+		StartPercent: 10
+	KillsSelf:
+		Delay: 500
+	RenderSprites:
+		Image: earth-pillar
+	WithSpriteBody:
+
 acid-pool:
 	# The acid glows green at night (the lobby's Night option).
 	NightLight:
@@ -2853,6 +3277,8 @@ flame-patch:
 		Image: fx-light
 		Sequence: glow-fire
 		Palette: effect
+	# Fire burns the weed carpet off its cell (a living node grows it back).
+	BurnsWeeds:
 	KillsSelf:
 		Delay: 200
 	Armament@PRIMARY:
@@ -2911,7 +3337,7 @@ nymph:
 		TargetTypes: SmallXeno
 	Evolves:
 		Next: runner
-	Voiced:
+	TgmcVoiced:
 		VoiceSet: HunterVoice
 	Health:
 		HP: 60
@@ -2923,10 +3349,7 @@ nymph:
 		Name: actor-nymph.name
 	Valued:
 		Cost: 35
-	Buildable:
-		Queue: Xeno
-		BuildPaletteOrder: 5
-		Description: actor-nymph.description
+	# An NPC minion in TGMC (XENO_TIER_MINION): not on the build list.
 
 # Mantis: a fast minion with TGMC's Ravage: a slashing lunge that cuts and throws back the marines in front of it.
 mantis:
@@ -2948,7 +3371,7 @@ mantis:
 		Sounds: xeno-roar-2.ogg
 	Evolves:
 		Previous: nymph
-	Voiced:
+	TgmcVoiced:
 		VoiceSet: HunterVoice
 	Health:
 		HP: 110
@@ -2960,11 +3383,7 @@ mantis:
 		Name: actor-mantis.name
 	Valued:
 		Cost: 80
-	Buildable:
-		Queue: Xeno
-		BuildPaletteOrder: 22
-		Prerequisites: evolution-tower
-		Description: actor-mantis.description
+	# An NPC minion in TGMC (XENO_TIER_MINION): not on the build list.
 
 # Baneling: a rolling sack of acid. It bursts on command (or when it dies), soaking everyone around in acid and gas.
 baneling:
@@ -2985,7 +3404,7 @@ baneling:
 	FireWarheadsOnDeath@burst:
 		Weapon: TGMCBanelingBurst
 		EmptyWeapon: TGMCBanelingBurst
-	Voiced:
+	TgmcVoiced:
 		VoiceSet: HunterVoice
 	Health:
 		HP: 70
@@ -2997,14 +3416,65 @@ baneling:
 		Name: actor-baneling.name
 	Valued:
 		Cost: 60
-	Buildable:
-		Queue: Xeno
-		BuildPaletteOrder: 24
-		Description: actor-baneling.description
+	# An NPC minion in TGMC (XENO_TIER_MINION): not on the build list.
 
 # Defender: the hive's shield. Fortify roots it to the ground and halves the damage it takes; Tail Sweep knocks marines back.
 defender:
 	Inherits: ^Xeno
+	# Shell mutation (TGMC's Carapace Regrowth): Regenerate Skin mends half as much again.
+	ChangesHealth@regrowth:
+		RequiresCondition: regenskin && mut-shell
+		Step: 5
+		Delay: 5
+		StartIfBelow: 100
+	# Centrifugal Force (TGMC's primordial): a spin that hurts and throws everyone around it. Needs the Primordial I upgrade.
+	ActiveAbility@centrifugalforce:
+		OrderName: AbilityCentrifugalForce
+		Slot: 6
+		Label: Spin
+		Description: Spin on the spot. Every marine within two cells is hurt and thrown back. Primordial.
+		RequiresCondition: primordial-1
+		PlasmaCost: 30
+		Aim: Self
+		Weapon: TGMCCentrifugal
+		Cooldown: 750
+		AiRange: 2c0
+		AiMinTargets: 2
+		Sounds: xeno-roar-6.ogg
+	# Crest Defense (TGMC): crest lowered, it takes less damage and walks slower. A switch.
+	ActiveAbility@crestdefense:
+		OrderName: AbilityCrestDefense
+		Slot: 4
+		Label: Crest
+		Description: Lower the crest. 30% less damage taken, 30% slower. Press again to raise it.
+		Toggle: true
+		Condition: crest
+		Sounds: xeno-hiss-1.ogg
+	DamageMultiplier@crest:
+		RequiresCondition: crest
+		Modifier: 70
+	SpeedMultiplier@crest:
+		RequiresCondition: crest
+		Modifier: 70
+	# Regenerate Skin (TGMC): mends a great deal in a few seconds, once a minute.
+	ActiveAbility@regenerateskin:
+		OrderName: AbilityRegenerateSkin
+		Slot: 5
+		Label: Regenerate
+		Description: Mend a great deal over four seconds. Once a minute.
+		PlasmaCost: 50
+		Cooldown: 1500
+		Condition: regenskin
+		Duration: 100
+		AiRange: 6c0
+		AiMinTargets: 1
+		AiWoundedPercent: 40
+		Sounds: xeno-hiss-2.ogg
+	ChangesHealth@regenskin:
+		RequiresCondition: regenskin
+		Step: 10
+		Delay: 5
+		StartIfBelow: 100
 	# Forward Charge: a short armoured rush that throws marines aside. Not while fortified.
 	ActiveAbility@abilitycharge:
 		OrderName: AbilityDefenderCharge
@@ -3050,7 +3520,7 @@ defender:
 		Modifier: 0
 	Evolves:
 		Next: beetle
-	Voiced:
+	TgmcVoiced:
 		VoiceSet: HunterVoice
 	Health:
 		HP: 200
@@ -3088,7 +3558,7 @@ beetle:
 		Sounds: xeno-roar-1.ogg
 	Evolves:
 		Previous: defender
-	Voiced:
+	TgmcVoiced:
 		VoiceSet: HunterVoice
 	Health:
 		HP: 280
@@ -3100,15 +3570,60 @@ beetle:
 		Name: actor-beetle.name
 	Valued:
 		Cost: 190
-	Buildable:
-		Queue: Xeno
-		BuildPaletteOrder: 72
-		Prerequisites: evolution-tower
-		Description: actor-beetle.description
+	# An NPC minion in TGMC (XENO_TIER_MINION): not on the build list.
 
 # Gorger: feeds on the fight. Feast makes it hit harder and heal while it lasts; Rejuvenate heals the xenos around it.
 gorger:
 	Inherits: ^Xeno
+	# Drain (TGMC): drinks from the marine beside it; the blood mends the gorger and fills its plasma.
+	ActiveAbility@drain:
+		OrderName: AbilityDrain
+		Slot: 2
+		Label: Drain
+		Description: Drink from the marine beside you. It is hurt and stunned, you mend and fill your blood.
+		Aim: Nearest
+		Range: 1c768
+		Weapon: TGMCGorgerDrain
+		SelfWeapon: TGMCDrainHeal
+		PlasmaGain: 30
+		Cooldown: 250
+		AiRange: 1c768
+		Sounds: xeno-hiss-1.ogg
+	# Transfusion (TGMC): gives blood to the xeno you click and mends it.
+	ActiveAbility@transfusion:
+		OrderName: AbilityTransfusion
+		Slot: 3
+		Label: Transfusion
+		Description: Mend the xeno you click with your blood.
+		PlasmaCost: 15
+		Aim: TargetActor
+		TargetRelationships: Ally
+		Range: 2c0
+		Weapon: TGMCTransfusion
+		Cooldown: 100
+		AiRange: 4c0
+		AiWoundedPercent: 50
+		Sounds: heal.ogg
+	# Carnage (TGMC): a few seconds of frenzy, hitting harder and mending with it.
+	ActiveAbility@carnage:
+		OrderName: AbilityCarnage
+		Slot: 4
+		Label: Carnage
+		Description: For four seconds it hits 40% harder and mends.
+		PlasmaCost: 10
+		Cooldown: 400
+		Condition: carnage
+		Duration: 100
+		AiRange: 3c0
+		Sounds: xeno-roar-5.ogg
+	FirepowerMultiplier@carnage:
+		RequiresCondition: carnage
+		Modifier: 140
+	ChangesHealth@carnage:
+		RequiresCondition: carnage
+		Step: 4
+		Delay: 10
+		StartIfBelow: 100
 	ActiveAbility@abilityfeast:
 		OrderName: AbilityFeast
 		PlasmaCost: 30
@@ -3121,19 +3636,6 @@ gorger:
 		AiMinTargets: 1
 		AiWoundedPercent: 60
 		Sounds: xeno-roar-3.ogg
-	ActiveAbility@abilityrejuvenate:
-		OrderName: AbilityRejuvenate
-		PlasmaCost: 40
-		Slot: 2
-		Label: Rejuvenate
-		Cooldown: 600
-		AuraRange: 3c0
-		AuraCondition: psycure
-		AuraDuration: 150
-		Ring: 60D060
-		AiRange: 3c0
-		AiMinTargets: 1
-		Sounds: xeno-hiss-2.ogg
 	FirepowerMultiplier@feast:
 		RequiresCondition: feasting
 		Modifier: 150
@@ -3144,7 +3646,7 @@ gorger:
 		StartIfBelow: 100
 	Evolves:
 		Previous: warrior
-	Voiced:
+	TgmcVoiced:
 		VoiceSet: HunterVoice
 	Health:
 		HP: 330
@@ -3159,12 +3661,27 @@ gorger:
 	Buildable:
 		Queue: Xeno
 		BuildPaletteOrder: 74
-		Prerequisites: evolution-tower
+		Prerequisites: evolution-tower, hive-territory-1
 		Description: actor-gorger.description
 
 # Hivelord: the big builder. It builds and mends like a drone, gives a wider build area and is tough enough to build under fire.
 hivelord:
 	Inherits: ^Xeno
+	# Resin Walker (TGMC's speed toggle, here a timed burst): faster for eight seconds.
+	ActiveAbility@resinwalker:
+		OrderName: AbilityResinWalker
+		Slot: 2
+		Label: Resin Walker
+		Description: Move 40% faster for eight seconds.
+		PlasmaCost: 30
+		Cooldown: 400
+		Condition: resinwalk
+		Duration: 200
+		AiRange: 8c0
+		Sounds: xeno-hiss-3.ogg
+	SpeedMultiplier@resinwalk:
+		RequiresCondition: resinwalk
+		Modifier: 140
 	ActiveAbility@abilityinfusion:
 		OrderName: AbilityHealingInfusion
 		PlasmaCost: 40
@@ -3181,7 +3698,7 @@ hivelord:
 		AiWoundedPercent: 60
 	Evolves:
 		Previous: drone
-	Voiced:
+	TgmcVoiced:
 		VoiceSet: DroneVoice
 	Health:
 		HP: 200
@@ -3193,12 +3710,15 @@ hivelord:
 		Weapon: TGMCMend
 		Cursor: repair
 		OutsideRangeCursor: repair-blocked
-		TargetRelationships: Ally
-		ForceTargetRelationships: None
+		# An ordinary order (right-click) mends an ally or corrupts a free ore field. Auto-targeting mends only allies.
+		TargetRelationships: Ally, Neutral
+		ForceTargetRelationships: Neutral
 	AutoTarget:
 		ScanRadius: 6
 	AutoTargetPriority@DEFAULT:
 		ValidTargets: Structure
+		# Only allies: a free ore field is a Structure too, and the resin would claim it.
+		ValidRelationships: Ally
 	Production:
 		Produces: XenoBuild
 	GivesBuildableArea:
@@ -3216,6 +3736,36 @@ hivelord:
 # Puppeteer: raises puppets, little husks that rush the enemy and fall apart after twenty seconds.
 puppeteer:
 	Inherits: ^Xeno
+	# Organic Bomb (TGMC): the nearest of its puppets within six cells bursts like a baneling. Refused when it has none in reach.
+	ActiveAbility@organicbomb:
+		OrderName: AbilityOrganicBomb
+		Slot: 5
+		Label: Organic Bomb
+		Description: Your nearest puppet within six cells bursts in acid.
+		PlasmaCost: 13
+		Aim: Self
+		Range: 6c0
+		Detonate: puppet
+		Weapon: TGMCBanelingBurst
+		Cooldown: 750
+		AiRange: 6c0
+		AiMinTargets: 3
+		Sounds: xeno-hiss-1.ogg
+	# Dreadful Presence (TGMC): marines within four cells are shaken: slower to move and to fire for six seconds.
+	ActiveAbility@dreadfulpresence:
+		OrderName: AbilityDreadfulPresence
+		Slot: 4
+		Label: Dread
+		Description: Marines within four cells move and fire slower for six seconds.
+		PlasmaCost: 10
+		Aim: Self
+		Weapon: TGMCDreadfulPresence
+		Range: 4c0
+		Ring: 802020
+		Cooldown: 500
+		AiRange: 4c0
+		AiMinTargets: 2
+		Sounds: xeno-roar-3.ogg
 	# Flay tears at the marine beside it; Pincushion shoots a spine from its tail.
 	ActiveAbility@abilityflay:
 		OrderName: AbilityFlay
@@ -3254,7 +3804,7 @@ puppeteer:
 		AiRange: 8c0
 		AiMinTargets: 1
 		Sounds: xeno-hiss-3.ogg
-	Voiced:
+	TgmcVoiced:
 		VoiceSet: HunterVoice
 	Health:
 		HP: 150
@@ -3278,7 +3828,7 @@ puppet:
 		TargetTypes: SmallXeno
 	Expires:
 		Ticks: 500
-	Voiced:
+	TgmcVoiced:
 		VoiceSet: HunterVoice
 	Health:
 		HP: 40
@@ -3298,7 +3848,7 @@ spiderling:
 		TargetTypes: SmallXeno
 	Expires:
 		Ticks: 1500
-	Voiced:
+	TgmcVoiced:
 		VoiceSet: HunterVoice
 	Health:
 		HP: 30
@@ -3371,7 +3921,7 @@ pyrogen:
 		AiRange: 7c0
 		AiMinTargets: 1
 		Sounds: xeno-roar-2.ogg
-	Voiced:
+	TgmcVoiced:
 		VoiceSet: HunterVoice
 	Health:
 		HP: 160
@@ -3406,7 +3956,7 @@ scorpion:
 		AiRange: 5c0
 		AiMinTargets: 1
 		Sounds: acid-spit-1.ogg
-	Voiced:
+	TgmcVoiced:
 		VoiceSet: HunterVoice
 	Health:
 		HP: 150
@@ -3418,15 +3968,36 @@ scorpion:
 		Name: actor-scorpion.name
 	Valued:
 		Cost: 160
-	Buildable:
-		Queue: Xeno
-		BuildPaletteOrder: 82
-		Prerequisites: evolution-tower
-		Description: actor-scorpion.description
+	# An NPC minion in TGMC (XENO_TIER_MINION): not on the build list.
 
 # Dragon: a huge fire-breathing xeno. Fire Breath burns a cone ahead; Wing Gust knocks everyone around it flat. One at a time.
 dragon:
 	Inherits: ^Xeno
+	# Grab (TGMC): seizes the marine beside it and holds it.
+	ActiveAbility@grab:
+		OrderName: AbilityGrab
+		Slot: 4
+		Label: Grab
+		Description: Seize the marine beside you. It is hurt and held still for three seconds.
+		Aim: Nearest
+		Range: 2c0
+		Weapon: TGMCDragonGrab
+		Cooldown: 500
+		AiRange: 2c0
+		Sounds: xeno-roar-5.ogg
+	# Backhand (TGMC): a swipe that hurts and hurls back the marines in front of it.
+	ActiveAbility@backhand:
+		OrderName: AbilityBackhand
+		Slot: 3
+		Label: Backhand
+		Description: Swipe the marines in front of you and hurl them back.
+		PlasmaCost: 20
+		Aim: Forward
+		ForwardDistance: 1c512
+		Weapon: TGMCBackhand
+		Cooldown: 450
+		AiRange: 2c0
+		Sounds: xeno-roar-6.ogg
 	Targetable@FIREPROOF:
 		TargetTypes: Fireproof
 	Armor:
@@ -3454,13 +4025,14 @@ dragon:
 		AiRange: 3c0
 		AiMinTargets: 2
 		Sounds: slam-2.ogg
-	Voiced:
+	TgmcVoiced:
 		VoiceSet: QueenVoice
 	Health:
 		HP: 700
 	Selectable:
 		Bounds: 2048, 1536, 0, -256
 	TgmcMobile:
+		Locomotor: heavy
 		Speed: 120
 	Tooltip:
 		Name: actor-dragon.name
@@ -3469,13 +4041,57 @@ dragon:
 	Buildable:
 		Queue: Xeno
 		BuildPaletteOrder: 190
-		Prerequisites: queen
+		Prerequisites: queen, hive-territory-2
 		BuildLimit: 1
 		Description: actor-dragon.description
 
 # King: the hive's warlord. Royal Roar stuns every marine around him and sends the xenos near him into a rage.
 king:
 	Inherits: ^Xeno
+	# Zero-Form Beam (TGMC's primordial). Needs the Primordial II upgrade.
+	ActiveAbility@zeroformbeam:
+		OrderName: AbilityZeroFormBeam
+		Slot: 5
+		Label: Zero-Form Beam
+		Description: Fire a beam at the spot you click, up to twelve cells away. Very heavy damage where it lands. Primordial.
+		RequiresCondition: primordial-2
+		PlasmaCost: 50
+		Aim: Target
+		Range: 12c0
+		Launch: true
+		Weapon: TGMCZeroFormBeam
+		Cooldown: 1500
+		AiRange: 12c0
+		AiMinTargets: 3
+		Sounds: xeno-roar-2.ogg
+	# Nightfall (TGMC): the lights go out around the king; marines within nine cells see half as far for ten seconds.
+	ActiveAbility@nightfall:
+		OrderName: AbilityNightfall
+		Slot: 3
+		Label: Nightfall
+		Description: Marines within nine cells see half as far for ten seconds.
+		PlasmaCost: 10
+		Aim: Self
+		Weapon: TGMCNightfall
+		Range: 9c0
+		Ring: 303060
+		Cooldown: 1125
+		AiRange: 9c0
+		AiMinTargets: 4
+		Sounds: xeno-roar-1.ogg
+	# Off-Guard (TGMC): the nearest marine is thrown off its aim and fires weakly for ten seconds.
+	ActiveAbility@offguard:
+		OrderName: AbilityOffGuard
+		Slot: 4
+		Label: Off-Guard
+		Description: The nearest marine fires weakly for ten seconds.
+		PlasmaCost: 10
+		Aim: Nearest
+		Range: 7c0
+		Weapon: TGMCOffGuard
+		Cooldown: 500
+		AiRange: 7c0
+		Sounds: xeno-hiss-2.ogg
 	Armor:
 		Type: Heavy
 	ActiveAbility@abilityroar:
@@ -3507,13 +4123,14 @@ king:
 		AiRange: 4c0
 		AiMinTargets: 3
 		Sounds: xeno-hiss-3.ogg
-	Voiced:
+	TgmcVoiced:
 		VoiceSet: QueenVoice
 	Health:
 		HP: 650
 	Selectable:
 		Bounds: 1024, 1024, 0, -256
 	TgmcMobile:
+		Locomotor: heavy
 		Speed: 130
 	Tooltip:
 		Name: actor-king.name
@@ -3522,7 +4139,7 @@ king:
 	Buildable:
 		Queue: Xeno
 		BuildPaletteOrder: 195
-		Prerequisites: queen
+		Prerequisites: queen, hive-territory-2
 		BuildLimit: 1
 		Description: actor-king.description
 
@@ -3552,7 +4169,7 @@ king:
 	Turreted:
 		TurnSpeed: 24
 	AttackTurreted:
-	Voiced:
+	TgmcVoiced:
 		VoiceSet: MarineVoice
 	FireWarheadsOnDeath:
 		Weapon: TGMCBlastFxBig
@@ -3619,7 +4236,7 @@ tank:
 	Valued:
 		Cost: 900
 	Buildable:
-		Queue: Infantry
+		Queue: Vehicle
 		BuildAtProductionType: Vehicle
 		BuildPaletteOrder: 75
 		Prerequisites: workshop, ~faction-marines
@@ -3653,7 +4270,7 @@ apc:
 	Valued:
 		Cost: 450
 	Buildable:
-		Queue: Infantry
+		Queue: Vehicle
 		BuildAtProductionType: Vehicle
 		BuildPaletteOrder: 72
 		Prerequisites: workshop, ~faction-marines
@@ -3690,7 +4307,7 @@ som-tank:
 	Valued:
 		Cost: 900
 	Buildable:
-		Queue: Infantry
+		Queue: Vehicle
 		BuildAtProductionType: Vehicle
 		BuildPaletteOrder: 75
 		Prerequisites: workshop, ~faction-som

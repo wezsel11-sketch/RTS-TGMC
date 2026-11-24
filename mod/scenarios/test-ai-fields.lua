@@ -1,6 +1,6 @@
--- Scenario test: the xeno AI, with no marines, leaves the dormant ore fields alone. A field only becomes a target once a marine
--- has repaired it (claimed), so with no marines every field keeps its starting health and none falls.
--- Prints "TEST ai-fields PASS" when no field is touched by 6000 ticks, "TEST ai-fields FAIL" if one is hit.
+-- Scenario test: the xeno AI, with no marines, never claws a free ore field. Its drones may corrupt one (the field then turns
+-- into a corrupted miner and leaves the world, which is fine); what must not happen is a field losing health.
+-- Prints "TEST ai-fields PASS" when no field is hurt by 6000 ticks, "TEST ai-fields FAIL" if one is.
 local reported = false
 
 WorldLoaded = function()
@@ -15,7 +15,7 @@ WorldLoaded = function()
 			return
 		end
 		for i, f in ipairs(fields) do
-			if f.IsDead or not f.IsInWorld or f.Health < start[i] then
+			if f.IsInWorld and not f.IsDead and f.Health < start[i] then
 				reported = true
 				print("TEST ai-fields FAIL (dormant field " .. i .. " was hit by tick " .. ticks .. ")")
 				return

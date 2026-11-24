@@ -183,6 +183,7 @@ Sequences:
 	tgmc|sequences/fx-gibs.yaml
 	tgmc|sequences/fx-blast-cas.yaml
 	tgmc|sequences/fx-dust-tile.yaml
+	tgmc|sequences/fx-wall-damage.yaml
 	tgmc|sequences/fx-smoke-puff.yaml
 	tgmc|sequences/fx-dirt-puff.yaml
 	tgmc|sequences/fx-rock.yaml

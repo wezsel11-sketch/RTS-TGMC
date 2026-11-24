@@ -120,9 +120,9 @@ Container@PLAYER_WIDGETS:
 					Height: 14
 		Background@TOP_BAR:
 			Logic: TopBarLogic
-			X: WINDOW_WIDTH / 2 - 270
+			X: WINDOW_WIDTH / 2 - 310
 			Y: 8
-			Width: 540
+			Width: 620
 			Height: 30
 			Background: tgui-window
 			Children:
@@ -155,9 +155,15 @@ Container@PLAYER_WIDGETS:
 					Width: 90
 					Height: 22
 					Font: TinyBold
+				Label@TOP_POINTS:
+					X: 445
+					Y: 4
+					Width: 85
+					Height: 22
+					Font: TinyBold
 				Label@GAME_TIMER:
 					Logic: GameTimerLogic
-					X: 450
+					X: 530
 					Y: 4
 					Width: 80
 					Height: 22
@@ -618,6 +624,9 @@ Container@PLAYER_WIDGETS:
 								HotkeyPalette@PRODUCTION_PALETTE:
 									X: 62
 									Columns: 7
+									# Two rows fit the panel; the rest scrolls (wheel, or the buttons beside Repeat).
+									MinimumRows: 2
+									MaximumRows: 2
 									IconSize: 62, 46
 									IconMargin: 1, 1
 									TooltipContainer: TOOLTIP_CONTAINER
@@ -626,6 +635,36 @@ Container@PLAYER_WIDGETS:
 									HotkeyPrefix: Production
 									HotkeyCount: 24
 									SelectProductionBuildingHotkey: SelectProductionBuilding
+								Button@SCROLL_UP_BUTTON:
+									X: 410
+									Y: -28
+									Width: 22
+									Height: 20
+									VisualHeight: 0
+									Background: sidebar-button
+									TooltipText: button-production-types-scroll-up-tooltip
+									TooltipContainer: TOOLTIP_CONTAINER
+									Children:
+										Image@ICON:
+											X: 3
+											Y: 2
+											ImageCollection: scrollpanel-decorations
+											ImageName: up
+								Button@SCROLL_DOWN_BUTTON:
+									X: 434
+									Y: -28
+									Width: 22
+									Height: 20
+									VisualHeight: 0
+									Background: sidebar-button
+									TooltipText: button-production-types-scroll-down-tooltip
+									TooltipContainer: TOOLTIP_CONTAINER
+									Children:
+										Image@ICON:
+											X: 3
+											Y: 2
+											ImageCollection: scrollpanel-decorations
+											ImageName: down
 								Container@PRODUCTION_TYPES:
 									Logic: ProductionTabProgressLogic
 									X: 0
@@ -633,8 +672,8 @@ Container@PLAYER_WIDGETS:
 									Height: 94
 									Children:
 										ProductionTypeButton@INFANTRY:
-											Y: 8
 											X: 0
+											Y: 2
 											Width: 28
 											Height: 28
 											VisualHeight: 0
@@ -653,7 +692,7 @@ Container@PLAYER_WIDGETS:
 													BarMargin: 0, 0
 										ProductionTypeButton@XENO:
 											X: 30
-											Y: 8
+											Y: 2
 											Width: 28
 											Height: 28
 											VisualHeight: 0
@@ -670,9 +709,28 @@ Container@PLAYER_WIDGETS:
 													Width: 24
 													Height: 3
 													BarMargin: 0, 0
-										ProductionTypeButton@BUILD:
+										ProductionTypeButton@VEHICLE:
 											X: 0
-											Y: 50
+											Y: 33
+											Width: 28
+											Height: 28
+											VisualHeight: 0
+											Background: sidebar-button
+											ProductionGroup: Vehicle
+											Children:
+												Image@ICON:
+													X: 4
+													Y: 4
+													ImageCollection: production-icons
+												ProgressBar@PROGRESS:
+													X: 2
+													Y: 24
+													Width: 24
+													Height: 3
+													BarMargin: 0, 0
+										ProductionTypeButton@BUILD:
+											X: 30
+											Y: 33
 											Width: 28
 											Height: 28
 											VisualHeight: 0
@@ -690,8 +748,8 @@ Container@PLAYER_WIDGETS:
 													Height: 3
 													BarMargin: 0, 0
 										ProductionTypeButton@UPGRADE:
-											X: 30
-											Y: 50
+											X: 0
+											Y: 64
 											Width: 28
 											Height: 28
 											VisualHeight: 0
@@ -711,7 +769,7 @@ Container@PLAYER_WIDGETS:
 						Label@BUILD_HINT:
 							X: 4
 							Y: -24
-							Width: PARENT_WIDTH - 70
+							Width: PARENT_WIDTH - 118
 							Height: 20
 							Text: hud-build-hint
 							Font: Tiny

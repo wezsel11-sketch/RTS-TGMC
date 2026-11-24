@@ -34,6 +34,10 @@ namespace OpenRA.Mods.TGMC.Traits
 		[Desc("A drone keeps away from spots with enemy units within this many cells.")]
 		public readonly int Danger = 8;
 
+		[Desc("Idle drones left at home while an unclaimed field (SpareField) exists, so FieldBotModule can send them to corrupt it.")]
+		public readonly int Spare = 0;
+		public readonly string SpareField = "miner-field";
+
 		public override object Create(ActorInitializer init) { return new WeedDroneBotModule(init.Self, this); }
 	}
 
@@ -57,6 +61,9 @@ namespace OpenRA.Mods.TGMC.Traits
 
 			countdown = Info.Interval;
 			var drones = world.Actors.Where(a => a.Owner == player && a.IsInWorld && !a.IsDead && a.IsIdle && Info.Drones.Contains(a.Info.Name)).ToList();
+			if (Info.Spare > 0 && world.Actors.Any(a => a.Info.Name == Info.SpareField && a.IsInWorld && !a.IsDead && a.Owner.NonCombatant))
+				drones = drones.Skip(Info.Spare).ToList();
+
 			if (drones.Count == 0)
 				return;
 

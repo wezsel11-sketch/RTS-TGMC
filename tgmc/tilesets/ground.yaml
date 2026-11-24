@@ -31,11 +31,12 @@ Terrain:
 	# The walls of the converted maps: rock to walk, but heavy weapons can knock them down (DestructibleWalls).
 	TerrainType@Wall:
 		Type: Wall
-		TargetTypes: Rock
+		# Wall as well as Rock: weapons that can knock a wall down take a wall cell as a forced target (Ctrl-click).
+		TargetTypes: Rock, Wall
 		Color: 8C8C94
 	TerrainType@ReinforcedWall:
 		Type: ReinforcedWall
-		TargetTypes: Rock
+		TargetTypes: Rock, Wall
 		Color: 6E6E78
 
 Templates:

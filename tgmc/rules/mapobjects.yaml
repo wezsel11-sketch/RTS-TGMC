@@ -48,12 +48,17 @@
 		Dimensions: 1, 1
 
 # An ore field: TGMC's ore drill, the one thing on a converted map a player can take. It starts broken and belongs to no one
-# (MinerField in tgmc/code/MinerField.cs). A marine engineer repairs it with the torch; once it is back to full health it becomes
-# that player's miner. It shows on the radar and stays on the map under fog, so every field is marked for both sides.
+# (MinerField in tgmc/code/MinerField.cs). A marine engineer repairs it with the torch, or a xeno drone covers it in resin; once it is
+# back to full health it becomes that player's miner (the xenos' corrupted miner). A miner knocked down to its floor is this field again. It shows on the radar and stays on the map under fog, so every field is marked for both sides.
 # Placed by mod/build_maptiles.py on each TGMC map that has drills (the sprite is drawn by mod/make_placeholders.py).
 miner-field:
 	Tooltip:
 		Name: actor-miner-field.name
+	ExternalCondition@platinum:
+		Condition: platinum
+	WithColoredOverlay@platinum:
+		Color: C8E6FF50
+		RequiresCondition: platinum
 	Health:
 		HP: 500
 	Building:
@@ -65,7 +70,7 @@ miner-field:
 	WithIdleAnimation:
 		Sequences: idle
 	Targetable:
-		TargetTypes: Ground, Structure, Repair
+		TargetTypes: Ground, Structure, Repair, OreField
 	HitShape:
 		UseTargetableCellsOffsets: true
 		Type: Rectangle
@@ -75,10 +80,27 @@ miner-field:
 		Bounds: 32, 32
 	BodyOrientation:
 		QuantizedFacings: 1
-	AppearsOnRadar:
+	# On the minimap a capture point is a diamond in its holder's colour (grey while free), larger on platinum.
+	PointRadarSignature:
+		RequiresCondition: !platinum
+	PointRadarSignature@platinum:
+		Radius: 2
+		RequiresCondition: platinum
 	FrozenUnderFog:
 	MinerField:
 		IntoActor: miner
+		FactionIntoActors:
+			xenos: corrupted-miner
+
+# Platinum under an ore field (TGMC's platinum drill): the field on this cell, and the miner or corrupted miner standing on it, pays half
+# as much again. It is a mark on the ground with no picture of its own: the field above it is tinted pale blue. (No second Tooltip for the name: two Tooltip traits on one actor crash every TraitInfoOrDefault<TooltipInfo> lookup, the selection card first.)
+platinum-vein:
+	Immobile:
+		OccupiesSpace: false
+	ProximityExternalCondition:
+		Condition: platinum
+		Range: 0c256
+		ValidRelationships: Ally, Neutral, Enemy
 
 # The Alamo, the dropship that lands for the Evac mission (mod/scenarios/mission-evac.lua): 11 by 21 cells, drawn from TGMC's own
 # layout with its side hatches, rear ramp and cockpit hatch (mod/build_sprites.py compose_alamo). Units walk onto it; the mission

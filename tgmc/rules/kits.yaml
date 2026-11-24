@@ -712,6 +712,10 @@ flare-light:
 # Xenos (TGMC's caste abilities). Plasma costs are TGMC's, scaled to the mod's plasma of 100.
 
 runner:
+	# Shell mutation (TGMC's Upfront Evasion, as armour): a fifth less damage while Evading.
+	DamageMultiplier@upfrontevasion:
+		RequiresCondition: evading && mut-shell
+		Modifier: 80
 	ActiveAbility@evasion:
 		OrderName: AbilityEvasion
 		Slot: 1
@@ -740,22 +744,22 @@ runner:
 		PlasmaCost: 10
 		Sounds: xeno-pounce-1.ogg, xeno-pounce-2.ogg
 		AiRange: 5c0
-	ActiveAbility@missile:
-		OrderName: AbilityAcidMissile
-		Slot: 3
-		Label: Missile
-		Description: Lob a glob of acid at the spot you click: it leaves a pool.
-		Aim: Target
-		Range: 7c0
-		Launch: true
-		Weapon: TGMCAcidMissile
-		Cooldown: 750
-		PlasmaCost: 50
-		Sounds: acid-spit-1.ogg, acid-spit-2.ogg
-		AiRange: 7c0
-		AiMinTargets: 2
 
 hunter:
+	# Mirage (TGMC's hunter): illusions of the hunter appear around it and draw fire for ten seconds.
+	ActiveAbility@mirage:
+		RequiresCondition: primordial-1
+		OrderName: AbilityMirage
+		Slot: 5
+		Label: Mirage
+		Description: Illusions of the hunter appear around it and draw fire. Primordial.
+		PlasmaCost: 25
+		Aim: Self
+		Weapon: TGMCMirage
+		Cooldown: 750
+		AiRange: 6c0
+		AiMinTargets: 2
+		Sounds: xeno-hiss-2.ogg
 	# Stealth is a switch now: on by default as before, off to stay seen (and fight without the delay).
 	Cloak@stealth:
 		RequiresCondition: stealth-mode
@@ -964,7 +968,24 @@ bull:
 		AiRange: 6c0
 
 sentinel:
+	# Drain Sting (TGMC's base sentinel): stings the marine beside it; the venom it draws back mends the sentinel and refills its plasma.
+	ActiveAbility@drainsting:
+		OrderName: AbilityDrainSting
+		PlasmaCost: 12
+		Slot: 3
+		Label: Drain Sting
+		Description: Sting the marine beside you: hurts and slows it, mends you and refills plasma.
+		Aim: Nearest
+		Range: 1c768
+		Weapon: TGMCDrainSting
+		SelfWeapon: TGMCStingHeal
+		PlasmaGain: 30
+		Cooldown: 350
+		AiRange: 1c768
+		Sounds: acid-spit-1.ogg
+	# Primordial in TGMC: needs the Primordial I upgrade.
 	ActiveAbility@toxicgrenade:
+		RequiresCondition: primordial-1
 		OrderName: AbilityToxicGrenade
 		Slot: 2
 		Label: Toxic
@@ -979,6 +1000,35 @@ sentinel:
 		AiMinTargets: 2
 
 warrior:
+	# Flurry (TGMC's primordial): three punches in a row. Needs the Primordial I upgrade.
+	ActiveAbility@flurry:
+		OrderName: AbilityFlurry
+		Slot: 6
+		Label: Flurry
+		Description: Three quick punches at the marine beside you, one after the other. Primordial.
+		RequiresCondition: primordial-1
+		PlasmaCost: 10
+		Aim: Nearest
+		Range: 1c768
+		Weapon: TGMCPunch
+		Cooldown: 20
+		Charges: 3
+		ChargeRegen: 250
+		AiRange: 1c768
+		Sounds: claw-swipe-1.ogg
+	# Grapple Toss (TGMC): grabs the marine beside it and throws it six cells.
+	ActiveAbility@grappletoss:
+		OrderName: AbilityGrappleToss
+		Slot: 5
+		Label: Toss
+		Description: Throw the marine beside you six cells away.
+		PlasmaCost: 18
+		Aim: Nearest
+		Range: 1c768
+		Weapon: TGMCGrappleToss
+		Cooldown: 400
+		AiRange: 1c768
+		Sounds: xeno-roar-4.ogg
 	ActiveAbility@lunge:
 		OrderName: AbilityWarriorLunge
 		Slot: 3
@@ -1037,6 +1087,21 @@ spitter:
 		AiRange: 0c0
 
 queen:
+	# Bulwark (TGMC): the xenos around the queen take a quarter less damage for ten seconds.
+	ActiveAbility@bulwark:
+		OrderName: AbilityBulwark
+		Slot: 7
+		Label: Bulwark
+		Description: Xenos within five cells take a quarter less damage for ten seconds.
+		PlasmaCost: 10
+		Aim: Self
+		Weapon: TGMCBulwark
+		Range: 5c0
+		Ring: 8060D0
+		Cooldown: 500
+		AiRange: 6c0
+		AiMinTargets: 3
+		Sounds: xeno-roar-2.ogg
 	ActiveAbility@heal:
 		OrderName: AbilityQueenHeal
 		Slot: 3
@@ -1111,6 +1176,53 @@ facehugger:
 		AiRange: 4c0
 
 # SOM. Most SOM units are their marine counterpart (Inherits) and so carry its kit; these are the ones that are not, or differ.
+
+# Blink Assault Veteran: TGMC's blink drive (blink_drive.dm: 7 cells). It blinks next to the nearest enemy in reach, else straight ahead,
+# then cuts with the energy sword; the marine blademan's Lunge stays on slot 1.
+som_blademan:
+	ActiveAbility@blink:
+		RequiresCondition: !blink-up
+		OrderName: AbilityBlinkDrive
+		Slot: 2
+		Label: Blink
+		Description: Teleport next to the nearest enemy within 7 cells, or 7 cells straight ahead.
+		Cooldown: 150
+		TeleportDistance: 7c0
+		Aim: Self
+		AiRange: 7c0
+		AiMinTargets: 1
+		Sounds: blink-drive.ogg
+		EffectImage: fx-light
+		EffectSequence: blast
+	# The same drive with the upgrade: ten cells.
+	ActiveAbility@blinklong:
+		RequiresCondition: blink-up
+		OrderName: AbilityBlinkDrive
+		Slot: 2
+		Label: Blink
+		Description: Teleport next to the nearest enemy within 10 cells, or 10 cells straight ahead.
+		Cooldown: 150
+		TeleportDistance: 10c0
+		Aim: Self
+		AiRange: 10c0
+		AiMinTargets: 1
+		Sounds: blink-drive.ogg
+		EffectImage: fx-light
+		EffectSequence: blast
+	# Recall: back to his nearest teleporter beacon (som-beacon in structures.yaml), from anywhere. Refused with no beacon standing.
+	ActiveAbility@recall:
+		OrderName: AbilityRecall
+		Slot: 3
+		Label: Recall
+		Description: Teleport to your nearest beacon, from anywhere on the map.
+		Cooldown: 750
+		TeleportTo: som-beacon
+		Aim: Self
+		# The bot blinks in; it does not blink home.
+		AiMinTargets: 99
+		Sounds: blink-drive.ogg
+		EffectImage: fx-light
+		EffectSequence: blast
 
 som_trooper:
 	ActiveAbility@frag:

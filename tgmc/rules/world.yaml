@@ -70,6 +70,9 @@
 	# The walls of the converted maps fall to heavy weapons (DamageWalls warheads in weapons.yaml).
 	DestructibleWalls:
 		Sounds: slam-1.ogg, explosion-2.ogg
+		DamageImage: wall-damage
+		DamageSequence: overlay
+		BreakWeapon: TGMCWallBreak
 	# Pings on the minimap: attacks on your base, a facehugged marine, a CAS target.
 	RadarPings:
 	TgmcEventLog:
@@ -190,6 +193,16 @@
 			Clear: 100
 			Road: 120
 			Ford: 60
+	# The heavy xeno castes (crusher, bull, behemoth, king, dragon): as foot, but they walk through fences and windows and break them
+	# (Crushable on those map objects, written by mod/build_maptiles.py).
+	Locomotor@HEAVY:
+		Name: heavy
+		SharesCell: false
+		Crushes: fence
+		TerrainSpeeds:
+			Clear: 100
+			Road: 120
+			Ford: 60
 	Faction@marines:
 		Name: faction-marines.name
 		InternalName: marines
@@ -215,6 +228,8 @@ World:
 	NightLighting:
 	# Does nothing unless TGMC_FAST=1 is set (mod/test_scenarios.sh, mod/balance.sh): then the sim runs flat out and draws nothing.
 	HeadlessTestSpeed:
+	# Groups keep their shape and walk together (a lobby option, see FormationMoves in tgmc/code/TileStep.cs).
+	FormationMoves:
 
 # Map editor and lobby marker for a starting position. Actors of this type are read by MapStartingLocations.
 mpspawn:

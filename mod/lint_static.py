@@ -248,7 +248,10 @@ def main():
 
     # Every Buildable actor needs an icon sequence
     for m in re.finditer(r"^([a-z][\w-]*):\n((?:\t.*\n|\n)*)", all_rules, re.M):
-        if "Buildable:" in m.group(2) and "icon" not in seqs.get(m.group(1), ()):
+        # A unit may draw with another unit's sprite set (RenderSprites: Image).
+        borrowed = re.search(r"^\tRenderSprites:\n(?:\t\t.*\n)*?\t\tImage: (\S+)", m.group(2), re.M)
+        image = borrowed.group(1) if borrowed else m.group(1)
+        if "Buildable:" in m.group(2) and "icon" not in seqs.get(image, ()):
             errors.append(f"{m.group(1)} is Buildable but has no icon sequence")
 
     for e in errors:

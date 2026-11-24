@@ -8,12 +8,12 @@ WorldLoaded = function()
 	Trigger.AfterDelay(10, function()
 		early = ravager.UseAbility(1)
 	end)
-	-- A sentinel with no marine in reach: its Neurotoxin is refused and must not cost plasma.
+	-- A sentinel with no marine in reach: its Drain Sting (slot 3) is refused and must not cost plasma.
 	local sentinel = Player.GetPlayer("Xenos").GetActorsByType("sentinel")[1]
 	local kept
 	Trigger.AfterDelay(20, function()
 		local before = sentinel.Plasma
-		sentinel.UseAbility(1)
+		sentinel.UseAbility(3)
 		kept = sentinel.Plasma >= before
 	end)
 	Trigger.AfterDelay(400, function()

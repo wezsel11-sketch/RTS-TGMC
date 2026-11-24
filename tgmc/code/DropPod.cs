@@ -24,6 +24,15 @@ namespace OpenRA.Mods.TGMC.Traits
 		[Desc("The marines in the pod. They belong to the player who calls it.")]
 		public readonly string[] Actors = [];
 
+		[Desc("The pod's load for a faction that does not use Actors: faction name, then its actors (SOM pods hold SOM troops).")]
+		public readonly Dictionary<string, string[]> FactionActors = [];
+
+		[ActorReference]
+		[Desc("A pod called within BeaconRange cells of one of the owner's actors of this type also brings BeaconActors (the SOM's teleporter beacon).")]
+		public readonly string Beacon = null;
+		public readonly int BeaconRange = 6;
+		public readonly string[] BeaconActors = [];
+
 		[Desc("Cells around the landing spot they step out onto.")]
 		public readonly int Radius = 2;
 
@@ -80,7 +89,12 @@ namespace OpenRA.Mods.TGMC.Traits
 			self.World.OrderGenerator = new AreaTargetGenerator(order, manager, info.Cursor, info.BlockedCursor, info.MarkerRadius, info.MarkerColor);
 		}
 
-		public bool Carries(string actor) { return info.Actors.Contains(actor); }
+		string[] Load(Actor self)
+		{
+			return info.FactionActors.TryGetValue(self.Owner.Faction.InternalName, out var own) ? own : info.Actors;
+		}
+
+		public bool Carries(string actor) { return info.Actors.Contains(actor) || info.FactionActors.Values.Any(v => v.Contains(actor)); }
 
 		public void Drop(Actor self, WPos target)
 		{
@@ -88,11 +102,18 @@ namespace OpenRA.Mods.TGMC.Traits
 			var world = self.World;
 			var map = world.Map;
 			var centre = map.CellContaining(target);
-			var cells = map.FindTilesInCircle(centre, info.Radius + 1).OrderBy(c => (c - centre).LengthSquared).ToList();
+			var load = Load(self);
+			if (info.Beacon != null && world.FindActorsInCircle(target, WDist.FromCells(info.BeaconRange))
+				.Any(a => a.Owner == self.Owner && !a.IsDead && a.Info.Name == info.Beacon))
+				load = load.Concat(info.BeaconActors).ToArray();
+
+			// A bigger load spreads wider: pods packed side by side land on the troops of the pods before them.
+			var cells = map.FindTilesInCircle(centre, info.Radius + 1 + load.Length / 4).OrderBy(c => (c - centre).LengthSquared).ToList();
 			var used = new List<CPos>();
-			for (var i = 0; i < info.Actors.Length; i++)
+
+			for (var i = 0; i < load.Length; i++)
 			{
-				var type = info.Actors[i];
+				var type = load[i];
 				var cell = cells.FirstOrDefault(c => !used.Contains(c) && used.All(u => Math.Max(Math.Abs(u.X - c.X), Math.Abs(u.Y - c.Y)) > 1));
 				if (cell == default)
 					cell = cells.FirstOrDefault(c => !used.Contains(c));
@@ -100,9 +121,11 @@ namespace OpenRA.Mods.TGMC.Traits
 					cell = centre;
 
 				used.Add(cell);
-				var spot = i == 0 && info.Actors.Length == 1 ? target : map.CenterOfCell(cell);
+				var spot = i == 0 && load.Length == 1 ? target : map.CenterOfCell(cell);
 				var delay = i * info.PodInterval;
-				world.AddFrameEndTask(w => w.Add(new PodDrop(self.Owner, info, type, spot, delay)));
+				// Every door opens at the same moment, after the last pod is down: a pod landing beside troops already out would hit them.
+				var hold = (load.Length - 1 - i) * info.PodInterval;
+				world.AddFrameEndTask(w => w.Add(new PodDrop(self.Owner, info, type, spot, delay, hold)));
 			}
 		}
 	}
@@ -120,14 +143,16 @@ namespace OpenRA.Mods.TGMC.Traits
 		int tick;
 		bool landed;
 		bool released;
+		readonly int hold;
 
-		public PodDrop(Player owner, DropPodPowerInfo info, string type, WPos target, int delay)
+		public PodDrop(Player owner, DropPodPowerInfo info, string type, WPos target, int delay, int hold = 0)
 		{
 			this.owner = owner;
 			this.info = info;
 			this.type = type;
 			this.target = target;
 			wait = delay;
+			this.hold = hold;
 			world = owner.World;
 			// The spot blinks until the pod is down (supplypod_down_target.dmi).
 			GroundFx.Marker(world, target, "fx-marker", "pod", delay + info.FallTicks);
@@ -183,7 +208,7 @@ namespace OpenRA.Mods.TGMC.Traits
 				});
 			}
 
-			if (landed && !released && tick >= info.FallTicks + info.OpenDelay)
+			if (landed && !released && tick >= info.FallTicks + info.OpenDelay + hold)
 			{
 				released = true;
 				Release();

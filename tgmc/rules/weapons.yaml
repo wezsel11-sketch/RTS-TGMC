@@ -82,6 +82,7 @@ TGMCRifle:
 		ValidTargets: Structure
 
 TGMCSadar:
+	ValidTargets: Ground, Water, Wall
 	Inherits: TGMCGrenade
 	Range: 9c0
 	ReloadDelay: 90
@@ -303,6 +304,7 @@ TGMCBlastFxBig:
 		ValidTargets: Ground, Water, Structure
 
 TGMCMortar:
+	ValidTargets: Ground, Water, Wall
 	Inherits: TGMCGrenade
 	Inherits@fx: TGMCBlastFxSmall
 	Range: 14c0
@@ -356,6 +358,7 @@ TGMCMortar:
 
 # The suicide vest's blast: a bigger explosion than a grenade, knocks walls down, kills the wearer (see the bomber in units.yaml).
 TGMCVestBlast:
+	ValidTargets: Ground, Water, Wall
 	Inherits: TGMCBlastFxSmall
 	Projectile: InstantHit
 	Warhead@1Wave: Shockwave
@@ -382,6 +385,7 @@ TGMCVestBlast:
 
 # A drop pod hitting the ground: a hard impact that shakes the screen and crushes what is under it.
 TGMCPodImpact:
+	ValidTargets: Ground, Water, Wall
 	Inherits: TGMCMortar
 	Warhead@7Shake: ShakeScreen
 		Duration: 22
@@ -393,6 +397,7 @@ TGMCPodImpact:
 
 # The mortar emplacement: the mortarman's shell from further away and a little quicker.
 TGMCMortarEmplacement:
+	ValidTargets: Ground, Water, Wall
 	Inherits: TGMCMortar
 	Range: 24c0
 	MinRange: 5c0
@@ -404,6 +409,7 @@ TGMCMortarEmplacement:
 # The artillery emplacement (a howitzer): the longest reach in the game and a bigger shell than a mortar's (TGMC: heavy 6, light 7), but
 # slow to reload.
 TGMCHowitzer:
+	ValidTargets: Ground, Water, Wall
 	Inherits: TGMCMortar
 	Inherits@fx: TGMCBlastFxBig
 	Range: 40c0
@@ -483,6 +489,12 @@ TGMCButt:
 	Warhead@1Dam: TargetDamage
 		Damage: 40
 		ValidTargets: WeedNode
+
+# Bayonet (upgrade-attach-bayonet): the same bash at twice the damage.
+TGMCBayonet:
+	Inherits: TGMCButt
+	Warhead@1Dam: TargetDamage
+		Damage: 80
 
 # The synthetic's baton: a plain melee blow at any enemy next to it (the Synthetic in units.yaml mends and repairs first).
 TGMCSynthMelee:
@@ -608,6 +620,8 @@ TGMCFlamePatch:
 
 # Weapon ladders (upgrades.yaml): the TX-15 cycles faster than the pump shotgun the engineer and skirmisher start with.
 TGMCShotgunTX15:
+	# Never at an ore field: a forced attack by an engineer would shoot the field its torch is repairing.
+	InvalidTargets: OreField
 	Inherits: TGMCShotgun
 	ReloadDelay: 32
 
@@ -750,11 +764,6 @@ TGMCClaws:
 		ImpactSoundChance: 50
 		ValidRelationships: Enemy
 		ValidTargets: Human
-	Warhead@3Cry: CreateEffect
-		ImpactSounds: marine-m-pain-1.ogg, marine-m-pain-2.ogg, marine-m-pain-3.ogg, marine-f-pain-1.ogg, marine-f-pain-2.ogg, marine-f-pain-3.ogg, marine-m-gored-1.ogg
-		ImpactSoundChance: 45
-		ValidRelationships: Enemy
-		ValidTargets: Human
 	Warhead@4Blood: CreateEffect
 		Image: fx-impact
 		Explosions: blood
@@ -841,12 +850,12 @@ TGMCMend:
 	Projectile: InstantHit
 	Warhead@1Dam: TargetDamage
 		Damage: -30
-		ValidRelationships: Ally
+		ValidRelationships: Ally, Neutral
 		ValidTargets: Repair
 	Warhead@2Fx: CreateEffect
 		Image: fx-impact
 		Explosions: heal
-		ValidRelationships: Ally
+		ValidRelationships: Ally, Neutral
 		ValidTargets: Repair
 	Warhead@9Light11: CreateEffect
 		Image: fx-light
@@ -944,6 +953,13 @@ TGMCLaserRifle:
 		Speed: 1000
 		Image: fx-laser
 		Inaccuracy: 384
+	# Volkite heat (SOM): the target burns for four seconds (see heated in units.yaml). Not on vehicles or structures.
+	Warhead@7Heat: GrantExternalCondition
+		Condition: heated
+		Duration: 100
+		Range: 0c384
+		ValidRelationships: Enemy, Neutral
+		ValidTargets: Infantry
 
 # The SOM veteran's plasma rifle: a plasma ball, slower and harder-hitting than a laser bolt, with the plasma sound.
 TGMCPlasmaRifle:
@@ -957,6 +973,21 @@ TGMCPlasmaRifle:
 		Inaccuracy: 192
 	Warhead@1Dam: SpreadDamage
 		Damage: 20
+	# Volkite heat (SOM): the target burns for four seconds (see heated in units.yaml). Not on vehicles or structures.
+	Warhead@7Heat: GrantExternalCondition
+		Condition: heated
+		Duration: 100
+		Range: 0c384
+		ValidRelationships: Enemy, Neutral
+		ValidTargets: Infantry
+
+# The volkite caliver (SOM): one heavier bolt that reaches two cells further than the charger.
+TGMCCaliver:
+	Inherits: TGMCPlasmaRifle
+	Range: 11c0
+	ReloadDelay: 30
+	Warhead@1Dam: SpreadDamage
+		Damage: 34
 
 # The boiler as a sniper: a fast, flat acid shot from long range (stopped by walls and cover), bursting into an acid explosion
 # and an acid pool where it lands. No lobbed shell, no gas.
@@ -987,7 +1018,7 @@ TGMCMortarSiege:
 	Inherits: TGMCMortarEmplacement
 	Range: 12c0
 	MinRange: 5c0
-	ValidTargets: Structure
+	ValidTargets: Structure, Wall
 	Warhead@1Wave: Shockwave
 		Damage: 140
 		Radius: 5
@@ -996,7 +1027,7 @@ TGMCHowitzerSiege:
 	Inherits: TGMCHowitzer
 	Range: 18c0
 	MinRange: 10c0
-	ValidTargets: Structure
+	ValidTargets: Structure, Wall
 	Warhead@1Wave: Shockwave
 		Damage: 260
 		Radius: 6
@@ -1060,6 +1091,11 @@ TGMCSmartgun:
 		ValidTargets: Structure
 
 TGMCGrenade:
+	ValidTargets: Ground, Water, Wall
+	# Every blast chips walls, as TGMC's ex_act does: a light one here (a wall cell has 500 points, see DestructibleWalls).
+	Warhead@5Walls: DamageWalls
+		Damage: 60
+		Radius: 2c0
 	Range: 8c0
 	ReloadDelay: 40
 	Report: grenade-launch.ogg
@@ -1201,6 +1237,7 @@ TGMCMinigun:
 
 # B17 demolitionist's launcher: a heavier shell than the grenadier's, with the same friendly fire.
 TGMCHEGrenade:
+	ValidTargets: Ground, Water, Wall
 	Inherits: TGMCGrenade
 	Range: 7c0
 	ReloadDelay: 60
@@ -1237,6 +1274,8 @@ TGMCM412:
 
 # Engineer's shotgun: six pellets that scatter, deadly up close.
 TGMCShotgun:
+	# Never at an ore field: a forced attack by an engineer would shoot the field its torch is repairing.
+	InvalidTargets: OreField
 	Inherits: TGMCRifle
 	Range: 4c0
 	Burst: 6
@@ -1349,6 +1388,7 @@ TGMCMechGun:
 		Spread: 192
 
 TGMCMechRocket:
+	ValidTargets: Ground, Water, Wall
 	Inherits: TGMCSadar
 	Range: 9c0
 	ReloadDelay: 150
@@ -1361,6 +1401,7 @@ TGMCMechRocket:
 
 # One bomb of the Condor's CAS run: a big fireball and a shake, and it hurts friend and foe alike.
 TGMCCasBomb:
+	ValidTargets: Ground, Water, Wall
 	Inherits: TGMCGrenade
 	Inherits@fx: TGMCBlastFxBig
 	Range: 90c0
@@ -1404,7 +1445,11 @@ TGMCCasBomb:
 # CAS ammo types, after TGMC's dropship ammo (code/game/objects/structures/dropship_ammo.dm). Each is one blast of a strike set up in
 # structures.yaml (CondorStrikePower). All hurt friend and foe alike.
 TGMCCasGun:
+	ValidTargets: Ground, Water, Wall
 	Inherits: TGMCGrenade
+	Warhead@5Walls: DamageWalls
+		Damage: 15
+		Radius: 1c0
 	Warhead@1Dam: ExplosiveDamage
 		Damage: 35
 		Spread: 1c0
@@ -1423,7 +1468,10 @@ TGMCCasGun:
 		ValidTargets: Ground, Water, Structure
 
 TGMCCasMini:
+	ValidTargets: Ground, Water, Wall
 	Inherits: TGMCGrenade
+	Warhead@5Walls: DamageWalls
+		Damage: 90
 	Warhead@1Dam: ExplosiveDamage
 		Damage: 90
 		Spread: 1c0
@@ -1445,7 +1493,10 @@ TGMCCasMini:
 		Multiplier: 1, 1
 
 TGMCCasWidow:
+	ValidTargets: Ground, Water, Wall
 	Inherits: TGMCCasMini
+	Warhead@5Walls: DamageWalls
+		Damage: 110
 	Warhead@1Dam: ExplosiveDamage
 		Damage: 350
 		Spread: 1c0
@@ -1463,6 +1514,7 @@ TGMCCasWidow:
 		Strength: 27
 
 TGMCCasNapalm:
+	ValidTargets: Ground, Water, Wall
 	Inherits: TGMCCasMini
 	-Warhead@1Dam:
 	Warhead@1Wave: Shockwave
@@ -1493,6 +1545,7 @@ TGMCCasNapalm:
 
 # The fire napalm and lasers leave behind, hit every few ticks at random spots (LingerWeapon).
 TGMCCasFire:
+	ValidTargets: Ground, Water, Wall
 	Inherits: TGMCGrenade
 	-Warhead@2Boom:
 	Warhead@1Dam: ExplosiveDamage
@@ -1512,6 +1565,7 @@ TGMCCasFire:
 
 # The Fatty: a first, smaller blast, then a ring of eight more.
 TGMCCasFatty:
+	ValidTargets: Ground, Water, Wall
 	Inherits: TGMCCasMini
 	Inherits@fx: TGMCBlastFxBig
 	-Warhead@1Dam:
@@ -1536,6 +1590,7 @@ TGMCCasFatty:
 		Radius: 3c0
 
 TGMCCasCluster:
+	ValidTargets: Ground, Water, Wall
 	Inherits: TGMCCasMini
 	Warhead@1Dam: ExplosiveDamage
 		Damage: 140
@@ -1543,7 +1598,11 @@ TGMCCasCluster:
 		Falloff: 100, 70, 35, 10, 0
 
 TGMCCasLaser:
+	ValidTargets: Ground, Water, Wall
 	Inherits: TGMCGrenade
+	Warhead@5Walls: DamageWalls
+		Damage: 15
+		Radius: 1c0
 	Warhead@1Dam: ExplosiveDamage
 		Damage: 100
 		Spread: 0c768
@@ -1564,6 +1623,7 @@ TGMCCasLaser:
 # Illumination flare: harmless, it only lights the spot (the strike keeps it revealed).
 TGMCCasFlare:
 	Inherits: TGMCGrenade
+	-Warhead@5Walls:
 	-Warhead@1Dam:
 	Warhead@2Boom: CreateEffect
 		Image: fx-impact
@@ -1578,6 +1638,7 @@ TGMCCasFlare:
 		ValidTargets: Ground, Water, Structure
 
 TGMCCasMoab:
+	ValidTargets: Ground, Water, Wall
 	Inherits: TGMCCasNapalm
 	Inherits@fx: TGMCBlastFxBig
 	Warhead@1Wave: Shockwave
@@ -1670,6 +1731,8 @@ TGMCMechFlamer:
 	Range: 5c0
 
 TGMCMechShotgun:
+	# Never at an ore field: a forced attack by an engineer would shoot the field its torch is repairing.
+	InvalidTargets: OreField
 	Inherits: TGMCShotgun
 	Range: 5c0
 	Burst: 8
@@ -1687,6 +1750,7 @@ TGMCMechSMG:
 		Damage: 6
 
 TGMCMechRPG:
+	ValidTargets: Ground, Water, Wall
 	Inherits: TGMCMechRocket
 	Range: 10c0
 	ReloadDelay: 170
@@ -1698,6 +1762,7 @@ TGMCMechRPG:
 		Radius: 2c0
 
 TGMCMechTow:
+	ValidTargets: Ground, Water, Wall
 	Inherits: TGMCSadar
 	Projectile: CoverBullet
 		Sequences: large
@@ -2021,7 +2086,7 @@ TGMCCrateSupply:
 		ValidRelationships: Ally
 		ValidTargets: Infantry
 
-# Mirage: a decoy dropped in front of the squad leader. Enemies shoot it while the squad moves (see mirage-decoy in units.yaml).
+# Mirage: illusions of the hunter on the cells around it. Marines shoot them while the hunter closes in (see mirage-decoy in units.yaml).
 TGMCMirage:
 	Range: 4c0
 	ReloadDelay: 15
@@ -2029,6 +2094,7 @@ TGMCMirage:
 	Warhead@1Decoy: SpawnActor
 		Actor: mirage-decoy
 		TrailCells: 0
+		Radius: 1
 
 # Fire-support mark: a sensor ping on the target, so the squad (and the CAS stock) sees it for a while.
 TGMCMarkTarget:
@@ -2053,7 +2119,11 @@ TGMCSmokeScreen:
 
 # The orbital bombardment, TGMC's explosive warhead (orbital_cannon.dm: explosion of 15 cells): a bigger blast than the MOAB that knocks walls down for twelve cells around.
 TGMCOrbital:
+	ValidTargets: Ground, Water, Wall
 	Inherits: TGMCCasMoab
+	# TGMC's large explosion at full length, not the MOAB's short crack.
+	Warhead@2Boom: CreateEffect
+		ImpactSounds: ob-blast.ogg
 	Warhead@1Wave: Shockwave
 		DamageTypes: ExplosionDeath
 		Damage: 900
@@ -2077,7 +2147,7 @@ TGMCOrbitalFire:
 	Warhead@2Boom: CreateEffect
 		Image: fx-blast-cas
 		Explosions: boom
-		ImpactSounds: explosion-big.ogg
+		ImpactSounds: ob-blast.ogg
 		ForceDisplayAtGroundLevel: true
 		ValidTargets: Ground, Water, Structure
 	Warhead@3Fire: SpawnActor
@@ -2091,6 +2161,7 @@ TGMCOrbitalFire:
 
 # One blast of the cluster warhead: TGMC's explosion(2, 4, 6) on a random spot, twenty-two of them in a tenth of a second each.
 TGMCOrbitalClusterBlast:
+	ValidTargets: Ground, Water, Wall
 	Inherits: TGMCCasCluster
 	Warhead@1Dam: ExplosiveDamage
 		Spread: 2c0
@@ -2346,6 +2417,7 @@ TGMCPincushion:
 
 # The tank's main gun: a heavy shell with a wide blast, good against armour and structures.
 TGMCTankCannon:
+	ValidTargets: Ground, Water, Wall
 	Inherits: TGMCSadar
 	Range: 11c0
 	ReloadDelay: 110
@@ -2368,8 +2440,192 @@ TGMCTankChaingun:
 
 # The SOM tank's coilgun: a hard, fast slug.
 TGMCCoilgun:
+	ValidTargets: Ground, Water, Wall
 	Inherits: TGMCTankCannon
 	ReloadDelay: 90
 	Projectile: Shell
 		Speed: 1200
 		Image: fx-laser
+
+# ---------------------------------------------------------------- caste abilities added from TGMC's action lists (2026-11)
+
+# Sentinel, Drain Sting: hurts and slows the marine beside it; TGMCStingHeal mends the sentinel (the ability's SelfWeapon).
+TGMCDrainSting:
+	Inherits: TGMCNeurotoxin
+	Range: 1c768
+	Warhead@1Dam: TargetDamage
+		Damage: 20
+
+TGMCStingHeal:
+	Inherits: TGMCPylonHeal
+	-Report:
+	Warhead@1Dam: TargetDamage
+		Damage: -40
+		# It mends the one that used it.
+		AffectsParent: true
+
+# Gorger, Drain: a bite that stuns for a moment; TGMCDrainHeal mends the gorger.
+TGMCGorgerDrain:
+	Range: 1c768
+	Projectile: InstantHit
+	Warhead@1Dam: TargetDamage
+		Damage: 30
+		ValidRelationships: Neutral, Enemy
+	Warhead@9Stun: GrantExternalCondition
+		Condition: stunned
+		Duration: 30
+		ValidRelationships: Enemy
+		ValidTargets: Human
+
+TGMCDrainHeal:
+	Inherits: TGMCPylonHeal
+	-Report:
+	Warhead@1Dam: TargetDamage
+		Damage: -70
+		# It mends the one that used it.
+		AffectsParent: true
+
+TGMCTransfusion:
+	Inherits: TGMCPylonHeal
+	Warhead@1Dam: TargetDamage
+		Damage: -120
+
+# Wraith, Portal: one end of the pair (the ability fires it at the clicked spot and at the wraith's own).
+TGMCPortal:
+	Range: 10c0
+	Projectile: InstantHit
+	Warhead@1Portal: SpawnActor
+		Actor: wraith-portal
+
+# Defiler, Defile: a heavy sting that slows and weakens.
+TGMCDefile:
+	Inherits: TGMCNeurotoxin
+	Range: 1c768
+	Warhead@1Dam: TargetDamage
+		Damage: 45
+	Warhead@8Weak: GrantExternalCondition
+		Condition: offguard
+		Duration: 200
+		ValidRelationships: Enemy
+		ValidTargets: Human
+
+# King, Nightfall and Off-Guard.
+TGMCNightfall:
+	Range: 9c0
+	Projectile: InstantHit
+	Warhead@1Dark: GrantExternalCondition
+		Condition: nightfall
+		Duration: 250
+		Range: 9c0
+		ValidRelationships: Enemy
+
+TGMCOffGuard:
+	Range: 7c0
+	Projectile: InstantHit
+	Warhead@1Weak: GrantExternalCondition
+		Condition: offguard
+		Duration: 250
+		Range: 0c768
+		ValidRelationships: Enemy
+
+# Dragon, Backhand; shrike, Unrelenting Force: a sweep in front that hurls marines back.
+TGMCBackhand:
+	Inherits: TGMCTailSweep
+	Warhead@1Dam: SpreadDamage
+		Damage: 60
+	Warhead@6Throw: Knockback
+		Spread: 1c768
+		Distance: 4c0
+
+TGMCUnrelentingForce:
+	Inherits: TGMCTailSweep
+	Warhead@1Dam: SpreadDamage
+		Damage: 10
+		Spread: 2c0
+	Warhead@6Throw: Knockback
+		Spread: 2c512
+		Distance: 6c0
+		Duration: 20
+
+# Warrior, Grapple Toss.
+TGMCGrappleToss:
+	Inherits: TGMCPsychicFling
+	Range: 1c768
+	Warhead@6Throw: Knockback
+		Distance: 6c0
+
+# Queen, Bulwark; puppeteer, Dreadful Presence.
+TGMCBulwark:
+	Range: 5c0
+	Projectile: InstantHit
+	Warhead@1Guard: GrantExternalCondition
+		Condition: bulwark
+		Duration: 250
+		Range: 5c0
+		ValidRelationships: Ally
+
+TGMCDreadfulPresence:
+	Range: 4c0
+	Projectile: InstantHit
+	Warhead@1Dread: GrantExternalCondition
+		Condition: dread
+		Duration: 150
+		Range: 4c0
+		ValidRelationships: Enemy
+
+# Dragon, Grab: the marine beside it is hurt and held still.
+TGMCDragonGrab:
+	Inherits: TGMCGorgerDrain
+	Range: 2c0
+	Warhead@1Dam: TargetDamage
+		Damage: 25
+	Warhead@9Stun: GrantExternalCondition
+		Duration: 75
+
+# Primordial abilities (the Primordial upgrades): defender's spin, shrike's vortex, king's beam.
+TGMCCentrifugal:
+	Inherits: TGMCTailSweep
+	Warhead@1Dam: SpreadDamage
+		Damage: 35
+		Spread: 2c0
+	Warhead@6Throw: Knockback
+		Distance: 3c0
+		Spread: 2c512
+
+TGMCPsychicVortex:
+	Inherits: TGMCStomp
+	Range: 6c0
+	Warhead@1Dam: SpreadDamage
+		Damage: 20
+		Spread: 2c0
+	Warhead@9Stun: GrantExternalCondition
+		Duration: 75
+		Range: 2c0
+
+TGMCZeroFormBeam:
+	Inherits: TGMCBoilerSnipe
+	Range: 12c0
+	ReloadDelay: 60
+	Warhead@1Dam: SpreadDamage
+		Damage: 220
+
+# A wall cell falling (DestructibleWalls' BreakWeapon): chunks of rubble fly out. Looks only.
+TGMCWallBreak:
+	Range: 1c0
+	Projectile: InstantHit
+	Warhead@7Rocks: ExplosionParticles
+		Image: fx-rock
+		Count: 18
+		Spread: 384
+		MinSpeed: 40
+		MaxSpeed: 130
+		MinRise: 110
+		MaxRise: 240
+		Gravity: 14
+		MinLife: 22
+		MaxLife: 34
+		FadeOut: 4
+		StartScale: 0.9
+		EndScale: 0.7
+		Tint: 6A6A6E
+		ValidTargets: Ground, Water, Structure, Wall, Rock

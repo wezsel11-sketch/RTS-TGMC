@@ -302,3 +302,146 @@ support-icon:
 		Filename: support-icon.png
 		Start: 7
 		Length: 1
+
+# TGMC's wall damage overlay as walls.dm draws it: multiplied onto the wall, so its dark cracks show and its white does not.
+# The picture is cut by mod/build_sprites.py (fx-wall-damage); DestructibleWalls draws it over a damaged wall cell.
+wall-damage:
+	overlay:
+		Filename: sprites/fx-wall-damage.png
+		BlendMode: Multiply
+
+# The wraith's portal and the behemoth's rock pillar (drawn by mod/make_placeholders.py write_ability_props).
+wraith-portal:
+	idle:
+		Filename: wraith-portal.png
+		Length: 4
+		Tick: 120
+
+earth-pillar:
+	idle:
+		Filename: earth-pillar.png
+
+# Palette icons of the second-wave upgrades (tgmc/rules/upgrades.yaml): a unit's or structure's own icon with a badge in the corner,
+# drawn by mod/make_placeholders.py (write_badge_upgrade_icons). The idle frame is only there because an image needs a main sequence.
+upgrade-attach-barrel:
+	idle:
+		Filename: upgrade-attach-barrel.png
+	icon:
+		Filename: upgrade-attach-barrel.png
+
+upgrade-attach-bayonet:
+	idle:
+		Filename: upgrade-attach-bayonet.png
+	icon:
+		Filename: upgrade-attach-bayonet.png
+
+upgrade-attach-harness:
+	idle:
+		Filename: upgrade-attach-harness.png
+	icon:
+		Filename: upgrade-attach-harness.png
+
+upgrade-attach-scope:
+	idle:
+		Filename: upgrade-attach-scope.png
+	icon:
+		Filename: upgrade-attach-scope.png
+
+upgrade-plasteel-cades:
+	idle:
+		Filename: upgrade-plasteel-cades.png
+	icon:
+		Filename: upgrade-plasteel-cades.png
+
+upgrade-sentry:
+	idle:
+		Filename: upgrade-sentry.png
+	icon:
+		Filename: upgrade-sentry.png
+
+upgrade-thick-weeds:
+	idle:
+		Filename: upgrade-thick-weeds.png
+	icon:
+		Filename: upgrade-thick-weeds.png
+
+upgrade-sticky-weeds:
+	idle:
+		Filename: upgrade-sticky-weeds.png
+	icon:
+		Filename: upgrade-sticky-weeds.png
+
+upgrade-fast-weeds:
+	idle:
+		Filename: upgrade-fast-weeds.png
+	icon:
+		Filename: upgrade-fast-weeds.png
+
+upgrade-hardened-resin:
+	idle:
+		Filename: upgrade-hardened-resin.png
+	icon:
+		Filename: upgrade-hardened-resin.png
+
+upgrade-turret-reach:
+	idle:
+		Filename: upgrade-turret-reach.png
+	icon:
+		Filename: upgrade-turret-reach.png
+
+upgrade-som-cells:
+	idle:
+		Filename: upgrade-som-cells.png
+	icon:
+		Filename: upgrade-som-cells.png
+
+upgrade-som-blink:
+	idle:
+		Filename: upgrade-som-blink.png
+	icon:
+		Filename: upgrade-som-blink.png
+
+upgrade-som-shield:
+	idle:
+		Filename: upgrade-som-shield.png
+	icon:
+		Filename: upgrade-som-shield.png
+
+upgrade-mutation-shell:
+	idle:
+		Filename: upgrade-mutation-shell.png
+	icon:
+		Filename: upgrade-mutation-shell.png
+
+upgrade-mutation-spur:
+	idle:
+		Filename: upgrade-mutation-spur.png
+	icon:
+		Filename: upgrade-mutation-spur.png
+
+upgrade-mutation-veil:
+	idle:
+		Filename: upgrade-mutation-veil.png
+	icon:
+		Filename: upgrade-mutation-veil.png
+
+upgrade-primordial-1:
+	idle:
+		Filename: upgrade-primordial-1.png
+	icon:
+		Filename: upgrade-primordial-1.png
+
+upgrade-primordial-2:
+	idle:
+		Filename: upgrade-primordial-2.png
+	icon:
+		Filename: upgrade-primordial-2.png
+
+# Resin strands over a corrupted miner and the mound of a burrowed widow (drawn by mod/make_placeholders.py write_ability_props).
+resin-strands:
+	idle:
+		Filename: resin-strands.png
+
+burrow-mound:
+	idle:
+		Filename: burrow-mound.png

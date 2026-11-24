@@ -1501,6 +1501,8 @@ UNITS = {
     "fx-dust-tile": {
         "sequences": {"dust": [(FX32, "landslide_dust", None, {"tick": 110, "size": 96})]},
     },
+    # TGMC's damage overlay for a wall (walls.dm draws it in eight steps of opacity); DestructibleWalls draws it over a damaged wall cell.
+    "fx-wall-damage": {"sequences": {"idle": [("icons/turf/walls.dmi", "overlay_damage")]}},
     # The particles of a blast (ExplosionParticles warhead), TGMC's own: the grey smoke and the brown dust of explosions.dm, rocks and sparks.
     "fx-smoke-puff": {"sequences": {"idle": [(FX96, "smoke3", None, {"size": 96})]}},
     "fx-dirt-puff": {"sequences": {"idle": [("icons/effects/96x157.dmi", "smoke", None, {"fit": (96, 96)})]}},

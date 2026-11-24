@@ -98,6 +98,9 @@ TGMCMusic.NextTrack = function()
 end
 
 TGMCMusic.PlayNext = function()
+	if TGMCMusic.State.over then
+		return
+	end
 	TGMCMusic.State.generation = TGMCMusic.State.generation + 1
 	local generation = TGMCMusic.State.generation
 	Media.PlayMusic(TGMCMusic.NextTrack(), function()
@@ -170,6 +173,21 @@ TGMCMusic.StartMusic = function()
 			combat = { "score-aggressor", "score-faceoff", "score-dangerous", "score-failing-defense", "score-space-fighter-loop", "score-volatile-reaction", "score-hot-pursuit", "score-killing-time", "score-hitman" },
 		}
 		me = nil
+	end
+
+	-- The match is over for the local player: the music stops for one of TGMC's round-end stings.
+	if me ~= nil then
+		local sting = function(kind)
+			TGMCMusic.State.over = true
+			TGMCMusic.State.generation = TGMCMusic.State.generation + 1
+			Media.StopMusic()
+			Media.PlaySound("sting-" .. kind .. "-" .. TGMCMusic.Rand(1, 2) .. ".ogg")
+			print("MUSIC sting " .. kind)
+		end
+		pcall(function()
+			Trigger.OnPlayerWon(me, function() sting("win") end)
+			Trigger.OnPlayerLost(me, function() sting("loss") end)
+		end)
 	end
 
 	Trigger.AfterDelay(TGMCMusic.Config.startDelay, function()

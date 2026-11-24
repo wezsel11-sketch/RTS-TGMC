@@ -123,6 +123,20 @@ namespace OpenRA.Mods.TGMC.Traits
 
 		public readonly AbilityAim Aim = AbilityAim.Nearest;
 
+		[ActorReference]
+		[Desc("The nearest of the owner's units of this type within Range dies and Weapon goes off where it stood (the puppeteer's " +
+			"Organic Bomb). The use is refused when there is none.")]
+		public readonly string Detonate = null;
+
+		[WeaponReference]
+		[Desc("A second weapon that goes off on the unit's own spot when the ability is used (a drain that heals the drinker, " +
+			"the near end of a portal).")]
+		public readonly string SelfWeapon = null;
+
+		[Desc("With Aim: TargetActor: this many ticks after the use, the target is put back where it stood and at the health it had " +
+			"when the ability was used (the wraith's Rewind). 0 for none.")]
+		public readonly int RewindTicks = 0;
+
 		[Desc("Fire Weapon as a projectile from the unit (a grenade's arc, a shell's whistle) instead of hitting the target at once.")]
 		public readonly bool Launch = false;
 
@@ -140,6 +154,10 @@ namespace OpenRA.Mods.TGMC.Traits
 
 		[Desc("The unit blinks this far: next to the nearest enemy within it if there is one, else straight ahead (the wraith). 0 for no blink.")]
 		public readonly WDist TeleportDistance = WDist.Zero;
+
+		[ActorReference]
+		[Desc("The unit teleports beside its owner's nearest actor of this type, however far (the SOM's beacon). Refused with none standing.")]
+		public readonly string TeleportTo = null;
 
 		[Desc("Ticks between the use and the blast. The unit stands still and is seen to go off (the suicide vest's 2-second warcry).")]
 		public readonly int FuseTicks = 0;
@@ -507,6 +525,9 @@ namespace OpenRA.Mods.TGMC.Traits
 			if (Info.TeleportDistance.Length > 0 && !Teleport(self))
 				return false;
 
+			if (Info.TeleportTo != null && !TeleportHome(self))
+				return false;
+
 			Target aim = Target.Invalid;
 			if (Info.Weapon != null || Info.ChargeDistance.Length > 0)
 			{
@@ -531,6 +552,18 @@ namespace OpenRA.Mods.TGMC.Traits
 						aim = Target.FromActor(victim);
 						break;
 				}
+			}
+
+			if (Info.Detonate != null)
+			{
+				var bomb = world.FindActorsInCircle(self.CenterPosition, Info.Range)
+					.Where(a => a.Owner == self.Owner && !a.IsDead && a.IsInWorld && a.Info.Name == Info.Detonate)
+					.MinByOrDefault(a => (a.CenterPosition - self.CenterPosition).LengthSquared);
+				if (bomb == null)
+					return false;
+
+				aim = Target.FromPos(bomb.CenterPosition);
+				bomb.Kill(self);
 			}
 
 			// Paid only now that the ability has found what it hits: a refused use costs nothing.
@@ -623,6 +656,17 @@ namespace OpenRA.Mods.TGMC.Traits
 				}
 			}
 
+			if (Info.SelfWeapon != null)
+			{
+				var own = world.Map.Rules.Weapons[Info.SelfWeapon.ToLowerInvariant()];
+				// The unit itself, not its spot: a TargetDamage warhead only touches an actor target.
+				var here = Target.FromActor(self);
+				Impact(world, own, here, new WarheadArgs { Weapon = own, SourceActor = self, Source = self.CenterPosition, ImpactPosition = self.CenterPosition, WeaponTarget = here, DamageModifiers = [] });
+			}
+
+			if (Info.RewindTicks > 0 && target.Type == TargetType.Actor)
+				Rewind(self, target.Actor);
+
 			if (Info.Spawn.Length > 0)
 				SpawnUnits(self, IsAimed && target.Type != TargetType.Invalid ? self.World.Map.CellContaining(target.CenterPosition) : null);
 
@@ -696,6 +740,52 @@ namespace OpenRA.Mods.TGMC.Traits
 			self.QueueActivity(new Warheads.Thrown(self, mobile, landing, Info.ChargeTicks, Info.ChargeHeight.Length, 0, self, default));
 		}
 
+		bool TeleportHome(Actor self)
+		{
+			var body = self.TraitOrDefault<IPositionable>();
+			var home = self.World.Actors.Where(a => a.Owner == self.Owner && a.IsInWorld && !a.IsDead && a.Info.Name == Info.TeleportTo)
+				.MinByOrDefault(a => (a.CenterPosition - self.CenterPosition).LengthSquared);
+			if (body == null || home == null)
+				return false;
+
+			var cell = self.World.Map.FindTilesInCircle(home.Location, 2).OrderBy(c => (c - home.Location).LengthSquared)
+				.FirstOrDefault(c => body.CanEnterCell(c));
+			if (cell == default)
+				return false;
+
+			Fx.Sprite(self.World, self.CenterPosition, Info.EffectImage, Info.EffectSequence, Info.Palette);
+			// After the step under way: a bare SetPosition mid-step is dragged back along the old path.
+			self.QueueActivity(false, new OpenRA.Mods.Common.Activities.SimpleTeleport(cell));
+			return true;
+		}
+
+		void Rewind(Actor self, Actor victim)
+		{
+			var cell = victim.Location;
+			var hp = victim.TraitOrDefault<IHealth>()?.HP ?? 0;
+			Fx.Sprite(self.World, victim.CenterPosition, Info.EffectImage, Info.EffectSequence, Info.Palette);
+			self.World.AddFrameEndTask(w => w.Add(new OpenRA.Effects.DelayedAction(Info.RewindTicks, () =>
+			{
+				if (victim.IsDead || !victim.IsInWorld)
+					return;
+
+				// Back to the cell it stood on, or the nearest free one if something has taken it (a building only gets its health back).
+				if (victim.TraitOrDefault<IPositionable>() is { } body)
+				{
+					var back = w.Map.FindTilesInCircle(cell, 2).OrderBy(c => (c - cell).LengthSquared)
+						.FirstOrDefault(c => c == victim.Location || body.CanEnterCell(c));
+					if (back != default && back != victim.Location)
+						victim.QueueActivity(false, new OpenRA.Mods.Common.Activities.SimpleTeleport(back));
+				}
+
+				// Its health goes back too, up or down.
+				if (victim.TraitOrDefault<IHealth>() is { } health && hp > 0 && health.HP != hp)
+					health.InflictDamage(victim, self, new Damage(health.HP - hp), true);
+
+				Fx.Sprite(w, victim.CenterPosition, Info.EffectImage, Info.EffectSequence, Info.Palette);
+			})));
+		}
+
 		bool Teleport(Actor self)
 		{
 			var map = self.World.Map;
@@ -719,8 +809,8 @@ namespace OpenRA.Mods.TGMC.Traits
 				return false;
 
 			Fx.Sprite(self.World, self.CenterPosition, Info.EffectImage, Info.EffectSequence, Info.Palette);
-			self.CancelActivity();
-			body.SetPosition(self, cell);
+			// After the step under way: a bare SetPosition mid-step is dragged back along the old path.
+			self.QueueActivity(false, new OpenRA.Mods.Common.Activities.SimpleTeleport(cell));
 			return true;
 		}
 
@@ -850,6 +940,9 @@ namespace OpenRA.Mods.TGMC.Traits
 		public readonly int Regen = 8;
 		public readonly int WeedRegen = 3;
 
+		[Desc("While the unit's UpgradeFlag of this name is on (the Veil mutation) plasma builds up half as fast again.")]
+		public readonly string BoostFlag = "veil";
+
 		[Desc("Actor types that count as weeds.")]
 		public readonly string[] Weeds = ["weeds", "weed-node", "forward-hive", "resin-silo"];
 
@@ -875,6 +968,8 @@ namespace OpenRA.Mods.TGMC.Traits
 		int value;
 		int wait;
 		int weedToken = Actor.InvalidConditionToken;
+		UpgradeFlag boost;
+		bool boostLooked;
 		int restToken = Actor.InvalidConditionToken;
 		int idle;
 
@@ -915,7 +1010,15 @@ namespace OpenRA.Mods.TGMC.Traits
 			if (value >= info.Max)
 				return;
 
-			if (++wait >= (onWeeds ? info.WeedRegen : info.Regen))
+			// Halves of a tick, so the boost (three for two) needs no fractions.
+			if (!boostLooked)
+			{
+				boostLooked = true;
+				boost = UpgradeFlag.Find(self, info.BoostFlag);
+			}
+
+			wait += boost != null && !boost.IsTraitDisabled ? 3 : 2;
+			if (wait >= 2 * (onWeeds ? info.WeedRegen : info.Regen))
 			{
 				wait = 0;
 				value++;

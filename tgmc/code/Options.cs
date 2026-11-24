@@ -18,6 +18,7 @@ namespace OpenRA.Mods.TGMC
 		public const string Infestation = "tgmc-infestation";
 		public const string Maturity = "tgmc-maturity";
 		public const string TileStep = "tgmc-tilestep";
+		public const string Formation = "tgmc-formation";
 		public const string BurstTime = "tgmc-bursttime";
 		public const string FloatingText = "tgmc-floatingtext";
 		public const string Weather = "tgmc-weather";
@@ -42,6 +43,7 @@ namespace OpenRA.Mods.TGMC
 					Infestation => info.InfestationDefault,
 					Maturity => info.MaturityDefault,
 					TileStep => info.TileStepDefault,
+					Formation => info.FormationDefault,
 					FloatingText => info.FloatingTextDefault,
 					Night => info.NightDefault,
 					LandingIntro => info.LandingIntroDefault,
@@ -65,6 +67,7 @@ namespace OpenRA.Mods.TGMC.Traits
 		public readonly bool InfestationDefault = true;
 		public readonly bool MaturityDefault = true;
 		public readonly bool TileStepDefault = false;
+		public readonly bool FormationDefault = true;
 		public readonly bool FloatingTextDefault = true;
 		public readonly bool NightDefault = false;
 
@@ -130,6 +133,9 @@ namespace OpenRA.Mods.TGMC.Traits
 
 			yield return new LobbyBooleanOption(map, Options.TileStep,
 				"checkbox-tgmc-tilestep.label", "checkbox-tgmc-tilestep.description", true, -15, TileStepDefault, false);
+
+			yield return new LobbyBooleanOption(map, Options.Formation,
+				"checkbox-tgmc-formation.label", "checkbox-tgmc-formation.description", true, -14, FormationDefault, false);
 		}
 	}
 

@@ -393,6 +393,11 @@ namespace OpenRA.Mods.TGMC.Traits
 		[Desc("A building to start placing (the ghost) at the click tick, as if its palette icon were clicked.")]
 		public readonly string Place = null;
 
+		[Desc("Crash sweep: from tick 20 on, every SweepStep ticks the next actor on the map is selected and the view is centred on it, so " +
+			"each one's sprites, selection card and command card are drawn once. The shot is taken after the last one (Tick is not used).")]
+		public readonly bool Sweep = false;
+		public readonly int SweepStep = 4;
+
 		[Desc("If above 0, takes the shot this many interface frames after the local player's game ends (the world stops ticking then).")]
 		public readonly int AfterGameOver = 0;
 
@@ -436,10 +441,34 @@ namespace OpenRA.Mods.TGMC.Traits
 
 		public ScreenshotAt(ScreenshotAtInfo info) { this.info = info; }
 
+		List<Actor> sweep;
+
 		void ITick.Tick(Actor self)
 		{
 			ticks++;
 			var world = self.World;
+			if (info.Sweep)
+			{
+				if (ticks < 20 || (ticks - 20) % info.SweepStep != 0)
+					return;
+
+				sweep ??= world.Actors.Where(a => a.IsInWorld && a.TraitOrDefault<IOccupySpace>() != null).ToList();
+				var i = (ticks - 20) / info.SweepStep;
+				if (i == sweep.Count)
+				{
+					System.Console.WriteLine($"SWEEP done: {sweep.Count} actors selected");
+					Game.TakeScreenshot();
+				}
+
+				if (i >= sweep.Count || sweep[i].IsDead || !sweep[i].IsInWorld)
+					return;
+
+				System.Console.WriteLine($"SWEEP {i} {sweep[i].Info.Name}");
+				world.Selection.Combine(world, [sweep[i]], false, false);
+				worldRenderer.Viewport.Center(sweep[i].CenterPosition);
+				return;
+			}
+
 			var selectTick = System.Math.Max(1, (info.ClickTick > 0 ? System.Math.Min(info.ClickTick, info.Tick) : info.Tick) - 10);
 			if (ticks == selectTick && world.LocalPlayer != null)
 			{
@@ -539,6 +568,7 @@ namespace OpenRA.Mods.TGMC.Widgets.Logic
 		int cachedTick = -100;
 		string income = "";
 		string army = "";
+		string points = "";
 
 		[ObjectCreator.UseCtor]
 		public TopBarLogic(Widget widget, World world)
@@ -546,6 +576,7 @@ namespace OpenRA.Mods.TGMC.Widgets.Logic
 			this.world = world;
 			widget.Get<LabelWidget>("TOP_INCOME").GetText = () => { Refresh(); return income; };
 			widget.Get<LabelWidget>("TOP_ARMY").GetText = () => { Refresh(); return army; };
+			widget.Get<LabelWidget>("TOP_POINTS").GetText = () => { Refresh(); return points; };
 		}
 
 		void Refresh()
@@ -558,7 +589,7 @@ namespace OpenRA.Mods.TGMC.Widgets.Logic
 			var player = world.LocalPlayer ?? world.RenderPlayer;
 			if (player == null)
 			{
-				income = army = "";
+				income = army = points = "";
 				return;
 			}
 
@@ -569,8 +600,16 @@ namespace OpenRA.Mods.TGMC.Widgets.Logic
 			var units = world.ActorsHavingTrait<IMove>().Count(a => a.Owner == player && a.IsInWorld && !a.IsDead);
 			var larvae = world.Actors.Count(a => a.Owner == player && a.IsInWorld && !a.IsDead && a.Info.Name == "larva");
 
+			// Capture points: every ore field on the map, claimed or not, and how many of them are this player's miners.
+			var fields = world.ActorsHavingTrait<MinerField>().Where(a => a.IsInWorld && !a.IsDead).ToList();
+			points = fields.Count > 0 ? $"Points {fields.Count(a => a.Owner == player)}/{fields.Count}" : "";
+
 			income = $"Income +{perMinute}/min";
 			army = larvae > 0 ? $"Army {units}   Larvae {larvae}" : $"Army {units}";
+
+			// Xenos: living weed nodes, which gate the big castes at 4 and 8 (WeedNodeTech).
+			if (player.Faction.InternalName == "xenos")
+				points = (points == "" ? "" : points + "  ") + $"Nodes {WeedNodeTech.Count(player)}";
 		}
 	}
 

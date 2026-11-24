@@ -1,5 +1,5 @@
 # Voice sets. Clips are built by mod/build_sounds.py. The phrases are the ones the traits ask for: Select (clicked),
-# Action (given a move order), Attack (given an attack order) and Die (killed). Pools pick a clip at random without
+# Action (given a move order), Attack (given an attack order) and Die (killed); the marines have three more, see below. Pools pick a clip at random without
 # repeating until every clip has played.
 #
 # Marines come in two recordings of each clip, male and female. Prefixes picks one per marine by its actor id, so a
@@ -7,6 +7,9 @@
 # <prefix><clip>.ogg, for example marine-f-warcry-6.ogg. The audio folder is mounted as its own
 # package (see mod.yaml), so sounds are referred to by file name alone.
 
+# TGMC's marines are players, so it has no spoken acknowledgements: a marine answers a click or a move order with a burst of
+# radio static and shouts a warcry only when sent to attack. Pain, Medic and Hugged are played by CriesInPain and Infestable
+# (tgmc/code/Pain.cs, Infestation.cs): hurt, badly hurt with no healer near, and a facehugger latching on.
 MarineVoice:
 	DefaultVariant: .ogg
 	Prefixes:
@@ -15,11 +18,15 @@ MarineVoice:
 		xenos: marine-m-, marine-f-
 		Random: marine-m-, marine-f-
 	Voices:
-		Select: warcry-1, warcry-6, warcry-10, warcry-11, warcry-13
-		Action: warcry-5, warcry-12, warcry-15, warcry-17, warcry-18, warcry-19
-		Attack: warcry-2, warcry-3, warcry-4, warcry-7, warcry-8, grenadethrow-1, grenadethrow-2, grenadethrow-3
+		Select: radio
+		Action: radio
+		Attack: warcry-1, warcry-2, warcry-3, warcry-4, warcry-5, warcry-6, warcry-7, warcry-8, warcry-9, warcry-10, warcry-11, warcry-12, warcry-13, warcry-14, warcry-15, warcry-16, warcry-17, warcry-18, warcry-19, grenadethrow-1, grenadethrow-2, grenadethrow-3
 		Die: scream-1, scream-2, scream-3, scream-4, scream-5, gored-1, gored-2
+		Pain: pain-1, pain-2, pain-3
+		Medic: medic-1
+		Hugged: facehugged-1, facehugged-2
 
+# The corpsman is the medic: no call for one.
 CorpsmanVoice:
 	DefaultVariant: .ogg
 	Prefixes:
@@ -28,10 +35,22 @@ CorpsmanVoice:
 		xenos: marine-m-, marine-f-
 		Random: marine-m-, marine-f-
 	Voices:
-		Select: medic-1
-		Action: warcry-5, warcry-15, warcry-17, warcry-18
-		Attack: warcry-2, warcry-3
+		Select: radio
+		Action: radio
+		Attack: warcry-2, warcry-3, warcry-5, warcry-15, warcry-17, warcry-18
 		Die: scream-1, scream-2, scream-3, scream-4, scream-5, gored-1, gored-2
+		Pain: pain-1, pain-2, pain-3
+		Hugged: facehugged-1, facehugged-2
+
+# The synthetic: TGMC's robot voice. No facehugger latches onto it and it does not call for a medic.
+SynthVoice:
+	DefaultVariant: .ogg
+	Voices:
+		Select: synth-yes
+		Action: synth-yes
+		Attack: robot-warcry-1, robot-warcry-2, robot-warcry-3
+		Die: robot-scream-1, robot-scream-2, robot-scream-3
+		Pain: robot-pain-1, robot-pain-2, robot-pain-3
 
 # Xenos: one set per caste, no gender.
 RunnerVoice:

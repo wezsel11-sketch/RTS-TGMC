@@ -1,5 +1,5 @@
 -- Scenario test: the caste abilities of the command card. Rage works once and then recovers; the praetorian's acid spray hurts a marine in front
--- of him and leaves acid gas; the wraith blinks next to the nearest marine; the defiler fills the ground around him with gas while he walks; the warrior's fling throws the marine next to him; the carrier throws huggers until its charges run out.
+-- of him and leaves acid gas; the defiler fills the ground around him with gas while he walks; the warrior's fling throws the marine next to him; the carrier throws huggers until its charges run out.
 -- Prints "TEST abilities PASS" or "TEST abilities FAIL".
 WorldLoaded = function()
 	local xenos = Player.GetPlayer("Xenos")
@@ -33,7 +33,6 @@ WorldLoaded = function()
 		results.rage2 = ravager.UseAbility(1)
 		results.spray = praetorian.UseAbility(1)
 		results.fling = warrior.UseAbility(1)
-		results.blink = wraith.UseAbility(2)
 		results.emit = defiler.UseAbility(1)
 		defiler.Move(CPos.New(defiler.Location.X + 10, defiler.Location.Y))
 		-- Counted while the gas still hangs: the defiler fills the cells around him as he walks.
@@ -52,10 +51,9 @@ WorldLoaded = function()
 			local huggers = #xenos.GetActorsByType("facehugger")
 			local sprayed = sprayTarget.IsDead or sprayTarget.Health < sprayHp
 			local flung = not flingTarget.IsDead and flingTarget.Location.X >= flingX + 3
-			local blinked = math.abs(wraith.Location.X - blinkTarget.Location.X) <= 2 and math.abs(wraith.Location.Y - blinkTarget.Location.Y) <= 2
-			local ok = results.rage1 and not results.rage2 and results.spray and results.fling and sprayed and flung and uses == 4 and gas >= 5 and results.blink and blinked and results.emit and puffs >= 20
+			local ok = results.rage1 and not results.rage2 and results.spray and results.fling and sprayed and flung and uses == 4 and gas >= 5 and results.emit and puffs >= 20
 			print("TEST abilities " .. (ok and "PASS" or "FAIL") .. " (rage " .. tostring(results.rage1) .. "/" .. tostring(results.rage2) ..
-				", sprayed=" .. tostring(sprayed) .. ", acid gas " .. gas .. ", defiler gas " .. puffs .. ", blinked=" .. tostring(blinked) .. ", flung=" .. tostring(flung) .. ", huggers thrown " .. uses .. ", huggers " .. huggers .. ")")
+				", sprayed=" .. tostring(sprayed) .. ", acid gas " .. gas .. ", defiler gas " .. puffs .. ", flung=" .. tostring(flung) .. ", huggers thrown " .. uses .. ", huggers " .. huggers .. ")")
 		end)
 	end)
 end

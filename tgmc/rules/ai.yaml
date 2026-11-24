@@ -730,6 +730,8 @@ Player:
 		Attackers: drone
 		Order: ForceAttack
 		AvoidNear: cryo-pod
+		# The first two idle drones, the ones WeedDroneBotModule@xenos skips with Spare: 2. Keep the two numbers equal.
+		Max: 2
 	# Marine bot: idle fighters go and knock down the xenos' corrupted miners, which frees the field for an engineer.
 	FieldBotModule@marines-retake:
 		RequiresCondition: enable-skirmish-ai && !faction-xenos
@@ -738,6 +740,37 @@ Player:
 		EnemyOnly: true
 		Order: AttackMove
 		MinTick: 3000
+	# Distress Signal (the lobby's Objective): idle marines walk to the disk terminals not yet decoded and hold them; with three
+	# decoded they go and hold the nuke. Xenos send idle fighters to the terminals and to a nuke the marines have armed.
+	FieldBotModule@marines-disks:
+		RequiresCondition: enable-skirmish-ai && !faction-xenos
+		Attackers: rifleman, smartgunner, grenadier, medic, som_trooper, som_veteran, som_scout
+		Target: disk-terminal
+		Order: AttackMove
+		Objective: distress
+		MinTick: 1500
+	FieldBotModule@marines-nuke:
+		RequiresCondition: enable-skirmish-ai && !faction-xenos
+		Attackers: rifleman, smartgunner, grenadier, medic, som_trooper, som_veteran, som_scout
+		Target: nuke
+		Order: AttackMove
+		Objective: distress
+		NeedsOwned: disk-terminal
+		NeedsOwnedCount: 3
+	FieldBotModule@xenos-disks:
+		RequiresCondition: enable-skirmish-ai && faction-xenos
+		Attackers: runner, hunter, sentinel, warrior, defender, spitter
+		Target: disk-terminal
+		Order: AttackMove
+		Objective: distress
+		Max: 4
+	FieldBotModule@xenos-nuke:
+		RequiresCondition: enable-skirmish-ai && faction-xenos
+		Attackers: runner, hunter, sentinel, warrior, defender, spitter, ravager, crusher, praetorian
+		Target: nuke
+		EnemyOnly: true
+		Order: AttackMove
+		Objective: distress
 	# Marine bot: every miner gets sentry turrets beside it (see FieldDefenseBotModule in tgmc/code/Bots/).
 	FieldDefenseBotModule@marines:
 		RequiresCondition: enable-skirmish-ai && !faction-xenos
@@ -814,6 +847,23 @@ Player:
 		Order: Attack
 		# A field beside the hive is lost to the first raid: leave it.
 		AvoidNear: resin-silo, forward-hive
+	# Both bots go for TGMC's geothermal generators once the ore fields have had the first minutes: engineers repair them (power and
+	# light), a drone corrupts them for the hive.
+	FieldBotModule@marines-power:
+		RequiresCondition: enable-skirmish-ai && !faction-xenos
+		Attackers: engineer, som_engineer
+		Target: geothermal-field
+		Order: Attack
+		AvoidNear: resin-silo, forward-hive
+		MinTick: 2500
+	FieldBotModule@xenos-power:
+		RequiresCondition: enable-skirmish-ai && faction-xenos
+		Attackers: drone
+		Target: geothermal-field
+		Order: ForceAttack
+		AvoidNear: cryo-pod
+		MinTick: 2500
+		Max: 1
 	# Marine bot: weed nodes can only be force-fired, so no squad ever picks one, yet they must fall for a win. Idle marines go and bash them with their rifle butts.
 	FieldBotModule@sweep:
 		RequiresCondition: enable-skirmish-ai && !faction-xenos

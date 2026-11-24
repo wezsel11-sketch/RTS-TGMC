@@ -16,7 +16,7 @@ _loaded = []
 SKIP = ("/obj/effect/landmark", "/obj/effect/ai_node", "/obj/effect/spawner", "/obj/structure/cable", "/obj/machinery/atmospherics",
         "/obj/structure/disposalpipe", "/obj/machinery/miner", "/obj/effect/step_trigger", "/obj/effect/forcefield",
         "/mob/", "/obj/effect/alien", "/obj/structure/xeno", "/obj/effect/temp", "/obj/machinery/camera", "/obj/machinery/power/apc",
-        "/obj/effect/abstract",
+        "/obj/effect/abstract", "/obj/machinery/power/geothermal",
         # The poddoors that wall in the landing zone (TGMC opens them on a timer) and their buttons; the RTS has no use for them.
         "/obj/machinery/door/poddoor/timed_late/containment/landing_zone", "/obj/machinery/button/door/open_only/landing_zone")
 

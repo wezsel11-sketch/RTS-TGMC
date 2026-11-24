@@ -39,6 +39,10 @@
 # A door: opens by itself with TGMC's animation when a unit comes near (MapDoor, see tgmc/code/MapDoor.cs). The sequences come from build_maptiles.py.
 ^MapDoor:
 	Inherits: ^MapObjectCover
+	# Xenos pry a colony door open: four seconds beside it first. Marines and SOM walk straight through.
+	MapDoor:
+		PryFactions: xenos
+		PryTicks: 100
 
 ^MapObjectOpen:
 	Inherits: ^MapObject
@@ -167,3 +171,19 @@ alamo-drop:
 	Interactable:
 	Dropship:
 		LandAtStart: true
+
+# TGMC's G-11 geothermal generator, broken at the start. A capture point like an ore field: an engineer repairs it into a running
+# generator that pays and lights the colony around it at night; a drone corrupts it for the hive (MinerField, tgmc/code/MinerField.cs).
+geothermal-field:
+	Inherits: miner-field
+	Tooltip:
+		Name: actor-geothermal-field.name
+	RenderSprites:
+		Image: geothermal
+	WithSpriteBody:
+		Sequence: broken
+	-WithIdleAnimation:
+	MinerField:
+		IntoActor: geothermal
+		FactionIntoActors:
+			xenos: corrupted-geothermal

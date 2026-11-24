@@ -1349,6 +1349,36 @@ UNITS = {
             "icon": [(RESIN_DOOR, "resin-door-0", None, {"fit": (44, 44)})],
         },
     },
+    # TGMC's geothermal generator (geothermal-field, geothermal, corrupted-geothermal): broken, running, and running under resin.
+    "geothermal": {
+        "sequences": {
+            "broken": [("icons/turf/geothermal.dmi", "weld")],
+            "idle": [("icons/turf/geothermal.dmi", "on100")],
+            "icon": [("icons/turf/geothermal.dmi", "on100", None, {"fit": (44, 44)})],
+        },
+    },
+    # Distress Signal objective (structures.yaml): the disk terminal (red until decoded, then green) and the nuke (armed: the timer frames).
+    "disk-terminal": {
+        "sequences": {
+            "idle": [("icons/obj/machines/computer.dmi", "nuke_red")],
+            "decoded": [("icons/obj/machines/computer.dmi", "nuke_green")],
+            "icon": [("icons/obj/machines/computer.dmi", "nuke_red", None, {"fit": (44, 44)})],
+        },
+    },
+    "nuke": {
+        "sequences": {
+            "idle": [("icons/obj/stationobjs.dmi", "nuclearbomb0")],
+            "armed": [("icons/obj/stationobjs.dmi", "nuclearbomb2")],
+            "icon": [("icons/obj/stationobjs.dmi", "nuclearbomb0", None, {"fit": (44, 44)})],
+        },
+    },
+    # A marine cocooned by the hive (cocoon in units.yaml).
+    "cocoon": {
+        "sequences": {
+            "idle": [("icons/obj/cocoon.dmi", "xeno_cocoon")],
+            "icon": [("icons/obj/cocoon.dmi", "xeno_cocoon", None, {"fit": (44, 44)})],
+        },
+    },
     "sticky-resin": {
         "zoffset": GROUND_Z["sticky"],
         "sequences": {

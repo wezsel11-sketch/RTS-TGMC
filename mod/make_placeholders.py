@@ -1021,9 +1021,13 @@ def built_map(name, m, tiles):
         near, next_one = sorted(max(abs(x - sx), abs(y - sy)) for sx, sy in spawns)[:2]
         if near * 4 >= next_one * 3:
             actors.append(("platinum-vein", "Neutral", x, y, 0))
+    # The Distress Signal points, clear of the fields, fences and hand-placed cover; scattered props keep off them below.
+    busy = set(m["fields"]) | set(cells(m.get("fences", ()))) | {(x, y) for _, x, y in m.get("cover", ())}
+    objective = distress_objective(reach, (), (), spawns, busy)
+    actors += objective
     if not tiles:
         return ground, actors
-    taken = set(m["fields"])
+    taken = set(m["fields"]) | {(x, y) for _, _, x, y, _ in objective}
     # Fence lines: a rectangle taller than wide runs north-south. They stand with no wall broken in the reachability check above.
     for x0, y0, x1, y1 in m.get("fences", ()):
         for x, y in sorted(cells([(x0, y0, x1, y1)])):
@@ -1048,6 +1052,17 @@ def built_map(name, m, tiles):
             elif n % 30 == 1:
                 actors.append((tiles.props[plain[n // 30 % len(plain)]], "Neutral", x, y, 0))
     return ground, actors
+
+
+# Operation Hot Drop, the campaign (write_tgmc_map's `mission`): TGMC's own maps, shrunk, with TGMC's game modes.
+CAMPAIGN = {
+    "campaign-1-distress": dict(map="lv-624", objective="distress", title="Hot Drop 1: Distress Signal",
+        brief="LV-624 has gone silent. Land, decode the three nuke disk terminals in the colony and arm the nuclear device before the hive grows."),
+    "campaign-2-blackout": dict(map="ice-colony", objective="distress", night=True, title="Hot Drop 2: Blackout",
+        brief="The hive has cut the power on Ice Colony. Repair the geothermal generators to light the dark, then decode the disks and arm the nuke."),
+    "campaign-3-crash": dict(map="big-red", objective="crash", title="Hot Drop 3: Crash",
+        brief="The ship has come down on Big Red. You have twenty-five minutes to decode the disks and set off the nuke before the hive overruns the site."),
+}
 
 
 # The maps built by hand. spawns: the marine base, the xeno base, then any further bases (a map with four is a four-player map).
@@ -2195,6 +2210,40 @@ SCENARIOS = {
     "scenario-formation": {"scripts": ("test-formation",), "size": (40, 24), "drop_conquest": True, "actors": [
         ("runner", "Xenos", 6, 10, 768), ("crusher", "Xenos", 6, 12, 768), ("resin-silo", "Xenos", 34, 18, 0), ("rifleman", "Marines", 2, 2, 0),
     ]},
+    # Downed marines: a runner brings a rifleman down; a corpsman revives him, the runner cocoons him, or he bleeds out
+    # (see scenarios/test-downed.lua). A spare rifleman far off and a silo keep either side from losing early.
+    **{f"scenario-downed-{mode}": {"scripts": (f"mode-downed-{mode}", "test-downed"), "size": (32, 24), "drop_conquest": True, "actors": [
+        ("rifleman", "Marines", 10, 10, 512), ("rifleman", "Marines", 28, 2, 0), ("runner", "Xenos", 12, 10, 256),
+        ("resin-silo", "Xenos", 28, 20, 0), *([("medic", "Marines", 6, 14, 768)] if mode == "revive" else []),
+    ]} for mode in ("revive", "cocoon", "bleed")},
+    # Distress Signal: riflemen hold the three disk terminals, then the nuke, which goes off and ends the hive (see scenarios/test-distress.lua).
+    # One rifleman waits at the nuke from the start: it must not arm before the terminals are decoded.
+    "scenario-distress": {"scripts": ("test-distress",), "size": (40, 24), "drop_conquest": True,
+                          "extra_rules": "World:\n\tTgmcOptions:\n\t\tObjectiveDefault: distress\n", "actors": [
+        ("disk-terminal", "Neutral", 6, 4, 0), ("disk-terminal", "Neutral", 6, 20, 0), ("disk-terminal", "Neutral", 20, 4, 0),
+        ("nuke", "Neutral", 30, 12, 0), ("rifleman", "Marines", 7, 4, 0), ("rifleman", "Marines", 7, 20, 0), ("rifleman", "Marines", 21, 4, 0),
+        ("rifleman", "Marines", 31, 12, 0), ("resin-silo", "Xenos", 36, 21, 0), ("runner", "Xenos", 37, 21, 0),
+    ]},
+    # Colony doors: a runner has to pry one open (see scenarios/test-door-pry.lua), timed against the same door with the pry off.
+    **{f"scenario-door-pry-{m}": {"scripts": (f"mode-door-pry-{m}", "test-door-pry"), "drop_conquest": True, "size": (32, 24), "ground": "doorline",
+                                  "extra_rules": "" if m == "on" else "^MapDoor:\n\tMapDoor:\n\t\tPryTicks: 0\n", "actors": [
+        ("rifleman", "Marines", 2, 2, 0), ("mapdoor-0", "Neutral", 14, 11, 0), ("runner", "Xenos", 8, 11, 256), ("resin-silo", "Xenos", 28, 20, 0),
+    ]} for m in ("on", "off")},
+    # Geothermal generators: an engineer repairs one, a drone corrupts the other (see scenarios/test-geothermal.lua).
+    "scenario-geothermal": {"scripts": ("test-geothermal",), "drop_conquest": True, "size": (32, 24), "actors": [
+        ("engineer", "Marines", 8, 10, 256), ("geothermal-field", "Neutral", 10, 10, 0), ("cryo-pod", "Marines", 3, 3, 0),
+        ("drone", "Xenos", 24, 10, 768), ("geothermal-field", "Neutral", 22, 10, 0), ("resin-silo", "Xenos", 28, 20, 0),
+    ]},
+    # Landing delay: the first minute keeps a rifleman at his landing zone (see scenarios/test-landing-leash.lua).
+    "scenario-landing-leash": {"scripts": ("test-landing-leash",), "drop_conquest": True, "size": (48, 24),
+                               "extra_rules": "World:\n\tTgmcOptions:\n\t\tLandingDelayDefault: 30\n", "actors": [
+        ("rifleman", "Marines", 6, 12, 256), ("cryo-pod", "Marines", 4, 4, 0), ("resin-silo", "Xenos", 44, 20, 0),
+    ]},
+    # Crash: the clock runs out with the nuke untouched, and the marines are gone (see scenarios/test-crash.lua).
+    "scenario-crash": {"scripts": ("test-crash",), "drop_conquest": True, "size": (40, 24),
+                       "extra_rules": "World:\n\tTgmcOptions:\n\t\tObjectiveDefault: crash\n\tCrashTimer:\n\t\tTimeLimit: 600\n", "actors": [
+        ("rifleman", "Marines", 6, 12, 0), ("rifleman", "Marines", 8, 12, 0), ("nuke", "Neutral", 30, 12, 0), ("resin-silo", "Xenos", 36, 20, 0),
+    ]},
     # Crash sweep (Not a test, run by mod/shots.sh): every unit and structure of the rules stands on one map, owned by the player, and
     # ScreenshotAt's Sweep selects each in turn with the HUD drawn. The actors are filled in by sweep_actors() below.
     "shot-sweep": {"scripts": ("shot",), "size": (96, 72), "drop_conquest": True,
@@ -2500,12 +2549,45 @@ def ore_fields(tgmc, spec, kind="/obj/machinery/miner"):
     return sorted(cells)
 
 
-def camo_rules(style):
-    """The map's camo for the marines' standard armour (TgmcCamo): TGMC's style for that map, or "" for the plain set."""
-    return f"World:\n\tTgmcCamo:\n\t\tStyle: {style}\n"
+def distress_objective(reach, nukes, towers, bases, taken):
+    """TGMC's Distress Signal points (the lobby's Objective, HoldObjective in tgmc/code/Objective.cs): the nuke where TGMC spawns it
+    (else halfway between the first two bases) and three disk terminals at TGMC's sensor tower spots, spread out: each the spot
+    furthest from the nuke and the terminals already placed. All on ground the marine base reaches, 8 or more cells from every base
+    and off the cells other map actors (ore fields, props) already use."""
+    def dist(a, b):
+        return abs(a[0] - b[0]) + abs(a[1] - b[1])
+    ok = [c for c in sorted(reach) if c not in taken and all(max(abs(c[0] - b[0]), abs(c[1] - b[1])) >= 8 for b in bases)]
+    if not ok:
+        return []
+    near = lambda p: min(ok, key=lambda c: dist(c, p))  # noqa: E731
+    mid = ((bases[0][0] + bases[1][0]) // 2, (bases[0][1] + bases[1][1]) // 2)
+    nuke = near(nukes[0] if nukes else mid)
+    # Too few tower spots: every fourth reachable cell stands in for the rest.
+    spots = sorted({near(t) for t in towers}) or ok[::4]
+    if len(spots) < 3:
+        spots += ok[::4]
+    picked = []
+    for _ in range(3):
+        free = [c for c in spots if c != nuke and c not in picked]
+        if not free:
+            break
+        picked.append(max(free, key=lambda c: min(dist(c, o) for o in [nuke] + picked)))
+    return [("nuke", "Neutral", nuke[0], nuke[1], 0)] + [("disk-terminal", "Neutral", x, y, 0) for x, y in picked]
 
 
-def write_tgmc_map(folder, title, rows, marines, xenos, art=None, objects=None, open_variant=None, ai_test=False, fields=(), bases=2, camo="", platinum=()):
+def camo_rules(style, weather=None):
+    """The map's camo for the marines' standard armour (TgmcCamo): TGMC's style for that map, or "" for the plain set. With `weather`,
+    also the map's default weather in the lobby (tgmc_dmm.WEATHER). One World block, since a rules file may name World only once."""
+    rules = f"World:\n\tTgmcCamo:\n\t\tStyle: {style}\n"
+    # TGMC's maps hold the marines at their landing zone for the first minute (the lobby's Landing Delay), as its fog walls do.
+    rules += "\tTgmcOptions:\n\t\tLandingDelayDefault: 60\n"
+    if weather:
+        rules += f"\t\tWeatherDefault: {weather}\n"
+    return rules
+
+
+def write_tgmc_map(folder, title, rows, marines, xenos, art=None, objects=None, open_variant=None, ai_test=False, fields=(), bases=2, camo="", platinum=(),
+                   nukes=(), towers=(), weather=None, generators=(), mission=None):
     """A skirmish map from a converted TGMC map. Landing Zone's two bases go at the given centres, on open ground. With `art`, a function
     (x, y) -> template id (build_maptiles), a cell that was not changed shows its real TGMC picture; a carved or cleared cell shows plain dirt."""
     h, w = len(rows), len(rows[0])
@@ -2610,6 +2692,13 @@ def write_tgmc_map(folder, title, rows, marines, xenos, art=None, objects=None, 
         ore = kept
     extra += [("miner-field", "Neutral", x, y, 0) for x, y in ore]
     extra += [("platinum-vein", "Neutral", x, y, 0) for x, y in ore if (x, y) in set(platinum)]
+    # TGMC's geothermal generators (geothermal-field, a capture point that lights the colony once repaired), where the marines can walk up.
+    reach_all = on_foot(set())
+    busy = {(x, y) for _, _, x, y, _ in extra}
+    gens = [(x, y) for x, y in generators if (x, y) not in busy and any(n in reach_all for n in ((x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1)))
+            and not any(abs(x - bx) < 4 and abs(y - by) < 4 for bx, by in [spawn_m, spawn_x] + extra_spawn)]
+    extra += [("geothermal-field", "Neutral", x, y, 0) for x, y in gens]
+    extra += distress_objective(reach_all, nukes, towers, [spawn_m, spawn_x] + extra_spawn, {(x, y) for _, _, x, y, _ in extra})
     original = rows
     def dug_art(x, y):
         """A tunnel cell dug through rock wears the picture of the nearest ordinary ground cell, not the repo's flat dirt tile."""
@@ -2621,12 +2710,18 @@ def write_tgmc_map(folder, title, rows, marines, xenos, art=None, objects=None, 
                         return art(nx, ny)
         return codes[land[y][x]]
     ground = (lambda x, y: (art(x, y) if land[y][x] == original[y][x] else dug_art(x, y), 0)) if art else (lambda x, y: (codes[land[y][x]], 0))
+    if mission:
+        # A campaign mission (CAMPAIGN below): the player's marines against the hive's bot, with the mission's objective and night set.
+        rules = camo_rules(camo, weather) + f"\t\tObjectiveDefault: {mission['objective']}\n" + ("\t\tNightDefault: true\n" if mission.get("night") else "")
+        write_map(folder, mission["title"], w, h, actors + xeno_actors + extra, "MissionSelector", [spawn_m, spawn_x], ground=ground,
+                  extra_rules=rules, category="Campaign", xeno_bot="skirmish", brief=mission["brief"])
+        return
     if ai_test:
         # An AI-vs-AI copy of the map for tuning the bots on it (see scenarios/test-aimap.lua).
-        write_map(folder, title, w, h, actors + xeno_actors + extra, "MissionSelector", [spawn_m, spawn_x], scripts=("test-aimap",), ground=ground, extra_rules=camo_rules(camo),
+        write_map(folder, title, w, h, actors + xeno_actors + extra, "MissionSelector", [spawn_m, spawn_x], scripts=("test-aimap",), ground=ground, extra_rules=camo_rules(camo, weather),
                   category="Conquest", marine_bot="skirmish", xeno_bot="skirmish", fast=True, drop_conquest=False)
         return
-    write_map(folder, title, w, h, actors + xeno_actors + extra, "Lobby", [spawn_m, spawn_x] + extra_spawn, ground=ground, extra_rules=camo_rules(camo),
+    write_map(folder, title, w, h, actors + xeno_actors + extra, "Lobby", [spawn_m, spawn_x] + extra_spawn, ground=ground, extra_rules=camo_rules(camo, weather),
               category="Conquest, Full size" if bases == 4 else "Conquest, Small",  # the map picker's filter tabs
               faction_start=True, players=FOUR_PLAYERS if bases == 4 else None,
               brief="TGMC's own map at full size, with its floors and walls." if bases == 4 else "TGMC's own map, shrunk for a quick match.")
@@ -2683,7 +2778,7 @@ def main():
         bases = _base_actors(spawns)
         for _, _, x, y, _ in bases:
             assert 2 <= x <= w - 3 and 2 <= y <= h - 3 and m["ground"](x, y)[0] in (GRASS, DIRT), f"{name}: actor at {x},{y} is off the map or not on open ground"
-        rules = camo_rules(THEME_CAMO[m["theme"]]) + f"World:\n\tTgmcOptions:\n\t\tWeatherDefault: {m['weather']}\n" + ("\t\tNightDefault: true\n" if m.get("night") else "")
+        rules = camo_rules(THEME_CAMO[m["theme"]], m["weather"]) + ("\t\tNightDefault: true\n" if m.get("night") else "")
         four = len(spawns) == 4
         write_map(os.path.join(args.out, "maps", name), m["title"], w, h, bases + extra, "Lobby", spawns, ground=ground,
                   category="Conquest, Full size" if four else "Conquest, Small", faction_start=True, players=FOUR_PLAYERS if four else None,
@@ -2692,15 +2787,33 @@ def main():
         write_map(os.path.join(dev_maps, "aimap-" + name), "AI test " + m["title"], w, h, bases + extra, "MissionSelector", spawns[:2],
                   scripts=("test-aimap",), ground=ground, category="Conquest", marine_bot="skirmish", xeno_bot="skirmish", fast=True, extra_rules=rules)
     if args.tgmc:
+        # Operation Hot Drop: three missions on TGMC's own maps, in order, each with one of TGMC's game modes. The engine keeps
+        # nothing from one map to the next, so nothing carries over: each mission starts from its own landing.
+        for key, mission in CAMPAIGN.items():
+            spec = tgmc_dmm.MAPS[mission["map"]]
+            write_tgmc_map(os.path.join(args.out, "maps", key), mission["title"], *tgmc_dmm.load(args.tgmc, spec),
+                           art=tiles.art(mission["map"]) if mission["map"] in full else None,
+                           objects=tiles.actors.get(mission["map"]) if mission["map"] in full else None, open_variant=tiles.open_variant,
+                           fields=ore_fields(args.tgmc, spec), platinum=ore_fields(args.tgmc, spec, "/obj/machinery/miner/damaged/platinum"),
+                           camo=tgmc_dmm.CAMO.get(mission["map"].removesuffix("-full"), ""),
+                           nukes=ore_fields(args.tgmc, spec, "/obj/effect/landmark/nuke_spawn"), towers=ore_fields(args.tgmc, spec, "/obj/effect/landmark/sensor_tower"),
+                           generators=ore_fields(args.tgmc, spec, "/obj/machinery/power/geothermal"),
+                           weather=tgmc_dmm.WEATHER.get(mission["map"].removesuffix("-full")), mission=mission)
         for name, spec in tgmc_dmm.MAPS.items():
             write_tgmc_map(os.path.join(args.out, "maps", name), spec["title"], *tgmc_dmm.load(args.tgmc, spec),
                            art=tiles.art(name) if name in full else None,
                            objects=tiles.actors.get(name) if name in full else None, open_variant=tiles.open_variant,
-                           fields=ore_fields(args.tgmc, spec), platinum=ore_fields(args.tgmc, spec, "/obj/machinery/miner/damaged/platinum"), bases=4 if name in full else 2, camo=tgmc_dmm.CAMO.get(name.removesuffix("-full"), ""))
+                           fields=ore_fields(args.tgmc, spec), platinum=ore_fields(args.tgmc, spec, "/obj/machinery/miner/damaged/platinum"), bases=4 if name in full else 2, camo=tgmc_dmm.CAMO.get(name.removesuffix("-full"), ""),
+                           nukes=ore_fields(args.tgmc, spec, "/obj/effect/landmark/nuke_spawn"), towers=ore_fields(args.tgmc, spec, "/obj/effect/landmark/sensor_tower"),
+                           generators=ore_fields(args.tgmc, spec, "/obj/machinery/power/geothermal"),
+                           weather=tgmc_dmm.WEATHER.get(name.removesuffix("-full")))
             if name in full:
                 write_tgmc_map(os.path.join(dev_maps, "aimap-" + name), "AI test " + spec["title"], *tgmc_dmm.load(args.tgmc, spec),
                                art=tiles.art(name), objects=tiles.actors.get(name), open_variant=tiles.open_variant, ai_test=True,
-                               fields=ore_fields(args.tgmc, spec), platinum=ore_fields(args.tgmc, spec, "/obj/machinery/miner/damaged/platinum"), camo=tgmc_dmm.CAMO.get(name.removesuffix("-full"), ""))
+                               fields=ore_fields(args.tgmc, spec), platinum=ore_fields(args.tgmc, spec, "/obj/machinery/miner/damaged/platinum"), camo=tgmc_dmm.CAMO.get(name.removesuffix("-full"), ""),
+                               nukes=ore_fields(args.tgmc, spec, "/obj/effect/landmark/nuke_spawn"), towers=ore_fields(args.tgmc, spec, "/obj/effect/landmark/sensor_tower"),
+                           generators=ore_fields(args.tgmc, spec, "/obj/machinery/power/geothermal"),
+                           weather=tgmc_dmm.WEATHER.get(name.removesuffix("-full")))
     for name, sc in SCENARIOS.items():
         width, height = sc.get("size", (24, 24))
         # "prop:<name>" is a built-map prop (a mapobj-<n> actor); without a TGMC checkout there are none and it is left out.

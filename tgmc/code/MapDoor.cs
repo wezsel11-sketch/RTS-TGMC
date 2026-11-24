@@ -3,6 +3,7 @@
 // the same licence as OpenRA, whose traits this file extends.
 #endregion
 
+using System.Collections.Generic;
 using System.Linq;
 using OpenRA.Mods.Common.Traits;
 using OpenRA.Mods.Common.Traits.Render;
@@ -43,6 +44,11 @@ namespace OpenRA.Mods.TGMC.Traits
 		[GrantedConditionReference]
 		public readonly string SidewaysCondition = null;
 
+		[Desc("Units of these factions have to pry the door open: it opens only after PryTicks with one of them beside it (TGMC's xenos " +
+			"force a colony door; marines just walk through).")]
+		public readonly HashSet<string> PryFactions = [];
+		public readonly int PryTicks = 0;
+
 		public readonly string[] OpenSound = ["door-open.ogg"];
 		public readonly string[] CloseSound = ["door-close.ogg"];
 
@@ -62,6 +68,7 @@ namespace OpenRA.Mods.TGMC.Traits
 		int openToken = Actor.InvalidConditionToken;
 		int sidewaysToken = Actor.InvalidConditionToken;
 		int quiet;
+		int pry;
 		string prefix;
 
 		public MapDoor(Actor self, MapDoorInfo info)
@@ -160,8 +167,19 @@ namespace OpenRA.Mods.TGMC.Traits
 			if (phase == Phase.Closed)
 			{
 				Turn(self);
-				if (Near(self))
+				var near = self.World.FindActorsInCircle(self.CenterPosition, info.Radius)
+					.Where(a => a != self && !a.IsDead && a.IsInWorld && a.Info.HasTraitInfo<MobileInfo>() && Friend(self, a)).ToList();
+				if (near.Count == 0)
+					pry = 0;
+				else if (near.Any(a => !Pries(a)))
 					Open(self);
+				else if (!near.Any(a => (a.CenterPosition - self.CenterPosition).HorizontalLengthSquared <= 1536L * 1536))
+					pry = 0; // still on the way: the prying starts beside the door
+				else if ((pry += 6) >= info.PryTicks)
+				{
+					pry = 0;
+					Open(self);
+				}
 			}
 			else if (phase == Phase.Open && info.CloseDelay > 0)
 			{
@@ -179,11 +197,15 @@ namespace OpenRA.Mods.TGMC.Traits
 			return phase != Phase.Open && cell == self.Location;
 		}
 
-		bool ITemporaryBlocker.CanRemoveBlockage(Actor self, Actor blocking) { return Friend(self, blocking); }
+		// A unit that has to pry the door cannot count on it opening for it: told otherwise, the mover walks through the shut door.
+		bool ITemporaryBlocker.CanRemoveBlockage(Actor self, Actor blocking) { return Friend(self, blocking) && !Pries(blocking); }
+
+		bool Pries(Actor a) { return info.PryTicks > 0 && info.PryFactions.Contains(a.Owner.Faction.InternalName); }
 
 		void INotifyBlockingMove.OnNotifyBlockingMove(Actor self, Actor blocking)
 		{
-			if (phase == Phase.Closed && Friend(self, blocking))
+			// A unit that has to pry the door waits for the tick's pry count instead (ITick above).
+			if (phase == Phase.Closed && Friend(self, blocking) && !Pries(blocking))
 				Open(self);
 		}
 	}

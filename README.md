@@ -111,6 +111,23 @@ the commits this mod was tested against (see the top of `mod/bootstrap.py`), so 
   Weeds, Hardened Resin, Far-Reaching Turrets; the Shell, Spur and Veil mutations (TGMC's three lines, as hive-wide number
   changes); Primordial I and II, which unlock each caste's late ability (Mirage, toxic grenade, Centrifugal Force, Flurry;
   Primal Wrath, Psychic Vortex, Zero-Form Beam). Mutations and primordials need territory.
+- **Downed marines** (a lobby option, on by default), TGMC's core loop. A marine brought to zero health falls and bleeds out
+  (about 24 seconds) instead of dying at once. A Corpsman, Synth or medbay heals him back up at 30 percent health. A xeno's
+  killing blow on him cocoons him: the cocoon pays the hive biomass, and after 30 seconds a larva comes out, unless the
+  marines destroy it first. Gibbed, melted, gassed or burnt he dies outright.
+- **Objective** (a lobby choice). *Conquest* is destroy everything. *Distress Signal* is TGMC's: marines decode three nuke
+  disk terminals by holding them (20 seconds each, with no xeno in reach), then hold the nuclear device to arm it. Armed, it
+  goes off after a minute and ends the hive; xenos standing at it with no marine there stop the clock. *Crash* is the same
+  against a 25-minute limit, after which the hive wins. Both bots play all three. Every map has the terminals and the nuke,
+  where TGMC's own maps spawn the nuke.
+- **TGMC's maps feel like TGMC's.** Each starts with its planet's weather (snowstorms on the ice worlds, sand on the
+  deserts, ash on the lava worlds, rain on the jungles); a snowstorm, sandstorm or ash fall cuts every unit's sight by a
+  quarter. The **Landing Delay** (a lobby choice, a minute on TGMC's maps) holds marines and SOM at their landing zone while
+  the hive sets up, as TGMC's fog walls do. The colony's **geothermal generators** start broken: an engineer repairs one
+  into a capture point that pays and lights the colony around it at night, a drone corrupts it for the hive. **Xenos pry
+  colony doors open** (four seconds at the door); marines walk straight through.
+- **Campaign: Operation Hot Drop.** Three missions on TGMC's maps, in the mission browser: Distress Signal on LV-624,
+  Blackout on Ice Colony at night, and Crash on Big Red. Nothing carries over from one mission to the next.
 - **Formation movement** (a lobby option, on by default): units sent to one spot together keep their shape and walk at the
   speed of the slowest.
 - **Capture points on the minimap** are diamonds in their holder's colour, grey while free, larger on platinum.

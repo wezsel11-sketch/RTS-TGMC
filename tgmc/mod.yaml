@@ -149,6 +149,10 @@ Sequences:
 	tgmc|sequences/resin-door.yaml
 	tgmc|sequences/sticky-resin.yaml
 	tgmc|sequences/egg.yaml
+	tgmc|sequences/cocoon.yaml
+	tgmc|sequences/disk-terminal.yaml
+	tgmc|sequences/nuke.yaml
+	tgmc|sequences/geothermal.yaml
 	tgmc|sequences/hugger-trap.yaml
 	tgmc|sequences/evolution-tower.yaml
 	tgmc|sequences/forward-hive.yaml

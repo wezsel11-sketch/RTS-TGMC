@@ -122,6 +122,13 @@ CAMO = {"lv-624": "jungle", "lawankaoutpost": "jungle", "desparity": "jungle", "
         "bluemoon": "ice", "prison-station-fop": "prison", "metnal-operation": "prison", "daedalusprison": "prison", "deltastation": "prison",
         "corsat": "prison"}
 
+# Each map's default weather (the lobby's Weather), after the planet TGMC sets it on: snowstorms on the ice worlds, sand on the
+# deserts, ash on the lava worlds, rain on the jungles. Indoor stations and prisons stay clear.
+WEATHER = {"ice-colony": "snow", "icy-caves": "snow", "gelida-iv": "snow", "bluemoon": "snow",
+           "desert-dam": "dust", "big-red": "dust", "kutjevo": "dust", "lv759": "dust",
+           "lavaoutpost": "ash", "magmoor-digsite-iv": "ash",
+           "lv-624": "rain", "lawankaoutpost": "rain", "desparity": "rain", "riptide": "rain", "whiskey-outpost": "rain"}
+
 # The same maps at TGMC's own size, one cell per tile (the ones above are shrunk to 1/2 or 1/3 so a match does not take an hour).
 for _name, _spec in list(MAPS.items()):
     MAPS[_name + "-full"] = dict(_spec, title=_spec["title"] + " (full size)", factor=1)

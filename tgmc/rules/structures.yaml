@@ -875,6 +875,25 @@ miner:
 		RequiresCondition: miner-housing
 		Modifier: 67
 
+# A repaired geothermal generator (geothermal-field in mapobjects.yaml): a miner that also lights the colony around it. Knocked
+# down to its floor by the xenos, the lights go out, as TGMC's colony goes dark when the hive cuts the power.
+geothermal:
+	Inherits: miner
+	Tooltip:
+		Name: actor-geothermal.name
+	RenderSprites:
+		Image: geothermal
+	-WithIdleAnimation:
+	MinerField:
+		FieldActor: geothermal-field
+	NightLight:
+		Range: 9c0
+		Intensity: 1
+		RedTint: 1
+		GreenTint: 0.95
+		BlueTint: 0.8
+		RequiresCondition: !miner-disabled
+
 # The xenos' miner: an ore field a drone has corrupted with resin (MinerField's FactionIntoActors in mapobjects.yaml). It pays the hive
 # biomass on top of its own income, less than a marine miner pays. Knocked down to its floor it is a free field again.
 corrupted-miner:
@@ -1816,3 +1835,71 @@ sensor-ping:
 	Immobile:
 		OccupiesSpace: false
 	Interactable:
+
+# TGMC's Distress Signal (the lobby's Objective): marines decode three disk terminals by holding them, then hold the nuke to arm it.
+# Neutral until taken; inert under the Conquest objective. HoldObjective is in tgmc/code/Objective.cs.
+^Objective:
+	HiddenUnderFog:
+		Type: CenterPosition
+	Immobile:
+		OccupiesSpace: true
+	Health:
+		HP: 10000
+	HitShape:
+	Targetable:
+		TargetTypes: Objective
+	RenderSprites:
+	BodyOrientation:
+		QuantizedFacings: 1
+	Selectable:
+		Bounds: 1024, 1024
+	SelectionDecorations:
+	AppearsOnRadar:
+	RevealsShroud:
+		Range: 2c0
+	Valued:
+		Cost: 0
+
+disk-terminal:
+	Inherits: ^Objective
+	Tooltip:
+		Name: actor-disk-terminal.name
+	WithSpriteBody:
+		RequiresCondition: !armed
+	WithSpriteBody@decoded:
+		Name: decoded
+		Sequence: decoded
+		RequiresCondition: armed
+	HoldObjective:
+		HoldTicks: 500
+		DoneSounds: ui-ping.ogg
+		DoneNotification: notification-disk-decoded
+
+nuke:
+	Inherits: ^Objective
+	Tooltip:
+		Name: actor-nuke.name
+	WithSpriteBody:
+		RequiresCondition: !armed
+	WithSpriteBody@armed:
+		Name: armed
+		Sequence: armed
+		RequiresCondition: armed
+	HoldObjective:
+		HoldTicks: 375
+		Terminal: disk-terminal
+		Terminals: 3
+		Countdown: 1500
+		DetonateWeapon: TGMCOrbital
+		DoneNotification: notification-nuke-armed
+		DetonateNotification: notification-nuke-detonated
+
+# A geothermal generator the hive has corrupted: pays biomass like a corrupted miner, and its lights stay out.
+corrupted-geothermal:
+	Inherits: corrupted-miner
+	Tooltip:
+		Name: actor-corrupted-geothermal.name
+	RenderSprites:
+		Image: geothermal
+	MinerField:
+		FieldActor: geothermal-field

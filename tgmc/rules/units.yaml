@@ -156,6 +156,15 @@
 		Text: DREAD
 		Color: FF6060
 		Height: 1250
+	# A snowstorm, sandstorm or ash fall (the lobby's Weather) cuts how far every unit sees by a quarter.
+	# The lobby's Landing Delay: marines and SOM stay at their landing zone for the first minutes.
+	LandingLeash:
+	GrantConditionOnWeather@storm:
+		Condition: storm
+		Weathers: snow, dust, ash
+	RevealsShroudMultiplier@storm:
+		RequiresCondition: storm
+		Modifier: 75
 	ExternalCondition@nightfall:
 		Condition: nightfall
 	RevealsShroudMultiplier@nightfall:
@@ -442,6 +451,10 @@
 			ExplosionDeath: -gib
 			AcidDeath: -gib
 			GasDeath: -gib
+	# TGMC's downed state (lobby option): at zero health he falls and bleeds out as a "downed" actor; a corpsman heals him back up,
+	# a xeno's killing blow cocoons him. Gibbed, melted, gassed or burnt he dies outright.
+	Downable:
+		DeathTypes: ExplosionDeath, AcidDeath, GasDeath, FlameDeath
 	# A marine that is down does not walk.
 	TgmcMobile:
 		PauseOnCondition: hugged || stunned
@@ -581,6 +594,10 @@ medic:
 	AutoTargetPriority@INFECTED:
 		ValidTargets: Infected
 		Priority: 10
+	# A downed marine bleeds out: he comes before a scratched one.
+	AutoTargetPriority@DOWNED:
+		ValidTargets: Downed
+		Priority: 9
 	Tooltip:
 		Name: actor-medic.name
 	Valued:
@@ -691,6 +708,10 @@ synth:
 	AutoTargetPriority@INFECTED:
 		ValidTargets: Infected
 		Priority: 10
+	# A downed marine bleeds out: he comes before a scratched one.
+	AutoTargetPriority@DOWNED:
+		ValidTargets: Downed
+		Priority: 9
 	AutoTargetPriority@REPAIR:
 		ValidTargets: Structure
 		ValidRelationships: Ally
@@ -1672,6 +1693,8 @@ demolitionist:
 		Description: actor-demolitionist.description
 
 ^Xeno:
+	# The killing blow on a downed marine cocoons him for the hive (cocoon, below).
+	CocoonsDowned:
 	# Badly hurt, a xeno leaves a trail of clawed footprints (fluidtracks.dmi, LeavesTracks in GroundFx.cs).
 	LeavesTracks:
 		Sequences: claw1, claw2
@@ -4313,3 +4336,75 @@ som-tank:
 		Prerequisites: workshop, ~faction-som
 		BuildLimit: 2
 		Description: actor-som-tank.description
+
+# A downed marine (Downable on ^Infantry): lies there bleeding out, 600 ticks (about 24 seconds) from half health. Healed to full by a corpsman,
+# synth or medbay he stands up again at 30 percent; finished off by a xeno he becomes a cocoon of the hive's. Drawn with the marine's
+# own "down" picture (Downed in tgmc/code/Downed.cs).
+downed:
+	Interactable:
+	# It occupies no cell, so a footprint check would hide it from the enemy for good.
+	HiddenUnderFog:
+		Type: CenterPosition
+	Tooltip:
+		Name: actor-downed.name
+	Health:
+		HP: 100
+	HitShape:
+	Immobile:
+		OccupiesSpace: false
+	# Infantry, so xenos and corpsmen go for him by themselves (their AutoTarget looks for Infantry); Downed, so corpsmen pick him first.
+	Targetable:
+		TargetTypes: Ground, Infantry, Heal, Human, Downed
+	ChangesHealth@bleed:
+		Step: -1
+		Delay: 12
+		StartIfBelow: 101
+		DamageCooldown: 0
+		DamageTypes: BleedOut
+	Downed:
+	OwnerLostAction:
+		Action: Kill
+	BodyOrientation:
+		QuantizedFacings: 1
+	StatusLabel@down:
+		Text: DOWN
+		Color: FF6050
+		Line: 1
+	Valued:
+		Cost: 0
+
+# A marine cocooned by the hive (TGMC's psy loop): pays the hive biomass while it hangs there, then a larva bursts out. Marines can
+# destroy it first to deny both.
+cocoon:
+	Interactable:
+	# It occupies no cell, so a footprint check would hide it from the enemy for good.
+	HiddenUnderFog:
+		Type: CenterPosition
+	Tooltip:
+		Name: actor-cocoon.name
+	Health:
+		HP: 150
+	HitShape:
+	Immobile:
+		OccupiesSpace: false
+	Targetable:
+		TargetTypes: Ground, Structure
+	RenderSprites:
+	BodyOrientation:
+	QuantizeFacingsFromSequence:
+		Sequence: idle
+	WithSpriteBody:
+	CashTrickler:
+		Interval: 25
+		Amount: 8
+		ShowTicks: false
+	KillsSelf:
+		Delay: 750
+		DamageTypes: Hatched
+	SpawnActorOnDeath:
+		Actor: larva
+		DeathType: Hatched
+	OwnerLostAction:
+		Action: Kill
+	Valued:
+		Cost: 0

@@ -24,6 +24,9 @@ namespace OpenRA.Mods.TGMC
 		public const string Weather = "tgmc-weather";
 		public const string Night = "tgmc-night";
 		public const string LandingIntro = "tgmc-landingintro";
+		public const string Downed = "tgmc-downed";
+		public const string Objective = "tgmc-objective";
+		public const string LandingDelay = "tgmc-landingdelay";
 
 		/// <summary>A dropdown option's value, or the default when there is no lobby.</summary>
 		public static string Value(World world, string id, string defaultValue)
@@ -47,6 +50,7 @@ namespace OpenRA.Mods.TGMC
 					FloatingText => info.FloatingTextDefault,
 					Night => info.NightDefault,
 					LandingIntro => info.LandingIntroDefault,
+					Downed => info.DownedDefault,
 					_ => defaultValue
 				};
 
@@ -73,6 +77,15 @@ namespace OpenRA.Mods.TGMC.Traits
 
 		[Desc("Marines and SOM arrive by dropship at the start: the Alamo lands, the squad walks out, the ship leaves.")]
 		public readonly bool LandingIntroDefault = true;
+
+		[Desc("Marines fall and bleed out instead of dying at once: a corpsman revives them, a xeno cocoons them (Downable in Downed.cs).")]
+		public readonly bool DownedDefault = true;
+
+		[Desc("How a match is won: \"conquest\" (destroy everything) or \"distress\" (TGMC's disks and nuke, HoldObjective in Objective.cs, as well as conquest).")]
+		public readonly string ObjectiveDefault = "conquest";
+
+		[Desc("Seconds the marines and SOM are held at their landing zone at the start, as TGMC's fog walls keep them out while the hive sets up: 0, 60, 120 or 180.")]
+		public readonly string LandingDelayDefault = "0";
 
 		[Desc("Weather when there is no lobby, and the lobby's default: clear, rain, dust, ash, snow or acidrain.")]
 		public readonly string WeatherDefault = "clear";
@@ -134,6 +147,18 @@ namespace OpenRA.Mods.TGMC.Traits
 			yield return new LobbyBooleanOption(map, Options.TileStep,
 				"checkbox-tgmc-tilestep.label", "checkbox-tgmc-tilestep.description", true, -15, TileStepDefault, false);
 
+			yield return new LobbyOption(map, Options.Objective,
+				"dropdown-tgmc-objective.label", "dropdown-tgmc-objective.description", true, -21,
+				new Dictionary<string, string> { { "conquest", "objective-conquest" }, { "distress", "objective-distress" }, { "crash", "objective-crash" } }, ObjectiveDefault, false);
+
+			yield return new LobbyOption(map, Options.LandingDelay,
+				"dropdown-tgmc-landingdelay.label", "dropdown-tgmc-landingdelay.description", true, -21,
+				new Dictionary<string, string> { { "0", "landingdelay-0" }, { "60", "landingdelay-60" }, { "120", "landingdelay-120" }, { "180", "landingdelay-180" } },
+				LandingDelayDefault, false);
+
+			yield return new LobbyBooleanOption(map, Options.Downed,
+				"checkbox-tgmc-downed.label", "checkbox-tgmc-downed.description", true, -13, DownedDefault, false);
+
 			yield return new LobbyBooleanOption(map, Options.Formation,
 				"checkbox-tgmc-formation.label", "checkbox-tgmc-formation.description", true, -14, FormationDefault, false);
 		}
@@ -164,6 +189,88 @@ namespace OpenRA.Mods.TGMC.Traits
 				this.self.GrantCondition(info.SnowCondition);
 			else if (weather == "acidrain")
 				this.self.GrantCondition(info.AcidRainCondition);
+		}
+	}
+
+	[Desc("TGMC's landing delay (the lobby's Landing Delay): until it runs out, a unit of Factions that strays more than Radius cells from its " +
+		"owner's start is turned back. The hive gets the first minutes to set up.")]
+	public class LandingLeashInfo : TraitInfo
+	{
+		public readonly HashSet<string> Factions = ["marines", "som"];
+		public readonly int Radius = 16;
+
+		[Desc("Ticks between looks.")]
+		public readonly int Interval = 25;
+
+		public override object Create(ActorInitializer init) { return new LandingLeash(this); }
+	}
+
+	public class LandingLeash : ITick, INotifyCreated
+	{
+		readonly LandingLeashInfo info;
+		int until;
+		bool told;
+
+		public LandingLeash(LandingLeashInfo info) { this.info = info; }
+
+		void INotifyCreated.Created(Actor self)
+		{
+			var options = self.World.Map.Rules.Actors[SystemActors.World].TraitInfoOrDefault<TgmcOptionsInfo>();
+			var seconds = int.TryParse(Options.Value(self.World, Options.LandingDelay, options?.LandingDelayDefault ?? "0"), out var v) ? v : 0;
+			until = info.Factions.Contains(self.Owner.Faction.InternalName) ? seconds * 25 : 0;
+		}
+
+		void ITick.Tick(Actor self)
+		{
+			if (until == 0 || self.World.WorldTick >= until || (self.World.WorldTick + self.ActorID) % info.Interval != 0)
+				return;
+
+			var move = self.TraitOrDefault<IMove>();
+			if (move == null)
+				return;
+
+			var home = self.Owner.HomeLocation;
+			if ((self.Location - home).LengthSquared <= info.Radius * info.Radius)
+				return;
+
+			// Back toward the start, to the edge of the zone.
+			var d = self.Location - home;
+			var len = System.Math.Max(1, (int)System.Math.Sqrt(d.LengthSquared));
+			var back = home + new CVec(d.X * (info.Radius - 2) / len, d.Y * (info.Radius - 2) / len);
+			self.CancelActivity();
+			self.QueueActivity(move.MoveTo(self.World.Map.Clamp(back), 2));
+
+			// Once per unit, so a whole squad turned back says it once each and not every second.
+			if (!told)
+				TextNotificationsManager.AddTransientLine(self.Owner, "notification-landing-zone");
+
+			told = true;
+		}
+	}
+
+	[Desc("Grants Condition to this actor when the lobby's weather is one of Weathers: a snowstorm, sandstorm or ash fall cuts how far units see.")]
+	public class GrantConditionOnWeatherInfo : TraitInfo
+	{
+		[FieldLoader.Require]
+		[GrantedConditionReference]
+		public readonly string Condition = null;
+
+		public readonly HashSet<string> Weathers = [];
+
+		public override object Create(ActorInitializer init) { return new GrantConditionOnWeather(this); }
+	}
+
+	public class GrantConditionOnWeather : INotifyCreated
+	{
+		readonly GrantConditionOnWeatherInfo info;
+
+		public GrantConditionOnWeather(GrantConditionOnWeatherInfo info) { this.info = info; }
+
+		void INotifyCreated.Created(Actor self)
+		{
+			var options = self.World.Map.Rules.Actors[SystemActors.World].TraitInfoOrDefault<TgmcOptionsInfo>();
+			if (info.Weathers.Contains(Options.Value(self.World, Options.Weather, options?.WeatherDefault ?? "clear")))
+				self.GrantCondition(info.Condition);
 		}
 	}
 }

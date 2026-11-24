@@ -65,7 +65,8 @@ namespace OpenRA.Mods.TGMC.Traits
 
 		void INotifyKilled.Killed(Actor self, AttackInfo e)
 		{
-			if (IsTraitDisabled)
+			// A downed marine's body is drawn by the Downed actor that takes his place.
+			if (IsTraitDisabled || self.TraitsImplementing<Downable>().Any(d => d.Downs(self, e)))
 				return;
 
 			string sequence;

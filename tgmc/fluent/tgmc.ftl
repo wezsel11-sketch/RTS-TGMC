@@ -368,6 +368,27 @@ actor-behemoth =
 actor-facehugger =
     .name = Facehugger
     .description = Hunts marines. Latches on and plants an embryo; the marine bursts into a larva after about 30 seconds unless a medic heals them first. Costs 40 requisition.
+actor-geothermal-field =
+    .name = Broken Geothermal Generator
+
+actor-geothermal =
+    .name = Geothermal Generator
+
+actor-corrupted-geothermal =
+    .name = Corrupted Geothermal Generator
+
+actor-disk-terminal =
+    .name = Nuke Disk Terminal
+
+actor-nuke =
+    .name = Nuclear Device
+
+actor-downed =
+    .name = Downed Marine
+
+actor-cocoon =
+    .name = Cocoon
+
 actor-larva =
     .name = Xeno Larva
 notification-evolve-cash = Not enough requisition to evolve.
@@ -397,6 +418,31 @@ checkbox-tgmc-floatingtext =
 checkbox-tgmc-formation =
     .label = Formation Movement
     .description = A group sent to one spot keeps its shape and walks at the speed of its slowest member.
+dropdown-tgmc-objective =
+    .label = Objective
+    .description = Conquest: destroy everything. Distress Signal: marines decode three disk terminals and arm the nuke; the hive must stop them. Crash: the same, but the nuke must go off within 25 minutes or the hive wins.
+objective-conquest = Conquest
+objective-distress = Distress Signal
+objective-crash = Crash
+notification-crash-5min = Five minutes until the hive overruns the crash site.
+notification-crash-1min = One minute left to detonate the nuke!
+notification-crash-lost = Time is up: the hive has overrun the colony.
+notification-disk-decoded = A nuke disk has been decoded.
+notification-nuke-armed = The nuclear device is armed!
+notification-nuke-detonated = The nuclear device has detonated.
+
+dropdown-tgmc-landingdelay =
+    .label = Landing Delay
+    .description = Marines and SOM must stay at their landing zone this long while the hive sets up, as behind TGMC's fog walls.
+landingdelay-0 = None
+landingdelay-60 = 1 minute
+landingdelay-120 = 2 minutes
+landingdelay-180 = 3 minutes
+notification-landing-zone = The area outside the landing zone is not secure yet.
+
+checkbox-tgmc-downed =
+    .label = Downed Marines
+    .description = A marine at zero health falls and bleeds out. A corpsman can revive him; a xeno cocoons him for biomass and a larva.
 checkbox-tgmc-tilestep =
     .label = Tile-by-Tile Movement
     .description = A move order walks one cell toward where you click, like stepping in SS13.

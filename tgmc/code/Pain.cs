@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using OpenRA.Mods.Common.Traits;
@@ -36,7 +37,8 @@ namespace OpenRA.Mods.TGMC.Traits
 		void INotifyDamage.Damaged(Actor self, AttackInfo e)
 		{
 			// Sound only: nothing here touches the synced game state, so the local random is safe.
-			if (e.Damage.Value <= 0 || self.IsDead || self.World.WorldTick < next)
+			// A cry under fog would give the unit away, and would spend the cooldown on nobody.
+			if (e.Damage.Value <= 0 || self.IsDead || self.World.WorldTick < next || self.World.FogObscures(self))
 				return;
 
 			var phrase = info.PainVoice;
@@ -67,7 +69,8 @@ namespace OpenRA.Mods.TGMC.Traits
 	public class TgmcVoiced : Voiced, IVoiced
 	{
 		// Sound only, never read by the game state. One value for the client: the last throttled shout, as a world and its tick.
-		static World lastWorld;
+		// Weak, so a finished game's world is not kept alive by the last shout in it.
+		static WeakReference<World> lastWorld;
 		static int lastTick;
 		readonly TgmcVoicedInfo info;
 
@@ -82,10 +85,10 @@ namespace OpenRA.Mods.TGMC.Traits
 			if (info.Throttled.Contains(phrase))
 			{
 				// Refused quietly: the caller treats it as played, so no other unit of the group shouts in its place.
-				if (lastWorld == self.World && self.World.WorldTick - lastTick < info.ThrottleTicks)
+				if (lastWorld != null && lastWorld.TryGetTarget(out var w) && w == self.World && self.World.WorldTick - lastTick < info.ThrottleTicks)
 					return true;
 
-				lastWorld = self.World;
+				lastWorld = new WeakReference<World>(self.World);
 				lastTick = self.World.WorldTick;
 			}
 

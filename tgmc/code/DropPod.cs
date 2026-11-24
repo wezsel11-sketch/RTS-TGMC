@@ -31,6 +31,8 @@ namespace OpenRA.Mods.TGMC.Traits
 		[Desc("A pod called within BeaconRange cells of one of the owner's actors of this type also brings BeaconActors (the SOM's teleporter beacon).")]
 		public readonly string Beacon = null;
 		public readonly int BeaconRange = 6;
+
+		[ActorReference]
 		public readonly string[] BeaconActors = [];
 
 		[Desc("Cells around the landing spot they step out onto.")]
@@ -64,6 +66,16 @@ namespace OpenRA.Mods.TGMC.Traits
 
 		public readonly string[] FallSounds = [];
 		public readonly string[] LandSounds = [];
+
+		public override void RulesetLoaded(Ruleset rules, ActorInfo ai)
+		{
+			base.RulesetLoaded(rules, ai);
+
+			// Stock lint reads only string values of a dictionary, so the faction loads are checked here.
+			foreach (var name in FactionActors.Values.SelectMany(n => n))
+				if (!rules.Actors.ContainsKey(name.ToLowerInvariant()))
+					throw new YamlException($"DropPodPower on {ai.Name}: FactionActors names unknown actor '{name}'.");
+		}
 
 		public override object Create(ActorInitializer init) { return new DropPodPower(init.Self, this); }
 	}

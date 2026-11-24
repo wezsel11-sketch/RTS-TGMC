@@ -180,7 +180,7 @@ namespace OpenRA.Mods.TGMC.Traits
 			cryCountdown = info.CryInterval;
 			token = self.GrantCondition(info.Condition);
 			Fx.Sound(self.World, self.CenterPosition, info.InfectSounds);
-			if (self.HasVoice("Hugged"))
+			if (self.HasVoice("Hugged") && !self.World.FogObscures(self))
 				self.PlayVoiceLocal("Hugged", 1f);
 
 			// Tell the host's side, so a facehugged marine is not missed in the middle of a fight.

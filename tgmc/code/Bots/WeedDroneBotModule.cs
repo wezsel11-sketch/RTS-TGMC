@@ -60,7 +60,7 @@ namespace OpenRA.Mods.TGMC.Traits
 				return;
 
 			countdown = Info.Interval;
-			var drones = world.Actors.Where(a => a.Owner == player && a.IsInWorld && !a.IsDead && a.IsIdle && Info.Drones.Contains(a.Info.Name)).ToList();
+			var drones = world.Actors.Where(a => a.Owner == player && a.IsInWorld && !a.IsDead && a.IsIdle && Info.Drones.Contains(a.Info.Name) && !BotUnits.Claimed(a)).ToList();
 			if (Info.Spare > 0 && world.Actors.Any(a => a.Info.Name == Info.SpareField && a.IsInWorld && !a.IsDead && a.Owner.NonCombatant))
 				drones = drones.Skip(Info.Spare).ToList();
 

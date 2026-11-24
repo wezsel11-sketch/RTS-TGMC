@@ -38,6 +38,13 @@ namespace OpenRA.Mods.TGMC.Traits
 			return formationMove != null && owner.CurrentActivity == formationMove ? formationSpeed : 100;
 		}
 
+		// Speed with every modifier on the unit (sticky resin, gas, upgrades), but not the formation's own cap.
+		public int CurrentSpeed(Actor self)
+		{
+			return OpenRA.Mods.Common.Util.ApplyPercentageModifiers(Info.Speed,
+				self.TraitsImplementing<ISpeedModifier>().Where(m => m != this).Select(m => m.GetSpeedModifier()));
+		}
+
 		public void JoinFormation(int percent, OpenRA.Activities.Activity move)
 		{
 			formationSpeed = percent;
@@ -140,7 +147,9 @@ namespace OpenRA.Mods.TGMC.Traits
 
 				var cx = members.Sum(m => m.Actor.Location.X) / members.Count;
 				var cy = members.Sum(m => m.Actor.Location.Y) / members.Count;
-				var slowest = members.Min(m => m.Mobile.Info.Speed);
+				// shortcut: pace is taken at the order; a member that leaves resin mid-walk keeps the old pace until its next order
+				// A stunned member (speed 0) does not hold the whole group still.
+				var slowest = members.Select(m => m.Mobile.CurrentSpeed(m.Actor)).Where(v => v > 0).DefaultIfEmpty(0).Min();
 				var taken = new HashSet<CPos>();
 				foreach (var (actor, mobile, cell, _) in members)
 				{
@@ -158,8 +167,9 @@ namespace OpenRA.Mods.TGMC.Traits
 					var move = new Move(actor, spot, WDist.Zero, null, true, mobile.Info.TargetLineColor);
 					actor.CancelActivity();
 					actor.QueueActivity(move);
-					if (mobile.Info.Speed > 0)
-						mobile.JoinFormation(slowest * 100 / mobile.Info.Speed, move);
+					var speed = mobile.CurrentSpeed(actor);
+					if (speed > 0 && slowest > 0)
+						mobile.JoinFormation(slowest * 100 / speed, move);
 				}
 			}
 		}

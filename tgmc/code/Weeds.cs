@@ -256,7 +256,7 @@ namespace OpenRA.Mods.TGMC.Traits
 	}
 	[Desc("Grants a condition while a weed (an actor named in Weeds, owned by an ally) lies on this actor's cell or beside it. " +
 		"A corrupted miner on weeds pays more, so marines starve it by burning the weeds off.")]
-	public class OnWeedsConditionInfo : TraitInfo
+	public class OnWeedsConditionInfo : TraitInfo, IRulesetLoaded
 	{
 		[GrantedConditionReference]
 		public readonly string Condition = "on-weeds";
@@ -275,6 +275,13 @@ namespace OpenRA.Mods.TGMC.Traits
 
 		[Desc("Only weeds that are targetable as this type count (weeds are StickyWeeds once their owner has the sticky upgrade). Empty for any.")]
 		public readonly string RequiredTargetType = null;
+
+		void IRulesetLoaded<ActorInfo>.RulesetLoaded(Ruleset rules, ActorInfo ai)
+		{
+			// The look runs on ActorID % Interval.
+			if (Interval < 1)
+				throw new YamlException($"OnWeedsCondition on {ai.Name}: Interval must be at least 1.");
+		}
 
 		public override object Create(ActorInitializer init) { return new OnWeedsCondition(this); }
 	}

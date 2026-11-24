@@ -1,5 +1,6 @@
 -- Scenario test: formation movement. A runner (fast) and a crusher (slow), two cells apart, are ordered to the same far cell on the
 -- same tick: they arrive within two seconds of each other and still two cells apart (the runner alone would be there long before).
+-- The crusher is stuck in sticky resin (half speed), so the pace must count speed modifiers, not only the base speed.
 -- Prints "TEST formation PASS" or "TEST formation FAIL".
 WorldLoaded = function()
 	local xenos = Player.GetPlayer("Xenos")
@@ -8,6 +9,7 @@ WorldLoaded = function()
 	local goal = CPos.New(34, 11)
 	local arrived = {}
 	Trigger.AfterDelay(10, function()
+		crusher.GrantCondition("stuck", 3000)
 		runner.OrderMove(goal)
 		crusher.OrderMove(goal)
 	end)

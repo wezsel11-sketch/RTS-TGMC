@@ -5,6 +5,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using OpenRA.GameRules;
 using OpenRA.Mods.Common.Warheads;
 using OpenRA.Primitives;
@@ -47,6 +48,9 @@ namespace OpenRA.Mods.TGMC.Traits
 
 		// Damaged cells -> how far gone (1 to DamageSteps), as update_overlays in TGMC's walls.dm.
 		readonly Dictionary<CPos, int> damaged = [];
+
+		// Render only: the steps the render player last saw, so the overlay does not show live damage through fog.
+		readonly Dictionary<CPos, int> seen = [];
 		OpenRA.Graphics.Sprite damageSprite;
 
 		public DestructibleWalls(Actor self, DestructibleWallsInfo info) { this.info = info; }
@@ -86,16 +90,33 @@ namespace OpenRA.Mods.TGMC.Traits
 				world.Map.Rules.Weapons[info.BreakWeapon.ToLowerInvariant()].Impact(Target.FromPos(world.Map.CenterOfCell(cell)), world.WorldActor);
 		}
 
-		// Drawn before the shroud, so an unexplored wall shows nothing.
+		// Drawn before the shroud, so an unexplored wall shows nothing; a fogged cell shows the last step the render player saw.
 		void IRenderAboveWorld.RenderAboveWorld(Actor self, OpenRA.Graphics.WorldRenderer wr)
 		{
-			if (damageSprite == null || damaged.Count == 0)
+			if (damageSprite == null || (damaged.Count == 0 && seen.Count == 0))
 				return;
+
+			var shown = damaged;
+			if (self.World.RenderPlayer != null)
+			{
+				foreach (var cell in damaged.Keys.Union(seen.Keys).ToList())
+				{
+					if (self.World.FogObscures(cell))
+						continue;
+
+					if (damaged.TryGetValue(cell, out var now))
+						seen[cell] = now;
+					else
+						seen.Remove(cell);
+				}
+
+				shown = seen;
+			}
 
 			var palette = wr.Palette(info.DamagePalette);
 			var tl = wr.Viewport.TopLeft;
 			var br = wr.Viewport.BottomRight;
-			foreach (var (cell, step) in damaged)
+			foreach (var (cell, step) in shown)
 			{
 				var pos = self.World.Map.CenterOfCell(cell);
 				var px = wr.ScreenPxPosition(pos);

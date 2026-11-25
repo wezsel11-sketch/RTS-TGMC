@@ -123,6 +123,8 @@ Player:
 	FieldWorkerBotModule@marines:
 		RequiresCondition: enable-skirmish-ai && !faction-xenos
 		Workers: engineer, som_engineer
+		# Four, as many as the xeno bot has drones. Balance round 1 (2026-11-25, 42 aimap maps): marines won 13 to 23 with two, 17 to 20 with four.
+		Wanted: 4
 	# Xeno bot: drones claim fields too (they corrupt them), and the weed module keeps two of them for it.
 	FieldWorkerBotModule@xenos:
 		RequiresCondition: enable-skirmish-ai && faction-xenos

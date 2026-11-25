@@ -5,6 +5,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using OpenRA.Mods.Common.Activities;
 using OpenRA.Mods.Common.Traits;
 using OpenRA.Mods.Common.Traits.Render;
 using OpenRA.Traits;
@@ -70,6 +71,9 @@ namespace OpenRA.Mods.TGMC.Traits
 		int quiet;
 		int pry;
 		string prefix;
+
+		// Where each prying unit near the closed door was headed. Its move ends at the shut door; the open door sends it on.
+		readonly Dictionary<Actor, (CPos Cell, bool Attack)> headed = [];
 
 		public MapDoor(Actor self, MapDoorInfo info)
 		{
@@ -141,7 +145,46 @@ namespace OpenRA.Mods.TGMC.Traits
 				// From now on the open body shows the open model, whatever the closed body does (damage states and the like reset it).
 				if (openToken == Actor.InvalidConditionToken)
 					openToken = self.GrantCondition(info.OpenCondition);
+
+				SendOn(self);
 			});
+		}
+
+		void Remember(Actor self)
+		{
+			var around = self.World.FindActorsInCircle(self.CenterPosition, info.Radius + WDist.FromCells(3))
+				.Where(a => a != self && !a.IsDead && a.IsInWorld && a.Info.HasTraitInfo<MobileInfo>() && Friend(self, a) && Pries(a)).ToList();
+			foreach (var a in headed.Keys.Where(a => !around.Contains(a)).ToList())
+				headed.Remove(a);
+
+			foreach (var a in around)
+			{
+				// An idle unit keeps what it was told: its move has ended here.
+				if (a.IsIdle)
+					continue;
+
+				// Only a move to the ground counts, not an attack on something. A move in its last step has no path left: kept as it was.
+				var dest = a.CurrentActivity.GetTargets(a).LastOrDefault();
+				if (dest.Type == TargetType.Terrain)
+					headed[a] = (self.World.Map.CellContaining(dest.CenterPosition), a.CurrentActivity is AttackMoveActivity);
+				else if (dest.Type != TargetType.Invalid)
+					headed.Remove(a);
+			}
+		}
+
+		void SendOn(Actor self)
+		{
+			foreach (var (a, (cell, attack)) in headed)
+			{
+				if (a.IsDead || !a.IsInWorld || !a.IsIdle || a.Location == cell
+					|| (a.CenterPosition - self.CenterPosition).HorizontalLengthSquared > info.Radius.LengthSquared)
+					continue;
+
+				var move = a.Trait<IMove>();
+				a.QueueActivity(attack ? new AttackMoveActivity(a, () => move.MoveTo(cell, 1)) : move.MoveTo(cell, 1));
+			}
+
+			headed.Clear();
 		}
 
 		void ITick.Tick(Actor self)
@@ -167,6 +210,9 @@ namespace OpenRA.Mods.TGMC.Traits
 			if (phase == Phase.Closed)
 			{
 				Turn(self);
+				if (info.PryTicks > 0)
+					Remember(self);
+
 				var near = self.World.FindActorsInCircle(self.CenterPosition, info.Radius)
 					.Where(a => a != self && !a.IsDead && a.IsInWorld && a.Info.HasTraitInfo<MobileInfo>() && Friend(self, a)).ToList();
 				if (near.Count == 0)

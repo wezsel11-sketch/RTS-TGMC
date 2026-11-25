@@ -205,6 +205,26 @@ def quarry_pit_ground(x, y):
     return (DIRT, 0) if y in (23, 24) and 6 <= x <= 58 else (GRASS, 0)
 
 
+def colony_blackout_ground(x, y):
+    """64x48. A colony in the snow: four rows of rock blocks (the buildings) with streets between them, a main road east to west
+    through the middle, open ground round each base."""
+    if 14 <= x <= 49:
+        for bx in (16, 24, 32, 40):
+            for by0, by1 in ((6, 11), (15, 20), (27, 32), (36, 41)):
+                if bx <= x <= bx + 4 and by0 <= y <= by1:
+                    return ROCK, 0
+    return (DIRT, 0) if y in (23, 24) or x in (14, 22, 30, 38, 46) and 4 <= y <= 43 else (GRASS, 0)
+
+
+def delta_marsh_ground(x, y):
+    """64x48. A river delta: three channels wind from north to south, crossed only at their fords, so each crossing is a fight."""
+    import math
+    for c, fords in ((20, (8, 24, 40)), (32, (16, 32)), (44, (8, 24, 40))):
+        if abs(x - c - 2 * math.sin(y / 5 + c)) < 1.3:
+            return (FORD, 0) if any(abs(y - f) <= 1 for f in fords) else (WATER, 0)
+    return GRASS, 0
+
+
 def broken_bridge_ground(x, y):
     """64x48. A rift cuts the map from the north-west to the south-east: water, rock lips on both sides, and three bridges. Each base can also flank
     round the ends of the rift, a long way."""
@@ -1094,6 +1114,14 @@ SKIRMISH_MAPS = {
     "quarry-pit": dict(walls=[(24, 19, 25, 19), (39, 19, 40, 19), (24, 29, 25, 29), (39, 29, 40, 29)], fences=[(30, 15, 34, 15), (30, 33, 34, 33)],
         title="Quarry Pit", size=(64, 48), spawns=[(6, 24), (57, 23)], ground=quarry_pit_ground, theme="desert", weather="dust",
                        fields=[(12, 34), (51, 34), (32, 21), (12, 14), (51, 14)], brief="A rock ring round a pit with an ore field in it: hold the pit, see all four roads."),
+    "colony-blackout": dict(walls=[], fences=[],
+        title="Colony Blackout", size=(64, 48), spawns=[(6, 24), (57, 23)], ground=colony_blackout_ground, theme="snow", weather="snow", night=True,
+                            fields=[(12, 10), (12, 38), (51, 10), (51, 38), (32, 24)],
+                            brief="A dark colony in a snowstorm: city blocks, narrow streets and one main road. Light is what you hold."),
+    "delta-marsh": dict(walls=[], fences=[],
+        title="Delta Marsh", size=(64, 48), spawns=[(6, 24), (57, 23)], ground=delta_marsh_ground, theme="jungle", weather="rain",
+                        fields=[(12, 12), (12, 36), (51, 12), (51, 36), (26, 24), (38, 24)],
+                        brief="Three river channels, crossed only at their fords. Every crossing is a fight."),
     "broken-bridge": dict(walls=[(22, 10, 22, 13), (41, 36, 42, 38)], fences=[(37, 17, 39, 17)],
         title="Broken Bridge", size=(64, 48), spawns=[(6, 24), (57, 23)], ground=broken_bridge_ground, theme="lava", weather="ash",
                           fields=[(12, 34), (51, 34), (30, 30), (38, 18), (12, 14), (51, 14)], brief="A rift of lava with three bridges, or the long way round its ends."),
@@ -2224,6 +2252,23 @@ SCENARIOS = {
         ("nuke", "Neutral", 30, 12, 0), ("rifleman", "Marines", 7, 4, 0), ("rifleman", "Marines", 7, 20, 0), ("rifleman", "Marines", 21, 4, 0),
         ("rifleman", "Marines", 31, 12, 0), ("resin-silo", "Xenos", 36, 21, 0), ("runner", "Xenos", 37, 21, 0),
     ]},
+    # ObjectiveBotModule: the marine bot decodes the three terminals and arms the nuke (see scenarios/test-ai-distress.lua).
+    "scenario-ai-distress": {"scripts": ("test-ai-distress",), "marine_bot": "hard", "drop_conquest": True, "size": (64, 40),
+        "extra_rules": "World:\n\tTgmcOptions:\n\t\tObjectiveDefault: distress\nPlayer:\n\t-ScoutBotModule@marines:\n\t-FieldBotModule@sweep:\n\t-RaidBotModule@marines:\nresin-silo:\n\tHealth:\n\t\tHP: 100000000\n", "actors": [
+        ("cryo-pod", "Marines", 4, 20, 0), ("rifleman", "Marines", 6, 19, 0), ("rifleman", "Marines", 6, 21, 0), ("rifleman", "Marines", 7, 19, 0), ("rifleman", "Marines", 7, 21, 0),
+        ("rifleman", "Marines", 8, 19, 0), ("rifleman", "Marines", 8, 21, 0), ("rifleman", "Marines", 9, 19, 0), ("rifleman", "Marines", 9, 21, 0),
+        ("disk-terminal", "Neutral", 20, 8, 0), ("disk-terminal", "Neutral", 20, 32, 0), ("disk-terminal", "Neutral", 34, 20, 0),
+        ("rifleman", "Marines", 5, 17, 0), ("rifleman", "Marines", 6, 17, 0), ("rifleman", "Marines", 7, 17, 0), ("rifleman", "Marines", 8, 17, 0),
+        ("rifleman", "Marines", 5, 23, 0), ("rifleman", "Marines", 6, 23, 0), ("rifleman", "Marines", 7, 23, 0), ("rifleman", "Marines", 8, 23, 0),
+        ("nuke", "Neutral", 48, 20, 0), ("resin-silo", "Xenos", 60, 4, 0),
+    ]},
+    # ObjectiveBotModule, contesting side: the xeno group goes for the terminal a marine stands at (see scenarios/test-ai-distress-contest.lua).
+    "scenario-ai-distress-contest": {"scripts": ("test-ai-distress-contest",), "xeno_bot": "easy", "drop_conquest": True, "size": (64, 40),
+        "extra_rules": "World:\n\tTgmcOptions:\n\t\tObjectiveDefault: distress\nPlayer:\n\t-ScoutBotModule@xenos:\n\t-FieldBotModule@xenos:\n\t-RaidBotModule@xenos:\n", "actors": [
+        ("cryo-pod", "Marines", 4, 4, 0), ("rifleman", "Marines", 21, 20, 0), ("disk-terminal", "Neutral", 20, 20, 0),
+        ("resin-silo", "Xenos", 58, 20, 0), ("runner", "Xenos", 54, 19, 0), ("runner", "Xenos", 54, 21, 0), ("runner", "Xenos", 55, 19, 0),
+        ("runner", "Xenos", 55, 21, 0), ("runner", "Xenos", 56, 19, 0), ("runner", "Xenos", 56, 21, 0),
+    ]},
     # Colony doors: a runner has to pry one open (see scenarios/test-door-pry.lua), timed against the same door with the pry off.
     **{f"scenario-door-pry-{m}": {"scripts": (f"mode-door-pry-{m}", "test-door-pry"), "drop_conquest": True, "size": (32, 24), "ground": "doorline",
                                   "extra_rules": "" if m == "on" else "^MapDoor:\n\tMapDoor:\n\t\tPryTicks: 0\n", "actors": [
@@ -2243,6 +2288,11 @@ SCENARIOS = {
     "scenario-crash": {"scripts": ("test-crash",), "drop_conquest": True, "size": (40, 24),
                        "extra_rules": "World:\n\tTgmcOptions:\n\t\tObjectiveDefault: crash\n\tCrashTimer:\n\t\tTimeLimit: 600\n", "actors": [
         ("rifleman", "Marines", 6, 12, 0), ("rifleman", "Marines", 8, 12, 0), ("nuke", "Neutral", 30, 12, 0), ("resin-silo", "Xenos", 36, 20, 0),
+    ]},
+    # Carapace I and Sharper Claws measured hit by hit (see scenarios/test-xeno-stats.lua). Both sides get enough health to last.
+    "scenario-xeno-stats": {"scripts": ("test-xeno-stats",), "drop_conquest": True, "size": (24, 16),
+                            "extra_rules": "runner:\n\tHealth:\n\t\tHP: 50000\nrifleman:\n\tHealth:\n\t\tHP: 50000\n", "actors": [
+        ("rifleman", "Marines", 8, 8, 256), ("runner", "Xenos", 12, 8, 768), ("resin-silo", "Xenos", 20, 12, 0), ("cryo-pod", "Marines", 3, 3, 0),
     ]},
     # Crash sweep (Not a test, run by mod/shots.sh): every unit and structure of the rules stands on one map, owned by the player, and
     # ScreenshotAt's Sweep selects each in turn with the HUD drawn. The actors are filled in by sweep_actors() below.
@@ -2556,16 +2606,20 @@ def distress_objective(reach, nukes, towers, bases, taken):
     and off the cells other map actors (ore fields, props) already use."""
     def dist(a, b):
         return abs(a[0] - b[0]) + abs(a[1] - b[1])
-    ok = [c for c in sorted(reach) if c not in taken and all(max(abs(c[0] - b[0]), abs(c[1] - b[1])) >= 8 for b in bases)]
+    # Open ground only: the cell and the two rings round it walkable, so a point never sits against the map edge or in a doorway.
+    ok = [c for c in sorted(reach) if c not in taken and all(max(abs(c[0] - b[0]), abs(c[1] - b[1])) >= 8 for b in bases)
+          and all((c[0] + dx, c[1] + dy) in reach for dx in range(-2, 3) for dy in range(-2, 3))]
     if not ok:
         return []
     near = lambda p: min(ok, key=lambda c: dist(c, p))  # noqa: E731
     mid = ((bases[0][0] + bases[1][0]) // 2, (bases[0][1] + bases[1][1]) // 2)
     nuke = near(nukes[0] if nukes else mid)
-    # Too few tower spots: every fourth reachable cell stands in for the rest.
-    spots = sorted({near(t) for t in towers}) or ok[::4]
+    # Too few tower spots: contested ground stands in, the cells about as far from the first two bases (within a quarter).
+    span = max(1, dist(bases[0], bases[1]))
+    contested = [c for c in ok if abs(dist(c, bases[0]) - dist(c, bases[1])) * 4 <= span][::3] or ok[::4]
+    spots = sorted({near(t) for t in towers})
     if len(spots) < 3:
-        spots += ok[::4]
+        spots += contested
     picked = []
     for _ in range(3):
         free = [c for c in spots if c != nuke and c not in picked]

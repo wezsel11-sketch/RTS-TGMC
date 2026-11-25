@@ -455,6 +455,8 @@
 	# a xeno's killing blow cocoons him. Gibbed, melted, gassed or burnt he dies outright.
 	Downable:
 		DeathTypes: ExplosionDeath, AcidDeath, GasDeath, FlameDeath
+		# A host carrying an embryo dies outright, so the larva is not lost with the body.
+		RequiresCondition: !infected
 	# A marine that is down does not walk.
 	TgmcMobile:
 		PauseOnCondition: hugged || stunned

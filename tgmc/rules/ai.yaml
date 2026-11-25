@@ -740,37 +740,15 @@ Player:
 		EnemyOnly: true
 		Order: AttackMove
 		MinTick: 3000
-	# Distress Signal (the lobby's Objective): idle marines walk to the disk terminals not yet decoded and hold them; with three
-	# decoded they go and hold the nuke. Xenos send idle fighters to the terminals and to a nuke the marines have armed.
-	FieldBotModule@marines-disks:
+	# Distress Signal (the lobby's Objective): a group of its own, taken before the squads get them, holds the objective (see
+	# ObjectiveBotModule in tgmc/code/Bots/). Marines decode the terminals, then arm and hold the nuke; xenos contest them.
+	ObjectiveBotModule@marines:
 		RequiresCondition: enable-skirmish-ai && !faction-xenos
-		Attackers: rifleman, smartgunner, grenadier, medic, som_trooper, som_veteran, som_scout
-		Target: disk-terminal
-		Order: AttackMove
-		Objective: distress
-		MinTick: 1500
-	FieldBotModule@marines-nuke:
-		RequiresCondition: enable-skirmish-ai && !faction-xenos
-		Attackers: rifleman, smartgunner, grenadier, medic, som_trooper, som_veteran, som_scout
-		Target: nuke
-		Order: AttackMove
-		Objective: distress
-		NeedsOwned: disk-terminal
-		NeedsOwnedCount: 3
-	FieldBotModule@xenos-disks:
+		Units: rifleman, smartgunner, machinegunner, grenadier, flamer, som_trooper, som_veteran, som_scout, som_machinegunner
+	ObjectiveBotModule@xenos:
 		RequiresCondition: enable-skirmish-ai && faction-xenos
-		Attackers: runner, hunter, sentinel, warrior, defender, spitter
-		Target: disk-terminal
-		Order: AttackMove
-		Objective: distress
-		Max: 4
-	FieldBotModule@xenos-nuke:
-		RequiresCondition: enable-skirmish-ai && faction-xenos
-		Attackers: runner, hunter, sentinel, warrior, defender, spitter, ravager, crusher, praetorian
-		Target: nuke
-		EnemyOnly: true
-		Order: AttackMove
-		Objective: distress
+		Units: runner, hunter, sentinel, warrior, defender, spitter, ravager, crusher, praetorian
+		Holds: false
 	# Marine bot: every miner gets sentry turrets beside it (see FieldDefenseBotModule in tgmc/code/Bots/).
 	FieldDefenseBotModule@marines:
 		RequiresCondition: enable-skirmish-ai && !faction-xenos

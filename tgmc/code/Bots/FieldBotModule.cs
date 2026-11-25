@@ -44,13 +44,6 @@ namespace OpenRA.Mods.TGMC.Traits
 		[Desc("Idle attackers sent per look, 0 for all.")]
 		public readonly int Max = 0;
 
-		[Desc("Only while the lobby's Objective is this (\"distress\" for the disk terminals and the nuke); null for always.")]
-		public readonly string Objective = null;
-
-		[Desc("Only once the bot owns NeedsOwnedCount actors of this type (the nuke waits for three decoded terminals).")]
-		public readonly string NeedsOwned = null;
-		public readonly int NeedsOwnedCount = 1;
-
 		public override object Create(ActorInitializer init) { return new FieldBotModule(init.Self, this); }
 	}
 
@@ -73,18 +66,6 @@ namespace OpenRA.Mods.TGMC.Traits
 				return;
 
 			countdown = Info.Interval;
-			if (Info.Objective != null)
-			{
-				var options = world.Map.Rules.Actors[SystemActors.World].TraitInfoOrDefault<TgmcOptionsInfo>();
-				// Crash is the Distress Signal against the clock: the same points, so the same orders.
-				var objective = Options.Value(world, Options.Objective, options?.ObjectiveDefault ?? "conquest");
-				if (objective != Info.Objective && !(Info.Objective == "distress" && objective == "crash"))
-					return;
-			}
-
-			if (Info.NeedsOwned != null && world.Actors.Count(a => a.Owner == player && a.Info.Name == Info.NeedsOwned && !a.IsDead) < Info.NeedsOwnedCount)
-				return;
-
 			var taken = new HashSet<Actor>();
 			// Dormant fields belong to the Neutral player, which is non-combatant. Miners belong to an enemy player.
 			var fields = world.Actors.Where(a => a.Info.Name == Info.Target && a.IsInWorld && !a.IsDead && (Info.EnemyOnly ? player.RelationshipWith(a.Owner) == PlayerRelationship.Enemy : a.Owner.NonCombatant)).ToList();

@@ -28,7 +28,8 @@ namespace OpenRA.Mods.TGMC.Traits
 			return p.TraitsImplementing<MinerGuardBotModule>().Any(m => m.IsGuard(a))
 				|| p.TraitsImplementing<DefendBotModule>().Any(m => m.IsBusy(a))
 				|| p.TraitsImplementing<RaidBotModule>().Any(m => m.IsRaider(a))
-				|| p.TraitsImplementing<ScoutBotModule>().Any(m => m.IsScout(a));
+				|| p.TraitsImplementing<ScoutBotModule>().Any(m => m.IsScout(a))
+				|| p.TraitsImplementing<ObjectiveBotModule>().Any(m => m.IsHolder(a));
 		}
 
 		// A unit handed back to the squad manager walks to the nearest of its owner's base actors, so it idles where the squads gather.

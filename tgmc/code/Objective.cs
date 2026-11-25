@@ -96,14 +96,17 @@ namespace OpenRA.Mods.TGMC.Traits
 				return;
 			}
 
-			// One side in the circle, with no enemy of it there: that side holds. Anything else lets the progress run down.
+			// One team in the circle, with no enemy of it there: the first of its players holds (marines and SOM allied in a team
+			// game hold together). Anything else lets the progress run down.
 			var sides = near.Where(a => info.Factions.Contains(a.Owner.Faction.InternalName) && a.GetEnabledTargetTypes().Overlaps(info.HolderTypes))
 				.Select(a => a.Owner).Distinct().ToList();
-			var side = sides.Count == 1 && !near.Any(a => sides[0].RelationshipWith(a.Owner) == PlayerRelationship.Enemy) ? sides[0] : null;
-			if (side != null && info.Terminals > 0 && self.World.Actors.Count(a => a.Owner == side && a.Info.Name == info.Terminal && !a.IsDead) < info.Terminals)
+			var side = sides.Count > 0 && sides.All(p => p.IsAlliedWith(sides[0]))
+				&& !near.Any(a => sides[0].RelationshipWith(a.Owner) == PlayerRelationship.Enemy) ? sides[0] : null;
+			if (side != null && info.Terminals > 0
+				&& self.World.Actors.Count(a => a.Info.Name == info.Terminal && !a.IsDead && a.Owner.IsAlliedWith(side)) < info.Terminals)
 				side = null;
 
-			if (side == null || (holder != null && side != holder))
+			if (side == null || (holder != null && !side.IsAlliedWith(holder)))
 			{
 				progress = System.Math.Max(0, progress - 2);
 				if (progress == 0)
@@ -112,11 +115,11 @@ namespace OpenRA.Mods.TGMC.Traits
 				return;
 			}
 
-			holder = side;
+			holder ??= side;
 			if (++progress < info.HoldTicks)
 				return;
 
-			self.ChangeOwnerSync(side);
+			self.ChangeOwnerSync(holder);
 			Fx.Sound(self.World, self.CenterPosition, info.DoneSounds);
 			if (info.DoneNotification != null)
 				foreach (var p in self.World.Players.Where(p => p.Playable))

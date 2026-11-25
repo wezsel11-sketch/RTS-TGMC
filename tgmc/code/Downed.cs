@@ -132,6 +132,7 @@ namespace OpenRA.Mods.TGMC.Traits
 				return;
 
 			// Healed to full: he gets up.
+			// shortcut: a new actor stands up, so the marine's veterancy is not kept; carry GainsExperience over if ranks start to matter.
 			done = true;
 			var owner = self.Owner;
 			var cell = self.Location;

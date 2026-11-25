@@ -225,7 +225,8 @@ namespace OpenRA.Mods.TGMC.Traits
 			if (until == 0 || self.World.WorldTick >= until || (self.World.WorldTick + self.ActorID) % info.Interval != 0)
 				return;
 
-			var move = self.TraitOrDefault<IMove>();
+			// Ground units only: the landing intro's dropship and the air support fly in from the map edge.
+			var move = self.TraitOrDefault<Mobile>();
 			if (move == null)
 				return;
 

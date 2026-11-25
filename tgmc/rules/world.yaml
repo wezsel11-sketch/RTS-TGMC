@@ -91,6 +91,17 @@
 		SoundFiles: amb-hive.ogg
 		Delay: 100, 300
 		Interval: 150, 500
+	# The weather is heard as well as seen: wind in a snowstorm, sandstorm or ash fall, TGMC's jungle in the rain.
+	AmbientSound@wind:
+		RequiresCondition: snow || dust || ash
+		SoundFiles: amb-wind.ogg
+		Delay: 50, 150
+		Interval: 300, 800
+	AmbientSound@rain:
+		RequiresCondition: rain || acidrain
+		SoundFiles: amb-jungle.ogg
+		Delay: 50, 150
+		Interval: 300, 800
 	StartGameNotification:
 	ValidateOrder:
 	ObjectivesPanel:

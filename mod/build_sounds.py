@@ -295,6 +295,9 @@ SOUNDS = {
     "amb-hum": ("sound/ambience/ambienthum.ogg", "amb"),
     "amb-generator": ("sound/machines/generator/generator_mid1.ogg", "amb"),
     "amb-hive": ("sound/ambience/ambicave.ogg", "amb"),
+    # Weather ambience, played map-wide while the lobby's weather is on (world.yaml)
+    "amb-wind": ("sound/ambience/windambient.ogg", "amb"),
+    "amb-jungle": ("sound/ambience/jungle_amb1.ogg", "amb"),
     # Music: TGMC's theme tracks, and the stings played when a game is won or lost
     "sting-win-1": ("sound/theme/winning_triumph1.ogg", "music"),
     "sting-win-2": ("sound/theme/winning_triumph2.ogg", "music"),

@@ -1043,7 +1043,7 @@ def built_map(name, m, tiles):
             actors.append(("platinum-vein", "Neutral", x, y, 0))
     # The Distress Signal points, clear of the fields, fences and hand-placed cover; scattered props keep off them below.
     busy = set(m["fields"]) | set(cells(m.get("fences", ()))) | {(x, y) for _, x, y in m.get("cover", ())}
-    objective = distress_objective(reach, (), (), spawns, busy)
+    objective = distress_objective(reach, (), (), spawns, busy, m["fields"])
     actors += objective
     if not tiles:
         return ground, actors
@@ -2269,6 +2269,24 @@ SCENARIOS = {
         ("resin-silo", "Xenos", 58, 20, 0), ("runner", "Xenos", 54, 19, 0), ("runner", "Xenos", 54, 21, 0), ("runner", "Xenos", 55, 19, 0),
         ("runner", "Xenos", 55, 21, 0), ("runner", "Xenos", 56, 19, 0), ("runner", "Xenos", 56, 21, 0),
     ]},
+    # The xeno bot goes for the terminal a marine is decoding, not the one with the most marines idling near it (see
+    # scenarios/test-ai-distress-priority.lua). A slow decode keeps the race open.
+    "scenario-ai-distress-priority": {"scripts": ("test-ai-distress-priority",), "xeno_bot": "easy", "drop_conquest": True, "size": (64, 40),
+        "extra_rules": "World:\n\tTgmcOptions:\n\t\tObjectiveDefault: distress\nPlayer:\n\t-ScoutBotModule@xenos:\n\t-FieldBotModule@xenos:\n\t-RaidBotModule@xenos:\n"
+                       "disk-terminal:\n\tHoldObjective:\n\t\tHoldTicks: 5000\nrifleman:\n\tHealth:\n\t\tHP: 100000\n", "actors": [
+        ("cryo-pod", "Marines", 4, 4, 0), ("disk-terminal", "Neutral", 20, 8, 0), ("rifleman", "Marines", 25, 7, 0), ("rifleman", "Marines", 25, 8, 0),
+        ("rifleman", "Marines", 25, 9, 0), ("disk-terminal", "Neutral", 20, 32, 0), ("rifleman", "Marines", 21, 32, 0),
+        ("resin-silo", "Xenos", 58, 20, 0), ("runner", "Xenos", 54, 19, 0), ("runner", "Xenos", 54, 21, 0), ("runner", "Xenos", 55, 19, 0),
+        ("runner", "Xenos", 55, 21, 0), ("runner", "Xenos", 56, 19, 0), ("runner", "Xenos", 56, 21, 0),
+    ]},
+    # The xeno bot fortifies the undecoded terminals: guards at each, and resin turrets beside them (see scenarios/test-ai-fortify.lua).
+    "scenario-ai-fortify": {"scripts": ("test-ai-fortify",), "xeno_bot": "easy", "drop_conquest": True, "size": (64, 40),
+        "extra_rules": "World:\n\tTgmcOptions:\n\t\tObjectiveDefault: distress\nPlayer:\n\t-ScoutBotModule@xenos:\n\t-FieldBotModule@xenos:\n\t-RaidBotModule@xenos:\n"
+                       "\tPlayerResources:\n\t\tDefaultCash: 5000\n", "actors": [
+        ("cryo-pod", "Marines", 2, 37, 0), ("disk-terminal", "Neutral", 30, 8, 0), ("disk-terminal", "Neutral", 30, 32, 0),
+        ("resin-silo", "Xenos", 50, 20, 0), ("evolution-tower", "Xenos", 54, 20, 0), ("drone", "Xenos", 47, 18, 0), ("drone", "Xenos", 47, 22, 0),
+        ("drone", "Xenos", 48, 18, 0), ("drone", "Xenos", 48, 22, 0),
+    ] + [("runner", "Xenos", 44 + i % 4, 17 + i // 4 * 2, 0) for i in range(12)]},
     # Colony doors: a runner has to pry one open (see scenarios/test-door-pry.lua), timed against the same door with the pry off.
     **{f"scenario-door-pry-{m}": {"scripts": (f"mode-door-pry-{m}", "test-door-pry"), "drop_conquest": True, "size": (32, 24), "ground": "doorline",
                                   "extra_rules": "" if m == "on" else "^MapDoor:\n\tMapDoor:\n\t\tPryTicks: 0\n", "actors": [
@@ -2599,11 +2617,12 @@ def ore_fields(tgmc, spec, kind="/obj/machinery/miner"):
     return sorted(cells)
 
 
-def distress_objective(reach, nukes, towers, bases, taken):
+def distress_objective(reach, nukes, towers, bases, taken, outposts=()):
     """TGMC's Distress Signal points (the lobby's Objective, HoldObjective in tgmc/code/Objective.cs): the nuke where TGMC spawns it
     (else halfway between the first two bases) and three disk terminals at TGMC's sensor tower spots, spread out: each the spot
     furthest from the nuke and the terminals already placed. All on ground the marine base reaches, 8 or more cells from every base
-    and off the cells other map actors (ore fields, props) already use."""
+    and off the cells other map actors (ore fields, props) already use. Also 10 (else 6) or more cells from every outpost (ore fields,
+    generators), where it can be: a player's base grows round the miners he claims, and its buildings walled Big Red's nuke in."""
     def dist(a, b):
         return abs(a[0] - b[0]) + abs(a[1] - b[1])
     # Open ground only: the cell and the two rings round it walkable, so a point never sits against the map edge or in a doorway.
@@ -2611,6 +2630,11 @@ def distress_objective(reach, nukes, towers, bases, taken):
           and all((c[0] + dx, c[1] + dy) in reach for dx in range(-2, 3) for dy in range(-2, 3))]
     if not ok:
         return []
+    for room in (10, 6):  # a small map may have no ground 10 cells clear: 6 then, else as it is
+        clear = [c for c in ok if all(max(abs(c[0] - o[0]), abs(c[1] - o[1])) >= room for o in outposts)]
+        if len(clear) >= 4:
+            ok = clear
+            break
     near = lambda p: min(ok, key=lambda c: dist(c, p))  # noqa: E731
     mid = ((bases[0][0] + bases[1][0]) // 2, (bases[0][1] + bases[1][1]) // 2)
     nuke = near(nukes[0] if nukes else mid)
@@ -2752,7 +2776,8 @@ def write_tgmc_map(folder, title, rows, marines, xenos, art=None, objects=None, 
     gens = [(x, y) for x, y in generators if (x, y) not in busy and any(n in reach_all for n in ((x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1)))
             and not any(abs(x - bx) < 4 and abs(y - by) < 4 for bx, by in [spawn_m, spawn_x] + extra_spawn)]
     extra += [("geothermal-field", "Neutral", x, y, 0) for x, y in gens]
-    extra += distress_objective(reach_all, nukes, towers, [spawn_m, spawn_x] + extra_spawn, {(x, y) for _, _, x, y, _ in extra})
+    extra += distress_objective(reach_all, nukes, towers, [spawn_m, spawn_x] + extra_spawn, {(x, y) for _, _, x, y, _ in extra},
+                                [(x, y) for t, _, x, y, _ in extra if t in ("miner-field", "geothermal-field")])
     original = rows
     def dug_art(x, y):
         """A tunnel cell dug through rock wears the picture of the nearest ordinary ground cell, not the repo's flat dirt tile."""

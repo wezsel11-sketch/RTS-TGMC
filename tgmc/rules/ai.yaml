@@ -751,6 +751,11 @@ Player:
 		RequiresCondition: enable-skirmish-ai && faction-xenos
 		Units: runner, hunter, sentinel, warrior, defender, spitter, ravager, crusher, praetorian
 		Holds: false
+		# The hive fortifies every undecoded terminal: three xenos on guard, a drone for the build area and a resin turret beside it.
+		Guards: 3
+		Builder: drone
+		Defense: resin-turret
+		Queue: XenoBuild
 	# Marine bot: every miner gets sentry turrets beside it (see FieldDefenseBotModule in tgmc/code/Bots/).
 	FieldDefenseBotModule@marines:
 		RequiresCondition: enable-skirmish-ai && !faction-xenos

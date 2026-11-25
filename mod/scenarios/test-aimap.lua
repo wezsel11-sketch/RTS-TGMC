@@ -57,14 +57,19 @@ WorldLoaded = function()
 			xc, xm and math.floor(xm.x) or -1, xm and math.floor(xm.y) or -1, #xenos.GetActorsByTypes(structures), #xenos.GetActorsByTypes(fields), xenos.Cash, #marines.GetActorsByTypes({ "disk-terminal" }), gap, nukeOwner(marines, xenos)))
 		for _, t in ipairs(Map.ActorsInWorld) do
 			if (t.Type == "disk-terminal" or t.Type == "nuke") and not t.IsDead then
-				local near, idle = 0, 0
+				local near, idle, close, foes = 0, 0, 0, 0
 				for _, a in ipairs(Map.ActorsInCircle(t.CenterPosition, WDist.FromCells(6))) do
 					if a.Owner == marines and a.HasProperty("Move") then
 						near = near + 1
 						if a.IsIdle then idle = idle + 1 end
 					end
 				end
-				print(string.format("OBJ tick=%d %s at %d,%d owner=%s marines-in-6=%d idle=%d", ticks, t.Type, t.Location.X, t.Location.Y, t.Owner.InternalName, near, idle))
+				-- The hold circle (HoldObjective Radius, 2 cells): marines that count, and enemies that stop it.
+				for _, a in ipairs(Map.ActorsInCircle(t.CenterPosition, WDist.FromCells(2))) do
+					if a.Owner == marines and a.HasProperty("Move") then close = close + 1 end
+					if a.Owner == xenos and a.HasProperty("Move") then foes = foes + 1 end
+				end
+				print(string.format("OBJ tick=%d %s at %d,%d owner=%s marines-in-6=%d idle=%d in-2=%d xenos-in-2=%d", ticks, t.Type, t.Location.X, t.Location.Y, t.Owner.InternalName, near, idle, close, foes))
 			end
 		end
 		if ticks >= MaxTicks then

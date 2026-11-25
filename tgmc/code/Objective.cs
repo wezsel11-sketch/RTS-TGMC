@@ -62,6 +62,10 @@ namespace OpenRA.Mods.TGMC.Traits
 		int timer = -1;
 
 		public bool Taken { get; private set; }
+
+		// The side decoding or arming the point and how far it has got, for the bots.
+		public Player Holder => holder;
+		public int Progress => progress;
 		public bool Armed => timer >= 0;
 
 		public HoldObjective(Actor self, HoldObjectiveInfo info) { this.info = info; }
